@@ -1,0 +1,61 @@
+/* Owner /home SCAFFOLD — empty slots; no API. Source: dashboard.md §1 */
+.home-page {
+  min-height: 100dvh;
+  width: 100%;
+  box-sizing: border-box;
+  background: #f5f7f6;
+  color: #0f172a;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-page__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 16px 24px;
+  box-sizing: border-box;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.home-page__slot {
+  min-height: 48px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.home-page__slot--header {
+  min-height: 56px;
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+}
+
+.home-page__slot--period {
+  margin: 0 16px;
+  max-width: 960px;
+  width: calc(100% - 32px);
+  align-self: center;
+}
+
+.home-page__slot--kpi {
+  min-height: 120px;
+}
+
+.home-page__slot-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #64748b;
+}

@@ -15,7 +15,8 @@
     "test:states": "node scripts/check-login-states.mjs",
     "test:splash-scaffold": "node scripts/check-splash-scaffold.mjs",
     "test:splash-layout": "node scripts/check-splash-layout.mjs",
-    "test:splash-buttons": "node scripts/check-splash-buttons.mjs"
+    "test:splash-buttons": "node scripts/check-splash-buttons.mjs",
+    "test:home-scaffold": "node scripts/check-home-scaffold.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

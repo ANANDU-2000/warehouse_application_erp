@@ -44,6 +44,15 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 5 WIRE | ⬜ | tokens → refresh → me/businesses → home/login |
 | 7 COMPARE | ⬜ | |
 
+### Dashboard (owner `/home`)
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | empty section slots — [`home_scaffold_compare.md`](modules/home_scaffold_compare.md) |
+| 2 LAYOUT | ⬜ | HexaOp / compact header chrome |
+| 5 WIRE | ⬜ | `reports/home-overview` |
+| 7 COMPARE | ⬜ | |
+
 ### Prompt template (copy per page)
 
 ```

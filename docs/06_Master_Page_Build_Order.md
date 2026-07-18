@@ -12,7 +12,7 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **4 BUTTONS** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 Subagent 1 | Backend in progress — STOP before UI |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 Subagent 2 PASS | DB check done — next UI `/home` after approve |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 me/businesses only | Blocked |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |

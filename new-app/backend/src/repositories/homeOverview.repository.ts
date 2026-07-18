@@ -136,8 +136,12 @@ export class HomeOverviewRepository {
        FROM trade_purchase_lines tpl
        INNER JOIN trade_purchases tp ON tp.[id] = tpl.[trade_purchase_id]
        LEFT JOIN catalog_items ci
-         ON ci.[id] = tpl.[catalog_item_id] AND ci.[deleted_at] IS NULL
-       LEFT JOIN item_categories ic ON ic.[id] = ci.[category_id]
+         ON ci.[id] = tpl.[catalog_item_id]
+         AND ci.[deleted_at] IS NULL
+         AND ci.[business_id] = @businessId
+       LEFT JOIN item_categories ic
+         ON ic.[id] = ci.[category_id]
+         AND ic.[business_id] = @businessId
        WHERE tp.[business_id] = @businessId
          AND tp.[purchase_date] >= @dateFrom
          AND tp.[purchase_date] <= @dateTo

@@ -11,7 +11,7 @@
 
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
-| 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | **COMPARE PASS** — next Splash |
+| 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **1 SCAFFOLD** |
 | 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | ❌ | Blocked |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 me/businesses only | Blocked |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
@@ -30,7 +30,7 @@
 | 17 | Item public/history | 2 | Covered in `products.md`? — **verify** | ❌ | Blocked |
 | 18 | Search | 1 | **verify** | ❌ | Blocked |
 | — | Dead aliases | 4 | ✅ redirects in `05` | — | **Do not build** |
-| — | Root `/` | 1 | Unknown — needs opening | — | Redirect to `/login` for scaffold only |
+| — | Root `/` | 1 | — | — | Redirect → `/splash` (SCAFFOLD) |
 
 ---
 
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI steps: **1–7 COMPARE PASS** (`login_compare.md`) → next Splash → Dashboard blocked until backend.
+Login UI: **COMPARE PASS**. Splash: **1 SCAFFOLD** (current) → 2 LAYOUT → WIRE restore later. Dashboard blocked until backend.
 
 ---
 
@@ -72,7 +72,7 @@ Live local SQL uses the pool wired in [`new-app/backend/src/index.ts`](../new-ap
 
 | Path | Notes |
 |---|---|
-| `/splash` | Later (session restore gate) |
+| `/splash` | **Step 1 SCAFFOLD** |
 | `/login` | **COMPARE PASS** |
 | `/forgot-password` | Stub only (full page later) |
 | `/home` | Post-login stub (Dashboard gated) |
@@ -260,7 +260,7 @@ Primarily via `/catalog/taxonomy`, `/catalog/new-category`, `/catalog/category/:
 
 | Path | Notes |
 |---|---|
-| `/` | Likely auth-gate redirect — scaffold redirects to `/login` |
+| `/` | Redirect → `/splash` (SCAFFOLD entry) |
 | `/get-started` | Not yet opened |
 | `/entries` | Likely legacy |
 | `/analytics` | Not yet opened |

@@ -34,6 +34,15 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 6 STATES | ✅ | network banner + full §12 HTTP error mapping |
 | 7 COMPARE | ✅ | [`login_compare.md`](modules/login_compare.md) — in-scope **PASS**; deferrals listed |
 
+### Splash (landing)
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | `/splash` static shell (`SplashPage`) — no restore |
+| 2 LAYOUT | ⬜ | logo asset + fade |
+| 5 WIRE | ⬜ | tokens → refresh → me/businesses → home/login |
+| 7 COMPARE | ⬜ | |
+
 ### Prompt template (copy per page)
 
 ```

@@ -12,7 +12,8 @@
     "test:fields": "node scripts/check-login-fields.mjs",
     "test:buttons": "node scripts/check-login-buttons.mjs",
     "test:wire": "node scripts/check-login-wire.mjs",
-    "test:states": "node scripts/check-login-states.mjs"
+    "test:states": "node scripts/check-login-states.mjs",
+    "test:splash-scaffold": "node scripts/check-splash-scaffold.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

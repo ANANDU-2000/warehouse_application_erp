@@ -1,0 +1,23 @@
+---
+description: Security rules for migration — secrets, auth, SQL
+alwaysApply: true
+---
+# Security Rules
+
+## Secrets
+
+- Never commit `.env`, tokens, PATs, connection strings, or MCP auth headers.
+- Never print secret values in chat responses.
+- Use `.env.example` with placeholders only.
+
+## Auth and data
+
+- Preserve legacy authz: roles + `permissions_json` + business scoping from `source-app/`.
+- Do not weaken password, JWT, OAuth, or permission checks.
+- Parameterize all SQL; no string-concatenated queries.
+- Do not log PII or tokens.
+
+## Source tree
+
+- Treat `source-app/` as read-only.
+- Treat `source-app/backend/.env` and any MCP tokens as compromised if ever committed — rotate immediately.

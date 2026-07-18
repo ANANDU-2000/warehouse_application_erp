@@ -1,0 +1,23 @@
+---
+description: Windows Server deployment constraints for the migrated ERP
+globs: new-app/**/*
+alwaysApply: false
+---
+# Deployment Rules
+
+Target host: Windows Server 2022 (IIS / Node service / SQL Server as documented).
+
+## Rules
+
+- Deploy only after the active module has a Legacy vs New PASS with no open Unknowns for that scope.
+- Never deploy secrets in git; use environment variables / secret store.
+- Document rollback steps before any production-affecting change.
+- Prefer reversible migrations (up/down or restore script).
+- Do not change production connection strings or firewall rules without explicit user approval.
+
+## Required deployment output
+
+1. What was deployed
+2. Health checks run
+3. Rollback command / steps
+4. Checklist updates in `docs/00_MASTER_CHECKLIST.md`

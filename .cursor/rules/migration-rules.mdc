@@ -1,0 +1,40 @@
+---
+description: Warehouse ERP migration ground rules — always apply
+alwaysApply: true
+---
+# Migration Ground Rules
+
+Source of truth: `source-app/` (Flutter + FastAPI + PostgreSQL). Never edit `source-app/`.
+Target: `new-app/` (React + TypeScript + Node/Express + SQL Server).
+
+## Hard rules
+
+1. Never guess. If something is not in `source-app/` or `docs/`, write `Unknown — needs verification` and stop.
+2. Never simplify or drop business logic, validation, or calculations found in `source-app/`.
+3. One module at a time. Do not start a new module until the current one is verified PASS.
+4. Every module follows: Analyze → Document → Verify → Plan → Design → Implement → Test → Compare → Review → Approve → Continue.
+5. Before writing code for a module, read the relevant `docs/` section and the matching files in `source-app/` — do not rely on earlier chat memory.
+6. After implementing, produce a Legacy vs New PASS/FAIL table before calling anything done.
+7. Update `docs/00_MASTER_CHECKLIST.md` status (⬜ → 🟡 → ✅) after each completed step.
+8. Never rename database columns unless explicitly approved.
+9. Never remove UI controls.
+10. Never remove validations.
+11. Never merge workflows.
+12. Never replace business rules with assumptions.
+13. Every implementation must reference the source code.
+14. Every response must include code references.
+15. Every implementation must update documentation.
+16. Every implementation must generate tests.
+17. Every implementation must include rollback notes.
+
+## Done gate (objective evidence — not confidence scores)
+
+Do not claim a module or task is done unless all of the following are true:
+
+- All documented fields for the scope are implemented (or listed as Unknown).
+- All documented API endpoints for the scope are implemented (or listed as Unknown).
+- All tests written for the scope pass.
+- Legacy vs New comparison shows no known mismatches.
+- Any remaining unknowns are explicitly listed for the user.
+
+If any item fails, stop and report. Do not continue to another module.

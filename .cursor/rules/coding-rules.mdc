@@ -1,0 +1,37 @@
+---
+description: Coding standards for new-app React/Node/SQL Server
+globs: new-app/**/*
+alwaysApply: false
+---
+# Coding Rules (`new-app/`)
+
+## Stack
+
+- Frontend: React + TypeScript (strict)
+- Backend: Node + Express + TypeScript
+- Database: SQL Server
+- Never edit `source-app/`
+
+## Must follow
+
+- Port behavior from `source-app/` and `docs/` — do not invent fields, endpoints, or rules.
+- If `docs/` and `source-app/` disagree, trust `source-app/`, flag the discrepancy, then continue only for the requested scope.
+- Keep modules isolated: touch only files for the active module.
+- Prefer clear names matching legacy concepts (tables, routes, screen names).
+- Never rename DB columns unless the user explicitly approved.
+- Never remove validations or UI controls present in legacy.
+- Every change needs tests in the same session as the code.
+- Include rollback notes when schema or API contracts change.
+
+## Structure preference
+
+- Backend: routes → controllers → services → repositories
+- Frontend: feature folders mirroring navigation / module inventory
+- Shared types and validators colocated with the feature when possible
+
+## Output on every coding task
+
+1. Files changed
+2. Source references (`source-app/...`)
+3. What is still missing
+4. Unknowns needing confirmation

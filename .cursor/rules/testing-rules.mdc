@@ -1,0 +1,25 @@
+---
+description: Testing requirements for migrated modules
+globs: new-app/**/*.{ts,tsx,js,jsx}
+alwaysApply: false
+---
+# Testing Rules
+
+## Required with every implementation
+
+- Write tests alongside code, not after.
+- Cover happy path and legacy validation failures.
+- Cover authorization/role checks when the source module has them.
+- Cover multi-step / transaction flows when the source module has them.
+
+## Evidence required before PASS
+
+- Tests for the scoped change run and pass.
+- Legacy vs New table lists each compared behavior as PASS or FAIL.
+- FAIL or Unknown items block calling the module done.
+
+## Do not
+
+- Skip tests because the change is "small"
+- Assert invented behavior not present in `source-app/` or `docs/`
+- Mark PASS when tests were not run

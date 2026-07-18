@@ -1,0 +1,570 @@
+import 'dart:async';
+
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/auth/auth_error_messages.dart';
+import '../../../core/auth/biometric_login.dart';
+import '../../../core/auth/auth_failure_policy.dart';
+import '../../../core/auth/session_notifier.dart';
+import '../../../core/router/post_auth_route.dart';
+import '../../../core/config/app_config.dart';
+import '../../../core/design_system/hexa_ds_tokens.dart';
+import '../../../core/theme/hexa_colors.dart';
+import 'widgets/auth_input_styles.dart';
+import 'widgets/auth_network_error_banner.dart';
+import 'widgets/auth_page_shell.dart';
+
+/// Keyboard-safe, centered card login (no hero image) — iOS + web friendly.
+class LoginPage extends ConsumerStatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  ConsumerState<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends ConsumerState<LoginPage> {
+  final _loginEmail = TextEditingController();
+  final _loginPass = TextEditingController();
+  final _emailFocus = FocusNode();
+  final _passFocus = FocusNode();
+
+  bool _loading = false;
+  bool _obscure = true;
+  bool _showValidation = false;
+  bool _showNetworkBanner = false;
+  DioException? _lastNetworkError;
+  String? _inlineAuthError;
+  bool _handledDupEmailQuery = false;
+  bool _handledOwnerOnlyNotice = false;
+  bool _bioReady = false;
+  String? _bioEmail;
+
+  @override
+  void initState() {
+    super.initState();
+    _loginEmail.addListener(_clearInlineErrors);
+    _loginPass.addListener(_clearInlineErrors);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _tryResumeSession();
+      unawaited(_loadBiometricState());
+    });
+  }
+
+  Future<void> _loadBiometricState() async {
+    final email = await BiometricLogin.savedEmail();
+    final can = await BiometricLogin.isAvailable();
+    final t = await ref.read(tokenStoreProvider).read();
+    final hasTokens = t.access != null && t.refresh != null;
+    if (!mounted) return;
+    setState(() {
+      _bioEmail = email;
+      _bioReady = can && email != null && email.isNotEmpty && hasTokens;
+    });
+  }
+
+  void _clearInlineErrors() {
+    if (_inlineAuthError != null) {
+      setState(() => _inlineAuthError = null);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_handledDupEmailQuery) {
+      try {
+        final q = GoRouterState.of(context).uri.queryParameters['msg'];
+        if (q == 'exists') {
+          _handledDupEmailQuery = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            _authSnack('This email is already registered. Please sign in below.');
+            if (!mounted) return;
+            context.go('/login');
+          });
+        }
+      } catch (_) {}
+    }
+    if (!_handledOwnerOnlyNotice) {
+      try {
+        final notice =
+            GoRouterState.of(context).uri.queryParameters['notice'];
+        if (notice == 'session_expired') {
+          _handledOwnerOnlyNotice = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            _authSnack('Session expired. Please sign in again.');
+          });
+        } else if (notice == 'owner_only') {
+          _handledOwnerOnlyNotice = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            _authSnack(
+              'Accounts are created by your owner. Sign in with the credentials they shared.',
+            );
+          });
+        }
+      } catch (_) {}
+    }
+  }
+
+  @override
+  void dispose() {
+    _loginEmail.removeListener(_clearInlineErrors);
+    _loginPass.removeListener(_clearInlineErrors);
+    _loginEmail.dispose();
+    _loginPass.dispose();
+    _emailFocus.dispose();
+    _passFocus.dispose();
+    super.dispose();
+  }
+
+  bool get _isFormValid {
+    final email = _loginEmail.text.trim();
+    final p = _loginPass.text;
+    return email.contains('@') && email.length >= 5 && p.length >= 6;
+  }
+
+  String? _emailError() {
+    if (!_showValidation) return null;
+    final s = _loginEmail.text.trim();
+    if (s.isEmpty || !s.contains('@')) {
+      return 'Enter a valid email address';
+    }
+    return null;
+  }
+
+  String? _passError() {
+    if (!_showValidation) return null;
+    if (_loginPass.text.isEmpty || _loginPass.text.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    return null;
+  }
+
+  void _goPostAuth() {
+    final s = ref.read(sessionProvider);
+    if (s == null) return;
+    context.go(authenticatedHomePath(s));
+  }
+
+  Future<void> _tryResumeSession() async {
+    if (ref.read(authSessionExpiredProvider) ||
+        ref.read(auth401CircuitOpenProvider)) {
+      return;
+    }
+    final t = await ref.read(tokenStoreProvider).read();
+    if (t.access == null || t.refresh == null) return;
+    if (ref.read(sessionProvider) != null) {
+      if (mounted) _goPostAuth();
+      return;
+    }
+    setState(() {
+      _loading = true;
+      _showNetworkBanner = false;
+      _lastNetworkError = null;
+    });
+    try {
+      await ref.read(sessionProvider.notifier).restore().timeout(
+            kIsWeb ? const Duration(seconds: 8) : const Duration(seconds: 25),
+          );
+    } on DioException catch (e) {
+      if (mounted && isDioNoConnectionError(e)) {
+        setState(() {
+          _lastNetworkError = e;
+          _showNetworkBanner = true;
+        });
+      }
+    } catch (_) {}
+    if (!mounted) return;
+    setState(() => _loading = false);
+    if (ref.read(sessionProvider) != null) {
+      _goPostAuth();
+    }
+  }
+
+  void _authSnack(String message) {
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _retryAfterNetwork() {
+    setState(() {
+      _showNetworkBanner = false;
+      _lastNetworkError = null;
+      _inlineAuthError = null;
+    });
+    if (_isFormValid) {
+      _signIn();
+    } else {
+      setState(() => _showValidation = true);
+    }
+  }
+
+  Future<void> _signIn() async {
+    if (_loading) return;
+    FocusScope.of(context).unfocus();
+    setState(() {
+      _showValidation = true;
+      _inlineAuthError = null;
+    });
+    if (!_isFormValid) return;
+
+    setState(() {
+      _loading = true;
+      _showNetworkBanner = false;
+      _lastNetworkError = null;
+    });
+    try {
+      final email = _loginEmail.text.trim();
+      await ref.read(sessionProvider.notifier).login(
+            email: email,
+            password: _loginPass.text,
+          );
+      await BiometricLogin.saveEmail(email);
+      if (mounted) _goPostAuth();
+    } on DioException catch (e) {
+      if (!mounted) return;
+      if (isDioNoConnectionError(e)) {
+        setState(() {
+          _lastNetworkError = e;
+          _showNetworkBanner = true;
+        });
+        return;
+      }
+      final sc = e.response?.statusCode;
+      if (sc == 401) {
+        setState(() {
+          _inlineAuthError = 'Invalid email or password. Try again.';
+        });
+        return;
+      }
+      if (sc == 403) {
+        final detail = e.response?.data;
+        final msg = detail is Map ? detail['detail']?.toString() : null;
+        setState(() {
+          _inlineAuthError = msg?.toLowerCase().contains('blocked') == true
+              ? 'This account is blocked. Contact your owner.'
+              : (msg?.toLowerCase().contains('inactive') == true
+                  ? 'This account is inactive.'
+                  : 'Sign-in not allowed for this account.');
+        });
+        return;
+      }
+      if (sc == 422) {
+        setState(() {
+          _inlineAuthError =
+              'Use your full login email (e.g. 1234567890@staff.harisree.local) and password from the owner.';
+        });
+        return;
+      }
+      setState(() {
+        _inlineAuthError = friendlyAuthError(e, context: AuthErrorContext.login);
+      });
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _inlineAuthError = 'Something went wrong. Please try again.';
+        });
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _signInWithBiometric() async {
+    if (_loading || !_bioReady) return;
+    final ok = await BiometricLogin.authenticate();
+    if (!ok || !mounted) return;
+    if (_bioEmail != null && _bioEmail!.isNotEmpty) {
+      _loginEmail.text = _bioEmail!;
+    }
+    setState(() => _loading = true);
+    try {
+      await ref.read(sessionProvider.notifier).restore();
+      if (mounted && ref.read(sessionProvider) != null) {
+        _goPostAuth();
+      } else if (mounted) {
+        setState(() {
+          _inlineAuthError = 'Session expired — sign in with password once.';
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _inlineAuthError = 'Biometric sign-in failed. Use password.';
+        });
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Widget _err(String? m) {
+    if (m == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Text(
+        m,
+        style: TextStyle(
+          color: Colors.red.shade700,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final eErr = _emailError();
+    final pErr = _passError();
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFE8F5F2),
+      resizeToAvoidBottomInset: true,
+      body: GestureDetector(
+        behavior: HitTestBehavior.deferToChild,
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: AuthPageShell(
+          children: [
+            AuthFormCard(
+              child: AutofillGroup(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.warehouse_outlined,
+                          size: 36,
+                          color: HexaColors.brandPrimary,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Harisree Agency',
+                                style: HexaDsType.heading(24,
+                                    color: HexaDsColors.textPrimary),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Warehouse Management',
+                                style: HexaDsType.body(14,
+                                    color: HexaDsColors.textMuted,
+                                    weight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Sign In',
+                      textAlign: TextAlign.center,
+                      style: HexaDsType.heading(20, color: HexaDsColors.textPrimary),
+                    ),
+                    const SizedBox(height: 12),
+                    if (_showNetworkBanner)
+                      AuthNetworkErrorBanner(
+                        onRetry: _retryAfterNetwork,
+                        title: authUnreachableBannerTitle(_lastNetworkError),
+                        detail: authServerUnreachableDetail(_lastNetworkError),
+                      ),
+                    TextField(
+                      controller: _loginEmail,
+                      focusNode: _emailFocus,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      autofillHints: const [AutofillHints.email],
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      onSubmitted: (_) => _passFocus.requestFocus(),
+                      decoration: authFilledDecoration(
+                        'Email',
+                        icon: Icons.email_outlined,
+                        err: eErr != null,
+                      ),
+                    ),
+                    _err(eErr),
+                    TextField(
+                      controller: _loginPass,
+                      focusNode: _passFocus,
+                      obscureText: _obscure,
+                      textInputAction: TextInputAction.done,
+                      autofillHints: const [AutofillHints.password],
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      onSubmitted: (_) {
+                        if (_isFormValid) _signIn();
+                      },
+                      decoration: authFilledDecoration(
+                        'Password',
+                        icon: Icons.key_rounded,
+                        err: pErr != null,
+                        suffix: IconButton(
+                          tooltip: _obscure ? 'Show password' : 'Hide password',
+                          onPressed: () => setState(() => _obscure = !_obscure),
+                          icon: Icon(
+                            _obscure
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
+                            color: const Color(0xFF6B7280),
+                            size: 22,
+                          ),
+                        ),
+                      ),
+                    ),
+                    _err(pErr),
+                    if (_inlineAuthError != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        _inlineAuthError!,
+                        style: TextStyle(
+                          color: Colors.red.shade700,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                    if (_bioReady) ...[
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: FilledButton.tonalIcon(
+                          onPressed: _loading ? null : _signInWithBiometric,
+                          style: FilledButton.styleFrom(
+                            backgroundColor:
+                                HexaColors.brandPrimary.withValues(alpha: 0.12),
+                            foregroundColor: HexaColors.brandPrimary,
+                          ),
+                          icon: const Icon(Icons.fingerprint, size: 28),
+                          label: const Text(
+                            'Sign in with fingerprint / Face ID',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (_bioEmail != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          _bioEmail!,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
+                      ],
+                    ],
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: FilledButton(
+                        onPressed: _loading
+                            ? null
+                            : (_isFormValid
+                                ? _signIn
+                                : () => setState(() => _showValidation = true)),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: HexaColors.brandPrimary,
+                          disabledBackgroundColor: const Color(0xFFE5E7EB),
+                          disabledForegroundColor: const Color(0xFF6B7280),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          textStyle: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        child: _loading
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text('Sign In'),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        onPressed: _loading
+                            ? null
+                            : () {
+                                context.go('/forgot-password');
+                              },
+                        child: Text(
+                          'Forgot password?',
+                          style: HexaDsType.body(12,
+                              color: HexaDsColors.textMuted,
+                              weight: FontWeight.w500),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Text(
+                        'Contact your manager to reset password',
+                        style: HexaDsType.body(12, color: HexaDsColors.textMuted),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    if (AppConfig.buildSha.isNotEmpty)
+                      Text(
+                        'Build ${AppConfig.buildSha}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    Text(
+                      '© 2026',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

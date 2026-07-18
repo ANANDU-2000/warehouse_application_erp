@@ -1,0 +1,53 @@
+# OS / secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.local
+*.pem
+*.key
+credentials.json
+secrets/
+
+# Cursor local MCP with real tokens (commit .example only)
+**/.cursor/mcp.json
+!.cursor/mcp.json.example
+
+# Dependencies / build
+node_modules/
+dist/
+build/
+.next/
+coverage/
+*.tsbuildinfo
+
+# Python / Flutter (source-app)
+**/__pycache__/
+**/*.pyc
+.venv/
+venv/
+**/.dart_tool/
+**/build/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/pubspec.lock
+**/ios/Pods/
+**/android/.gradle/
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# SQL dumps / local data
+*.bak
+*.sql.gz
+data/local/

@@ -1,0 +1,164 @@
+# 00 — Master Migration Checklist
+### HEXA Purchase Assistant → React + TypeScript + Node/Express + SQL Server + Windows Server 2022
+
+**Legend:** ✅ Done · 🟡 In Progress · ⬜ Not Started · 🔒 Locked (blocked until prior phase is confirmed)
+
+---
+
+## PHASE 1 — Analysis & Understanding 🟡
+
+| # | Task | Status | Evidence |
+|---|---|---|---|
+| 1.1 | Project understanding (what the app does, who uses it) | ✅ | `01_Project_Overview.md` |
+| 1.2 | Architecture analysis (stack, hosting, deploy topology) | ✅ | `01_Project_Overview.md`, `02_Folder_Structure.md` |
+| 1.3 | Module inventory (backend routers/services, frontend features) | ✅ | `03_Module_Inventory.md` |
+| 1.4 | API analysis (full endpoint inventory) | ✅ | `18_API_Inventory.md` |
+| 1.5 | Database analysis (tables, columns, FKs from ORM) | ✅ | `20_Database_Analysis.md` |
+| 1.6 | Business logic analysis (per-module rules, calculations) | ⬜ | Not started — deepest, riskiest gap right now |
+| 1.7 | UI/UX analysis (every screen, button, form, field) | ⬜ | Not started |
+| 1.8 | User flow / navigation analysis | ✅ | `05_Navigation_Map.md` — resolved orphan-module question, found dual shell (Owner vs Staff), confirmed 1 dead route + 2 redirect-aliases |
+| 1.9 | Relationships / ER diagram | ⬜ | Not started (column-level DB doc exists; relationship/cardinality doc doesn't) |
+| 1.10 | Reports inventory | ⬜ | Not started |
+| 1.11 | Roles & permissions matrix (confirm "manager" role question) | ⬜ | Flagged as unresolved in `03_Module_Inventory.md` |
+| 1.12 | Phase 1 sign-off | 🔒 | Blocked until 1.6–1.11 done |
+
+**Phase 1 status: ~55% complete.** Navigation is now confirmed truth, not inferred. Remaining gaps: business logic, per-screen field/button wireframe detail, ER relationships, reports inventory, roles/permissions matrix.
+
+### Cursor operator setup (workspace)
+
+| # | Task | Status | Evidence |
+|---|---|---|---|
+| 0.1 | Split rules (migration/coding/testing/deployment/security) | ✅ | `.cursor/rules/*.mdc` |
+| 0.2 | One-responsibility skills (01–13) | ✅ | `.cursor/skills/*/SKILL.md` |
+| 0.3 | Task prompts (analyse/migrate/review/deploy) | ✅ | `.cursor/prompts/*.md` |
+| 0.4 | MCP GitHub template + gitignore for secrets | ✅ | `.cursor/mcp.json.example`, `.gitignore` |
+| 0.5 | Operator flow doc | ✅ | `docs/CURSOR_SETUP.md` |
+| 0.6 | User: paste GitHub PAT into local `.cursor/mcp.json` + restart Cursor | ⬜ | Manual |
+| 0.7 | User: confirm Indexing covers whole workspace | ⬜ | Manual |
+| 0.8 | Git remote → `ANANDU-2000/warehouse_application_erp` + first push | 🟡 | In progress |
+
+---
+
+## PHASE 2 — Database Design & SQL Server Migration 🔒
+| # | Task | Status |
+|---|---|---|
+| 2.1 | ER diagram + relationship/cardinality doc | 🔒 |
+| 2.2 | Data type mapping table (Postgres → SQL Server, incl. JSONB, UUID, NUMERIC precision) | 🔒 |
+| 2.3 | SQL Server DDL — tables | 🔒 |
+| 2.4 | Constraints (PK, FK, UNIQUE, CHECK) | 🔒 |
+| 2.5 | Indexes | 🔒 |
+| 2.6 | RLS-equivalent strategy (Postgres RLS → SQL Server security policy or app-layer) | 🔒 |
+| 2.7 | Stored procedures / views / triggers (only if source DB logic requires them) | 🔒 |
+| 2.8 | Migration/seed scripts | 🔒 |
+| 2.9 | Schema verification against source (row-for-row structural diff) | 🔒 |
+| 2.10 | Phase 2 sign-off | 🔒 |
+
+---
+
+## PHASE 3 — Backend Migration (Node/Express) 🔒
+| # | Task | Status |
+|---|---|---|
+| 3.1 | Folder structure (Clean Architecture: routes/controllers/services/repositories) | 🔒 |
+| 3.2 | Repository pattern per table/aggregate | 🔒 |
+| 3.3 | Service layer (business logic, ported 1:1 from FastAPI services) | 🔒 |
+| 3.4 | Controllers/routes (Express routers matching `18_API_Inventory.md` paths) | 🔒 |
+| 3.5 | Authentication (JWT, refresh, Google OAuth) | 🔒 |
+| 3.6 | Authorization (role + `permissions_json` enforcement, business-scoping) | 🔒 |
+| 3.7 | Validation layer (equivalent to Pydantic — e.g. Zod) | 🔒 |
+| 3.8 | Error handling middleware | 🔒 |
+| 3.9 | Logging | 🔒 |
+| 3.10 | Transactions (multi-table writes — e.g. purchase commit-stock flow) | 🔒 |
+| 3.11 | Phase 3 sign-off (per module, not all at once — see Implementation Rule) | 🔒 |
+
+---
+
+## PHASE 4 — Frontend Migration (React + TypeScript) 🔒
+| # | Task | Status |
+|---|---|---|
+| 4.1 | Project scaffold (Vite + React + TS + strict mode) | 🔒 |
+| 4.2 | Routing (mirrors Flutter navigation — pending 1.8) | 🔒 |
+| 4.3 | Design system / theme port | 🔒 |
+| 4.4 | Shared components | 🔒 |
+| 4.5 | Per-module screens/forms | 🔒 |
+| 4.6 | State management | 🔒 |
+| 4.7 | Responsive layout (mobile/tablet/desktop parity) | 🔒 |
+| 4.8 | Accessibility | 🔒 |
+| 4.9 | Phase 4 sign-off (per module) | 🔒 |
+
+---
+
+## PHASE 5 — API Integration 🔒
+| # | Task | Status |
+|---|---|---|
+| 5.1 | API client layer | 🔒 |
+| 5.2 | CRUD wiring per module | 🔒 |
+| 5.3 | Error handling (surfaced to UI) | 🔒 |
+| 5.4 | Loading states | 🔒 |
+| 5.5 | Optimistic updates (where source app uses them — e.g. stock optimistic version + 409 retry, per README) | 🔒 |
+| 5.6 | Phase 5 sign-off | 🔒 |
+
+---
+
+## PHASE 6 — Testing 🔒
+| # | Task | Status |
+|---|---|---|
+| 6.1 | Unit tests | 🔒 |
+| 6.2 | Integration tests | 🔒 |
+| 6.3 | API tests | 🔒 |
+| 6.4 | Database tests | 🔒 |
+| 6.5 | E2E tests | 🔒 |
+| 6.6 | Regression tests (legacy vs new PASS/FAIL table, per module) | 🔒 |
+| 6.7 | Manual test pass | 🔒 |
+| 6.8 | Phase 6 sign-off | 🔒 |
+
+---
+
+## PHASE 7 — Performance Optimization 🔒
+| # | Task | Status |
+|---|---|---|
+| 7.1 | Backend query/index profiling | 🔒 |
+| 7.2 | Caching strategy (source uses ETag/read-cache — port equivalent) | 🔒 |
+| 7.3 | Frontend bundle/render profiling | 🔒 |
+| 7.4 | Load testing | 🔒 |
+| 7.5 | Phase 7 sign-off | 🔒 |
+
+---
+
+## PHASE 8 — Security Review 🔒
+| # | Task | Status |
+|---|---|---|
+| 8.1 | AuthN/AuthZ review | 🔒 |
+| 8.2 | Input validation / injection review | 🔒 |
+| 8.3 | Secrets/env review | 🔒 |
+| 8.4 | Dependency audit | 🔒 |
+| 8.5 | Rate limiting (source has `middleware/rate_limit.py` — port equivalent) | 🔒 |
+| 8.6 | Phase 8 sign-off | 🔒 |
+
+---
+
+## PHASE 9 — Windows Server 2022 Deployment 🔒
+| # | Task | Status |
+|---|---|---|
+| 9.1 | Windows Server + SQL Server setup | 🔒 |
+| 9.2 | Node.js runtime + Windows Service | 🔒 |
+| 9.3 | IIS/Nginx reverse proxy | 🔒 |
+| 9.4 | HTTPS + GoDaddy domain | 🔒 |
+| 9.5 | Environment variables/secrets | 🔒 |
+| 9.6 | Backup strategy | 🔒 |
+| 9.7 | Monitoring/health checks | 🔒 |
+| 9.8 | Rollback plan | 🔒 |
+| 9.9 | Go-live | 🔒 |
+
+---
+
+## Rules we are following (your own rules, restated so we don't drift)
+
+1. One phase at a time. No skipping ahead.
+2. One module at a time once implementation starts (Phase 3+).
+3. Every module goes through: Analyze → Document → Verify → Plan → Design → Implement → Test → Compare → Review → Approve → Continue.
+4. Nothing is "done" until compared Legacy vs New with a PASS/FAIL table.
+5. Unknowns are stated as `Unknown` — never guessed.
+6. I stop and ask you before continuing past a phase boundary.
+
+---
+*Last updated: after Phase 1 gap review, before starting 1.6 (Business Logic Analysis).*

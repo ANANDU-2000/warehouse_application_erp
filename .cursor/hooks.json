@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeSubmitPrompt": [
+      {
+        "type": "prompt",
+        "prompt": "If the user is asking to implement or migrate code: confirm only ONE module/scope is requested; remind them source-app/ is read-only; if Phase 1 gaps block the work per docs/00_MASTER_CHECKLIST.md, say so and do not invent behavior. Do not block pure questions or doc-only analysis."
+      }
+    ]
+  }
+}

@@ -2,6 +2,8 @@
 
 SQL Server DDL lives under [`ddl/`](ddl/).
 
+## Tables (Phase 2.3)
+
 | File | Contents |
 |---|---|
 | `ddl/00_schema.sql` | Header + `USE [dbo]` |
@@ -14,7 +16,17 @@ SQL Server DDL lives under [`ddl/`](ddl/).
 
 **46 tables** total. See `docs/26_SQL_Server_DDL.md`.
 
-**Foreign keys:** deferred to Phase **2.4** (columns present as `UNIQUEIDENTIFIER`; no `REFERENCES` yet).  
-**Indexes (non-unique):** deferred to Phase **2.5**.
+## Constraints (Phase 2.4)
+
+| File | Contents |
+|---|---|
+| `ddl/constraints/10_fk_core.sql` … `15_fk_ops_aux.sql` | **103** ORM FKs from `docs/23` |
+| `ddl/constraints/16_check.sql` | **6** CHECKs from latest Postgres SQL |
+| `ddl/constraints/90_drop_constraints.sql` | Rollback DROP CONSTRAINT |
+
+See `docs/27_SQL_Server_Constraints.md`. Soft UUID columns remain without FK.
+
+**Indexes (non-unique):** deferred to Phase **2.5**.  
+**RLS:** deferred to Phase **2.6**.
 
 Type mapping: `docs/25_SQL_Server_Type_Mapping.md`.

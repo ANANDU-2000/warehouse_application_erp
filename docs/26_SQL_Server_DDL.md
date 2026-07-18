@@ -172,7 +172,7 @@ Prefer full DB restore for production-like environments.
 
 ## 8. Next
 
-**Phase 2.4** — add PK companions already present; add FK / CHECK constraints from `docs/23_Relationships.md`.
+**Phase 2.4** — done: see `docs/27_SQL_Server_Constraints.md` and `new-app/database/ddl/constraints/`.
 
 ---
 

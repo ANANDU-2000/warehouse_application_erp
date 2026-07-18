@@ -21,6 +21,7 @@ import type { BusinessesRepository } from "./repositories/businesses.repository"
 import type { DashboardRepository } from "./repositories/dashboard.repository";
 import type { HomeOverviewRepository } from "./repositories/homeOverview.repository";
 import type { StaffHomeRepository } from "./repositories/staffHome.repository";
+import type { HomeActivityRepository } from "./repositories/homeActivity.repository";
 import {
   createAuthzMiddleware,
   type AuthzMiddleware,
@@ -31,6 +32,7 @@ import {
   createTradePurchasesRoutes,
 } from "./routes/staffHome.routes";
 import { createStaffHomeController } from "./controllers/staffHome.controller";
+import { createHomeActivityController } from "./controllers/homeActivity.controller";
 
 export type AppDeps = {
   /** Injected for tests / when pool is ready. */
@@ -43,6 +45,7 @@ export type AppDeps = {
   dashboard?: DashboardRepository;
   homeOverview?: HomeOverviewRepository;
   staffHome?: StaffHomeRepository;
+  homeActivity?: HomeActivityRepository;
 };
 
 /** Fail-closed users repo when SQL pool is not wired. */
@@ -117,6 +120,17 @@ function unavailableStaffHomeRepository(): StaffHomeRepository {
   } as unknown as StaffHomeRepository;
 }
 
+function unavailableHomeActivityRepository(): HomeActivityRepository {
+  const fail = async (): Promise<never> => {
+    throw new Error("Database pool not connected. Call connect() first.");
+  };
+  return {
+    listTradePurchases: fail,
+    auditRecent: fail,
+    listStaffPurchases: fail,
+  };
+}
+
 export type AppWithAuthz = express.Express & {
   /** Authz middleware bundle — for future /v1/businesses/:businessId routes. */
   authz: AuthzMiddleware;
@@ -147,10 +161,12 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
   );
 
   const staffHome = deps.staffHome ?? unavailableStaffHomeRepository();
+  const homeActivity = deps.homeActivity ?? unavailableHomeActivityRepository();
   const staffHomeController = createStaffHomeController({
     users,
     staffHome,
   });
+  const homeActivityController = createHomeActivityController({ homeActivity });
   app.use("/v1/me", createStaffHomeMeRoutes(staffHomeController, app.authz));
 
   const dashboard = deps.dashboard ?? unavailableDashboardRepository();
@@ -170,11 +186,15 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
   );
   app.use(
     "/v1/businesses/:businessId/trade-purchases",
-    createTradePurchasesRoutes(staffHomeController, app.authz),
+    createTradePurchasesRoutes(
+      staffHomeController,
+      homeActivityController,
+      app.authz,
+    ),
   );
   app.use(
     "/v1/businesses/:businessId/stock",
-    createStockRoutes(staffHomeController, app.authz),
+    createStockRoutes(staffHomeController, homeActivityController, app.authz),
   );
 
   app.use(errorHandler);

@@ -14,4 +14,4 @@
 
 **Rollback:** Revert BUTTONS commit; restore inert back `<span>` (LAYOUT/FIELDS).
 
-**Next:** `/home/activity` WIRE — full activity feed APIs (trade-purchases / stock audit / staff-purchases per `dashboard.md`).
+**Next:** `/home/activity` WIRE PASS — see [`home_activity_wire_compare.md`](home_activity_wire_compare.md). Next STATES.

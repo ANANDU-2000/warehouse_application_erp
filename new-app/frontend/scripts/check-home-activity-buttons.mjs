@@ -28,11 +28,8 @@ assert(page.includes('"/home"') || page.includes("'/home'"), "fallback /home");
 assert(page.includes('aria-label="Back"'), "Back aria-label");
 assert(page.includes("onClick={handleBack}"), "back onClick");
 
-assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("home-overview"), "no home-overview");
-assert(!page.includes("trade-purchases"), "no trade-purchases");
-assert(!page.includes("stock/audit"), "no stock audit");
-
+assert(!page.includes("/dashboard?"), "no month dashboard");
+/* WIRE owns feed APIs */
 const css = readFileSync(
   join(root, "src/features/home/HomeWarehouseActivityPage.css"),
   "utf8",

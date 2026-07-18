@@ -40,10 +40,8 @@ assert(page.includes('data-slot="appbar"'), "appbar slot");
 assert(page.includes('data-slot="period-filter"'), "period-filter slot");
 assert(page.includes('data-slot="period-caption"'), "period-caption slot");
 assert(page.includes('data-slot="activity-list"'), "activity-list slot");
-assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("trade-purchases"), "no trade-purchases API");
-assert(!page.includes("stock/audit"), "no stock audit API");
-/* FIELDS/BUTTONS may use HomePeriod / navigate — SCAFFOLD slots still required */
+assert(!page.includes("fetch(") || page.includes("homeActivity"), "API via module");
+/* WIRE may fetch — SCAFFOLD slots still required */
 
 const router = readFileSync(join(root, "src/app/router.tsx"), "utf8");
 assert(

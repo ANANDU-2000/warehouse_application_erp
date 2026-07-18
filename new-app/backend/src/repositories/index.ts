@@ -22,3 +22,7 @@ export {
   StaffHomeRepository,
   createStaffHomeRepository,
 } from "./staffHome.repository";
+export {
+  createHomeActivityRepository,
+  type HomeActivityRepository,
+} from "./homeActivity.repository";

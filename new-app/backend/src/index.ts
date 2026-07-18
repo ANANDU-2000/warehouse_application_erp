@@ -18,6 +18,7 @@ import {
 import { createDashboardRepository } from "./repositories/dashboard.repository";
 import { createHomeOverviewRepository } from "./repositories/homeOverview.repository";
 import { createStaffHomeRepository } from "./repositories/staffHome.repository";
+import { createHomeActivityRepository } from "./repositories/homeActivity.repository";
 import { logger } from "./logging/logger";
 
 async function main(): Promise<void> {
@@ -33,6 +34,7 @@ async function main(): Promise<void> {
         dashboard: createDashboardRepository(pool),
         homeOverview: createHomeOverviewRepository(pool),
         staffHome: createStaffHomeRepository(pool),
+        homeActivity: createHomeActivityRepository(pool),
       };
       logger.info("database.connected", {
         host: env.sql.host,

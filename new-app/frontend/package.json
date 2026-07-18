@@ -29,6 +29,7 @@
     "test:home-activity-layout": "node scripts/check-home-activity-layout.mjs",
     "test:home-activity-fields": "node scripts/check-home-activity-fields.mjs",
     "test:home-activity-buttons": "node scripts/check-home-activity-buttons.mjs",
+    "test:home-activity-wire": "node scripts/check-home-activity-wire.mjs",
     "test:staff-home-scaffold": "node scripts/check-staff-home-scaffold.mjs",
     "test:staff-home-layout": "node scripts/check-staff-home-layout.mjs",
     "test:staff-home-fields": "node scripts/check-staff-home-fields.mjs",

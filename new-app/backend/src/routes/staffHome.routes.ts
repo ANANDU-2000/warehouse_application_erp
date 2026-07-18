@@ -1,9 +1,10 @@
 /**
- * Staff home WIRE routes — Flutter paths under /v1/me and /v1/businesses/:id/...
+ * Staff home + home activity WIRE routes.
  */
 import { Router } from "express";
 import type { AuthzMiddleware } from "../middleware/authz";
 import type { StaffHomeController } from "../controllers/staffHome.controller";
+import type { HomeActivityController } from "../controllers/homeActivity.controller";
 
 export function createStaffHomeMeRoutes(
   controller: StaffHomeController,
@@ -17,7 +18,8 @@ export function createStaffHomeMeRoutes(
 }
 
 export function createTradePurchasesRoutes(
-  controller: StaffHomeController,
+  staffHome: StaffHomeController,
+  homeActivity: HomeActivityController,
   authz: AuthzMiddleware,
 ): Router {
   const r = Router({ mergeParams: true });
@@ -25,13 +27,20 @@ export function createTradePurchasesRoutes(
     "/delivery-pipeline",
     authz.requireAuth,
     authz.requireMembership,
-    (req, res, next) => void controller.getDeliveryPipeline(req, res, next),
+    (req, res, next) => void staffHome.getDeliveryPipeline(req, res, next),
+  );
+  r.get(
+    "/",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void homeActivity.listTradePurchases(req, res, next),
   );
   return r;
 }
 
 export function createStockRoutes(
-  controller: StaffHomeController,
+  staffHome: StaffHomeController,
+  homeActivity: HomeActivityController,
   authz: AuthzMiddleware,
 ): Router {
   const r = Router({ mergeParams: true });
@@ -39,19 +48,31 @@ export function createStockRoutes(
     "/list",
     authz.requireAuth,
     authz.requireMembership,
-    (req, res, next) => void controller.listStock(req, res, next),
+    (req, res, next) => void staffHome.listStock(req, res, next),
   );
   r.get(
     "/opening/missing",
     authz.requireAuth,
     authz.requireMembership,
-    (req, res, next) => void controller.openingMissing(req, res, next),
+    (req, res, next) => void staffHome.openingMissing(req, res, next),
   );
   r.get(
     "/variances/today",
     authz.requireAuth,
     authz.requireMembership,
-    (req, res, next) => void controller.variancesToday(req, res, next),
+    (req, res, next) => void staffHome.variancesToday(req, res, next),
+  );
+  r.get(
+    "/audit/recent",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void homeActivity.auditRecent(req, res, next),
+  );
+  r.get(
+    "/staff-purchases",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void homeActivity.listStaffPurchases(req, res, next),
   );
   return r;
 }

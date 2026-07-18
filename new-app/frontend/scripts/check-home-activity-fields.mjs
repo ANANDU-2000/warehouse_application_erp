@@ -52,10 +52,8 @@ assert(
 assert(period.includes('today: "Today"'), "Today label shared");
 assert(period.includes("homePeriodRange"), "range helper shared");
 
-assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("home-overview"), "no home-overview");
-assert(!page.includes("trade-purchases"), "no trade-purchases");
-/* BUTTONS may useNavigate — FIELDS period checks only */
+assert(!page.includes("/dashboard?"), "no month dashboard UI");
+/* WIRE may fetch via homeActivityFeed */
 
 assert(css.includes("home-activity-page__period-chip--selected"), "selected");
 assert(css.includes("#0e4f46") || css.includes("#0E4F46"), "brand selected");

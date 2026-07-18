@@ -26,4 +26,4 @@ Catalog, trade, stock, and remaining tables — add per module after Login gates
 
 `src/config/database.ts`: `connect` / `close` / `getPool` / optional `ping`.
 
-Inject `ConnectionPool` into repository constructors (tests mock the pool).
+Inject `SqlClient` (`ConnectionPool` or `Transaction`) into repository constructors (tests mock the pool). Multi-table writes use `withTransaction` (Phase 3.10).

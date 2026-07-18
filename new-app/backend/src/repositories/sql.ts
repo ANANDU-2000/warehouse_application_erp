@@ -1,8 +1,14 @@
 /**
  * Parameterized query helpers for mssql Request.
  * Always use @params — never string-concatenate user input.
+ *
+ * `SqlClient` is a ConnectionPool or Transaction (both expose `.request()`),
+ * so the same helpers work inside `withTransaction`.
  */
-import type { ConnectionPool, IResult, ISqlType } from "mssql";
+import type { ConnectionPool, IResult, ISqlType, Request, Transaction } from "mssql";
+
+/** Pool or open transaction — anything that can create a Request. */
+export type SqlClient = ConnectionPool | Transaction | { request(): Request };
 
 /** Accepted by mssql `request.input` (e.g. sql.UniqueIdentifier or sql.NVarChar(320)). */
 export type SqlTypeArg = ISqlType | (() => ISqlType);
@@ -15,11 +21,11 @@ export type SqlParam = {
 };
 
 export async function queryMany<T extends object>(
-  pool: ConnectionPool,
+  client: SqlClient,
   text: string,
   params: SqlParam[] = [],
 ): Promise<T[]> {
-  const request = pool.request();
+  const request = client.request();
   for (const p of params) {
     request.input(p.name, p.type as SqlTypeArg, p.value);
   }
@@ -28,10 +34,10 @@ export async function queryMany<T extends object>(
 }
 
 export async function queryOne<T extends object>(
-  pool: ConnectionPool,
+  client: SqlClient,
   text: string,
   params: SqlParam[] = [],
 ): Promise<T | null> {
-  const rows = await queryMany<T>(pool, text, params);
+  const rows = await queryMany<T>(client, text, params);
   return rows[0] ?? null;
 }

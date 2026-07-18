@@ -1,6 +1,6 @@
 export type { UserRow, BusinessRow, MembershipRow } from "./types";
 export { queryMany, queryOne } from "./sql";
-export type { SqlParam } from "./sql";
+export type { SqlParam, SqlClient } from "./sql";
 export { UsersRepository, createUsersRepository } from "./users.repository";
 export {
   BusinessesRepository,

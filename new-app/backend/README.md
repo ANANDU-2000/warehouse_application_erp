@@ -4,10 +4,10 @@ Node.js + Express + TypeScript API for the warehouse ERP migration.
 
 ## Status
 
-**Phase 3.9** — Structured JSON logging + HTTP access trail (`requestId`).  
-Transactions → **3.10**. Google OAuth still **501**.
+**Phase 3.10** — `withTransaction` + `SqlClient` (pool or Transaction).  
+Phase 3 sign-off → **3.11**. Google OAuth still **501**.
 
-See `docs/41_Logging.md` (repo root docs).
+See `docs/42_Transactions.md` (repo root docs).
 
 ## Layout
 
@@ -16,7 +16,8 @@ src/
   routes/         → /api/health + /v1/auth/*
   controllers/    → health + auth
   services/
-  repositories/
+  repositories/   → SqlClient (pool | Transaction)
+  db/             → withTransaction
   auth/
   validation/
   middleware/     → requestId, requestLog, errorHandler, authz

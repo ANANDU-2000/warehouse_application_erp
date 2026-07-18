@@ -4,9 +4,8 @@
  * Future tenant-scoped repos must accept businessId and filter (docs/29).
  * Columns: `new-app/database/ddl/01_core.sql` (memberships).
  */
-import type { ConnectionPool } from "mssql";
 import { sql } from "../config/database";
-import { queryMany, queryOne } from "./sql";
+import { queryMany, queryOne, type SqlClient } from "./sql";
 import type { MembershipRow } from "./types";
 
 const MEMBERSHIP_COLUMNS = `
@@ -14,11 +13,11 @@ const MEMBERSHIP_COLUMNS = `
 `.trim();
 
 export class MembershipsRepository {
-  constructor(private readonly pool: ConnectionPool) {}
+  constructor(private readonly client: SqlClient) {}
 
   async findById(id: string): Promise<MembershipRow | null> {
     return queryOne<MembershipRow>(
-      this.pool,
+      this.client,
       `SELECT ${MEMBERSHIP_COLUMNS} FROM memberships WHERE id = @id`,
       [{ name: "id", type: sql.UniqueIdentifier, value: id }],
     );
@@ -27,7 +26,7 @@ export class MembershipsRepository {
   /** Memberships for a user (Login / business list). Caller scopes further in 3.3+. */
   async listByUserId(userId: string): Promise<MembershipRow[]> {
     return queryMany<MembershipRow>(
-      this.pool,
+      this.client,
       `SELECT ${MEMBERSHIP_COLUMNS} FROM memberships WHERE user_id = @userId ORDER BY created_at`,
       [{ name: "userId", type: sql.UniqueIdentifier, value: userId }],
     );
@@ -42,7 +41,7 @@ export class MembershipsRepository {
     businessId: string,
   ): Promise<MembershipRow | null> {
     return queryOne<MembershipRow>(
-      this.pool,
+      this.client,
       `SELECT ${MEMBERSHIP_COLUMNS}
        FROM memberships
        WHERE user_id = @userId AND business_id = @businessId`,
@@ -54,6 +53,6 @@ export class MembershipsRepository {
   }
 }
 
-export function createMembershipsRepository(pool: ConnectionPool): MembershipsRepository {
-  return new MembershipsRepository(pool);
+export function createMembershipsRepository(client: SqlClient): MembershipsRepository {
+  return new MembershipsRepository(client);
 }

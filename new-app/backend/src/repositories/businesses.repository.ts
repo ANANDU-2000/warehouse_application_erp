@@ -3,9 +3,8 @@
  * Load by explicit id only (no list-all). See docs/29 tenancy.
  * Columns: `new-app/database/ddl/01_core.sql` (businesses).
  */
-import type { ConnectionPool } from "mssql";
 import { sql } from "../config/database";
-import { queryOne } from "./sql";
+import { queryOne, type SqlClient } from "./sql";
 import type { BusinessRow } from "./types";
 
 const BUSINESS_COLUMNS = `
@@ -14,17 +13,17 @@ const BUSINESS_COLUMNS = `
 `.trim();
 
 export class BusinessesRepository {
-  constructor(private readonly pool: ConnectionPool) {}
+  constructor(private readonly client: SqlClient) {}
 
   async findById(id: string): Promise<BusinessRow | null> {
     return queryOne<BusinessRow>(
-      this.pool,
+      this.client,
       `SELECT ${BUSINESS_COLUMNS} FROM businesses WHERE id = @id`,
       [{ name: "id", type: sql.UniqueIdentifier, value: id }],
     );
   }
 }
 
-export function createBusinessesRepository(pool: ConnectionPool): BusinessesRepository {
-  return new BusinessesRepository(pool);
+export function createBusinessesRepository(client: SqlClient): BusinessesRepository {
+  return new BusinessesRepository(client);
 }

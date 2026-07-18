@@ -3,9 +3,8 @@
  * Columns: `new-app/database/ddl/01_core.sql` (users).
  * Auth / password verify → Phase 3.5. Business rules → Phase 3.3.
  */
-import type { ConnectionPool } from "mssql";
 import { sql } from "../config/database";
-import { queryOne } from "./sql";
+import { queryOne, type SqlClient } from "./sql";
 import type { UserRow } from "./types";
 
 const USER_COLUMNS = `
@@ -16,11 +15,11 @@ const USER_COLUMNS = `
 `.trim();
 
 export class UsersRepository {
-  constructor(private readonly pool: ConnectionPool) {}
+  constructor(private readonly client: SqlClient) {}
 
   async findById(id: string): Promise<UserRow | null> {
     return queryOne<UserRow>(
-      this.pool,
+      this.client,
       `SELECT ${USER_COLUMNS} FROM users WHERE id = @id`,
       [{ name: "id", type: sql.UniqueIdentifier, value: id }],
     );
@@ -28,13 +27,13 @@ export class UsersRepository {
 
   async findByEmail(email: string): Promise<UserRow | null> {
     return queryOne<UserRow>(
-      this.pool,
+      this.client,
       `SELECT ${USER_COLUMNS} FROM users WHERE email = @email`,
       [{ name: "email", type: sql.NVarChar(320), value: email }],
     );
   }
 }
 
-export function createUsersRepository(pool: ConnectionPool): UsersRepository {
-  return new UsersRepository(pool);
+export function createUsersRepository(client: SqlClient): UsersRepository {
+  return new UsersRepository(client);
 }

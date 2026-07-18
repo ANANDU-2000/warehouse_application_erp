@@ -1,20 +1,35 @@
+import { useState } from "react";
 import "./SplashPage.css";
 
 /**
- * Splash — Step 1 SCAFFOLD only.
- * Static branded shell from splash_page.dart (visual chrome only).
- * Spec: HexaColors.appName / appTagline; gradient #062E28 → #0E4F46 → #159A8A.
+ * Splash — Step 2 LAYOUT.
+ * Logo asset + 800ms ease-out fade + static spinner (splash_page.dart chrome).
+ * No session restore or API wire.
  */
 export function SplashPage() {
+  const [logoFailed, setLogoFailed] = useState(false);
+
   return (
     <div className="splash-page">
       <div className="splash-page__gradient" aria-hidden="true" />
       <div className="splash-page__center">
         <div className="splash-page__logo" aria-hidden="true">
-          <WarehouseIcon />
+          {logoFailed ? (
+            <WarehouseIcon />
+          ) : (
+            <img
+              className="splash-page__logo-img"
+              src="/brand/app_logo.png"
+              alt=""
+              onError={() => setLogoFailed(true)}
+            />
+          )}
         </div>
         <h1 className="splash-page__title">Harisree Warehouse</h1>
         <p className="splash-page__tagline">Stock · Purchase · Delivery</p>
+        <div className="splash-page__spinner" role="status" aria-label="Loading">
+          <span className="splash-page__spinner-ring" aria-hidden="true" />
+        </div>
       </div>
       <p className="splash-page__footer">Harisree Warehouse v1.0</p>
     </div>

@@ -29,7 +29,7 @@ assert(page.includes('aria-label="Back"'), "Back aria-label");
 assert(page.includes("onClick={handleBack}"), "back onClick");
 assert(page.includes("<button"), "back is button");
 assert(!page.includes("/dashboard?"), "no month dashboard");
-assert(!page.includes("fetch("), "no fetch yet");
+/* WIRE may call home-overview via fetchHomeOverview */
 
 const css = readFileSync(
   join(root, "src/features/home/HomeBreakdownListPage.css"),

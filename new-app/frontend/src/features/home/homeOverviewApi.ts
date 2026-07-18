@@ -51,11 +51,30 @@ export type HomeOverviewOperational = {
   notifications_unread: number;
 };
 
+export type HomeOverviewCategory = {
+  category_id: string;
+  category_name: string;
+  total_purchase: number;
+  total_qty: number;
+  units: { bags: number; boxes: number; tins: number };
+  subtitle_supplier?: string;
+  subtitle_broker?: string;
+  items?: unknown[];
+};
+
+export type HomeOverviewShell = {
+  subcategories: Record<string, unknown>[];
+  suppliers: Record<string, unknown>[];
+  items: Record<string, unknown>[];
+};
+
 export type HomeOverviewPayload = {
   from: string;
   to: string;
   summary: HomeOverviewSummary;
   unit_totals: HomeOverviewUnitTotals;
+  categories?: HomeOverviewCategory[];
+  home_shell?: HomeOverviewShell;
   stock_in_hand?: HomeOverviewStockInHand;
   home_operational?: HomeOverviewOperational;
 };

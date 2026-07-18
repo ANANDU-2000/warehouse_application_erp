@@ -14,4 +14,4 @@
 
 **Rollback:** Revert BUTTONS commit; restore inert back `<span>` (LAYOUT/FIELDS).
 
-**Next:** `/home/breakdown-more` WIRE — dashboard / shell report APIs for Total + ranked rows.
+**Next:** `/home/breakdown-more` WIRE PASS — see [`home_breakdown_wire_compare.md`](home_breakdown_wire_compare.md). Next STATES.

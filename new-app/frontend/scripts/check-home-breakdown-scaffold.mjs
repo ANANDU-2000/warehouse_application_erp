@@ -26,7 +26,7 @@ assert(page.includes('data-slot="total-header"'), "total-header slot");
 assert(page.includes('data-slot="search"'), "search slot");
 assert(page.includes('data-slot="ranked-list"'), "ranked-list slot");
 assert(!page.includes("fetch("), "no fetch in SCAFFOLD");
-/* BUTTONS owns popOrGo */
+/* WIRE may call APIs via fetchHomeOverview — slots still required */
 
 const tabPath = join(root, "src/features/home/homeBreakdownTab.ts");
 assert(existsSync(tabPath), "homeBreakdownTab.ts exists");

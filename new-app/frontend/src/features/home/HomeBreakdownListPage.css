@@ -122,6 +122,72 @@
   font-weight: 700;
 }
 
+.home-breakdown-page__loading,
+.home-breakdown-page__load-error {
+  margin: 8px 0;
+  font-size: 13px;
+  color: var(--home-breakdown-muted);
+}
+
+.home-breakdown-page__load-error {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.home-breakdown-page__tile {
+  padding: 10px 0;
+  box-sizing: border-box;
+}
+
+.home-breakdown-page__tile-top {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.home-breakdown-page__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.home-breakdown-page__tile-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--home-breakdown-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-breakdown-page__tile-amount {
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--home-breakdown-text);
+}
+
+.home-breakdown-page__tile-sub {
+  margin: 4px 0 0 18px;
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--home-breakdown-muted);
+}
+
+.home-breakdown-page__tile-qty {
+  font-weight: 800;
+  color: var(--home-breakdown-text);
+}
+
+.home-breakdown-page__tile-tail {
+  font-weight: 600;
+}
+
 /* Search field — white, r12, brandBorder */
 .home-breakdown-page__search[hidden] {
   display: none;

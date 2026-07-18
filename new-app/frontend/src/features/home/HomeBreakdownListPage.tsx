@@ -1,19 +1,37 @@
 /**
- * Owner `/home/breakdown-more` — Step 4 BUTTONS.
- * Source: home_breakdown_list_page.dart AppBar leading popOrGo('/home').
+ * Owner `/home/breakdown-more` — Step 5 WIRE.
+ * Source: home_breakdown_list_page.dart + homeDashboardDataProvider / home_shell.
+ * API: GET …/reports/home-overview only (never /dashboard).
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   HOME_BREAKDOWN_SEARCH_HINT,
   HOME_BREAKDOWN_TOTAL_LABEL,
 } from "./homeBreakdownCopy";
+import { breakdownRowMatchesQuery } from "./homeBreakdownSearch";
 import {
   homeBreakdownAppBarTitle,
   homeBreakdownTabFromQuery,
   type HomeBreakdownTab,
 } from "./homeBreakdownTab";
+import {
+  BREAKDOWN_DOT_COLORS,
+  categoryQtyLabel,
+  dashboardUnitsLineFromOverview,
+  itemUpperQtyLine,
+} from "./homeBreakdownUnits";
+import { formatRupee } from "./homeFormatters";
+import {
+  fetchHomeOverview,
+  type HomeOverviewCategory,
+  type HomeOverviewPayload,
+} from "./homeOverviewApi";
+import { homePeriodApiDates } from "./homePeriod";
+import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import "./HomeBreakdownListPage.css";
+
+export const HOME_BREAKDOWN_LOADING = "Loading…";
 
 /** Flutter navigation_ext.popOrGo — pop when stack allows, else go fallback. */
 function popOrGo(navigate: ReturnType<typeof useNavigate>, fallback: string) {
@@ -34,19 +52,182 @@ function resolveTab(raw: string | null): HomeBreakdownTab {
   return homeBreakdownTabFromQuery(raw) ?? "category";
 }
 
+function coerceNum(v: unknown): number {
+  if (typeof v === "number" && Number.isFinite(v)) return v;
+  if (typeof v === "string" && v.trim() !== "") {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  }
+  return 0;
+}
+
+type DisplayRow = {
+  title: string;
+  amount: number;
+  qtyLine: string;
+  rest1?: string;
+  rest2?: string;
+};
+
+function categoryRows(cats: HomeOverviewCategory[]): DisplayRow[] {
+  return [...cats]
+    .filter((c) => coerceNum(c.total_purchase) > 0)
+    .sort(
+      (a, b) => coerceNum(b.total_purchase) - coerceNum(a.total_purchase),
+    )
+    .map((c) => {
+      const units = c.units ?? { bags: 0, boxes: 0, tins: 0 };
+      const firstUnit =
+        Array.isArray(c.items) &&
+        c.items[0] &&
+        typeof c.items[0] === "object" &&
+        "unit" in (c.items[0] as object)
+          ? String((c.items[0] as { unit?: string }).unit ?? "")
+          : undefined;
+      return {
+        title: c.category_name?.trim() || "Uncategorised",
+        amount: coerceNum(c.total_purchase),
+        qtyLine: categoryQtyLabel(
+          {
+            bags: coerceNum(units.bags),
+            boxes: coerceNum(units.boxes),
+            tins: coerceNum(units.tins),
+          },
+          coerceNum(c.total_qty),
+          firstUnit,
+        ),
+        rest1: c.subtitle_supplier?.trim() || "—",
+        rest2: c.subtitle_broker?.trim() || "—",
+      };
+    });
+}
+
+function shellRows(
+  tab: HomeBreakdownTab,
+  overview: HomeOverviewPayload,
+  query: string,
+): DisplayRow[] {
+  const shell = overview.home_shell;
+  if (!shell) return [];
+  if (tab === "subcategory") {
+    const rows = [...(shell.subcategories ?? [])].sort(
+      (a, b) =>
+        coerceNum(b.total_purchase) - coerceNum(a.total_purchase),
+    );
+    return rows
+      .map((a) => {
+        const typ = String(a.type_name ?? "").trim();
+        const title = typ
+          ? typ
+          : String(a.category_name ?? "—");
+        const qtyLine = itemUpperQtyLine(a);
+        return {
+          title,
+          amount: coerceNum(a.total_purchase),
+          qtyLine,
+        };
+      })
+      .filter((r) =>
+        breakdownRowMatchesQuery({
+          title: r.title,
+          qtyLine: r.qtyLine,
+          query,
+        }),
+      );
+  }
+  if (tab === "supplier") {
+    const rows = [...(shell.suppliers ?? [])].sort(
+      (a, b) =>
+        coerceNum(b.total_purchase) - coerceNum(a.total_purchase),
+    );
+    return rows
+      .map((a) => {
+        const title = String(a.supplier_name ?? "—");
+        const qtyLine = itemUpperQtyLine(a);
+        return {
+          title,
+          amount: coerceNum(a.total_purchase),
+          qtyLine,
+        };
+      })
+      .filter((r) =>
+        breakdownRowMatchesQuery({
+          title: r.title,
+          qtyLine: r.qtyLine,
+          query,
+        }),
+      );
+  }
+  if (tab === "items") {
+    const rows = [...(shell.items ?? [])].sort(
+      (a, b) =>
+        coerceNum(b.total_purchase) - coerceNum(a.total_purchase),
+    );
+    return rows
+      .map((a) => {
+        const title = String(a.item_name ?? "—");
+        const qtyLine = itemUpperQtyLine(a, title);
+        return {
+          title,
+          amount: coerceNum(a.total_purchase),
+          qtyLine,
+        };
+      })
+      .filter((r) =>
+        breakdownRowMatchesQuery({
+          title: r.title,
+          qtyLine: r.qtyLine,
+          query,
+        }),
+      );
+  }
+  return [];
+}
+
 export function HomeBreakdownListPage() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const tab = resolveTab(params.get("tab"));
   const title = homeBreakdownAppBarTitle(tab);
-  /** Flutter: showBreakdownSearch only for non-category tabs. */
   const showSearch = tab !== "category";
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
-  /** Flutter `_breakdownSearchActive` — collapses total header chrome. */
   const searchActive =
     showSearch && (searchFocused || searchQuery.trim() !== "");
+
+  const [overview, setOverview] = useState<HomeOverviewPayload | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const session = readPrimaryBusiness();
+    if (!session?.id) {
+      setLoading(false);
+      setOverview(null);
+      setLoadError(null);
+      return;
+    }
+    const { from, to } = homePeriodApiDates("month");
+    const ac = new AbortController();
+    setLoading(true);
+    setLoadError(null);
+    void fetchHomeOverview({ businessId: session.id, from, to })
+      .then((data) => {
+        if (ac.signal.aborted) return;
+        setOverview(data);
+        setLoading(false);
+      })
+      .catch((err: unknown) => {
+        if (ac.signal.aborted) return;
+        const msg =
+          err instanceof Error ? err.message : "Could not load breakdown";
+        setLoadError(msg);
+        setOverview(null);
+        setLoading(false);
+      });
+    return () => ac.abort();
+  }, []);
 
   function clearSearch() {
     setSearchQuery("");
@@ -55,6 +236,18 @@ export function HomeBreakdownListPage() {
   function handleBack() {
     popOrGo(navigate, "/home");
   }
+
+  const rows: DisplayRow[] =
+    overview == null
+      ? []
+      : tab === "category"
+        ? categoryRows(overview.categories ?? [])
+        : shellRows(tab, overview, searchQuery);
+
+  const totalAmount = overview?.summary.total_purchase ?? 0;
+  const unitsLine = overview
+    ? dashboardUnitsLineFromOverview(overview.unit_totals)
+    : "—";
 
   return (
     <div
@@ -122,40 +315,90 @@ export function HomeBreakdownListPage() {
           />
         )}
 
-        <section
-          className="home-breakdown-page__total-header"
-          data-slot="total-header"
-          data-testid="home-breakdown-slot-total-header"
-          aria-label="Total header"
-          hidden={searchActive}
-        >
-          {!searchActive ? (
-            <div className="home-breakdown-page__total-card">
-              <span className="home-breakdown-page__total-label">
-                {HOME_BREAKDOWN_TOTAL_LABEL}
-              </span>
-              <span
-                className="home-breakdown-page__total-amount home-breakdown-page__total-amount--placeholder"
-                aria-hidden="true"
-              >
-                —
-              </span>
-              <span
-                className="home-breakdown-page__total-units home-breakdown-page__total-units--placeholder"
-                aria-hidden="true"
-              >
-                —
-              </span>
-            </div>
-          ) : null}
-        </section>
+        {loading ? (
+          <p className="home-breakdown-page__loading" role="status">
+            {HOME_BREAKDOWN_LOADING}
+          </p>
+        ) : null}
+        {!loading && loadError ? (
+          <p className="home-breakdown-page__load-error" role="alert">
+            {loadError}
+          </p>
+        ) : null}
 
-        <section
-          className="home-breakdown-page__ranked-list"
-          data-slot="ranked-list"
-          data-testid="home-breakdown-slot-ranked-list"
-          aria-label="Ranked list"
+        {!loading && !loadError ? (
+          <>
+            <section
+              className="home-breakdown-page__total-header"
+              data-slot="total-header"
+              data-testid="home-breakdown-slot-total-header"
+              aria-label="Total header"
+              hidden={searchActive}
+            >
+              {!searchActive ? (
+                <div className="home-breakdown-page__total-card">
+                  <span className="home-breakdown-page__total-label">
+                    {HOME_BREAKDOWN_TOTAL_LABEL}
+                  </span>
+                  <span className="home-breakdown-page__total-amount">
+                    {formatRupee(totalAmount)}
+                  </span>
+                  <span className="home-breakdown-page__total-units">
+                    {unitsLine}
+                  </span>
+                </div>
+              ) : null}
+            </section>
+
+            <section
+              className="home-breakdown-page__ranked-list"
+              data-slot="ranked-list"
+              data-testid="home-breakdown-slot-ranked-list"
+              aria-label="Ranked list"
+            >
+              {rows.map((row, i) => (
+                <BreakdownTile
+                  key={`${row.title}-${i}`}
+                  row={row}
+                  dot={BREAKDOWN_DOT_COLORS[i % BREAKDOWN_DOT_COLORS.length]}
+                />
+              ))}
+            </section>
+          </>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function BreakdownTile({
+  row,
+  dot,
+}: {
+  row: DisplayRow;
+  dot: string;
+}) {
+  const tail = [row.rest1, row.rest2]
+    .filter((s) => s && s.trim() !== "" && s.trim() !== "—")
+    .join(" · ");
+  return (
+    <div className="home-breakdown-page__tile" role="listitem">
+      <div className="home-breakdown-page__tile-top">
+        <span
+          className="home-breakdown-page__dot"
+          style={{ background: dot }}
+          aria-hidden="true"
         />
+        <span className="home-breakdown-page__tile-title">{row.title}</span>
+        <span className="home-breakdown-page__tile-amount">
+          {formatRupee(row.amount)}
+        </span>
+      </div>
+      <div className="home-breakdown-page__tile-sub">
+        <span className="home-breakdown-page__tile-qty">{row.qtyLine}</span>
+        {tail ? (
+          <span className="home-breakdown-page__tile-tail"> · {tail}</span>
+        ) : null}
       </div>
     </div>
   );

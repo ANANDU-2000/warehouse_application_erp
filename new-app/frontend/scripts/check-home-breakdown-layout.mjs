@@ -34,8 +34,7 @@ assert(page.includes("HOME_BREAKDOWN_TOTAL_LABEL"), "uses Total constant");
 assert(page.includes("HOME_BREAKDOWN_SEARCH_HINT"), "uses search hint");
 assert(page.includes("BackIcon") || page.includes("back-icon"), "back icon");
 assert(page.includes('aria-label="Back"'), "Back aria-label");
-/* BUTTONS owns popOrGo */
-assert(!page.includes("fetch("), "no fetch");
+/* BUTTONS owns popOrGo; WIRE owns home-overview fetch */
 
 assert(page.includes('data-slot="total-header"'), "total-header slot");
 assert(page.includes('data-slot="search"'), "search slot");

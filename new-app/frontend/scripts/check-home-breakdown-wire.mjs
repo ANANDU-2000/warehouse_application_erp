@@ -32,7 +32,12 @@ assert(page.includes("formatRupee"), "INR format");
 assert(page.includes("categoryRows") || page.includes("categories"), "categories");
 assert(page.includes("home_shell") || page.includes("shellRows"), "home_shell");
 assert(page.includes("breakdownRowMatchesQuery"), "search filter");
-assert(page.includes("HOME_BREAKDOWN_LOADING") || page.includes("Loading…"), "loading");
+assert(
+  page.includes("home-breakdown-page__spinner-ring") ||
+    page.includes("home-breakdown-cold-spinner") ||
+    page.includes("CircularProgress"),
+  "cold-load spinner (STATES)",
+);
 assert(!page.includes("/dashboard?"), "no month dashboard path");
 assert(!page.includes('"/dashboard"'), "no /dashboard string");
 

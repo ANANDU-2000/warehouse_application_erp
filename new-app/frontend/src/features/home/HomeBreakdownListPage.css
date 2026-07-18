@@ -122,16 +122,29 @@
   font-weight: 700;
 }
 
-.home-breakdown-page__loading,
-.home-breakdown-page__load-error {
-  margin: 8px 0;
-  font-size: 13px;
-  color: var(--home-breakdown-muted);
+/* Cold load — Flutter Center(CircularProgressIndicator) */
+.home-breakdown-page__cold-load {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
 }
 
-.home-breakdown-page__load-error {
-  color: #b91c1c;
-  font-weight: 600;
+.home-breakdown-page__spinner-ring {
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid rgba(14, 79, 70, 0.2);
+  border-top-color: #0e4f46;
+  animation: home-breakdown-spin 0.8s linear infinite;
+}
+
+@keyframes home-breakdown-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .home-breakdown-page__tile {

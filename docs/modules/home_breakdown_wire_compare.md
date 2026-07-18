@@ -13,12 +13,12 @@
 | 6 | Tile chrome (dot / title / amount / qty) | `_breakdownTile` | Display-only tiles | PASS |
 | 7 | Non-category from `home_shell` + search filter | Yes | `shellRows` + match helper | PASS |
 | 8 | Default period month dates | Shared home period | `homePeriodApiDates("month")` | PASS |
-| 9 | Minimal loading copy | Spinner | `Loading…` | PASS |
+| 9 | Minimal loading copy | Spinner | Deferred → STATES spinner | N/A |
 | 10 | Shell subcategories/suppliers/items data | Full when API fills | Backend often empty — UI wired | N/A |
 | 11 | Cross-route period sync with `/home` | Riverpod shared | **Deferred** | N/A |
 | 12 | Row tap → catalog/supplier | Yes | **Deferred** | N/A |
-| 13 | FriendlyLoadError / empty HexaEmptyState | Yes | **Deferred STATES** | N/A |
+| 13 | FriendlyLoadError / empty HexaEmptyState | **Not on this Flutter page** | Confirmed N/A in STATES | N/A |
 
 **Rollback:** Revert WIRE commit; restore BUTTONS-only page (placeholders, no fetch).
 
-**Next:** `/home/breakdown-more` STATES — skeleton, FriendlyLoadError + Retry, empty copy.
+**Next:** `/home/breakdown-more` STATES PASS — see [`home_breakdown_states_compare.md`](home_breakdown_states_compare.md). Next COMPARE.

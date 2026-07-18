@@ -1,6 +1,7 @@
 /**
- * Owner `/home/breakdown-more` — Step 5 WIRE.
- * Source: home_breakdown_list_page.dart + homeDashboardDataProvider / home_shell.
+ * Owner `/home/breakdown-more` — Step 6 STATES.
+ * Source: home_breakdown_list_page.dart — Center CircularProgressIndicator cold load;
+ * silent empty ranked list (no HexaEmptyState / FriendlyLoadError on this route).
  * API: GET …/reports/home-overview only (never /dashboard).
  */
 import { useEffect, useState } from "react";
@@ -31,7 +32,35 @@ import { homePeriodApiDates } from "./homePeriod";
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import "./HomeBreakdownListPage.css";
 
-export const HOME_BREAKDOWN_LOADING = "Loading…";
+/** Flutter empty seed when fetch fails / no session — Total ₹0 + 0 KG. */
+function emptyOverviewSeed(): HomeOverviewPayload {
+  return {
+    from: "",
+    to: "",
+    summary: {
+      deals: 0,
+      total_purchase: 0,
+      total_landing: 0,
+      total_selling: 0,
+      total_profit: 0,
+      profit_percent: null,
+      total_qty: 0,
+      pending_delivery_count: 0,
+      supplier_count: 0,
+      broker_count: 0,
+      received_delivery_count: 0,
+      negative_stock_count: 0,
+    },
+    unit_totals: {
+      total_kg: 0,
+      total_bags: 0,
+      total_boxes: 0,
+      total_tins: 0,
+    },
+    categories: [],
+    home_shell: { subcategories: [], suppliers: [], items: [] },
+  };
+}
 
 /** Flutter navigation_ext.popOrGo — pop when stack allows, else go fallback. */
 function popOrGo(navigate: ReturnType<typeof useNavigate>, fallback: string) {
@@ -198,32 +227,27 @@ export function HomeBreakdownListPage() {
 
   const [overview, setOverview] = useState<HomeOverviewPayload | null>(null);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     const session = readPrimaryBusiness();
     if (!session?.id) {
       setLoading(false);
-      setOverview(null);
-      setLoadError(null);
+      setOverview(emptyOverviewSeed());
       return;
     }
     const { from, to } = homePeriodApiDates("month");
     const ac = new AbortController();
     setLoading(true);
-    setLoadError(null);
     void fetchHomeOverview({ businessId: session.id, from, to })
       .then((data) => {
         if (ac.signal.aborted) return;
         setOverview(data);
         setLoading(false);
       })
-      .catch((err: unknown) => {
+      .catch(() => {
+        /* Flutter: failed fetch → empty seed; no FriendlyLoadError on this page */
         if (ac.signal.aborted) return;
-        const msg =
-          err instanceof Error ? err.message : "Could not load breakdown";
-        setLoadError(msg);
-        setOverview(null);
+        setOverview(emptyOverviewSeed());
         setLoading(false);
       });
     return () => ac.abort();
@@ -237,6 +261,9 @@ export function HomeBreakdownListPage() {
     popOrGo(navigate, "/home");
   }
 
+  /** Cold load: Flutter body = Center(CircularProgressIndicator) only. */
+  const showColdSpinner = loading && overview == null;
+
   const rows: DisplayRow[] =
     overview == null
       ? []
@@ -247,7 +274,7 @@ export function HomeBreakdownListPage() {
   const totalAmount = overview?.summary.total_purchase ?? 0;
   const unitsLine = overview
     ? dashboardUnitsLineFromOverview(overview.unit_totals)
-    : "—";
+    : "0 KG";
 
   return (
     <div
@@ -271,63 +298,67 @@ export function HomeBreakdownListPage() {
         <h1 className="home-breakdown-page__title">{title}</h1>
       </header>
 
-      <div className="home-breakdown-page__body">
-        {showSearch ? (
-          <section
-            className="home-breakdown-page__search"
-            data-slot="search"
-            data-testid="home-breakdown-slot-search"
-            aria-label="Search"
+      <div
+        className="home-breakdown-page__body"
+        aria-busy={showColdSpinner}
+      >
+        {showColdSpinner ? (
+          <div
+            className="home-breakdown-page__cold-load"
+            role="status"
+            aria-label="Loading"
+            data-testid="home-breakdown-cold-spinner"
           >
-            <div className="home-breakdown-page__search-chrome">
-              <SearchIcon />
-              <input
-                type="search"
-                className="home-breakdown-page__search-input"
-                placeholder={HOME_BREAKDOWN_SEARCH_HINT}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setSearchFocused(true)}
-                onBlur={() => setSearchFocused(false)}
-                aria-label={HOME_BREAKDOWN_SEARCH_HINT}
-                data-testid="home-breakdown-search-input"
-              />
-              {searchQuery.trim() !== "" ? (
-                <button
-                  type="button"
-                  className="home-breakdown-page__search-clear"
-                  aria-label="Clear"
-                  onClick={clearSearch}
-                  data-testid="home-breakdown-search-clear"
-                >
-                  <ClearIcon />
-                </button>
-              ) : null}
-            </div>
-          </section>
+            <span
+              className="home-breakdown-page__spinner-ring"
+              aria-hidden="true"
+            />
+          </div>
         ) : (
-          <section
-            className="home-breakdown-page__search"
-            data-slot="search"
-            data-testid="home-breakdown-slot-search"
-            aria-label="Search"
-            hidden
-          />
-        )}
-
-        {loading ? (
-          <p className="home-breakdown-page__loading" role="status">
-            {HOME_BREAKDOWN_LOADING}
-          </p>
-        ) : null}
-        {!loading && loadError ? (
-          <p className="home-breakdown-page__load-error" role="alert">
-            {loadError}
-          </p>
-        ) : null}
-
-        {!loading && !loadError ? (
           <>
+            {showSearch ? (
+              <section
+                className="home-breakdown-page__search"
+                data-slot="search"
+                data-testid="home-breakdown-slot-search"
+                aria-label="Search"
+              >
+                <div className="home-breakdown-page__search-chrome">
+                  <SearchIcon />
+                  <input
+                    type="search"
+                    className="home-breakdown-page__search-input"
+                    placeholder={HOME_BREAKDOWN_SEARCH_HINT}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => setSearchFocused(true)}
+                    onBlur={() => setSearchFocused(false)}
+                    aria-label={HOME_BREAKDOWN_SEARCH_HINT}
+                    data-testid="home-breakdown-search-input"
+                  />
+                  {searchQuery.trim() !== "" ? (
+                    <button
+                      type="button"
+                      className="home-breakdown-page__search-clear"
+                      aria-label="Clear"
+                      onClick={clearSearch}
+                      data-testid="home-breakdown-search-clear"
+                    >
+                      <ClearIcon />
+                    </button>
+                  ) : null}
+                </div>
+              </section>
+            ) : (
+              <section
+                className="home-breakdown-page__search"
+                data-slot="search"
+                data-testid="home-breakdown-slot-search"
+                aria-label="Search"
+                hidden
+              />
+            )}
+
             <section
               className="home-breakdown-page__total-header"
               data-slot="total-header"
@@ -365,7 +396,7 @@ export function HomeBreakdownListPage() {
               ))}
             </section>
           </>
-        ) : null}
+        )}
       </div>
     </div>
   );

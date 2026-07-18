@@ -66,6 +66,18 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 4 BUTTONS | ✅ | back popOrGo `/home` — [`home_activity_buttons_compare.md`](modules/home_activity_buttons_compare.md) |
 | 5 WIRE | ✅ | trade/audit/staff feed — [`home_activity_wire_compare.md`](modules/home_activity_wire_compare.md) |
 | 6 STATES | ✅ | skeleton / FriendlyLoadError / empty — [`home_activity_states_compare.md`](modules/home_activity_states_compare.md) |
+| 7 COMPARE | ✅ | in-scope PASS — [`home_activity_compare.md`](modules/home_activity_compare.md) |
+
+### Dashboard (owner `/home/breakdown-more`)
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ⬜ | |
+| 2 LAYOUT | ⬜ | |
+| 3 FIELDS | ⬜ | |
+| 4 BUTTONS | ⬜ | |
+| 5 WIRE | ⬜ | |
+| 6 STATES | ⬜ | |
 | 7 COMPARE | ⬜ | |
 
 ### Dashboard (staff `/staff/home`)

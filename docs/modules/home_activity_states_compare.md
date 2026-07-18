@@ -20,4 +20,4 @@
 
 **Rollback:** Revert STATES commit; restore WIRE plain loading/error paragraphs.
 
-**Next:** `/home/activity` COMPARE — full Legacy vs New for this route.
+**Next:** `/home/activity` COMPARE PASS — see [`home_activity_compare.md`](home_activity_compare.md). Next `/home/breakdown-more` SCAFFOLD.

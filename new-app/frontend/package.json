@@ -31,6 +31,7 @@
     "test:home-activity-buttons": "node scripts/check-home-activity-buttons.mjs",
     "test:home-activity-wire": "node scripts/check-home-activity-wire.mjs",
     "test:home-activity-states": "node scripts/check-home-activity-states.mjs",
+    "test:home-activity-compare": "node scripts/check-home-activity-compare.mjs",
     "test:staff-home-scaffold": "node scripts/check-staff-home-scaffold.mjs",
     "test:staff-home-layout": "node scripts/check-staff-home-layout.mjs",
     "test:staff-home-fields": "node scripts/check-staff-home-fields.mjs",

@@ -22,13 +22,13 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE**. Phase 3: **COMPLETE** (platform) — next **4.1 Project scaffold**.
+**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE**. Phase 3: **COMPLETE** (platform). Login E2E **L1 PASS** — next **L2** login DB commit (then L3 = 4.1 scaffold).
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
 | # | Module | Status | Evidence |
 |---|---|---|---|
-| 1 | Login | ✅ Analyze+Review PASS | `docs/modules/login.md`, `docs/matrix/login_traceability.md` |
+| 1 | Login | 🟡 E2E L1 PASS | Analyze ✅ · L1 `GET /v1/me/businesses` ✅ (`docs/43`) · next L2 DB commit |
 | 2 | Dashboard | ✅ Analyze+Review PASS | `docs/modules/dashboard.md`, `docs/matrix/dashboard_traceability.md` |
 | 3 | Users & Roles | ✅ Analyze+Review PASS | `docs/modules/users-roles.md`, `docs/matrix/users-roles_traceability.md`, `docs/matrix/roles_permissions_matrix.md` |
 | 4 | Products | ✅ Analyze+Review PASS | `docs/modules/products.md`, `docs/matrix/products_traceability.md`, branch `phase1/products-analysis` |
@@ -44,7 +44,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Phase 3 platform COMPLETE (`PHASE3_SIGN_OFF.md`); next: **4.1 React scaffold** or Login completion (`GET /v1/me/businesses`, Unknown #1) as a focused micro-plan.
+**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Login E2E in progress: **L1** ✅ `docs/43_Me_Businesses.md` → next **L2** login DB commit → L3 Phase 4.1 → L4 splash/login UI → L5 E2E PASS.
 
 ### Cursor operator setup (workspace)
 
@@ -192,4 +192,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-18 — Phase 3 platform PASS (`PHASE3_SIGN_OFF.md`); next = 4.1 React scaffold (or Login completion micro-plan).*
+*Last updated: 2026-07-18 — Login E2E L1 PASS (`43_Me_Businesses.md`); next = L2 login DB commit.*

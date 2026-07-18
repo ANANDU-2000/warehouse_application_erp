@@ -4,13 +4,16 @@ import { requestId } from "./middleware/requestId";
 import { requestLog } from "./middleware/requestLog";
 import { apiRouter } from "./routes";
 import { createAuthRoutes } from "./routes/auth.routes";
+import { createMeRoutes } from "./routes/me.routes";
 import {
   createAuthController,
   type AuthControllerDeps,
 } from "./controllers/auth.controller";
+import { createMeController } from "./controllers/me.controller";
 import { JwtTokenIssuer } from "./auth/jwtTokenIssuer";
 import type { UsersRepository } from "./repositories/users.repository";
 import type { MembershipsRepository } from "./repositories/memberships.repository";
+import type { BusinessesRepository } from "./repositories/businesses.repository";
 import {
   createAuthzMiddleware,
   type AuthzMiddleware,
@@ -19,9 +22,10 @@ import {
 export type AppDeps = {
   /** Injected for tests / when pool is ready. */
   auth?: Partial<AuthControllerDeps>;
-  /** Repos for authz middleware factories (Phase 3.6). */
+  /** Repos for authz middleware factories (Phase 3.6) + /v1/me. */
   users?: UsersRepository;
   memberships?: MembershipsRepository;
+  businesses?: BusinessesRepository;
 };
 
 /** Fail-closed users repo when SQL pool is not wired. */
@@ -46,6 +50,15 @@ function unavailableMembershipsRepository(): MembershipsRepository {
   } as unknown as MembershipsRepository;
 }
 
+function unavailableBusinessesRepository(): BusinessesRepository {
+  const fail = async (): Promise<never> => {
+    throw new Error("Database pool not connected. Call connect() first.");
+  };
+  return {
+    findById: fail,
+  } as unknown as BusinessesRepository;
+}
+
 export type AppWithAuthz = express.Express & {
   /** Authz middleware bundle — for future /v1/businesses/:businessId routes. */
   authz: AuthzMiddleware;
@@ -60,6 +73,7 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
 
   const users = deps.users ?? deps.auth?.users ?? unavailableUsersRepository();
   const memberships = deps.memberships ?? unavailableMembershipsRepository();
+  const businesses = deps.businesses ?? unavailableBusinessesRepository();
 
   const authDeps: AuthControllerDeps = {
     users,
@@ -68,6 +82,11 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
   app.use("/v1/auth", createAuthRoutes(createAuthController(authDeps)));
 
   app.authz = createAuthzMiddleware(users, memberships);
+
+  app.use(
+    "/v1/me",
+    createMeRoutes(createMeController({ memberships, businesses }), app.authz),
+  );
 
   app.use(errorHandler);
   return app;

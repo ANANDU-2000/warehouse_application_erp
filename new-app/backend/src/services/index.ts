@@ -29,6 +29,9 @@ export { normalizeLoginEmail, resolveUserByEmail } from "./authLogin.service";
 
 export { assertAccountEligible } from "./accountEligibility.service";
 
+export { listMyBusinesses } from "./meBusinesses.service";
+export type { BusinessBrief, ListMyBusinessesDeps } from "./meBusinesses.service";
+
 export {
   createAccessToken,
   createRefreshToken,

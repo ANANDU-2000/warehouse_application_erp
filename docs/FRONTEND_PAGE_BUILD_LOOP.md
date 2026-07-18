@@ -61,7 +61,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | Step | Status | Evidence |
 |---|---|---|
 | 1 SCAFFOLD | ✅ | empty slots — [`home_activity_scaffold_compare.md`](modules/home_activity_scaffold_compare.md) |
-| 2 LAYOUT | ⬜ | AppBar / caption chrome |
+| 2 LAYOUT | ✅ | AppBar / caption / table header — [`home_activity_layout_compare.md`](modules/home_activity_layout_compare.md) |
 | 3 FIELDS | ⬜ | period chips (shared home period) |
 | 4 BUTTONS | ⬜ | back → `/home` |
 | 5 WIRE | ⬜ | activity full feed APIs |

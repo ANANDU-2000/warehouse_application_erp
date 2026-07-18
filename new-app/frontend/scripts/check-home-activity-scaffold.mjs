@@ -20,7 +20,22 @@ const pagePath = join(
 assert(existsSync(pagePath), "HomeWarehouseActivityPage exists");
 
 const page = readFileSync(pagePath, "utf8");
-assert(page.includes("Warehouse activity"), "AppBar title");
+const copyPath = join(root, "src/features/home/homeActivityCopy.ts");
+assert(
+  existsSync(copyPath) || page.includes("Warehouse activity"),
+  "title source exists",
+);
+if (existsSync(copyPath)) {
+  const copy = readFileSync(copyPath, "utf8");
+  assert(copy.includes("Warehouse activity"), "AppBar title");
+} else {
+  assert(page.includes("Warehouse activity"), "AppBar title");
+}
+assert(
+  page.includes("Warehouse activity") ||
+    page.includes("HOME_ACTIVITY_APPBAR_TITLE"),
+  "AppBar title in page",
+);
 assert(page.includes('data-slot="appbar"'), "appbar slot");
 assert(page.includes('data-slot="period-filter"'), "period-filter slot");
 assert(page.includes('data-slot="period-caption"'), "period-caption slot");

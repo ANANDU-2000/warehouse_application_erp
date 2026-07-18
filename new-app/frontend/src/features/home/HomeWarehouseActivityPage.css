@@ -1,8 +1,11 @@
-/* /home/activity SCAFFOLD — empty slots only; LAYOUT owns chrome polish */
+/* /home/activity LAYOUT — AppBar + caption + list card chrome; no API */
 .home-activity-page {
   --home-activity-bg: #f7f9f6;
   --home-activity-border: #e5e7eb;
   --home-activity-text: #0f172a;
+  --home-activity-muted: #64748b;
+  --home-activity-gutter: 16px;
+  --home-activity-header-bg: #f1f5f9;
 
   min-height: 100dvh;
   width: 100%;
@@ -17,11 +20,25 @@
   min-height: 56px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 8px 0 4px;
+  gap: 4px;
+  padding: 0 16px 0 4px;
   box-sizing: border-box;
   background: #ffffff;
   border-bottom: 1px solid var(--home-activity-border);
+}
+
+.home-activity-page__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  color: var(--home-activity-text);
+  flex-shrink: 0;
+}
+
+.home-activity-page__back-icon {
+  display: block;
 }
 
 .home-activity-page__title {
@@ -39,12 +56,82 @@
   min-height: 0;
 }
 
-.home-activity-page__slot {
-  min-height: 48px;
+/* Flutter: padding fromLTRB(0, 8, 0, 4) around period + caption */
+.home-activity-page__period-block {
+  padding: 8px 0 4px;
   box-sizing: border-box;
 }
 
-.home-activity-page__slot--list {
+/* LAYOUT: muted strip placeholder — chips in FIELDS */
+.home-activity-page__period-strip {
+  height: 32px;
+  margin: 0 var(--home-activity-gutter);
+  border-radius: 999px;
+  background: var(--home-activity-header-bg);
+  box-sizing: border-box;
+}
+
+/* Flutter: fromLTRB(16, 2, 16, 0); fontSize 11; Color(0xFF64748B) */
+.home-activity-page__period-caption {
+  margin: 0;
+  padding: 2px var(--home-activity-gutter) 0;
+  font-size: 11px;
+  color: var(--home-activity-muted);
+  line-height: 1.35;
+}
+
+/* Flutter: SliverPadding fromLTRB(16, 12, 16, 24) + Card r16 */
+.home-activity-page__list {
   flex: 1;
-  min-height: 120px;
+  padding: 12px var(--home-activity-gutter) 24px;
+  box-sizing: border-box;
+}
+
+.home-activity-page__card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid var(--home-activity-border);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Title/events line — filled in FIELDS/WIRE */
+.home-activity-page__card-head {
+  min-height: 14px;
+  margin: 14px 16px 0;
+}
+
+/* Flutter _ActivityTableHeader: pad H14 V8, bg #F1F5F9, r10 */
+.home-activity-page__table-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 8px 14px 14px;
+  padding: 8px 14px;
+  box-sizing: border-box;
+  background: var(--home-activity-header-bg);
+  border-radius: 10px;
+}
+
+.home-activity-page__col {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--home-activity-muted);
+  line-height: 1.2;
+}
+
+/* flex 34 / 38 / 28 ≈ Flutter Expanded flex */
+.home-activity-page__col--bill {
+  flex: 34;
+  text-align: left;
+}
+
+.home-activity-page__col--qty {
+  flex: 38;
+  text-align: center;
+}
+
+.home-activity-page__col--verified {
+  flex: 28;
+  text-align: end;
 }

@@ -14,4 +14,4 @@
 
 **Rollback:** Revert SCAFFOLD commit; restore `DashboardRouteStubPage` on `/home/activity`.
 
-**Next:** `/home/activity` LAYOUT — AppBar/back chrome + period caption styling (still no API). Then FIELDS (period chips).
+**Next:** `/home/activity` LAYOUT PASS — see [`home_activity_layout_compare.md`](home_activity_layout_compare.md). Next FIELDS (period chips).

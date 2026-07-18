@@ -22,7 +22,7 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Analysis + module queue + ER + sign-off PASS. Phase 2: **2.1–2.9 PASS** — next **2.10 Phase 2 sign-off**.
+**Phase 1 status: COMPLETE.** Analysis + module queue + ER + sign-off PASS. Phase 2: **COMPLETE** (`PHASE2_SIGN_OFF.md`). Next: **Phase 3.1** backend folder structure.
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
@@ -44,7 +44,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Phase 1 analysis queue complete — next: **Phase 2**.
+**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Phase 1 analysis queue complete; Phase 2 COMPLETE — next: **Phase 3.1**.
 
 ### Cursor operator setup (workspace)
 
@@ -61,9 +61,9 @@
 
 ---
 
-## PHASE 2 — Database Design & SQL Server Migration 🟡
+## PHASE 2 — Database Design & SQL Server Migration ✅
 
-**In progress.** 2.1–2.9 PASS. Next: **2.10 Phase 2 sign-off**.
+**COMPLETE.** 2.1–2.10 PASS. Sign-off: `docs/PHASE2_SIGN_OFF.md`. Next: **Phase 3.1 Folder structure**.
 
 | # | Task | Status | Evidence / notes |
 |---|---|---|---|
@@ -76,24 +76,27 @@
 | 2.7 | Stored procedures / views / triggers (only if source DB logic requires them) | ✅ | `docs/30_Procs_Views_Triggers.md` — none required; 1 PG cleanup function deferred to Phase 3 job |
 | 2.8 | Migration/seed scripts | ✅ | `new-app/database/migrate/` + `docs/31_Migration_Seed.md` — apply/rollback orchestration; app seed deferred to Phase 3 |
 | 2.9 | Schema verification against source (row-for-row structural diff) | ✅ | `docs/32_Schema_Verification.md` — 46 tables, columns match ORM; documented exceptions |
-| 2.10 | Phase 2 sign-off | ⬜ | **Next** — unlocked after 2.9 |
+| 2.10 | Phase 2 sign-off | ✅ | `docs/PHASE2_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 3 unlocked |
 
 ---
 
-## PHASE 3 — Backend Migration (Node/Express) 🔒
-| # | Task | Status |
-|---|---|---|
-| 3.1 | Folder structure (Clean Architecture: routes/controllers/services/repositories) | 🔒 |
-| 3.2 | Repository pattern per table/aggregate | 🔒 |
-| 3.3 | Service layer (business logic, ported 1:1 from FastAPI services) | 🔒 |
-| 3.4 | Controllers/routes (Express routers matching `18_API_Inventory.md` paths) | 🔒 |
-| 3.5 | Authentication (JWT, refresh, Google OAuth) | 🔒 |
-| 3.6 | Authorization (role + `permissions_json` enforcement, business-scoping) | 🔒 |
-| 3.7 | Validation layer (equivalent to Pydantic — e.g. Zod) | 🔒 |
-| 3.8 | Error handling middleware | 🔒 |
-| 3.9 | Logging | 🔒 |
-| 3.10 | Transactions (multi-table writes — e.g. purchase commit-stock flow) | 🔒 |
-| 3.11 | Phase 3 sign-off (per module, not all at once — see Implementation Rule) | 🔒 |
+## PHASE 3 — Backend Migration (Node/Express) 🟡
+
+**Unlocked.** Next: **3.1 Folder structure**.
+
+| # | Task | Status | Evidence / notes |
+|---|---|---|---|
+| 3.1 | Folder structure (Clean Architecture: routes/controllers/services/repositories) | ⬜ | **Next** — unlocked after Phase 2 sign-off |
+| 3.2 | Repository pattern per table/aggregate | 🔒 | |
+| 3.3 | Service layer (business logic, ported 1:1 from FastAPI services) | 🔒 | |
+| 3.4 | Controllers/routes (Express routers matching `18_API_Inventory.md` paths) | 🔒 | |
+| 3.5 | Authentication (JWT, refresh, Google OAuth) | 🔒 | |
+| 3.6 | Authorization (role + `permissions_json` enforcement, business-scoping) | 🔒 | |
+| 3.7 | Validation layer (equivalent to Pydantic — e.g. Zod) | 🔒 | |
+| 3.8 | Error handling middleware | 🔒 | |
+| 3.9 | Logging | 🔒 | |
+| 3.10 | Transactions (multi-table writes — e.g. purchase commit-stock flow) | 🔒 | |
+| 3.11 | Phase 3 sign-off (per module, not all at once — see Implementation Rule) | 🔒 | |
 
 ---
 
@@ -186,4 +189,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-18 — Phase 2.1–2.9 PASS (`31_Migration_Seed.md`, `32_Schema_Verification.md`); next = 2.10 Phase 2 sign-off.*
+*Last updated: 2026-07-18 — Phase 2 COMPLETE (`PHASE2_SIGN_OFF.md`); next = Phase 3.1 backend folder structure.*

@@ -42,6 +42,8 @@ Seed strategy (app-layer Phase 3) — `docs/31_Migration_Seed.md`.
 
 Structural ORM vs DDL **PASS** — `docs/32_Schema_Verification.md`.
 
-**Next:** Phase **2.10** sign-off.
+## Phase 2 sign-off (Phase 2.10)
+
+**COMPLETE** — `docs/PHASE2_SIGN_OFF.md`. Next: Phase **3.1** Node/Express folder structure.
 
 Type mapping: `docs/25_SQL_Server_Type_Mapping.md`.

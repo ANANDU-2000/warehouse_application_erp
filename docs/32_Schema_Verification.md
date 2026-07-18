@@ -74,7 +74,7 @@ Verification is documentation only. Schema rollback remains `migrate/Rollback-Sc
 
 ## 6. Next
 
-**Phase 2.10** — Phase 2 sign-off (unlock after this PASS).
+**Phase 2.10** — done: see `docs/PHASE2_SIGN_OFF.md`.
 
 ---
 

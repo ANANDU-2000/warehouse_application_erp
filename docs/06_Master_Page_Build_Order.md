@@ -11,7 +11,7 @@
 
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
-| 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | **YES** — UI Step 6 STATES |
+| 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | **COMPARE PASS** — next Splash |
 | 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | ❌ | Blocked |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 me/businesses only | Blocked |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI steps: **1–5** ✅ → **6 STATES** (current) → 7 COMPARE → splash later.
+Login UI steps: **1–7 COMPARE PASS** (`login_compare.md`) → next Splash → Dashboard blocked until backend.
 
 ---
 
@@ -73,7 +73,7 @@ Live local SQL uses the pool wired in [`new-app/backend/src/index.ts`](../new-ap
 | Path | Notes |
 |---|---|
 | `/splash` | Later (session restore gate) |
-| `/login` | **Step 6 STATES** |
+| `/login` | **COMPARE PASS** |
 | `/forgot-password` | Stub only (full page later) |
 | `/home` | Post-login stub (Dashboard gated) |
 | `/staff/home` | Post-login stub (Dashboard gated) |

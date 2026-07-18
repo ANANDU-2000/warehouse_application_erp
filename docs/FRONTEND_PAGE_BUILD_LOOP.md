@@ -32,7 +32,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 4 BUTTONS | ✅ | Sign In + Forgot stub + helper/© — no live API |
 | 5 WIRE | ✅ | `POST /v1/auth/login` → tokens → `GET /v1/me/businesses` → home stubs |
 | 6 STATES | ✅ | network banner + full §12 HTTP error mapping |
-| 7 COMPARE | ⬜ | Full Login PASS/FAIL |
+| 7 COMPARE | ✅ | [`login_compare.md`](modules/login_compare.md) — in-scope **PASS**; deferrals listed |
 
 ### Prompt template (copy per page)
 

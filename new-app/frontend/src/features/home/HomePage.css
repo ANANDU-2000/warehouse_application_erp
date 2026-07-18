@@ -1,4 +1,4 @@
-/* Owner /home LAYOUT — HexaOp gutters + home_compact_header chrome; no API */
+/* Owner /home FIELDS — period chips + LAYOUT chrome; no API */
 .home-page {
   --home-brand: #0e4f46;
   --home-bg: #f7f9f6;
@@ -134,20 +134,83 @@
   max-width: 960px;
   width: calc(100% - 32px);
   align-self: center;
-  min-height: 36px;
-  border-radius: 8px;
-  background: #eef2ef;
-  border: 1px solid var(--home-border);
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.home-page__period-chrome {
+.home-page__period-chips {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  overflow-x: auto;
+  padding: 0 4px;
+  scrollbar-width: thin;
+}
+
+.home-page__period-chip {
+  flex-shrink: 0;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--home-border);
+  background: #f1f5f9;
+  color: var(--home-text);
   font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.home-page__period-chip--selected {
+  background: var(--home-brand);
+  border-color: var(--home-brand);
+  color: #ffffff;
+}
+
+.home-page__period-caption {
+  margin: 0;
+  padding: 2px var(--home-gutter) 0;
+  font-size: 11px;
+  color: var(--home-muted);
+}
+
+.home-page__custom-range {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 8px var(--home-gutter) 4px;
+}
+
+.home-page__custom-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--home-muted);
+}
+
+.home-page__custom-field input[type="date"] {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--home-text);
+  border: 1px solid var(--home-border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: #ffffff;
+}
+
+.home-page__custom-error {
+  margin: 0;
+  width: 100%;
+  font-size: 11px;
+  font-weight: 600;
+  color: #b91c1c;
 }
 
 .home-page__body {

@@ -29,7 +29,6 @@ assert(home.includes("home-page__card"), "card sections");
 assert(home.includes('data-slot="compact-header"'), "header slot");
 assert(!home.includes("fetch("), "no fetch");
 assert(!home.includes("useNavigate"), "no navigate");
-assert(!home.includes("onClick"), "no click handlers");
 
 const css = readFileSync(
   join(root, "src/features/home/HomePage.css"),

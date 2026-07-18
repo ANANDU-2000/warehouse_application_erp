@@ -1,11 +1,49 @@
+import { useState } from "react";
 import "./HomePage.css";
+import {
+  HOME_PERIOD_LABELS,
+  HOME_PERIOD_ORDER,
+  defaultCustomRange,
+  isValidCustomRange,
+  parseDateInputValue,
+  toDateInputValue,
+  type HomeCustomRange,
+  type HomePeriod,
+} from "./homePeriod";
 
 /**
- * Owner `/home` — Step 2 LAYOUT.
- * Compact header chrome + card section surfaces (HexaOp / home_compact_header).
- * No period chips, KPI data, or network calls.
+ * Owner `/home` — Step 3 FIELDS.
+ * Period chips + client state (HomePeriodFilterRow / homePeriodProvider).
+ * No KPI data or network calls.
  */
 export function HomePage() {
+  const [period, setPeriod] = useState<HomePeriod>("month");
+  const [customRange, setCustomRange] = useState<HomeCustomRange>(() =>
+    defaultCustomRange(),
+  );
+
+  function selectPeriod(next: HomePeriod) {
+    setPeriod(next);
+  }
+
+  function onCustomFromChange(value: string) {
+    const parsed = parseDateInputValue(value);
+    if (!parsed) return;
+    setCustomRange((prev) => ({
+      start: parsed,
+      endInclusive: prev.endInclusive,
+    }));
+  }
+
+  function onCustomToChange(value: string) {
+    const parsed = parseDateInputValue(value);
+    if (!parsed) return;
+    setCustomRange((prev) => ({
+      start: prev.start,
+      endInclusive: parsed,
+    }));
+  }
+
   return (
     <div className="home-page" data-testid="home-page">
       <header
@@ -42,7 +80,56 @@ export function HomePage() {
         aria-label="Period filter"
         data-slot="sticky-period"
       >
-        <span className="home-page__period-chrome">Period</span>
+        <div
+          className="home-page__period-chips"
+          role="listbox"
+          aria-label="Period"
+        >
+          {HOME_PERIOD_ORDER.map((key) => {
+            const label = HOME_PERIOD_LABELS[key];
+            const selected = period === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                role="option"
+                aria-selected={selected}
+                className={`home-page__period-chip${selected ? " home-page__period-chip--selected" : ""}`}
+                onClick={() => selectPeriod(key)}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+        <p className="home-page__period-caption">
+          Applies to purchase center and warehouse activity
+        </p>
+        {period === "custom" ? (
+          <div className="home-page__custom-range" data-testid="home-custom-range">
+            <label className="home-page__custom-field">
+              <span>From</span>
+              <input
+                type="date"
+                value={toDateInputValue(customRange.start)}
+                onChange={(e) => onCustomFromChange(e.target.value)}
+              />
+            </label>
+            <label className="home-page__custom-field">
+              <span>To</span>
+              <input
+                type="date"
+                value={toDateInputValue(customRange.endInclusive)}
+                onChange={(e) => onCustomToChange(e.target.value)}
+              />
+            </label>
+            {!isValidCustomRange(customRange) ? (
+              <p className="home-page__custom-error" role="alert">
+                From date must be on or before To date
+              </p>
+            ) : null}
+          </div>
+        ) : null}
       </div>
 
       <main className="home-page__body">

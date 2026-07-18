@@ -1,35 +1,174 @@
-/* Staff /staff/home SCAFFOLD — empty slots; DesktopPageShell max 560; no API */
-.staff-home {
-  min-height: 100dvh;
-  width: 100%;
-  box-sizing: border-box;
-  background: #f7f9f6;
-  color: #0f172a;
-  padding: 16px;
+/* Staff home LAYOUT — source staff_home_page.dart + HexaColors / HexaOp */
+
+.staff-home-page {
+  --staff-home-brand: #0e4f46;
+  --staff-home-bg: #f7f9f6;
+  --staff-home-border: #e5e7eb;
+  --staff-home-muted: #6b7280;
+  --staff-home-title: #111827;
+  min-height: 100%;
+  background: var(--staff-home-bg);
 }
 
-.staff-home__shell {
+.staff-home-scroll {
+  min-height: 100%;
+  overflow: auto;
+}
+
+.staff-home-inner {
+  box-sizing: border-box;
   max-width: 560px;
-  width: 100%;
   margin: 0 auto;
+  padding: 16px 16px 28px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-sizing: border-box;
 }
 
-.staff-home__slot {
-  min-height: 56px;
-  border: 1px dashed #cbd5e1;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.6);
-  padding: 14px;
-  box-sizing: border-box;
+.staff-home-greeting {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
 }
 
-.staff-home__slot-title {
+.staff-home-greeting-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.staff-home-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--staff-home-brand) 12%, transparent);
+  color: var(--staff-home-brand);
+  font-weight: 800;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.staff-home-greeting-text {
+  min-width: 0;
+}
+
+.staff-home-greeting-name-row {
   margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: #64748b;
+  line-height: 1.25;
+}
+
+.staff-home-greeting-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--staff-home-title);
+}
+
+.staff-home-greeting-role {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  color: var(--staff-home-brand);
+}
+
+.staff-home-greeting-date {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--staff-home-muted);
+}
+
+.staff-home-bell {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  opacity: 0.85;
+}
+
+.staff-home-bell:disabled {
+  cursor: default;
+}
+
+.staff-home-bell-icon {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--staff-home-brand);
+  border-radius: 4px 4px 6px 6px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.staff-home-bell-icon::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border: 2px solid var(--staff-home-brand);
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.staff-home-card {
+  background: #fff;
+  border: 1px solid var(--staff-home-border);
+  border-radius: 12px;
+  padding: 14px 14px 16px;
+  box-sizing: border-box;
+}
+
+.staff-home-slot--bare {
+  min-height: 0;
+}
+
+.staff-home-section-header {
+  margin: 0 0 10px;
+}
+
+.staff-home-section-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--staff-home-title);
+  line-height: 1.25;
+}
+
+.staff-home-section-subtitle {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--staff-home-muted);
+  line-height: 1.35;
+}
+
+.staff-home-scan-cta {
+  height: 52px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    90deg,
+    var(--staff-home-brand),
+    color-mix(in srgb, var(--staff-home-brand) 82%, transparent)
+  );
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--staff-home-brand) 35%, transparent);
+}
+
+.staff-home-scan-cta-label {
+  color: #fff;
+  font-weight: 900;
+  font-size: 16px;
 }

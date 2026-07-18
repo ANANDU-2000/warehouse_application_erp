@@ -13,4 +13,4 @@
 
 **Rollback:** Revert SCAFFOLD commit; restore `StaffHomeStubPage` on `/staff/home`.
 
-**Next:** `/staff/home` LAYOUT — HexaOp / greeting chrome (still no API).
+**Next:** `/staff/home` LAYOUT — HexaOp / greeting chrome (still no API). Done → see [`staff_home_layout_compare.md`](staff_home_layout_compare.md).

@@ -61,7 +61,8 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | Step | Status | Evidence |
 |---|---|---|
 | 1 SCAFFOLD | ✅ | empty section slots — [`staff_home_scaffold_compare.md`](modules/staff_home_scaffold_compare.md) |
-| 2 LAYOUT | ⬜ | |
+| 2 LAYOUT | ✅ | greeting + section headers — [`staff_home_layout_compare.md`](modules/staff_home_layout_compare.md) |
+| 3 FIELDS | ⬜ | StaffHomeFocus chips next |
 | 7 COMPARE | ⬜ | |
 
 ### Prompt template (copy per page)

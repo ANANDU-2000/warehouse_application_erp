@@ -18,4 +18,4 @@
 
 **Smoke:** `npm run test:staff-home-fields`  
 **Rollback:** Revert FIELDS commit; remove focus card; keep LAYOUT headers.  
-**Next:** `/staff/home` BUTTONS — profile sheet, bell, Scan barcode CTA, tool/quick-action tiles.
+**Next:** `/staff/home` BUTTONS — profile sheet, bell, Scan barcode, tool/quick-action tiles. Done → see [`staff_home_buttons_compare.md`](staff_home_buttons_compare.md).

@@ -7,7 +7,7 @@ import { DashboardRouteStubPage } from "../features/home/DashboardRouteStubPage"
 import { StaffHomePage } from "../features/staff/StaffHomePage";
 
 /**
- * Splash + Login + owner /home + staff /staff/home SCAFFOLD + stub destinations.
+ * Splash + Login + owner /home + staff /staff/home + stub destinations.
  * Source: docs/05_Navigation_Map.md; dashboard.md
  */
 export function AppRouter() {
@@ -23,6 +23,50 @@ export function AppRouter() {
           element={<DashboardRouteStubPage title="Warehouse activity" />}
         />
         <Route path="/staff/home" element={<StaffHomePage />} />
+        <Route
+          path="/staff/settings"
+          element={<DashboardRouteStubPage title="Staff settings" />}
+        />
+        <Route
+          path="/staff/search"
+          element={<DashboardRouteStubPage title="Staff search" />}
+        />
+        <Route
+          path="/staff/items"
+          element={<DashboardRouteStubPage title="Staff gallery" />}
+        />
+        <Route
+          path="/staff/stock"
+          element={<DashboardRouteStubPage title="Staff stock" />}
+        />
+        <Route
+          path="/staff/purchase-history"
+          element={<DashboardRouteStubPage title="Purchase history" />}
+        />
+        <Route
+          path="/staff/low-stock"
+          element={<DashboardRouteStubPage title="Staff low stock" />}
+        />
+        <Route
+          path="/staff/activity"
+          element={<DashboardRouteStubPage title="Staff activity" />}
+        />
+        <Route
+          path="/staff/deliveries"
+          element={<DashboardRouteStubPage title="Staff deliveries" />}
+        />
+        <Route
+          path="/staff/scan"
+          element={<DashboardRouteStubPage title="Staff scan" />}
+        />
+        <Route
+          path="/catalog/taxonomy"
+          element={<DashboardRouteStubPage title="Categories" />}
+        />
+        <Route
+          path="/barcode/bulk-print"
+          element={<DashboardRouteStubPage title="Bulk print labels" />}
+        />
         <Route
           path="/notifications"
           element={<DashboardRouteStubPage title="Notifications" />}

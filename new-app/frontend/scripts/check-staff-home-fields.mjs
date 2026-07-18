@@ -52,9 +52,6 @@ assert(page.includes("writeStaffHomeFocus"), "persist focus");
 assert(page.includes('data-testid="staff-home-focus"'), "focus test id");
 assert(page.includes("role=\"radiogroup\""), "radiogroup");
 assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("useNavigate"), "no useNavigate");
-assert(!page.includes("Settings"), "no Settings (BUTTONS sheet)");
-assert(!page.includes("Logout"), "no Logout (BUTTONS sheet)");
 
 if (failures.length) {
   console.error("Staff home FIELDS checks FAILED:");

@@ -10,12 +10,13 @@
 | **Completed (this step)** | Profile name; floor KPI counts; low-stock badge; attention tile counts + gates; thin backends for Flutter paths |
 | **Current** | `/staff/home` WIRE scoped — PASS when smoke/build green |
 | **Pending next** | `/staff/home` **STATES** (skeleton / FriendlyLoadError / empty copy) |
-| **Deferred (WIRE-2)** | Pull-refresh |
+| **Deferred (WIRE-2)** | Realtime invalidation (no stack yet) |
 | **Completed WIRE-2a** | Warehouse & Purchases stats — [`staff_home_wire2a_compare.md`](staff_home_wire2a_compare.md) |
 | **Completed WIRE-2b** | Pending delivery cards — [`staff_home_wire2b_compare.md`](staff_home_wire2b_compare.md) |
 | **Completed WIRE-2c** | Shift today strip — [`staff_home_wire2c_compare.md`](staff_home_wire2c_compare.md) |
 | **Completed WIRE-2d** | Recent activity feed — [`staff_home_wire2d_compare.md`](staff_home_wire2d_compare.md) |
 | **Completed WIRE-2e** | Bell unread badge — [`staff_home_wire2e_compare.md`](staff_home_wire2e_compare.md) |
+| **Completed WIRE-2f** | Pull-refresh + light auto-refresh — [`staff_home_wire2f_compare.md`](staff_home_wire2f_compare.md) |
 
 ## Legacy vs New
 
@@ -31,9 +32,9 @@
 | 8 | Floor labels | Pending / Delivered / Low stock | exact | PASS |
 | 9 | Attention titles | Opening stock / Missing barcodes / Stock mismatch | exact | PASS |
 | 10 | Focus gates | `staffHomeShows*` | same | PASS |
-| 11 | Warehouse / pending cards / shift / activity / notif | Yes | WIRE-2a–2e PASS; pull-refresh deferred | N/A |
+| 11 | Warehouse / pending cards / shift / activity / notif / refresh | Yes | WIRE-2a–2f PASS; realtime N/A | N/A |
 | 12 | Full error/Retry UX | Yes | Minimal message — **STATES** | N/A |
 
 **Smoke:** `npm run test:staff-home-wire`  
 **Rollback:** Revert WIRE commit; remove staffHome routes/repos; restore BUTTONS empty counts.  
-**Next:** Staff WIRE-2e PASS — see [`staff_home_wire2e_compare.md`](staff_home_wire2e_compare.md). Ask before pull-refresh / Subagent 4.
+**Next:** Staff WIRE-2f PASS — see [`staff_home_wire2f_compare.md`](staff_home_wire2f_compare.md). Ask before Users & Roles / Subagent 4.

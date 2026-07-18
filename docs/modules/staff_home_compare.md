@@ -14,9 +14,9 @@
 | State | Step |
 |---|---|
 | ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
-| 🟡 Current | Staff WIRE-2e bell badge **PASS** — ask before pull-refresh / Subagent 4 |
-| ⬜ Pending (ask first) | pull-refresh · Users & Roles (backend blocked) |
-| ⏸ Deferred | Pull-refresh; merge to `main` |
+| 🟡 Current | Staff WIRE-2f pull-refresh **PASS** — ask before Users & Roles / Subagent 4 |
+| ⬜ Pending (ask first) | Users & Roles (backend blocked) · Dashboard Subagent 4 |
+| ⏸ Deferred | Merge to `main` |
 
 ---
 
@@ -50,7 +50,7 @@
 | Shift today strip numbers (`activity-log` + `audit/feed`) | **WIRE-2c PASS** — [`staff_home_wire2c_compare.md`](staff_home_wire2c_compare.md) |
 | Recent activity feed rows | **WIRE-2d PASS** — [`staff_home_wire2d_compare.md`](staff_home_wire2d_compare.md) |
 | Notifications unread badge merge | **WIRE-2e PASS** — [`staff_home_wire2e_compare.md`](staff_home_wire2e_compare.md) |
-| Pull-to-refresh / auto-refresh listener | Not ported |
+| Pull-to-refresh / auto-refresh listener | **WIRE-2f PASS** — [`staff_home_wire2f_compare.md`](staff_home_wire2f_compare.md) (realtime N/A) |
 | Profile sheet business title line | Name/role only this loop |
 | Nested staff routes full pages | Stubs only |
 | Splash session restore WIRE | **Done** — [`splash_compare.md`](splash_compare.md) |
@@ -77,9 +77,9 @@ Docs/checklist only: revert COMPARE commit. Application code unchanged by this s
 
 ## 5. Next after Approve
 
-1. Ask before starting: **pull-refresh** · Users & Roles (still backend-blocked) · Dashboard Subagent 4  
+1. Ask before starting: Users & Roles (still backend-blocked) · Dashboard Subagent 4  
 2. Do **not** mark full Dashboard module ✅ until Subagent 4 remaining routes are agreed  
 3. Hold merge of `ops/dashboard-module` to `main` until you review
 4. Splash `/splash` — **COMPARE PASS**
-5. WIRE-2a–2e — **PASS**
+5. WIRE-2a–2f — **PASS**
 

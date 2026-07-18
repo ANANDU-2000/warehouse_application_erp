@@ -49,6 +49,7 @@
     "test:staff-home-wire2c": "node scripts/check-staff-home-wire2c.mjs",
     "test:staff-home-wire2d": "node scripts/check-staff-home-wire2d.mjs",
     "test:staff-home-wire2e": "node scripts/check-staff-home-wire2e.mjs",
+    "test:staff-home-wire2f": "node scripts/check-staff-home-wire2f.mjs",
     "test:staff-home-states": "node scripts/check-staff-home-states.mjs",
     "test:staff-home-compare": "node scripts/check-staff-home-compare.mjs"
   },

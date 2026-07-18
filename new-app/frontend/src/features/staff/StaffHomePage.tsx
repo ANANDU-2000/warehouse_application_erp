@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactElement } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactElement, type TouchEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   clearPrimaryBusiness,
@@ -91,6 +91,12 @@ import {
   readNotificationKindToggles,
   staffBellBadgeLabel,
 } from "./staffBellBadge";
+import {
+  canStaffHomeLightRefresh,
+  STAFF_HOME_AUTO_REFRESH_MS,
+  STAFF_HOME_LIGHT_REFRESH_DEBOUNCE_MS,
+  STAFF_HOME_PULL_THRESHOLD_PX,
+} from "./staffHomeRefresh";
 import {
   STAFF_HOME_CLOSE_LABEL,
   STAFF_HOME_LOGOUT_BODY,
@@ -750,6 +756,12 @@ export function StaffHomePage(): ReactElement {
   const [recentLoading, setRecentLoading] = useState(true);
   const [recentError, setRecentError] = useState(false);
   const [bellCount, setBellCount] = useState(0);
+  const [pulling, setPulling] = useState(false);
+  const [pullDy, setPullDy] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const pullStartY = useRef<number | null>(null);
+  const lastLightRefreshAt = useRef<number | null>(null);
 
   const reloadShell = useCallback(() => {
     setRetryTick((n) => n + 1);
@@ -762,6 +774,100 @@ export function StaffHomePage(): ReactElement {
   const reloadPurchases = useCallback(() => {
     setPuRetryTick((n) => n + 1);
   }, []);
+
+  /** Full pull refresh — _invalidateStaffHomeRefresh */
+  const reloadAll = useCallback(() => {
+    setRetryTick((n) => n + 1);
+    setWhRetryTick((n) => n + 1);
+    setPuRetryTick((n) => n + 1);
+  }, []);
+
+  /** Light auto-refresh — invalidateStaffHomeSurfacesLight (same ticks on this page) */
+  const refreshLight = useCallback(
+    (reason: string) => {
+      void reason;
+      const now = Date.now();
+      if (
+        !canStaffHomeLightRefresh(
+          lastLightRefreshAt.current,
+          now,
+          STAFF_HOME_LIGHT_REFRESH_DEBOUNCE_MS,
+        )
+      ) {
+        return;
+      }
+      lastLightRefreshAt.current = now;
+      reloadAll();
+    },
+    [reloadAll],
+  );
+
+  /* WIRE-2f: StaffHomeAutoRefreshListener — 2min periodic + visibility */
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      refreshLight("periodic");
+    }, STAFF_HOME_AUTO_REFRESH_MS);
+    function onVisibility() {
+      if (document.visibilityState === "visible") {
+        refreshLight("foreground");
+      }
+    }
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [refreshLight]);
+
+  async function onPullRefresh(): Promise<void> {
+    if (refreshing) return;
+    setRefreshing(true);
+    reloadAll();
+    await new Promise<void>((resolve) => {
+      window.setTimeout(resolve, 600);
+    });
+    setRefreshing(false);
+    setPullDy(0);
+    setPulling(false);
+  }
+
+  function onTouchStart(e: TouchEvent<HTMLDivElement>): void {
+    const el = scrollRef.current;
+    if (!el || el.scrollTop > 0 || refreshing) {
+      pullStartY.current = null;
+      return;
+    }
+    pullStartY.current = e.touches[0]?.clientY ?? null;
+  }
+
+  function onTouchMove(e: TouchEvent<HTMLDivElement>): void {
+    if (pullStartY.current == null || refreshing) return;
+    const el = scrollRef.current;
+    if (!el || el.scrollTop > 0) {
+      pullStartY.current = null;
+      setPulling(false);
+      setPullDy(0);
+      return;
+    }
+    const y = e.touches[0]?.clientY ?? pullStartY.current;
+    const dy = Math.max(0, y - pullStartY.current);
+    if (dy > 8) {
+      setPulling(true);
+      setPullDy(Math.min(dy, STAFF_HOME_PULL_THRESHOLD_PX * 1.5));
+    }
+  }
+
+  function onTouchEnd(): void {
+    if (pullStartY.current == null) return;
+    const shouldRefresh = pullDy >= STAFF_HOME_PULL_THRESHOLD_PX;
+    pullStartY.current = null;
+    if (shouldRefresh) {
+      void onPullRefresh();
+    } else {
+      setPulling(false);
+      setPullDy(0);
+    }
+  }
 
   useEffect(() => {
     const biz = readPrimaryBusiness();
@@ -1043,7 +1149,35 @@ export function StaffHomePage(): ReactElement {
 
   return (
     <div className="staff-home-page" data-testid="staff-home-page">
-      <div className="staff-home-scroll">
+      <div
+        className="staff-home-scroll"
+        ref={scrollRef}
+        data-testid="staff-home-scroll"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onTouchCancel={onTouchEnd}
+      >
+        {((pulling && pullDy > 0) || refreshing) ? (
+          <div
+            className="staff-home-pull-indicator"
+            style={{
+              height: refreshing
+                ? 40
+                : Math.max(24, Math.min(pullDy, STAFF_HOME_PULL_THRESHOLD_PX)),
+            }}
+            data-testid="staff-home-pull-indicator"
+            aria-hidden={!refreshing}
+          >
+            <div
+              className={`staff-home-pull-spinner${
+                refreshing || pullDy >= STAFF_HOME_PULL_THRESHOLD_PX
+                  ? " staff-home-pull-spinner--active"
+                  : ""
+              }`}
+            />
+          </div>
+        ) : null}
         <div className="staff-home-inner">
           <header
             className="staff-home-greeting"

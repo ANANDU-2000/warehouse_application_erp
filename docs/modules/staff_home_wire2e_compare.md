@@ -21,4 +21,4 @@
 
 **Smoke:** `npm run test:staff-home-wire2e`  
 **Rollback:** Revert WIRE-2e commit; restore bell without badge; unmount notifications + alerts/summary if unused.  
-**Next:** Ask before pull-refresh · Users & Roles (blocked) · Dashboard Subagent 4.
+**Next:** Staff WIRE-2f PASS — [`staff_home_wire2f_compare.md`](staff_home_wire2f_compare.md). Ask before Users & Roles / Subagent 4.

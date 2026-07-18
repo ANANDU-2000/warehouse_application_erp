@@ -86,6 +86,29 @@ export class MembershipsRepository {
       ],
     );
   }
+
+  /** Update role + permissions_json for patch_user role change. */
+  async updateRoleAndPermissions(
+    membershipId: string,
+    role: string,
+    permissionsJson: string,
+  ): Promise<void> {
+    await queryOne(
+      this.client,
+      `UPDATE [memberships]
+       SET [role] = @role, [permissions_json] = @permissionsJson
+       WHERE [id] = @id`,
+      [
+        { name: "id", type: sql.UniqueIdentifier, value: membershipId },
+        { name: "role", type: sql.NVarChar(32), value: role },
+        {
+          name: "permissionsJson",
+          type: sql.NVarChar(/* MAX */ -1),
+          value: permissionsJson,
+        },
+      ],
+    );
+  }
 }
 
 export function createMembershipsRepository(client: SqlClient): MembershipsRepository {

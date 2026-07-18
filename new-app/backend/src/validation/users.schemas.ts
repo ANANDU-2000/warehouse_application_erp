@@ -43,6 +43,26 @@ export const userCreateInSchema = z
 
 export type UserCreateIn = z.infer<typeof userCreateInSchema>;
 
+/**
+ * Mirrors UserPatchIn — all fields optional.
+ * role pattern admin|manager|staff|owner; email lower applied in service (field_validator).
+ */
+export const userPatchInSchema = z.object({
+  full_name: z.string().min(1).max(255).optional().nullable(),
+  email: z.string().min(5).max(320).optional().nullable(),
+  phone: z.string().min(1).max(32).optional().nullable(),
+  role: z
+    .string()
+    .regex(/^(admin|manager|staff|owner)$/)
+    .optional()
+    .nullable(),
+  is_active: z.boolean().optional().nullable(),
+  is_blocked: z.boolean().optional().nullable(),
+  notes: z.string().max(2000).optional().nullable(),
+});
+
+export type UserPatchIn = z.infer<typeof userPatchInSchema>;
+
 /** Digits-only phone — users.py:_phone_digits */
 export function phoneDigits(phone: string): string {
   return (phone || "").replace(/\D/g, "");

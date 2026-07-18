@@ -28,12 +28,24 @@ export type TodayStatsRow = {
   items_created: number;
 };
 
+/** Load for patch/get with membership id + token_version. */
+export type BusinessUserPatchLoad = BusinessUserMemberRow & {
+  membership_id: string;
+  token_version: number;
+};
+
 const LIST_COLUMNS = `
   u.[id], u.[name], u.[phone], u.[email], u.[username],
   m.[role],
   u.[is_active], u.[is_blocked],
   u.[last_login_at], u.[last_active_at],
   u.[notes], u.[created_at]
+`.trim();
+
+const PATCH_LOAD_COLUMNS = `
+  ${LIST_COLUMNS},
+  m.[id] AS [membership_id],
+  u.[token_version]
 `.trim();
 
 function asBool(v: unknown): boolean {
@@ -122,6 +134,32 @@ export class BusinessUsersRepository {
       ],
     );
     return row ? mapMemberRow(row) : null;
+  }
+
+  /** Load for patch_user — includes membership_id + token_version. */
+  async findMemberForPatch(
+    businessId: string,
+    userId: string,
+  ): Promise<BusinessUserPatchLoad | null> {
+    const row = await queryOne<Record<string, unknown>>(
+      this.client,
+      `SELECT ${PATCH_LOAD_COLUMNS}
+       FROM [users] u
+       INNER JOIN [memberships] m ON m.[user_id] = u.[id]
+       WHERE m.[business_id] = @businessId
+         AND u.[id] = @userId
+         AND u.[deleted_at] IS NULL`,
+      [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: userId },
+      ],
+    );
+    if (!row) return null;
+    return {
+      ...mapMemberRow(row),
+      membership_id: String(row.membership_id),
+      token_version: Number(row.token_version ?? 0),
+    };
   }
 
   /**

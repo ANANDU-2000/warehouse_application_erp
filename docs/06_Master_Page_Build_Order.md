@@ -12,8 +12,8 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 DONE | Next: ask Users PATCH **or** Subagent 4 satellite ([`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md)) |
-| 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list+create+profile PASS | Mutate/UI blocked — [`users_roles_backend_profile_compare.md`](modules/users_roles_backend_profile_compare.md) |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 DONE | Next: ask Users DELETE/reset **or** Subagent 4 satellite ([`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md)) |
+| 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list+create+profile+PATCH PASS | DELETE/UI blocked — [`users_roles_backend_patch_compare.md`](modules/users_roles_backend_patch_compare.md) |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
 | 6 | Suppliers/Brokers | 12 | ✅ `suppliers.md` | ❌ | Blocked |

@@ -18,7 +18,13 @@ import {
 } from "../services/usersCreate.service";
 import { getUserProfileForBusiness } from "../services/usersProfile.service";
 import {
+  patchActorFromUser,
+  patchUserForBusiness,
+  type PatchUserDeps,
+} from "../services/usersPatch.service";
+import {
   userCreateInSchema,
+  userPatchInSchema,
 } from "../validation/users.schemas";
 import {
   SchemaValidationError,
@@ -31,6 +37,8 @@ export type UsersControllerDeps = {
   pool?: ConnectionPool;
   /** Test seam for create. */
   runInTransaction?: CreateUserDeps["runInTransaction"];
+  /** Test seam for patch (shares pool txn pattern). */
+  runPatchInTransaction?: PatchUserDeps["runInTransaction"];
 };
 
 export function createUsersController(deps: UsersControllerDeps) {
@@ -135,6 +143,61 @@ export function createUsersController(deps: UsersControllerDeps) {
           deps.businesses,
           businessId,
           userId,
+        );
+        res.json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async patch(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> {
+      try {
+        const businessId = req.params.businessId;
+        const userId = req.params.userId;
+        if (typeof businessId !== "string" || !businessId) {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        if (typeof userId !== "string" || !userId) {
+          sendDetail(res, 400, "userId required");
+          return;
+        }
+        const user = req.user;
+        const membership = req.membership;
+        if (!user || !membership) {
+          sendDetail(res, 401, "Not authenticated");
+          return;
+        }
+
+        let body;
+        try {
+          body = validateWithSchema(userPatchInSchema, req.body ?? {});
+        } catch (e) {
+          if (e instanceof SchemaValidationError) {
+            sendDetail(res, 422, e.detail);
+            return;
+          }
+          throw e;
+        }
+
+        const out = await patchUserForBusiness(
+          {
+            pool: deps.pool,
+            businesses: deps.businesses,
+            businessUsers: deps.businessUsers,
+            runInTransaction: deps.runPatchInTransaction,
+          },
+          {
+            businessId,
+            userId,
+            body,
+            actorMembershipRole: membership.role,
+            actor: patchActorFromUser(user),
+          },
         );
         res.json(out);
       } catch (e) {

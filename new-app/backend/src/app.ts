@@ -27,6 +27,7 @@ import type { StaffHomeRepository } from "./repositories/staffHome.repository";
 import type { HomeActivityRepository } from "./repositories/homeActivity.repository";
 import type { ConnectionPool } from "mssql";
 import type { CreateUserDeps } from "./services/usersCreate.service";
+import type { PatchUserDeps } from "./services/usersPatch.service";
 import {
   createAuthzMiddleware,
   type AuthzMiddleware,
@@ -59,6 +60,8 @@ export type AppDeps = {
   pool?: ConnectionPool;
   /** Test seam for POST …/users. */
   runInTransaction?: CreateUserDeps["runInTransaction"];
+  /** Test seam for PATCH …/users/:userId. */
+  runPatchInTransaction?: PatchUserDeps["runInTransaction"];
 };
 
 /** Fail-closed users repo when SQL pool is not wired. */
@@ -71,7 +74,9 @@ function unavailableUsersRepository(): UsersRepository {
     findByEmail: fail,
     usernameExists: fail,
     emailExistsActive: fail,
+    emailExistsActiveExcluding: fail,
     insert: fail,
+    patchById: fail,
   } as unknown as UsersRepository;
 }
 
@@ -84,6 +89,7 @@ function unavailableMembershipsRepository(): MembershipsRepository {
     listByUserId: fail,
     findByUserAndBusiness: fail,
     insert: fail,
+    updateRoleAndPermissions: fail,
   } as unknown as MembershipsRepository;
 }
 
@@ -161,6 +167,7 @@ function unavailableBusinessUsersRepository(): BusinessUsersRepository {
   return {
     listForBusiness: fail,
     findMemberByUserId: fail,
+    findMemberForPatch: fail,
     activityCount7d: fail,
     todayStats: fail,
     purchases7d: fail,
@@ -254,6 +261,7 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
         businesses,
         pool: deps.pool,
         runInTransaction: deps.runInTransaction,
+        runPatchInTransaction: deps.runPatchInTransaction,
       }),
       app.authz,
     ),

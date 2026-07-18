@@ -71,6 +71,122 @@ export class UsersRepository {
     return row != null;
   }
 
+  /**
+   * Active email taken by another user — patch_user filter.
+   * User.email == email AND id != user.id AND deleted_at IS NULL
+   */
+  async emailExistsActiveExcluding(
+    email: string,
+    excludeUserId: string,
+  ): Promise<boolean> {
+    const row = await queryOne<{ id: string }>(
+      this.client,
+      `SELECT TOP 1 [id] FROM [users]
+       WHERE [email] = @email
+         AND [id] <> @excludeUserId
+         AND [deleted_at] IS NULL`,
+      [
+        { name: "email", type: sql.NVarChar(320), value: email },
+        {
+          name: "excludeUserId",
+          type: sql.UniqueIdentifier,
+          value: excludeUserId,
+        },
+      ],
+    );
+    return row != null;
+  }
+
+  /** Partial update for patch_user. */
+  async patchById(
+    userId: string,
+    fields: {
+      name?: string;
+      email?: string;
+      phone?: string;
+      is_active?: boolean;
+      is_blocked?: boolean;
+      deleted_at?: Date | null;
+      notes?: string | null;
+      token_version?: number;
+    },
+  ): Promise<void> {
+    const sets: string[] = [];
+    const params: { name: string; type: object; value: unknown }[] = [
+      { name: "id", type: sql.UniqueIdentifier, value: userId },
+    ];
+    if (fields.name !== undefined) {
+      sets.push("[name] = @name");
+      params.push({
+        name: "name",
+        type: sql.NVarChar(255),
+        value: fields.name,
+      });
+    }
+    if (fields.email !== undefined) {
+      sets.push("[email] = @email");
+      params.push({
+        name: "email",
+        type: sql.NVarChar(320),
+        value: fields.email,
+      });
+    }
+    if (fields.phone !== undefined) {
+      sets.push("[phone] = @phone");
+      params.push({
+        name: "phone",
+        type: sql.NVarChar(32),
+        value: fields.phone,
+      });
+    }
+    if (fields.is_active !== undefined) {
+      sets.push("[is_active] = @is_active");
+      params.push({
+        name: "is_active",
+        type: sql.Bit,
+        value: fields.is_active,
+      });
+    }
+    if (fields.is_blocked !== undefined) {
+      sets.push("[is_blocked] = @is_blocked");
+      params.push({
+        name: "is_blocked",
+        type: sql.Bit,
+        value: fields.is_blocked,
+      });
+    }
+    if (fields.deleted_at !== undefined) {
+      sets.push("[deleted_at] = @deleted_at");
+      params.push({
+        name: "deleted_at",
+        type: sql.DateTimeOffset,
+        value: fields.deleted_at,
+      });
+    }
+    if (fields.notes !== undefined) {
+      sets.push("[notes] = @notes");
+      params.push({
+        name: "notes",
+        type: sql.NVarChar(2000),
+        value: fields.notes,
+      });
+    }
+    if (fields.token_version !== undefined) {
+      sets.push("[token_version] = @token_version");
+      params.push({
+        name: "token_version",
+        type: sql.Int,
+        value: fields.token_version,
+      });
+    }
+    if (sets.length === 0) return;
+    await queryOne(
+      this.client,
+      `UPDATE [users] SET ${sets.join(", ")} WHERE [id] = @id`,
+      params,
+    );
+  }
+
   /** Insert user row for create_user. */
   async insert(row: UserInsertInput): Promise<void> {
     await queryOne(

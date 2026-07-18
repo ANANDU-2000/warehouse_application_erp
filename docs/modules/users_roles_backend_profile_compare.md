@@ -21,4 +21,4 @@
 
 **Rollback:** Revert this commit; remove `GET /:userId` + profile helpers; restore docs boards to Slice 1–2.
 
-**Next (ask first):** PATCH user · reset-password · nested profile APIs · Users UI · Subagent 4 satellite.
+**Next (ask first):** DELETE · reset-password · permissions · Users UI · Subagent 4. PATCH: [`users_roles_backend_patch_compare.md`](users_roles_backend_patch_compare.md).

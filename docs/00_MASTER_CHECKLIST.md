@@ -5,7 +5,7 @@
 
 ---
 
-## PHASE 1 — Analysis & Understanding 🟡
+## PHASE 1 — Analysis & Understanding ✅
 
 | # | Task | Status | Evidence |
 |---|---|---|---|
@@ -20,9 +20,9 @@
 | 1.9 | Relationships / ER diagram | ✅ | `docs/23_Relationships.md`, `docs/24_ER_Diagram.md` — 103 ORM FKs + 4 soft UUID links; Review PASS 2026-07-18 |
 | 1.10 | Reports inventory | ✅ | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md` — closes with module #14 |
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
-| 1.12 | Phase 1 sign-off | 🔒 | Blocked until explicit Phase 1 sign-off review |
+| 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: ~99% complete.** Analysis docs through 1.9 ER Review PASS. Remaining: Phase 1 sign-off (1.12).
+**Phase 1 status: COMPLETE.** Analysis + module queue + ER + sign-off PASS. Next: Phase 2 (Database Design) — start `2.2` type mapping (cite `23`/`24` for 2.1).
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
@@ -44,7 +44,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not start module N+1 analysis until module N Analyze+Review is PASS. Do not implement any module until its review PASS. Module queue + **1.9 ER** complete — next Phase 1 work: **1.12 sign-off**.
+**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Phase 1 analysis queue complete — next: **Phase 2**.
 
 ### Cursor operator setup (workspace)
 
@@ -61,19 +61,22 @@
 
 ---
 
-## PHASE 2 — Database Design & SQL Server Migration 🔒
-| # | Task | Status |
-|---|---|---|
-| 2.1 | ER diagram + relationship/cardinality doc | 🔒 |
-| 2.2 | Data type mapping table (Postgres → SQL Server, incl. JSONB, UUID, NUMERIC precision) | 🔒 |
-| 2.3 | SQL Server DDL — tables | 🔒 |
-| 2.4 | Constraints (PK, FK, UNIQUE, CHECK) | 🔒 |
-| 2.5 | Indexes | 🔒 |
-| 2.6 | RLS-equivalent strategy (Postgres RLS → SQL Server security policy or app-layer) | 🔒 |
-| 2.7 | Stored procedures / views / triggers (only if source DB logic requires them) | 🔒 |
-| 2.8 | Migration/seed scripts | 🔒 |
-| 2.9 | Schema verification against source (row-for-row structural diff) | 🔒 |
-| 2.10 | Phase 2 sign-off | 🔒 |
+## PHASE 2 — Database Design & SQL Server Migration ⬜
+
+**Ready to start** after Phase 1 sign-off. Prefer: mark `2.1` done by citing `docs/23_Relationships.md` + `docs/24_ER_Diagram.md`, then execute **`2.2` data type mapping** first.
+
+| # | Task | Status | Evidence / notes |
+|---|---|---|---|
+| 2.1 | ER diagram + relationship/cardinality doc | ⬜ | Cite Phase 1 `docs/23_Relationships.md` + `docs/24_ER_Diagram.md` |
+| 2.2 | Data type mapping table (Postgres → SQL Server, incl. JSONB, UUID, NUMERIC precision) | ⬜ | **Recommended first design deliverable** |
+| 2.3 | SQL Server DDL — tables | 🔒 | |
+| 2.4 | Constraints (PK, FK, UNIQUE, CHECK) | 🔒 | |
+| 2.5 | Indexes | 🔒 | |
+| 2.6 | RLS-equivalent strategy (Postgres RLS → SQL Server security policy or app-layer) | 🔒 | |
+| 2.7 | Stored procedures / views / triggers (only if source DB logic requires them) | 🔒 | |
+| 2.8 | Migration/seed scripts | 🔒 | |
+| 2.9 | Schema verification against source (row-for-row structural diff) | 🔒 | |
+| 2.10 | Phase 2 sign-off | 🔒 | |
 
 ---
 
@@ -183,4 +186,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-18 — Phase 1.9 ER Review PASS (`23_Relationships.md`, `24_ER_Diagram.md`); next = 1.12 sign-off.*
+*Last updated: 2026-07-18 — Phase 1.12 sign-off PASS (`docs/PHASE1_SIGN_OFF.md`); Phase 1 COMPLETE; next = Phase 2 (`2.1` cite / `2.2` type mapping).*

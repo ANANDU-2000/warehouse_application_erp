@@ -18,7 +18,8 @@
     "test:splash-buttons": "node scripts/check-splash-buttons.mjs",
     "test:home-scaffold": "node scripts/check-home-scaffold.mjs",
     "test:home-layout": "node scripts/check-home-layout.mjs",
-    "test:home-fields": "node scripts/check-home-fields.mjs"
+    "test:home-fields": "node scripts/check-home-fields.mjs",
+    "test:home-buttons": "node scripts/check-home-buttons.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

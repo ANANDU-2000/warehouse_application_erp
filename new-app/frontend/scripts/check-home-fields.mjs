@@ -51,7 +51,6 @@ assert(home.includes('type="date"'), "custom date inputs");
 assert(home.includes("isValidCustomRange"), "custom validation");
 assert(!home.includes("fetch("), "no fetch");
 assert(!home.includes("home-overview"), "no home-overview");
-assert(!home.includes("useNavigate"), "no navigate");
 
 const css = readFileSync(
   join(root, "src/features/home/HomePage.css"),

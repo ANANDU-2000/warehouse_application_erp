@@ -51,6 +51,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 1 SCAFFOLD | ✅ | empty section slots — [`home_scaffold_compare.md`](modules/home_scaffold_compare.md) |
 | 2 LAYOUT | ✅ | compact header + cards — [`home_layout_compare.md`](modules/home_layout_compare.md) |
 | 3 FIELDS | ✅ | period chips + client state — [`home_fields_compare.md`](modules/home_fields_compare.md) |
+| 4 BUTTONS | ✅ | header + tools + View all stubs — [`home_buttons_compare.md`](modules/home_buttons_compare.md) |
 | 5 WIRE | ⬜ | `reports/home-overview` |
 | 7 COMPARE | ⬜ | |
 

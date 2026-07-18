@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
+import { useNavigate } from "react-router-dom";
 import "./HomePage.css";
 import {
   HOME_PERIOD_LABELS,
@@ -10,13 +11,15 @@ import {
   type HomeCustomRange,
   type HomePeriod,
 } from "./homePeriod";
+import { HOME_OWNER_TOOLS } from "./homeOwnerTools";
 
 /**
- * Owner `/home` — Step 3 FIELDS.
- * Period chips + client state (HomePeriodFilterRow / homePeriodProvider).
- * No KPI data or network calls.
+ * Owner `/home` — Step 4 BUTTONS.
+ * Header + Tools + activity View all navigate locally (stubs).
+ * No KPI data or network calls (WIRE).
  */
 export function HomePage() {
+  const navigate = useNavigate();
   const [period, setPeriod] = useState<HomePeriod>("month");
   const [customRange, setCustomRange] = useState<HomeCustomRange>(() =>
     defaultCustomRange(),
@@ -66,12 +69,24 @@ export function HomePage() {
             <span className="home-page__sync-dot" aria-hidden="true" />
             Synced
           </span>
-          <span className="home-page__icon" aria-hidden="true" title="Notifications">
+          <button
+            type="button"
+            className="home-page__icon-btn"
+            title="Notifications"
+            aria-label="Notifications"
+            onClick={() => navigate("/notifications")}
+          >
             <BellIcon />
-          </span>
-          <span className="home-page__icon" aria-hidden="true" title="Settings">
+          </button>
+          <button
+            type="button"
+            className="home-page__icon-btn"
+            title="Settings"
+            aria-label="Settings"
+            onClick={() => navigate("/settings")}
+          >
             <SettingsIcon />
-          </span>
+          </button>
         </div>
       </header>
 
@@ -137,8 +152,48 @@ export function HomePage() {
         <SectionCard slot="kpi-grid" title="KPI grid" tall />
         <SectionCard slot="delivery" title="Delivery pipeline" />
         <SectionCard slot="purchase-center" title="Purchase control center" />
-        <SectionCard slot="tools" title="Owner quick actions" />
-        <SectionCard slot="activity" title="Warehouse activity" />
+
+        <section
+          className="home-page__card"
+          aria-label="Owner quick actions"
+          data-slot="tools"
+        >
+          <h2 className="home-page__card-title">Tools</h2>
+          <div className="home-page__tools" data-testid="home-owner-tools">
+            {HOME_OWNER_TOOLS.map((tool) => (
+              <button
+                key={tool.id}
+                type="button"
+                className="home-page__tool"
+                style={
+                  {
+                    "--tool-color": tool.color,
+                  } as CSSProperties
+                }
+                onClick={() => navigate(tool.path)}
+              >
+                <span className="home-page__tool-label">{tool.label}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section
+          className="home-page__card"
+          aria-label="Warehouse activity"
+          data-slot="activity"
+        >
+          <div className="home-page__activity-head">
+            <h2 className="home-page__card-title">Warehouse activity</h2>
+            <button
+              type="button"
+              className="home-page__view-all"
+              onClick={() => navigate("/home/activity")}
+            >
+              View all
+            </button>
+          </div>
+        </section>
       </main>
     </div>
   );

@@ -34,7 +34,8 @@ SELECT COUNT(*) AS fk_count FROM sys.foreign_keys;
 
 Also expect **6** CHECK constraints and **149** nonclustered indexes after full apply.
 
-**Verified locally (2026-07-18):** `table_count=46`, `fk_count=103`, indexes=149.
+**Verified locally (2026-07-18):** `table_count=46`, `fk_count=103`, indexes=149.  
+**Smoke:** `GET /api/health` → `databaseConnected: true` (msnodesqlv8 + ODBC Driver 18).
 
 ---
 

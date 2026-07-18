@@ -668,7 +668,7 @@ This dual-migration-path pattern is itself a migration risk for the SQL Server p
 
 ## Not yet covered (next batch)
 
-- Relationships/cardinality diagram (`23_Relationships.md`, `24_ER_Diagram.md`) — needs `relationship(...)` lines parsed (excluded from this extraction, which focused on columns)
+- ~~Relationships/cardinality diagram (`23_Relationships.md`, `24_ER_Diagram.md`)~~ — **done** (2026-07-18): 103 ORM FKs inventoried; soft UUIDs separated; mermaid ER by domain
 - Full constraint/index detail from the 60 raw SQL files (`25_SQL_Migration_Plan.md`, `30_Indexes.md`)
 - Stored procedures / functions / triggers / views — Postgres doesn't typically use these as heavily as SQL Server; need to check `backend/sql/*.sql` for `CREATE FUNCTION`/`CREATE TRIGGER`/`CREATE VIEW` statements specifically (`26–29`)
 - Exact `NUMERIC(p,s)` precision per money/quantity column (must come from raw SQL, not the ORM)

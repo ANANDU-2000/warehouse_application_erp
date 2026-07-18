@@ -17,12 +17,12 @@
 | 1.6 | Business logic analysis (per-module rules, calculations) | ✅ | Login ✅ · … · Reports ✅ · Settings ✅ — see module queue |
 | 1.7 | UI/UX analysis (every screen, button, form, field) | ✅ | Login ✅ · … · Reports ✅ · Settings ✅ — see module queue |
 | 1.8 | User flow / navigation analysis | ✅ | `05_Navigation_Map.md` — resolved orphan-module question, found dual shell (Owner vs Staff), confirmed 1 dead route + 2 redirect-aliases |
-| 1.9 | Relationships / ER diagram | ⬜ | Not started (column-level DB doc exists; relationship/cardinality doc doesn't) |
+| 1.9 | Relationships / ER diagram | ✅ | `docs/23_Relationships.md`, `docs/24_ER_Diagram.md` — 103 ORM FKs + 4 soft UUID links; Review PASS 2026-07-18 |
 | 1.10 | Reports inventory | ✅ | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md` — closes with module #14 |
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
-| 1.12 | Phase 1 sign-off | 🔒 | Blocked until 1.6–1.11 done |
+| 1.12 | Phase 1 sign-off | 🔒 | Blocked until explicit Phase 1 sign-off review |
 
-**Phase 1 status: ~99% complete.** Login through Settings Analyze+Review PASS. Remaining: ER diagram (1.9), then Phase 1 sign-off (1.12).
+**Phase 1 status: ~99% complete.** Analysis docs through 1.9 ER Review PASS. Remaining: Phase 1 sign-off (1.12).
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
@@ -44,7 +44,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not start module N+1 analysis until module N Analyze+Review is PASS. Do not implement any module until its review PASS. Module queue analysis complete — next Phase 1 work: **1.9 ER diagram**, then **1.12 sign-off**.
+**Rule:** Do not start module N+1 analysis until module N Analyze+Review is PASS. Do not implement any module until its review PASS. Module queue + **1.9 ER** complete — next Phase 1 work: **1.12 sign-off**.
 
 ### Cursor operator setup (workspace)
 
@@ -183,4 +183,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-18 — Settings Analyze+Review PASS (module queue 1–15 closed); next = 1.9 ER diagram, then 1.12 sign-off.*
+*Last updated: 2026-07-18 — Phase 1.9 ER Review PASS (`23_Relationships.md`, `24_ER_Diagram.md`); next = 1.12 sign-off.*

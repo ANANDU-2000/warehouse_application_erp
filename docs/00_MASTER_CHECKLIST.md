@@ -14,15 +14,15 @@
 | 1.3 | Module inventory (backend routers/services, frontend features) | ✅ | `03_Module_Inventory.md` |
 | 1.4 | API analysis (full endpoint inventory) | ✅ | `18_API_Inventory.md` |
 | 1.5 | Database analysis (tables, columns, FKs from ORM) | ✅ | `20_Database_Analysis.md` |
-| 1.6 | Business logic analysis (per-module rules, calculations) | 🟡 | Login ✅ · Dashboard ✅ · Users & Roles ✅ · Products ✅ · Categories ✅ — see module queue |
-| 1.7 | UI/UX analysis (every screen, button, form, field) | 🟡 | Login ✅ · Dashboard ✅ · Users & Roles ✅ · Products ✅ · Categories ✅ — see module queue |
+| 1.6 | Business logic analysis (per-module rules, calculations) | 🟡 | Login ✅ · Dashboard ✅ · Users & Roles ✅ · Products ✅ · Categories ✅ · Units ✅ — see module queue |
+| 1.7 | UI/UX analysis (every screen, button, form, field) | 🟡 | Login ✅ · Dashboard ✅ · Users & Roles ✅ · Products ✅ · Categories ✅ · Units ✅ — see module queue |
 | 1.8 | User flow / navigation analysis | ✅ | `05_Navigation_Map.md` — resolved orphan-module question, found dual shell (Owner vs Staff), confirmed 1 dead route + 2 redirect-aliases |
 | 1.9 | Relationships / ER diagram | ⬜ | Not started (column-level DB doc exists; relationship/cardinality doc doesn't) |
 | 1.10 | Reports inventory | ⬜ | Not started |
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | 🔒 | Blocked until 1.6–1.11 done |
 
-**Phase 1 status: ~80% complete.** Login + Dashboard + Users & Roles + Products + Categories Analyze+Review PASS. Remaining: modules 6–15, ER, reports inventory.
+**Phase 1 status: ~85% complete.** Login through Units Analyze+Review PASS. Remaining: modules 7–15, ER, reports inventory.
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
@@ -33,8 +33,8 @@
 | 3 | Users & Roles | ✅ Analyze+Review PASS | `docs/modules/users-roles.md`, `docs/matrix/users-roles_traceability.md`, `docs/matrix/roles_permissions_matrix.md` |
 | 4 | Products | ✅ Analyze+Review PASS | `docs/modules/products.md`, `docs/matrix/products_traceability.md`, branch `phase1/products-analysis` |
 | 5 | Categories | ✅ Analyze+Review PASS | `docs/modules/categories.md`, `docs/matrix/categories_traceability.md`, branch `phase1/categories-analysis` |
-| 6 | Units | 🔒 | Next analysis — still locked for implement |
-| 7 | Suppliers | 🔒 | |
+| 6 | Units | ✅ Analyze+Review PASS | `docs/modules/units.md`, `docs/matrix/units_traceability.md`, branch `phase1/units-analysis` |
+| 7 | Suppliers | 🔒 | Next analysis — still locked for implement |
 | 8 | Customers | 🔒 | |
 | 9 | Purchase Orders | 🔒 | |
 | 10 | Goods Receipt | 🔒 | |
@@ -44,7 +44,7 @@
 | 14 | Reports | 🔒 | |
 | 15 | Settings | 🔒 | |
 
-**Rule:** Do not start module N+1 analysis until module N Analyze+Review is PASS. Do not implement any module until its review PASS. Next: Units analysis only.
+**Rule:** Do not start module N+1 analysis until module N Analyze+Review is PASS. Do not implement any module until its review PASS. Next: Suppliers analysis only.
 
 ### Cursor operator setup (workspace)
 

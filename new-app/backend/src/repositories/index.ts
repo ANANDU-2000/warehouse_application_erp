@@ -11,6 +11,14 @@ export {
   createMembershipsRepository,
 } from "./memberships.repository";
 export {
+  BusinessUsersRepository,
+  createBusinessUsersRepository,
+} from "./businessUsers.repository";
+export type {
+  BusinessUserMemberRow,
+  TodayStatsRow,
+} from "./businessUsers.repository";
+export {
   DashboardRepository,
   createDashboardRepository,
 } from "./dashboard.repository";

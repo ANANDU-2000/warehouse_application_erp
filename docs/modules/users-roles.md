@@ -1,9 +1,10 @@
 # Module: Users & Roles
 
 **Queue:** 3 of 15  
-**Status:** Review PASS (2026-07-18)  
-**Scope:** Analysis only — no `new-app` implementation  
+**Status:** Backend Slice 1 — `GET …/users` PASS (2026-07-18) · UI blocked  
+**Scope:** Analysis + backend list API; create/profile/UI not started  
 **Source of truth:** `source-app/`  
+**Compare:** [`users_roles_backend_list_compare.md`](users_roles_backend_list_compare.md) 
 
 ## Definition
 

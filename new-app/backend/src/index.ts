@@ -15,6 +15,7 @@ import {
   createMembershipsRepository,
   createBusinessesRepository,
 } from "./repositories";
+import { createBusinessUsersRepository } from "./repositories/businessUsers.repository";
 import { createDashboardRepository } from "./repositories/dashboard.repository";
 import { createHomeOverviewRepository } from "./repositories/homeOverview.repository";
 import { createStaffHomeRepository } from "./repositories/staffHome.repository";
@@ -31,6 +32,7 @@ async function main(): Promise<void> {
         users: createUsersRepository(pool),
         memberships: createMembershipsRepository(pool),
         businesses: createBusinessesRepository(pool),
+        businessUsers: createBusinessUsersRepository(pool),
         dashboard: createDashboardRepository(pool),
         homeOverview: createHomeOverviewRepository(pool),
         staffHome: createStaffHomeRepository(pool),

@@ -7,6 +7,7 @@ import { createAuthRoutes } from "./routes/auth.routes";
 import { createMeRoutes } from "./routes/me.routes";
 import { createDashboardRoutes } from "./routes/dashboard.routes";
 import { createReportsRoutes } from "./routes/reports.routes";
+import { createUsersRoutes } from "./routes/users.routes";
 import {
   createAuthController,
   type AuthControllerDeps,
@@ -14,10 +15,12 @@ import {
 import { createMeController } from "./controllers/me.controller";
 import { createDashboardController } from "./controllers/dashboard.controller";
 import { createReportsController } from "./controllers/reports.controller";
+import { createUsersController } from "./controllers/users.controller";
 import { JwtTokenIssuer } from "./auth/jwtTokenIssuer";
 import type { UsersRepository } from "./repositories/users.repository";
 import type { MembershipsRepository } from "./repositories/memberships.repository";
 import type { BusinessesRepository } from "./repositories/businesses.repository";
+import type { BusinessUsersRepository } from "./repositories/businessUsers.repository";
 import type { DashboardRepository } from "./repositories/dashboard.repository";
 import type { HomeOverviewRepository } from "./repositories/homeOverview.repository";
 import type { StaffHomeRepository } from "./repositories/staffHome.repository";
@@ -48,6 +51,8 @@ export type AppDeps = {
   homeOverview?: HomeOverviewRepository;
   staffHome?: StaffHomeRepository;
   homeActivity?: HomeActivityRepository;
+  /** Users & Roles — business user list */
+  businessUsers?: BusinessUsersRepository;
 };
 
 /** Fail-closed users repo when SQL pool is not wired. */
@@ -139,6 +144,17 @@ function unavailableHomeActivityRepository(): HomeActivityRepository {
   };
 }
 
+function unavailableBusinessUsersRepository(): BusinessUsersRepository {
+  const fail = async (): Promise<never> => {
+    throw new Error("Database pool not connected. Call connect() first.");
+  };
+  return {
+    listForBusiness: fail,
+    activityCount7d: fail,
+    todayStats: fail,
+  } as unknown as BusinessUsersRepository;
+}
+
 export type AppWithAuthz = express.Express & {
   /** Authz middleware bundle — for future /v1/businesses/:businessId routes. */
   authz: AuthzMiddleware;
@@ -211,6 +227,16 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
   app.use(
     "/v1/businesses/:businessId/notifications",
     createNotificationsRoutes(staffHomeController, app.authz),
+  );
+
+  const businessUsers =
+    deps.businessUsers ?? unavailableBusinessUsersRepository();
+  app.use(
+    "/v1/businesses/:businessId/users",
+    createUsersRoutes(
+      createUsersController({ businessUsers, businesses }),
+      app.authz,
+    ),
   );
 
   app.use(errorHandler);

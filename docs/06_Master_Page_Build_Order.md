@@ -12,8 +12,8 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 DONE | Next: ask Users & Roles backend **or** Subagent 4 satellite ([`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md)) |
-| 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 me/businesses only | Blocked |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 DONE | Next: ask Users create/profile APIs **or** Subagent 4 satellite ([`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md)) |
+| 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 `GET …/users` PASS | Create/UI blocked — [`users_roles_backend_list_compare.md`](modules/users_roles_backend_list_compare.md) |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
 | 6 | Suppliers/Brokers | 12 | ✅ `suppliers.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Next: ask **Users & Roles backend** or one **Subagent 4 satellite**. Users & Roles UI blocked until users APIs.
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users **`GET …/users` PASS**. Next: ask **create/GET-by-id** or one **Subagent 4 satellite**. Users UI blocked until enough users APIs.
 
 ---
 
@@ -95,8 +95,9 @@ Backend (wire in later steps): `POST /v1/auth/login`, `POST /v1/auth/refresh`, `
 
 | Path | Notes |
 |---|---|
-| `/settings/users` | Users list |
-| `/settings/users/:userId` | User detail |
+| `GET /v1/businesses/:businessId/users` | Backend Slice 1 **PASS** — [`users_roles_backend_list_compare.md`](modules/users_roles_backend_list_compare.md) |
+| `/settings/users` | Users list UI — blocked until more APIs |
+| `/settings/users/:userId` | User detail UI — blocked |
 
 ### Seq 4 — Products/Catalog
 

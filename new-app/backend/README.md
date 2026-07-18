@@ -4,8 +4,10 @@ Node.js + Express + TypeScript API for the warehouse ERP migration.
 
 ## Status
 
-**Phase 3.1** — folder structure + `GET /api/health` only.  
-Repositories / SQL Server pool → **3.2**. Auth → **3.5**.
+**Phase 3.2** — `mssql` pool + core identity repositories (`users`, `businesses`, `memberships`).  
+Service layer → **3.3**. Auth → **3.5**.
+
+See `docs/34_Repository_Pattern.md` (repo root docs).
 
 ## Layout
 
@@ -13,21 +15,19 @@ Repositories / SQL Server pool → **3.2**. Auth → **3.5**.
 src/
   routes/         → FastAPI routers
   controllers/    → thin HTTP adapters
-  services/       → FastAPI services (business logic)
-  repositories/   → data access (Phase 3.2+)
+  services/       → FastAPI services (business logic) — 3.3
+  repositories/   → data access (users / businesses / memberships)
   middleware/
-  config/
+  config/         → env + mssql pool (connect / close / getPool)
 ```
-
-See `docs/33_Backend_Structure.md` (repo root docs).
 
 ## Scripts
 
 ```bash
 npm install
 npm run dev      # tsx watch
-npm test         # vitest smoke
+npm test         # vitest (mocked repos + health)
 npm run build && npm start
 ```
 
-Copy `.env.example` → `.env` before connecting to SQL Server (3.2).
+Copy `.env.example` → `.env` and set `SQLSERVER_*` before calling `connect()` against a live server (optional; tests do not need live SQL).

@@ -1,5 +1,5 @@
 /**
- * Business-scoped users routes — list + create.
+ * Business-scoped users routes — list + create + profile + patch + delete + reset.
  * Prefix mounted at /v1/businesses/:businessId/users
  * Source: source-app/backend/app/routers/users.py
  */
@@ -28,6 +28,14 @@ export function createUsersRoutes(
     authz.requireMembership,
     createRequireRole("owner", "admin", "super_admin"),
     (req, res, next) => void controller.create(req, res, next),
+  );
+
+  r.post(
+    "/:userId/reset-password",
+    authz.requireAuth,
+    authz.requireMembership,
+    createRequireRole("owner", "admin", "super_admin"),
+    (req, res, next) => void controller.resetPassword(req, res, next),
   );
 
   r.get(

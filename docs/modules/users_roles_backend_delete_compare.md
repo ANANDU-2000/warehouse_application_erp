@@ -14,10 +14,10 @@
 | 7 | token_version += 1 | Yes | Yes | PASS |
 | 8 | USER_DELETE activity log | Yes | `insertActivityLog` | PASS |
 | 9 | 204 No Content | Yes | `res.status(204).send()` | PASS |
-| 10 | reset-password / UI | Out of slice | Not added | N/A |
+| 10 | reset-password / UI | Out of slice | See Slice 6 | N/A |
 
 **Smoke:** `npx vitest run tests/users/` (39 PASS); `tsc --noEmit` PASS.
 
 **Rollback:** Revert this commit; remove DELETE route + delete service; restore boards to Slice 1–4.
 
-**Next (ask first):** reset-password · permissions · Users UI · Subagent 4.
+**Next:** Slice 6 reset-password — [`users_roles_backend_reset_password_compare.md`](users_roles_backend_reset_password_compare.md).

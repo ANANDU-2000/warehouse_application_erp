@@ -1,5 +1,5 @@
 /**
- * Users HTTP — list + create slices.
+ * Users HTTP — list + create + profile + patch + delete + reset-password.
  * Source: source-app/backend/app/routers/users.py
  */
 import type { Request, Response, NextFunction } from "express";
@@ -28,6 +28,11 @@ import {
   type DeleteUserDeps,
 } from "../services/usersDelete.service";
 import {
+  resetActorFromUser,
+  resetPasswordForBusiness,
+  type ResetPasswordDeps,
+} from "../services/usersResetPassword.service";
+import {
   userCreateInSchema,
   userPatchInSchema,
 } from "../validation/users.schemas";
@@ -46,6 +51,8 @@ export type UsersControllerDeps = {
   runPatchInTransaction?: PatchUserDeps["runInTransaction"];
   /** Test seam for delete. */
   runDeleteInTransaction?: DeleteUserDeps["runInTransaction"];
+  /** Test seam for reset-password. */
+  runResetInTransaction?: ResetPasswordDeps["runInTransaction"];
 };
 
 export function createUsersController(deps: UsersControllerDeps) {
@@ -249,6 +256,48 @@ export function createUsersController(deps: UsersControllerDeps) {
           },
         );
         res.status(204).send();
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async resetPassword(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> {
+      try {
+        const businessId = req.params.businessId;
+        const userId = req.params.userId;
+        if (typeof businessId !== "string" || !businessId) {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        if (typeof userId !== "string" || !userId) {
+          sendDetail(res, 400, "userId required");
+          return;
+        }
+        const user = req.user;
+        const membership = req.membership;
+        if (!user || !membership) {
+          sendDetail(res, 401, "Not authenticated");
+          return;
+        }
+
+        const out = await resetPasswordForBusiness(
+          {
+            pool: deps.pool,
+            businessUsers: deps.businessUsers,
+            runInTransaction: deps.runResetInTransaction,
+          },
+          {
+            businessId,
+            userId,
+            actorMembershipRole: membership.role,
+            actor: resetActorFromUser(user),
+          },
+        );
+        res.json(out);
       } catch (e) {
         next(e);
       }

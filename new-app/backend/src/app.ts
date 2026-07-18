@@ -29,6 +29,7 @@ import type { ConnectionPool } from "mssql";
 import type { CreateUserDeps } from "./services/usersCreate.service";
 import type { PatchUserDeps } from "./services/usersPatch.service";
 import type { DeleteUserDeps } from "./services/usersDelete.service";
+import type { ResetPasswordDeps } from "./services/usersResetPassword.service";
 import {
   createAuthzMiddleware,
   type AuthzMiddleware,
@@ -65,6 +66,8 @@ export type AppDeps = {
   runPatchInTransaction?: PatchUserDeps["runInTransaction"];
   /** Test seam for DELETE …/users/:userId. */
   runDeleteInTransaction?: DeleteUserDeps["runInTransaction"];
+  /** Test seam for POST …/users/:userId/reset-password. */
+  runResetInTransaction?: ResetPasswordDeps["runInTransaction"];
 };
 
 /** Fail-closed users repo when SQL pool is not wired. */
@@ -266,6 +269,7 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
         runInTransaction: deps.runInTransaction,
         runPatchInTransaction: deps.runPatchInTransaction,
         runDeleteInTransaction: deps.runDeleteInTransaction,
+        runResetInTransaction: deps.runResetInTransaction,
       }),
       app.authz,
     ),

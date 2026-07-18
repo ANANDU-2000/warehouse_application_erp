@@ -62,6 +62,6 @@
 
 ## Next (ask first)
 
-1. **Users reset-password / permissions**, or  
+1. **Users credentials GET / permissions / UI**, or  
 2. One **satellite** from the stub tables above (start page loop), or  
 3. Hold / merge review of `ops/dashboard-module` → `main`.

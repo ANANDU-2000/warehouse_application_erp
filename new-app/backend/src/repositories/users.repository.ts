@@ -109,6 +109,7 @@ export class UsersRepository {
       deleted_at?: Date | null;
       notes?: string | null;
       token_version?: number;
+      password_hash?: string;
     },
   ): Promise<void> {
     const sets: string[] = [];
@@ -177,6 +178,14 @@ export class UsersRepository {
         name: "token_version",
         type: sql.Int,
         value: fields.token_version,
+      });
+    }
+    if (fields.password_hash !== undefined) {
+      sets.push("[password_hash] = @password_hash");
+      params.push({
+        name: "password_hash",
+        type: sql.NVarChar(255),
+        value: fields.password_hash,
       });
     }
     if (sets.length === 0) return;

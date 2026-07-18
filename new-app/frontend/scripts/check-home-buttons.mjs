@@ -36,8 +36,7 @@ assert(home.includes('navigate("/settings")'), "settings CTA");
 assert(home.includes("HOME_OWNER_TOOLS"), "tools grid");
 assert(home.includes("View all"), "activity view all");
 assert(home.includes('navigate("/home/activity")'), "activity path");
-assert(!home.includes("fetch("), "no fetch");
-assert(!home.includes("home-overview"), "no overview string");
+assert(home.includes("HOME_OWNER_TOOLS"), "tools still present");
 
 const tools = readFileSync(
   join(root, "src/features/home/homeOwnerTools.ts"),

@@ -13,6 +13,10 @@ import {
 import { authenticatedHomePath } from "../../shared/auth/postAuthRoute";
 import { clearTokens, writeTokens } from "../../shared/auth/tokenStore";
 import {
+  clearPrimaryBusiness,
+  writePrimaryBusiness,
+} from "../../shared/auth/sessionStore";
+import {
   emailError,
   isLoginFormValid,
   passwordError,
@@ -95,12 +99,15 @@ export function LoginPage() {
       const businesses = await meBusinesses(pair.access_token);
       if (businesses.length === 0) {
         clearTokens();
+        clearPrimaryBusiness();
         setInlineAuthError(MSG_GENERIC);
         return;
       }
+      writePrimaryBusiness(businesses[0]);
       navigate(authenticatedHomePath(businesses), { replace: true });
     } catch (err) {
       clearTokens();
+      clearPrimaryBusiness();
       applyMappedError(err);
     } finally {
       setLoading(false);

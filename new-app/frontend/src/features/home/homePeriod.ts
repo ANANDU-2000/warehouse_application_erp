@@ -132,3 +132,22 @@ export function isValidCustomRange(custom: HomeCustomRange): boolean {
     startOfLocalDay(custom.endInclusive).getTime()
   );
 }
+
+/**
+ * Inclusive API dates for home-overview `from`/`to`.
+ * Formula source: home_dashboard_provider — lastInclusive = range.end - 1ms.
+ */
+export function homePeriodApiDates(
+  period: HomePeriod,
+  options?: {
+    now?: Date;
+    custom?: HomeCustomRange | null;
+  },
+): { from: string; to: string } {
+  const range = homePeriodRange(period, options);
+  const lastInclusive = new Date(range.end.getTime() - 1);
+  return {
+    from: toDateInputValue(range.start),
+    to: toDateInputValue(lastInclusive),
+  };
+}

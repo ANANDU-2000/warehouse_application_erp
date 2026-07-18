@@ -316,3 +316,168 @@
   font-family: inherit;
   padding: 4px 0;
 }
+
+.home-page__loading,
+.home-page__muted {
+  margin: 0;
+  font-size: 13px;
+  color: var(--home-muted);
+}
+
+.home-page__load-error {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #b91c1c;
+}
+
+.home-page__alerts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.home-page__alert {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.home-page__alert--amber {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+}
+
+.home-page__alert--red {
+  background: rgba(220, 38, 38, 0.12);
+  color: #dc2626;
+}
+
+.home-page__alert--filled {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.home-page__kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+@media (min-width: 900px) {
+  .home-page__kpi-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.home-page__kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--home-border);
+  border-radius: 12px;
+  background: #f8faf9;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+.home-page__kpi--accent {
+  border-color: rgba(220, 38, 38, 0.35);
+}
+
+.home-page__kpi-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--home-muted);
+}
+
+.home-page__kpi-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--home-text);
+  word-break: break-word;
+}
+
+.home-page__kpi--accent .home-page__kpi-value {
+  color: #dc2626;
+}
+
+.home-page__kpi-sub {
+  font-size: 11px;
+  color: var(--home-muted);
+}
+
+.home-page__pipeline {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  width: 100%;
+  border: 1px solid rgba(14, 79, 70, 0.22);
+  border-radius: 12px;
+  background: rgba(14, 79, 70, 0.06);
+  padding: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--home-text);
+}
+
+.home-page__card--purchase {
+  background: rgba(14, 79, 70, 0.06);
+  border-color: rgba(14, 79, 70, 0.25);
+}
+
+.home-page__purchase-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--home-brand);
+}
+
+.home-page__purchase-units {
+  margin: 10px 0 0;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.home-page__purchase-amount {
+  margin: 8px 0 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f766e;
+}
+
+.home-page__purchase-meta {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--home-muted);
+}
+
+.home-page__purchase-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.home-page__meta-chip {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--home-muted);
+}
+
+.home-page__profit {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--home-muted);
+}

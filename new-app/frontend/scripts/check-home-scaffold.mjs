@@ -1,5 +1,5 @@
 /**
- * Owner /home SCAFFOLD smoke checks.
+ * Owner /home SCAFFOLD smoke checks (slots still present after WIRE).
  * Run: node scripts/check-home-scaffold.mjs
  */
 import { readFileSync, existsSync } from "node:fs";
@@ -49,9 +49,6 @@ assert(
   home.includes('data-slot="activity"') || home.includes('slot="activity"'),
   "activity slot",
 );
-assert(!home.includes("fetch("), "no fetch");
-assert(!home.includes("home-overview"), "no home-overview");
-assert(!home.includes("useEffect"), "no boot effects");
 
 const router = readFileSync(join(root, "src/app/router.tsx"), "utf8");
 assert(router.includes("HomePage"), "router imports HomePage");

@@ -49,8 +49,7 @@ assert(home.includes("HOME_PERIOD_LABELS"), "chip labels");
 assert(home.includes("home-page__period-chip"), "chip class");
 assert(home.includes('type="date"'), "custom date inputs");
 assert(home.includes("isValidCustomRange"), "custom validation");
-assert(!home.includes("fetch("), "no fetch");
-assert(!home.includes("home-overview"), "no home-overview");
+assert(home.includes("HOME_PERIOD_ORDER"), "chip order");
 
 const css = readFileSync(
   join(root, "src/features/home/HomePage.css"),

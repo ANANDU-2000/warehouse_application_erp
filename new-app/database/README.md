@@ -41,6 +41,11 @@ See `docs/28_SQL_Server_Indexes.md`.
 **No** `CREATE SECURITY POLICY` scripts yet (optional later).  
 See `docs/29_RLS_Equivalent_Strategy.md`.
 
-**Next:** Phase **2.7** — procs/views/triggers only if source requires.
+## Procs / views / triggers (Phase 2.7)
+
+**None required** for SQL Server parity (0 triggers, 0 views, 0 procedures).  
+One Postgres maintenance function (`cleanup_report_saved_views`) deferred to optional Phase 3 job — see `docs/30_Procs_Views_Triggers.md`.
+
+**Next:** Phase **2.8** — migration / seed scripts.
 
 Type mapping: `docs/25_SQL_Server_Type_Mapping.md`.

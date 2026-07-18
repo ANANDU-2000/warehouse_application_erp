@@ -200,7 +200,7 @@ Requirements before adopting: connection reset on pool checkout; NULL/empty cont
 
 ## 10. Next
 
-**Phase 2.7** — Stored procedures / views / triggers **only if** source DB logic requires them (scan `source-app/backend/sql` + Alembic; most logic is app-layer).
+**Phase 2.7** — done: see `docs/30_Procs_Views_Triggers.md` (none required).
 
 ---
 

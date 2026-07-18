@@ -1,0 +1,50 @@
+# Frontend page build loop
+
+**Rule:** One page step at a time. Stop and show diff before the next step.  
+**Master order:** [`06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md)  
+**Spec per module:** `docs/modules/<module>.md`
+
+---
+
+## Steps (every route)
+
+| # | Step | Allowed | Forbidden |
+|---|---|---|---|
+| 1 | **SCAFFOLD** | Route + empty page shell / layout container | Fields, CTA, API |
+| 2 | **LAYOUT** | Brand colors, background asset, title/chrome parity | Form fields, submit, API |
+| 3 | **FIELDS** | Inputs + client validation from module doc | Submit/API wire |
+| 4 | **BUTTONS** | CTA / secondary links (may navigate locally) | Live API calls |
+| 5 | **WIRE** | Call backend endpoints from `18_API_Inventory` / module doc | Invented endpoints |
+| 6 | **STATES** | Loading, error, success, disabled | Dropping legacy messages |
+| 7 | **COMPARE** | Legacy vs New PASS/FAIL table | Calling module “done” without PASS |
+
+After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md) → next route/module.
+
+---
+
+## Working example — Login
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | `phase4/login-scaffold` — `/login` + `AuthPageShell` + empty `AuthFormCard` |
+| 2 LAYOUT | 🟡 | Brand mint/primary, `getstarted_bg.png`, warehouse icon + titles — **no fields** |
+| 3 FIELDS | ⬜ | email/password next |
+| 4 BUTTONS | ⬜ | Sign In + Forgot link |
+| 5 WIRE | ⬜ | `POST /v1/auth/login` then `GET /v1/me/businesses` |
+| 6 STATES | ⬜ | validation / 401 / network banner |
+| 7 COMPARE | ⬜ | Full Login PASS/FAIL |
+
+### Prompt template (copy per page)
+
+```
+PAGE: <name>
+STEP: <n. NAME>
+
+READ FIRST:
+1. docs/modules/<module>.md
+2. docs/05_Navigation_Map.md (exact path)
+3. Backend routes for this page (if WIRE+)
+
+TASK: <one step only>
+STOP after this. Show diff before next step.
+```

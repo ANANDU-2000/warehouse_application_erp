@@ -7,7 +7,8 @@ type AuthFormCardProps = {
 
 /**
  * Port of Flutter AuthFormCard — frosted card container.
- * SCAFFOLD: empty card (no fields). Source: auth_page_shell.dart AuthFormCard.
+ * LAYOUT: may contain title chrome only; no fields yet.
+ * Source: auth_page_shell.dart AuthFormCard; docs/modules/login.md §2.
  */
 export function AuthFormCard({ children }: AuthFormCardProps) {
   return <div className="auth-form-card">{children}</div>;

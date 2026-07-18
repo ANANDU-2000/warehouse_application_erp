@@ -11,7 +11,7 @@
   z-index: 0;
 }
 
-/* Fallback when getstarted_bg.png not yet ported — HexaColors.atmosphereGradient */
+/* Fallback — HexaColors.atmosphereGradient (login.md §3) */
 .auth-page-shell__atmosphere {
   position: absolute;
   inset: 0;
@@ -21,13 +21,30 @@
     #f7f9f6 45%,
     #0e4f46 160%
   );
-  filter: blur(12px);
-  transform: scale(1.05);
+}
+
+.auth-page-shell__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+/* Flutter ImageFilter.blur sigma 12 */
+.auth-page-shell__blur {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .auth-page-shell__scrim {
   position: absolute;
   inset: 0;
+  z-index: 3;
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.35) 0%,

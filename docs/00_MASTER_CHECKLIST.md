@@ -192,4 +192,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-18 — Login E2E L1 PASS (`43_Me_Businesses.md`); next = L2 login DB commit.*
+*Last updated: 2026-07-18 — Local SQL bootstrap PASS (`44_Local_SQL_Bootstrap.md`, 46 tables / 103 FKs); next = Login E2E L2.*

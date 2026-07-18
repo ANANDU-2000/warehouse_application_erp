@@ -3,4 +3,6 @@ import { getHealth } from "../controllers/health.controller";
 
 export const healthRoutes = Router();
 
-healthRoutes.get("/", getHealth);
+healthRoutes.get("/", (req, res, next) => {
+  void getHealth(req, res, next);
+});

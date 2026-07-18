@@ -67,9 +67,10 @@ ALTER TABLE stock_dispute_cases
     ADD CONSTRAINT FK_stock_dispute_cases_created_by
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL;
 
+-- ON DELETE NO ACTION: SQL Server cascade-path limit. See docs/44.
 ALTER TABLE stock_dispute_cases
     ADD CONSTRAINT FK_stock_dispute_cases_resolved_by
-    FOREIGN KEY (resolved_by) REFERENCES users(id) ON DELETE SET NULL;
+    FOREIGN KEY (resolved_by) REFERENCES users(id) ON DELETE NO ACTION;
 
 ALTER TABLE reorder_list
     ADD CONSTRAINT FK_reorder_list_business_id
@@ -99,9 +100,10 @@ ALTER TABLE staff_purchase_logs
     ADD CONSTRAINT FK_staff_purchase_logs_broker_id
     FOREIGN KEY (broker_id) REFERENCES brokers(id) ON DELETE SET NULL;
 
+-- ON DELETE NO ACTION: SQL Server cascade-path limit. See docs/44.
 ALTER TABLE staff_purchase_logs
     ADD CONSTRAINT FK_staff_purchase_logs_stock_movement_id
-    FOREIGN KEY (stock_movement_id) REFERENCES stock_movements(id) ON DELETE SET NULL;
+    FOREIGN KEY (stock_movement_id) REFERENCES stock_movements(id) ON DELETE NO ACTION;
 
 ALTER TABLE staff_purchase_logs
     ADD CONSTRAINT FK_staff_purchase_logs_created_by

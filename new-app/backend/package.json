@@ -19,6 +19,7 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "msnodesqlv8": "^5.2.2",
     "mssql": "^12.7.0",
     "zod": "^4.4.3"
   },

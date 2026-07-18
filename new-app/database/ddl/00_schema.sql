@@ -3,6 +3,6 @@
 -- Mapping: docs/25_SQL_Server_Type_Mapping.md
 -- FKs deferred to Phase 2.4; indexes deferred to Phase 2.5
 -- Table count target: 46 (no customers/sales tables)
-
-USE [dbo];
-GO
+--
+-- Note: do NOT `USE [dbo]` — dbo is a schema, not a database.
+-- Connect to WarehouseErp (or target DB) via sqlcmd -d / SSMS context.

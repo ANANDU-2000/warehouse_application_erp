@@ -2,9 +2,10 @@
 -- Source: docs/23_Relationships.md (ORM ForeignKeys only)
 -- Apply after 00-06 CREATE TABLE scripts.
 
+-- ON DELETE NO ACTION: SQL Server rejects SET NULL here (multiple cascade paths). See docs/44.
 ALTER TABLE users
     ADD CONSTRAINT FK_users_created_by
-    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL;
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE NO ACTION;
 
 ALTER TABLE memberships
     ADD CONSTRAINT FK_memberships_user_id

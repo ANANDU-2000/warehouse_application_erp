@@ -5,9 +5,9 @@ Node.js + Express + TypeScript API for the warehouse ERP migration.
 ## Status
 
 **Phase 3 platform COMPLETE** — see `docs/PHASE3_SIGN_OFF.md`.  
-Login E2E **L1 PASS** — `GET /v1/me/businesses` (`docs/43_Me_Businesses.md`). Next: **L2** login DB commit. Google OAuth still **501**.
+Login E2E **L1 PASS**. Local SQL bootstrap — `docs/44_Local_SQL_Bootstrap.md` (`GET /api/health` → `databaseConnected`). Next: **L2** login DB commit. Google still **501**.
 
-See `docs/43_Me_Businesses.md` (repo root docs).
+See `docs/44_Local_SQL_Bootstrap.md` (repo root docs).
 
 ## Layout
 
@@ -32,7 +32,7 @@ src/
 
 | Method | Path | Notes |
 |---|---|---|
-| GET | `/api/health` | Liveness |
+| GET | `/api/health` | Liveness + `databaseConnected` when pool up |
 | POST | `/v1/auth/login` | 200 TokenPair |
 | POST | `/v1/auth/refresh` | 200 TokenPair or 401 |
 | POST | `/v1/auth/{register,forgot-password,reset-password,google}` | 501 stubs |
@@ -47,4 +47,4 @@ npm test
 npm run build && npm start
 ```
 
-Copy `.env.example` → `.env`. Set `JWT_*` and `LOG_LEVEL` as needed.
+Copy `.env.example` → `.env`. Set `SQLSERVER_USER` / `SQLSERVER_PASSWORD` (and `JWT_*`, `LOG_LEVEL`) as needed.

@@ -1,13 +1,35 @@
 /**
- * SQL Server connection pool (mssql / Tedious).
+ * SQL Server connection pool (mssql).
  * Phase 3.2 — repositories use getPool() after connect().
+ *
+ * Drivers:
+ * - tedious (default non-Windows) — requires TCP/IP on port 1433
+ * - msnodesqlv8 (default Windows) — ODBC connection string (works without TCP)
+ * Override with SQLSERVER_DRIVER=tedious|msnodesqlv8
+ * ODBC driver name: SQLSERVER_ODBC_DRIVER (default "ODBC Driver 18 for SQL Server")
  */
-import sql, { type ConnectionPool, type config as SqlConfig } from "mssql";
+import sqlTedious, {
+  type ConnectionPool,
+  type config as SqlConfig,
+} from "mssql";
+import sqlNative from "mssql/msnodesqlv8";
 import { env } from "./env";
 
 export type DatabaseConfig = typeof env.sql;
 
 let pool: ConnectionPool | null = null;
+
+function resolveDriver(): "tedious" | "msnodesqlv8" {
+  const raw = (process.env.SQLSERVER_DRIVER ?? "").toLowerCase();
+  if (raw === "tedious" || raw === "msnodesqlv8") {
+    return raw;
+  }
+  return process.platform === "win32" ? "msnodesqlv8" : "tedious";
+}
+
+const driver = resolveDriver();
+/** Active mssql binding (tedious or msnodesqlv8). */
+export const sql = driver === "msnodesqlv8" ? sqlNative : sqlTedious;
 
 export function getDatabaseConfig(): DatabaseConfig {
   return env.sql;
@@ -29,7 +51,33 @@ export function hasDatabaseCredentials(): boolean {
   );
 }
 
-function buildConfig(): SqlConfig {
+function odbcDriverName(): string {
+  return process.env.SQLSERVER_ODBC_DRIVER ?? "ODBC Driver 18 for SQL Server";
+}
+
+/** Escape ODBC connection-string values that may contain `;` or `}`. */
+function odbcEscape(value: string): string {
+  return value.replace(/\}/g, "}}");
+}
+
+function buildNativeConnectionString(): string {
+  const encrypt = env.sql.encrypt ? "yes" : "no";
+  const trust = env.sql.trustServerCertificate ? "yes" : "no";
+  return [
+    `Driver={${odbcDriverName()}}`,
+    `Server=${odbcEscape(env.sql.host)}`,
+    `Database=${odbcEscape(env.sql.database)}`,
+    `Uid=${odbcEscape(env.sql.user)}`,
+    `Pwd=${odbcEscape(env.sql.password)}`,
+    `Encrypt=${encrypt}`,
+    `TrustServerCertificate=${trust}`,
+  ].join(";");
+}
+
+function buildConfig(): SqlConfig | { connectionString: string } {
+  if (driver === "msnodesqlv8") {
+    return { connectionString: buildNativeConnectionString() };
+  }
   return {
     server: env.sql.host,
     port: env.sql.port,
@@ -57,7 +105,7 @@ export async function connect(): Promise<ConnectionPool> {
       "SQL Server credentials missing. Set SQLSERVER_USER and SQLSERVER_PASSWORD (and host/database).",
     );
   }
-  pool = await new sql.ConnectionPool(buildConfig()).connect();
+  pool = await new sql.ConnectionPool(buildConfig() as SqlConfig).connect();
   return pool;
 }
 
@@ -81,4 +129,6 @@ export async function ping(): Promise<boolean> {
   return result.recordset[0]?.ok === 1;
 }
 
-export { sql };
+export function getSqlDriver(): "tedious" | "msnodesqlv8" {
+  return driver;
+}

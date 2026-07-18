@@ -38,9 +38,10 @@ ALTER TABLE catalog_items
     ADD CONSTRAINT FK_catalog_items_created_by_user_id
     FOREIGN KEY (created_by_user_id) REFERENCES users(id) ON DELETE SET NULL;
 
+-- ON DELETE NO ACTION: SQL Server cascade-path limit. See docs/44.
 ALTER TABLE catalog_items
     ADD CONSTRAINT FK_catalog_items_updated_by_user_id
-    FOREIGN KEY (updated_by_user_id) REFERENCES users(id) ON DELETE SET NULL;
+    FOREIGN KEY (updated_by_user_id) REFERENCES users(id) ON DELETE NO ACTION;
 
 ALTER TABLE catalog_item_default_suppliers
     ADD CONSTRAINT FK_catalog_item_default_suppliers_business_id

@@ -1,6 +1,15 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { getHealthStatus } from "../services/health.service";
 
-export function getHealth(_req: Request, res: Response): void {
-  res.status(200).json(getHealthStatus());
+export async function getHealth(
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const body = await getHealthStatus();
+    res.status(200).json(body);
+  } catch (err) {
+    next(err);
+  }
 }

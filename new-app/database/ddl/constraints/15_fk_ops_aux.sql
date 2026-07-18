@@ -12,9 +12,10 @@ ALTER TABLE notifications
     ADD CONSTRAINT FK_notifications_user_id
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
+-- ON DELETE NO ACTION: SQL Server cascade-path limit. See docs/44.
 ALTER TABLE notifications
     ADD CONSTRAINT FK_notifications_triggered_by_user_id
-    FOREIGN KEY (triggered_by_user_id) REFERENCES users(id) ON DELETE SET NULL;
+    FOREIGN KEY (triggered_by_user_id) REFERENCES users(id) ON DELETE NO ACTION;
 
 ALTER TABLE report_saved_views
     ADD CONSTRAINT FK_report_saved_views_business_id

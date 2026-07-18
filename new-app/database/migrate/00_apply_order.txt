@@ -1,0 +1,29 @@
+# Phase 2.8 — Apply order for SQL Server schema
+# Paths relative to new-app/database/
+# Run via migrate/Apply-Schema.ps1 (dry-run by default)
+
+# --- Tables (Phase 2.3) ---
+ddl/00_schema.sql
+ddl/01_core.sql
+ddl/02_catalog.sql
+ddl/03_contacts.sql
+ddl/04_trade.sql
+ddl/05_stock.sql
+ddl/06_ops_aux.sql
+
+# --- Constraints FK + CHECK (Phase 2.4) ---
+ddl/constraints/10_fk_core.sql
+ddl/constraints/11_fk_catalog.sql
+ddl/constraints/12_fk_contacts.sql
+ddl/constraints/13_fk_trade.sql
+ddl/constraints/14_fk_stock.sql
+ddl/constraints/15_fk_ops_aux.sql
+ddl/constraints/16_check.sql
+
+# --- Indexes (Phase 2.5) ---
+ddl/indexes/20_ix_core.sql
+ddl/indexes/21_ix_catalog.sql
+ddl/indexes/22_ix_contacts.sql
+ddl/indexes/23_ix_trade.sql
+ddl/indexes/24_ix_stock.sql
+ddl/indexes/25_ix_ops_aux.sql

@@ -22,7 +22,7 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Analysis + module queue + ER + sign-off PASS. Phase 2: **2.1–2.7 PASS** — next **2.8 Migration/seed scripts**.
+**Phase 1 status: COMPLETE.** Analysis + module queue + ER + sign-off PASS. Phase 2: **2.1–2.9 PASS** — next **2.10 Phase 2 sign-off**.
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
@@ -63,7 +63,7 @@
 
 ## PHASE 2 — Database Design & SQL Server Migration 🟡
 
-**In progress.** 2.1–2.7 PASS. Next: **2.8 Migration/seed scripts**.
+**In progress.** 2.1–2.9 PASS. Next: **2.10 Phase 2 sign-off**.
 
 | # | Task | Status | Evidence / notes |
 |---|---|---|---|
@@ -74,9 +74,9 @@
 | 2.5 | Indexes | ✅ | `new-app/database/ddl/indexes/` — 149 non-unique; `docs/28_SQL_Server_Indexes.md` |
 | 2.6 | RLS-equivalent strategy (Postgres RLS → SQL Server security policy or app-layer) | ✅ | `docs/29_RLS_Equivalent_Strategy.md` — app-layer primary; SECURITY POLICY deferred |
 | 2.7 | Stored procedures / views / triggers (only if source DB logic requires them) | ✅ | `docs/30_Procs_Views_Triggers.md` — none required; 1 PG cleanup function deferred to Phase 3 job |
-| 2.8 | Migration/seed scripts | ⬜ | **Next** — unlocked after 2.7 |
-| 2.9 | Schema verification against source (row-for-row structural diff) | 🔒 | |
-| 2.10 | Phase 2 sign-off | 🔒 | |
+| 2.8 | Migration/seed scripts | ✅ | `new-app/database/migrate/` + `docs/31_Migration_Seed.md` — apply/rollback orchestration; app seed deferred to Phase 3 |
+| 2.9 | Schema verification against source (row-for-row structural diff) | ✅ | `docs/32_Schema_Verification.md` — 46 tables, columns match ORM; documented exceptions |
+| 2.10 | Phase 2 sign-off | ⬜ | **Next** — unlocked after 2.9 |
 
 ---
 
@@ -186,4 +186,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-18 — Phase 2.1–2.7 PASS (`30_Procs_Views_Triggers.md`); next = 2.8 Migration/seed scripts.*
+*Last updated: 2026-07-18 — Phase 2.1–2.9 PASS (`31_Migration_Seed.md`, `32_Schema_Verification.md`); next = 2.10 Phase 2 sign-off.*

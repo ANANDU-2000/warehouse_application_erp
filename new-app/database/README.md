@@ -7,45 +7,41 @@ SQL Server DDL lives under [`ddl/`](ddl/).
 | File | Contents |
 |---|---|
 | `ddl/00_schema.sql` | Header + `USE [dbo]` |
-| `ddl/01_core.sql` | businesses, users, memberships, sessions, tokens, admin/usage/webhook logs, business_goals |
-| `ddl/02_catalog.sql` | categories, catalog items/variants/defaults, units & packaging intelligence |
-| `ddl/03_contacts.sql` | brokers, suppliers, broker_supplier_m2m |
-| `ddl/04_trade.sql` | trade purchases/lines/drafts, lifecycle events, damage reports |
-| `ddl/05_stock.sql` | stock movements, adjustments, counts, audits, disputes, reorder, staff purchase logs |
-| `ddl/06_ops_aux.sql` | notifications, report views, activity, daily usage, checklists |
+| `ddl/01_core.sql` … `06_ops_aux.sql` | **46** tables |
 
-**46 tables** — `docs/26_SQL_Server_DDL.md`.
+See `docs/26_SQL_Server_DDL.md`.
 
 ## Constraints (Phase 2.4)
 
-| File | Contents |
-|---|---|
-| `ddl/constraints/10_fk_*.sql` … `15_fk_*.sql` | **103** ORM FKs |
-| `ddl/constraints/16_check.sql` | **6** CHECKs |
-| `ddl/constraints/90_drop_constraints.sql` | Rollback |
-
-See `docs/27_SQL_Server_Constraints.md`.
+`ddl/constraints/` — **103** FKs + **6** CHECKs. See `docs/27_SQL_Server_Constraints.md`.
 
 ## Indexes (Phase 2.5)
 
-| File | Contents |
-|---|---|
-| `ddl/indexes/20_ix_core.sql` … `25_ix_ops_aux.sql` | **149** non-unique indexes |
-| `ddl/indexes/91_drop_indexes.sql` | Rollback |
-
-See `docs/28_SQL_Server_Indexes.md`.
+`ddl/indexes/` — **149** non-unique. See `docs/28_SQL_Server_Indexes.md`.
 
 ## Tenancy / RLS (Phase 2.6)
 
-**Strategy:** app-layer `business_id` scoping in Node (Phase 3) — primary equivalent of Postgres `054` RLS.  
-**No** `CREATE SECURITY POLICY` scripts yet (optional later).  
-See `docs/29_RLS_Equivalent_Strategy.md`.
+App-layer primary — `docs/29_RLS_Equivalent_Strategy.md`.
 
 ## Procs / views / triggers (Phase 2.7)
 
-**None required** for SQL Server parity (0 triggers, 0 views, 0 procedures).  
-One Postgres maintenance function (`cleanup_report_saved_views`) deferred to optional Phase 3 job — see `docs/30_Procs_Views_Triggers.md`.
+None required — `docs/30_Procs_Views_Triggers.md`.
 
-**Next:** Phase **2.8** — migration / seed scripts.
+## Migration apply / rollback (Phase 2.8)
+
+| File | Role |
+|---|---|
+| `migrate/00_apply_order.txt` | Ordered file list |
+| `migrate/Apply-Schema.ps1` | Dry-run by default; `-Server`/`-Database` to execute |
+| `migrate/Rollback-Schema.ps1` | Indexes → constraints → tables |
+| `migrate/92_drop_tables.sql` | Drop 46 tables |
+
+Seed strategy (app-layer Phase 3) — `docs/31_Migration_Seed.md`.
+
+## Schema verification (Phase 2.9)
+
+Structural ORM vs DDL **PASS** — `docs/32_Schema_Verification.md`.
+
+**Next:** Phase **2.10** sign-off.
 
 Type mapping: `docs/25_SQL_Server_Type_Mapping.md`.

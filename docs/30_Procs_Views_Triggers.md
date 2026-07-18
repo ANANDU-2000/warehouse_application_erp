@@ -116,7 +116,7 @@ If a cleanup job is added in Phase 3, remove that job/endpoint; no DB proc depen
 
 ## 7. Next
 
-**Phase 2.8** — Migration / seed scripts (apply order, empty-tenant seed if any, rollback).
+**Phase 2.8** — done: see `docs/31_Migration_Seed.md`.
 
 ---
 

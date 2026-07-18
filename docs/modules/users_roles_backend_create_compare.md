@@ -18,10 +18,10 @@
 | 11 | User + Membership + USER_CREATE audit in txn | commit | `withTransaction` | PASS |
 | 12 | `permissions_json` = effective_permissions(role, None) | Yes | JSON.stringify same map | PASS |
 | 13 | 201 `UserCreateOut` with UserListOut enrichment | `_user_row` | `buildUserListOut` | PASS |
-| 14 | UI / PATCH / GET-by-id | Out of slice | Not added | N/A |
+| 14 | UI / PATCH / GET-by-id | Out of slice | Profile done separately | N/A |
 
-**Smoke:** `npx vitest run tests/users/` (20 PASS); `tsc --noEmit` PASS.
+**Smoke:** `npx vitest run tests/users/` (list+create+profile); `tsc --noEmit` PASS.
 
 **Rollback:** Revert this commit; remove POST handler; drop insert helpers / create services if unused; restore docs boards to Slice 1 only.
 
-**Next (ask first):** GET `/{user_id}` profile · other mutate APIs · Users UI · Subagent 4 satellite.
+**Next (ask first):** PATCH / mutate APIs · Users UI · Subagent 4. Profile: [`users_roles_backend_profile_compare.md`](users_roles_backend_profile_compare.md).

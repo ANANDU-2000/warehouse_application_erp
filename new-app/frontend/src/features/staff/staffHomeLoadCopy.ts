@@ -30,6 +30,17 @@ export const STAFF_HOME_ACTIVITY_ERROR = "Could not load recent activity.";
 /** StaffHomeShiftSnapshotStrip empty title. */
 export const STAFF_HOME_SHIFT_EMPTY = "No activity today";
 
+/** StaffHomeShiftSnapshotStrip empty subtitle. */
+export const STAFF_HOME_SHIFT_EMPTY_SUBTITLE =
+  "Tap Stock or Scan to log work";
+
+export const STAFF_HOME_SHIFT_TILE_LABELS = {
+  scans: "Scans",
+  stock: "Stock",
+  purchases: "Purchases",
+  deliveries: "Deliveries",
+} as const;
+
 /** Pending delivery cards — staff_home_pending_delivery_cards.dart */
 export const STAFF_HOME_MARK_ARRIVED = "Mark arrived";
 export const STAFF_HOME_VERIFY = "Verify";

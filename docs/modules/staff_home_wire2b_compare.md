@@ -19,4 +19,4 @@
 
 **Smoke:** `npm run test:staff-home-wire2b`  
 **Rollback:** Revert WIRE-2b commit; restore empty pending slot; remove receive stubs if unused.  
-**Next:** Staff WIRE-2c — Shift today strip (`activity-log` + `audit/feed`). Stop until approved.
+**Next:** Staff WIRE-2c PASS — [`staff_home_wire2c_compare.md`](staff_home_wire2c_compare.md). Next WIRE-2d recent activity.

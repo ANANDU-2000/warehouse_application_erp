@@ -24,7 +24,9 @@ import {
   type StaffHomeFocus,
 } from "./staffHomeFocus";
 import {
+  fetchActivityLogToday,
   fetchStaffHomeShell,
+  fetchStockAuditFeedToday,
   fetchStockTotals,
   fetchTradePurchasesRecent,
   staffAppPeriodMonthDates,
@@ -44,6 +46,8 @@ import {
   STAFF_HOME_RETRY_SUBTITLE,
   STAFF_HOME_SESSION_EXPIRED,
   STAFF_HOME_SHIFT_EMPTY,
+  STAFF_HOME_SHIFT_EMPTY_SUBTITLE,
+  STAFF_HOME_SHIFT_TILE_LABELS,
   STAFF_HOME_STATS_PURCHASES_SUBTITLE,
   STAFF_HOME_STATS_PURCHASES_TITLE,
   STAFF_HOME_STATS_UNIT_LABELS,
@@ -62,6 +66,13 @@ import {
   type StaffPendingPurchase,
   type TradePurchaseListRow,
 } from "./staffPendingDeliveries";
+import {
+  emptyStaffTodaySummary,
+  staffTodayApiDate,
+  staffTodayTotal,
+  summarizeStaffToday,
+  type StaffTodayActivitySummary,
+} from "./staffShiftSummary";
 import {
   STAFF_HOME_CLOSE_LABEL,
   STAFF_HOME_LOGOUT_BODY,
@@ -403,6 +414,162 @@ function PendingDeliveryCards(props: {
   );
 }
 
+/** Minimal Material-style icons — StaffHomeShiftSnapshotRow _ShiftTile */
+function ShiftTileIcon(props: { kind: "scans" | "stock" | "purchases" | "deliveries" }) {
+  const common = {
+    width: 15,
+    height: 15,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.75,
+    "aria-hidden": true as const,
+  };
+  if (props.kind === "scans") {
+    return (
+      <svg {...common}>
+        <path d="M4 7V4h3M17 4h3v3M20 17v3h-3M7 20H4v-3" />
+        <rect x="7" y="7" width="10" height="10" rx="1" />
+      </svg>
+    );
+  }
+  if (props.kind === "stock") {
+    return (
+      <svg {...common}>
+        <path d="M21 8l-9-4-9 4v8l9 4 9-4V8z" />
+        <path d="M3 8l9 4 9-4M12 12v8" />
+      </svg>
+    );
+  }
+  if (props.kind === "purchases") {
+    return (
+      <svg {...common}>
+        <path d="M8 6h13v14H8z" />
+        <path d="M8 6V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2" />
+        <path d="M11 11h7M11 15h7" />
+      </svg>
+    );
+  }
+  return (
+    <svg {...common}>
+      <path d="M3 7h11v10H3z" />
+      <path d="M14 10h4l3 3v4h-7" />
+      <circle cx="7" cy="19" r="1.5" />
+      <circle cx="17" cy="19" r="1.5" />
+    </svg>
+  );
+}
+
+/** StaffHomeShiftSnapshotRow — Scans / Stock / Purchases / Deliveries */
+function ShiftSnapshotRow(props: {
+  scans: string;
+  stock: string;
+  purchases: string;
+  deliveries: string;
+}): ReactElement {
+  const tiles: {
+    value: string;
+    label: string;
+    kind: "scans" | "stock" | "purchases" | "deliveries";
+  }[] = [
+    {
+      value: props.scans,
+      label: STAFF_HOME_SHIFT_TILE_LABELS.scans,
+      kind: "scans",
+    },
+    {
+      value: props.stock,
+      label: STAFF_HOME_SHIFT_TILE_LABELS.stock,
+      kind: "stock",
+    },
+    {
+      value: props.purchases,
+      label: STAFF_HOME_SHIFT_TILE_LABELS.purchases,
+      kind: "purchases",
+    },
+    {
+      value: props.deliveries,
+      label: STAFF_HOME_SHIFT_TILE_LABELS.deliveries,
+      kind: "deliveries",
+    },
+  ];
+  return (
+    <div
+      className="staff-home-shift-row"
+      data-testid="staff-home-shift-row"
+    >
+      {tiles.map((t, i) => (
+        <div key={t.label} className="staff-home-shift-tile-wrap">
+          {i > 0 ? (
+            <div className="staff-home-shift-divider" aria-hidden="true" />
+          ) : null}
+          <div className="staff-home-shift-tile">
+            <span className="staff-home-shift-icon">
+              <ShiftTileIcon kind={t.kind} />
+            </span>
+            <span className="staff-home-shift-value">{t.value}</span>
+            <span className="staff-home-shift-label">{t.label}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ShiftSnapshotStrip(props: {
+  loading: boolean;
+  error: boolean;
+  summary: StaffTodayActivitySummary;
+  pendingDel: number;
+  onOpenScan: () => void;
+}): ReactElement {
+  if (props.loading) {
+    return (
+      <ShiftSnapshotRow
+        scans="–"
+        stock="–"
+        purchases="–"
+        deliveries="–"
+      />
+    );
+  }
+  if (props.error) {
+    return (
+      <ShiftSnapshotRow
+        scans="–"
+        stock="–"
+        purchases="–"
+        deliveries={props.pendingDel > 0 ? String(props.pendingDel) : "–"}
+      />
+    );
+  }
+  if (staffTodayTotal(props.summary) === 0 && props.pendingDel === 0) {
+    return (
+      <button
+        type="button"
+        className="staff-home-shift-empty"
+        onClick={props.onOpenScan}
+        data-testid="staff-home-shift-empty"
+      >
+        <span className="staff-home-shift-empty-title">
+          {STAFF_HOME_SHIFT_EMPTY}
+        </span>
+        <span className="staff-home-shift-empty-sub">
+          {STAFF_HOME_SHIFT_EMPTY_SUBTITLE}
+        </span>
+      </button>
+    );
+  }
+  return (
+    <ShiftSnapshotRow
+      scans={String(props.summary.scanned)}
+      stock={String(props.summary.stockUpdates)}
+      purchases={String(props.summary.purchases)}
+      deliveries={String(props.pendingDel)}
+    />
+  );
+}
+
 function FriendlyLoadError(props: {
   message: string;
   subtitle: string;
@@ -459,6 +626,11 @@ export function StaffHomePage(): ReactElement {
   const [pendingDeliveries, setPendingDeliveries] = useState<
     StaffPendingPurchase[]
   >([]);
+  const [shiftSummary, setShiftSummary] = useState<StaffTodayActivitySummary>(
+    emptyStaffTodaySummary(),
+  );
+  const [shiftLoading, setShiftLoading] = useState(true);
+  const [shiftError, setShiftError] = useState(false);
 
   const reloadShell = useCallback(() => {
     setRetryTick((n) => n + 1);
@@ -594,6 +766,39 @@ export function StaffHomePage(): ReactElement {
       })
       .catch(() => {
         if (!cancelled) setPendingDeliveries([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [retryTick]);
+
+  /* WIRE-2c: staffTodayActivity + staffTodayStockWork → summarizeStaffToday */
+  useEffect(() => {
+    const biz = readPrimaryBusiness();
+    if (!biz?.id) {
+      setShiftLoading(false);
+      setShiftSummary(emptyStaffTodaySummary());
+      setShiftError(false);
+      return;
+    }
+    let cancelled = false;
+    setShiftLoading(true);
+    setShiftError(false);
+    const onDate = staffTodayApiDate();
+    void Promise.all([
+      fetchActivityLogToday(biz.id),
+      fetchStockAuditFeedToday(biz.id, onDate),
+    ])
+      .then(([activityRows, auditRows]) => {
+        if (cancelled) return;
+        setShiftSummary(summarizeStaffToday({ activityRows, auditRows }));
+        setShiftLoading(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setShiftSummary(emptyStaffTodaySummary());
+        setShiftError(true);
+        setShiftLoading(false);
       });
     return () => {
       cancelled = true;
@@ -812,9 +1017,13 @@ export function StaffHomePage(): ReactElement {
                   title={STAFF_HOME_SECTION.shiftToday.title}
                   subtitle={STAFF_HOME_SECTION.shiftToday.subtitle}
                 />
-                {!loading && loadKind === null ? (
-                  <p className="staff-home-empty-copy">{STAFF_HOME_SHIFT_EMPTY}</p>
-                ) : null}
+                <ShiftSnapshotStrip
+                  loading={shiftLoading}
+                  error={shiftError}
+                  summary={shiftSummary}
+                  pendingDel={counts.pending}
+                  onOpenScan={() => navigate("/barcode/scan")}
+                />
               </section>
 
               <section

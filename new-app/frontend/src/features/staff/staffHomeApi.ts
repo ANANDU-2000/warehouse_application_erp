@@ -251,6 +251,46 @@ export function staffAppPeriodMonthDates(now = new Date()): {
   return { periodStart, periodEnd };
 }
 
+/** GET …/activity-log?period=today — staffTodayActivityProvider */
+export async function fetchActivityLogToday(
+  businessId: string,
+): Promise<Record<string, unknown>[]> {
+  const q = new URLSearchParams({
+    period: "today",
+    page: "1",
+    per_page: "80",
+  });
+  const res = await authGet(
+    `/v1/businesses/${encodeURIComponent(businessId)}/activity-log?${q}`,
+  );
+  if (!res.ok) throw new StaffHomeApiError(res.status, await readDetail(res));
+  const data: unknown = await res.json();
+  if (!Array.isArray(data)) return [];
+  return data.map((e) =>
+    e && typeof e === "object" ? (e as Record<string, unknown>) : {},
+  );
+}
+
+/** GET …/stock/audit/feed?on=&limit=200 — staffTodayStockWorkProvider */
+export async function fetchStockAuditFeedToday(
+  businessId: string,
+  onDate: string,
+): Promise<Record<string, unknown>[]> {
+  const q = new URLSearchParams({
+    limit: "200",
+    on: onDate,
+  });
+  const res = await authGet(
+    `/v1/businesses/${encodeURIComponent(businessId)}/stock/audit/feed?${q}`,
+  );
+  if (!res.ok) throw new StaffHomeApiError(res.status, await readDetail(res));
+  const data: unknown = await res.json();
+  if (!Array.isArray(data)) return [];
+  return data.map((e) =>
+    e && typeof e === "object" ? (e as Record<string, unknown>) : {},
+  );
+}
+
 /**
  * Recent trade purchases snapshot — api_read_snapshots tradePurchasesRecentSnapshot
  * listTradePurchases(limit: 50), include_lines default false.

@@ -156,6 +156,50 @@ export function createStaffHomeController(deps: StaffHomeControllerDeps) {
         next(e);
       }
     },
+
+    /**
+     * GET …/activity-log — users.py list_activity
+     */
+    async listActivityLog(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string") {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        const user = req.user;
+        if (!user) {
+          sendDetail(res, 401, "Not authenticated");
+          return;
+        }
+        const userId =
+          typeof req.query.user_id === "string" && req.query.user_id.trim()
+            ? req.query.user_id.trim()
+            : user.id;
+        const period =
+          typeof req.query.period === "string" ? req.query.period : "today";
+        const daysRaw =
+          typeof req.query.days === "string" ? Number(req.query.days) : null;
+        const days =
+          daysRaw != null && Number.isFinite(daysRaw) && daysRaw > 0
+            ? Math.min(90, Math.floor(daysRaw))
+            : null;
+        const page = Number(req.query.page ?? 1) || 1;
+        const perPage = Number(req.query.per_page ?? 50) || 50;
+        res.json(
+          await deps.staffHome.listActivityLog({
+            businessId,
+            userId,
+            period,
+            days,
+            page,
+            perPage,
+          }),
+        );
+      } catch (e) {
+        next(e);
+      }
+    },
   };
 }
 

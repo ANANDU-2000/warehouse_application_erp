@@ -13,7 +13,7 @@ import {
   tradeLineWeightExprSql,
   tradePurchaseStatusInReportsSql,
 } from "../services/tradeLineSql";
-import { queryMany, queryOne, type SqlClient } from "./sql";
+import { queryMany, queryOne, type SqlClient, type SqlParam } from "./sql";
 
 export type DeliveryPipelineOut = {
   pending: number;
@@ -68,6 +68,17 @@ export type StockTotalsOut = {
   total_tins: number;
 };
 
+/** FastAPI ActivityLogOut — users.py list_activity */
+export type ActivityLogOut = {
+  id: string;
+  user_name: string | null;
+  action_type: string;
+  item_id: string | null;
+  item_name: string | null;
+  details: Record<string, unknown> | null;
+  created_at: string;
+};
+
 type StatusCountRow = { delivery_status: string | null; c: number };
 type AmountRow = { total: number };
 type CountRow = { c: number };
@@ -91,6 +102,16 @@ type StockTotalsRow = {
   total_kg: number;
   total_boxes: number;
   total_tins: number;
+};
+
+type ActivityLogRow = {
+  id: string;
+  user_name: string | null;
+  action_type: string;
+  item_id: string | null;
+  item_name: string | null;
+  details: string | null;
+  created_at: Date;
 };
 
 function moneyStr(n: number): string {
@@ -384,6 +405,80 @@ export class StaffHomeRepository {
       total_boxes: Number(row?.total_boxes ?? 0),
       total_tins: Number(row?.total_tins ?? 0),
     };
+  }
+
+  /**
+   * GET activity-log — users.py list_activity (period today/week/month or days).
+   * Defaults to current user when userId omitted.
+   */
+  async listActivityLog(opts: {
+    businessId: string;
+    userId: string;
+    period: string;
+    days: number | null;
+    page: number;
+    perPage: number;
+  }): Promise<ActivityLogOut[]> {
+    const page = Math.max(1, opts.page);
+    const perPage = Math.min(200, Math.max(1, opts.perPage));
+    const offset = (page - 1) * perPage;
+    const period = (opts.period || "today").toLowerCase();
+
+    let startExpr: string;
+    const params: SqlParam[] = [
+      { name: "businessId", type: sql.UniqueIdentifier, value: opts.businessId },
+      { name: "userId", type: sql.UniqueIdentifier, value: opts.userId },
+      { name: "offset", type: sql.Int, value: offset },
+      { name: "perPage", type: sql.Int, value: perPage },
+    ];
+
+    if (opts.days != null && opts.days > 0) {
+      startExpr = `DATEADD(day, -@days, SYSUTCDATETIME())`;
+      params.push({ name: "days", type: sql.Int, value: opts.days });
+    } else if (period === "week") {
+      startExpr = `DATEADD(day, -7, SYSUTCDATETIME())`;
+    } else if (period === "month") {
+      startExpr = `DATEADD(day, -30, SYSUTCDATETIME())`;
+    } else {
+      /* today — start of UTC day */
+      startExpr = `CAST(CAST(SYSUTCDATETIME() AS date) AS datetimeoffset)`;
+    }
+
+    const rows = await queryMany<ActivityLogRow>(
+      this.client,
+      `SELECT [id], [user_name], [action_type], [item_id], [item_name],
+              [details], [created_at]
+       FROM staff_activity_log
+       WHERE [business_id] = @businessId
+         AND [user_id] = @userId
+         AND [created_at] >= ${startExpr}
+       ORDER BY [created_at] DESC
+       OFFSET @offset ROWS FETCH NEXT @perPage ROWS ONLY`,
+      params,
+    );
+
+    return rows.map((r) => {
+      let details: Record<string, unknown> | null = null;
+      if (r.details) {
+        try {
+          details = JSON.parse(r.details) as Record<string, unknown>;
+        } catch {
+          details = null;
+        }
+      }
+      return {
+        id: r.id,
+        user_name: r.user_name,
+        action_type: r.action_type,
+        item_id: r.item_id,
+        item_name: r.item_name,
+        details,
+        created_at:
+          r.created_at instanceof Date
+            ? r.created_at.toISOString()
+            : String(r.created_at),
+      };
+    });
   }
 }
 

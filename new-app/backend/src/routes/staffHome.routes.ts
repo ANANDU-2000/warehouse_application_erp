@@ -6,6 +6,20 @@ import type { AuthzMiddleware } from "../middleware/authz";
 import type { StaffHomeController } from "../controllers/staffHome.controller";
 import type { HomeActivityController } from "../controllers/homeActivity.controller";
 
+export function createActivityLogRoutes(
+  staffHome: StaffHomeController,
+  authz: AuthzMiddleware,
+): Router {
+  const r = Router({ mergeParams: true });
+  r.get(
+    "/",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void staffHome.listActivityLog(req, res, next),
+  );
+  return r;
+}
+
 export function createStaffHomeMeRoutes(
   controller: StaffHomeController,
   authz: AuthzMiddleware,
@@ -67,6 +81,12 @@ export function createStockRoutes(
     authz.requireAuth,
     authz.requireMembership,
     (req, res, next) => void staffHome.variancesToday(req, res, next),
+  );
+  r.get(
+    "/audit/feed",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void homeActivity.auditRecent(req, res, next),
   );
   r.get(
     "/audit/recent",

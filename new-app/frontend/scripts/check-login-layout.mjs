@@ -28,9 +28,7 @@ const loginSrc = readFileSync(join(root, "src/features/auth/LoginPage.tsx"), "ut
 assert(loginSrc.includes("Harisree Agency"), "agency title missing");
 assert(loginSrc.includes("Warehouse Management"), "subtitle missing");
 assert(loginSrc.includes("Sign In"), "Sign In heading missing");
-assert(!/type=["']password["']/.test(loginSrc), "password field must not exist yet");
-assert(!/type=["']email["']/.test(loginSrc), "email field must not exist yet");
-assert(!loginSrc.includes("fetch("), "no API fetch in LAYOUT");
+assert(!loginSrc.includes("fetch("), "no API fetch in LAYOUT/FIELDS");
 
 if (failures.length) {
   console.error("Login LAYOUT checks FAILED:");

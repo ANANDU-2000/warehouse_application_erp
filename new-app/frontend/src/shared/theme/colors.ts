@@ -8,6 +8,18 @@ export const hexaColors = {
   /** HexaDsColors.textMuted → HexaColors.neutral */
   textMuted: "#64748B",
   white: "#FFFFFF",
+  /** HexaColors.inputBorderGrey / auth_input_styles enabledBorder */
+  inputBorder: "#E5E7EB",
+  /** HexaColors.inputText */
+  inputText: "#111111",
+  /** HexaColors.inputHint (also used where Material grey.shade500 is close) */
+  inputHint: "#9CA3AF",
+  /** authFilledDecoration fillColor */
+  inputFill: "#F3F4F6",
+  /** login_page _err Colors.red.shade700 */
+  errorText: "#D32F2F",
+  /** visibility icon Color(0xFF6B7280) */
+  iconMuted: "#6B7280",
 } as const;
 
 /** Public path for AuthBrandAssets.background (login.md §3). */

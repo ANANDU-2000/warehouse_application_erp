@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import "./HomePage.css";
 import {
@@ -15,6 +15,8 @@ import {
 import { HOME_OWNER_TOOLS } from "./homeOwnerTools";
 import {
   fetchHomeOverview,
+  HomeOverviewApiError,
+  HomeOverviewNetworkError,
   type HomeOverviewPayload,
 } from "./homeOverviewApi";
 import {
@@ -23,14 +25,32 @@ import {
   purchasedUnitsLine,
 } from "./homeFormatters";
 import {
+  HOME_ACTIVITY_EMPTY_SUBTITLE,
+  HOME_ACTIVITY_EMPTY_TITLE,
+  HOME_ACTIVITY_UNAVAILABLE,
+  HOME_DELIVERY_LOAD_ERROR,
+  HOME_KPI_PENDING_CLEAR,
+  HOME_LOADING_DASHBOARD,
+  HOME_NO_CONNECTION,
+  HOME_NO_PURCHASES_IN_PERIOD,
+  HOME_RETRY_LABEL,
+  HOME_RETRY_SUBTITLE,
+  HOME_SESSION_EXPIRED,
+  HOME_SESSION_EXPIRED_SUBTITLE,
+} from "./homeLoadCopy";
+import {
+  clearPrimaryBusiness,
   displayWarehouseTitle,
   readPrimaryBusiness,
   warehouseCodeFromBusinessId,
 } from "../../shared/auth/sessionStore";
+import { clearTokens } from "../../shared/auth/tokenStore";
+
+type LoadKind = "session" | "network" | "generic" | null;
 
 /**
- * Owner `/home` — Step 5 WIRE.
- * GET …/reports/home-overview (compact + shell_bundle). Not GET /dashboard.
+ * Owner `/home` — Step 6 STATES.
+ * Exact Flutter loading / FriendlyLoadError / empty copy.
  */
 export function HomePage() {
   const navigate = useNavigate();
@@ -41,9 +61,21 @@ export function HomePage() {
   );
   const [overview, setOverview] = useState<HomeOverviewPayload | null>(null);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadKind, setLoadKind] = useState<LoadKind>(null);
+  const [retryTick, setRetryTick] = useState(0);
+
+  const onRetryOverview = useCallback(() => {
+    setRetryTick((n) => n + 1);
+  }, []);
+
+  const onSessionExpiredRetry = useCallback(() => {
+    clearTokens();
+    clearPrimaryBusiness();
+    navigate("/login");
+  }, [navigate]);
 
   function selectPeriod(next: HomePeriod) {
+    if (loading) return;
     setPeriod(next);
   }
 
@@ -71,8 +103,8 @@ export function HomePage() {
     }
     if (!session?.id) {
       setLoading(false);
-      setLoadError("Sign in required");
       setOverview(null);
+      setLoadKind("session");
       return;
     }
 
@@ -80,7 +112,7 @@ export function HomePage() {
     const timer = window.setTimeout(() => {
       void (async () => {
         setLoading(true);
-        setLoadError(null);
+        setLoadKind(null);
         try {
           const { from, to } = homePeriodApiDates(period, {
             custom: period === "custom" ? customRange : null,
@@ -92,14 +124,26 @@ export function HomePage() {
           });
           if (!cancelled) {
             setOverview(data);
-            setLoadError(null);
+            setLoadKind(null);
           }
         } catch (err) {
           if (!cancelled) {
             setOverview(null);
-            setLoadError(
-              err instanceof Error ? err.message : "Failed to load dashboard",
-            );
+            if (
+              err instanceof HomeOverviewApiError &&
+              (err.status === 401 || err.status === 403)
+            ) {
+              setLoadKind("session");
+            } else if (err instanceof HomeOverviewNetworkError) {
+              setLoadKind("network");
+            } else if (
+              err instanceof HomeOverviewApiError &&
+              err.detail === "Not signed in"
+            ) {
+              setLoadKind("session");
+            } else {
+              setLoadKind("network");
+            }
           }
         } finally {
           if (!cancelled) setLoading(false);
@@ -111,7 +155,7 @@ export function HomePage() {
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [period, customRange, session?.id]);
+  }, [period, customRange, session?.id, retryTick]);
 
   const title = session ? displayWarehouseTitle(session) : "Warehouse";
   const code = session
@@ -148,6 +192,9 @@ export function HomePage() {
     : "";
   const showProfit =
     overview != null && Math.abs(overview.summary.total_profit) > 0.01;
+  const hasOverviewError = !loading && loadKind != null;
+  const showDeliveryPipeline =
+    overview != null && (pending > 0 || received > 0);
 
   return (
     <div className="home-page" data-testid="home-page">
@@ -211,6 +258,7 @@ export function HomePage() {
                 type="button"
                 role="option"
                 aria-selected={selected}
+                disabled={loading}
                 className={`home-page__period-chip${selected ? " home-page__period-chip--selected" : ""}`}
                 onClick={() => selectPeriod(key)}
               >
@@ -229,6 +277,7 @@ export function HomePage() {
               <input
                 type="date"
                 value={toDateInputValue(customRange.start)}
+                disabled={loading}
                 onChange={(e) => onCustomFromChange(e.target.value)}
               />
             </label>
@@ -237,6 +286,7 @@ export function HomePage() {
               <input
                 type="date"
                 value={toDateInputValue(customRange.endInclusive)}
+                disabled={loading}
                 onChange={(e) => onCustomToChange(e.target.value)}
               />
             </label>
@@ -251,93 +301,176 @@ export function HomePage() {
 
       <main className="home-page__body">
         {loading ? (
-          <p className="home-page__loading" data-testid="home-loading">
-            Loading dashboard…
-          </p>
-        ) : null}
-        {loadError && !loading ? (
-          <p className="home-page__load-error" role="alert">
-            {loadError}
-          </p>
+          <section
+            className="home-page__card"
+            data-testid="home-loading"
+            aria-busy="true"
+            aria-label={HOME_LOADING_DASHBOARD}
+          >
+            <HomeSectionSkeleton rows={4} />
+            <p className="home-page__loading">{HOME_LOADING_DASHBOARD}</p>
+          </section>
         ) : null}
 
-        <section
-          className="home-page__card"
-          aria-label="Alerts"
-          data-slot="alerts"
-        >
-          <h2 className="home-page__card-title">Alerts</h2>
-          <div className="home-page__alerts">
-            {lowAlert > 0 ? (
-              <button
-                type="button"
-                className="home-page__alert home-page__alert--amber"
-                onClick={() => navigate("/stock/low-stock")}
-              >
-                Low stock · {lowAlert}
-              </button>
-            ) : null}
-            {pending > 0 ? (
-              <button
-                type="button"
-                className="home-page__alert home-page__alert--red home-page__alert--filled"
-                onClick={() => navigate("/purchase?filter=pending_delivery")}
-              >
-                Pending delivery · {pending}
-              </button>
-            ) : null}
-            {outAlert > 0 ? (
-              <button
-                type="button"
-                className="home-page__alert home-page__alert--red"
-                onClick={() => navigate("/stock?status=out")}
-              >
-                Out of stock · {outAlert}
-              </button>
-            ) : null}
-            {!loading &&
-            lowAlert === 0 &&
-            pending === 0 &&
-            outAlert === 0 ? (
-              <p className="home-page__muted">No alerts</p>
-            ) : null}
-          </div>
-        </section>
+        {!loading && loadKind === "session" ? (
+          <FriendlyLoadError
+            message={HOME_SESSION_EXPIRED}
+            subtitle={HOME_SESSION_EXPIRED_SUBTITLE}
+            onRetry={onSessionExpiredRetry}
+          />
+        ) : null}
 
-        <section
-          className="home-page__card home-page__card--tall"
-          aria-label="KPI grid"
-          data-slot="kpi-grid"
-        >
-          <h2 className="home-page__card-title">KPI grid</h2>
-          <div className="home-page__kpi-grid">
-            <KpiTile
-              label="Purchases"
-              value={String(purchaseCount)}
-              subtitle={periodLabel}
-              onClick={() => navigate("/purchase")}
-            />
-            <KpiTile
-              label="Pending delivery"
-              value={String(pending)}
-              subtitle={pending > 0 ? "Needs action" : "Clear"}
-              accent={pending > 0}
-              onClick={() => navigate("/purchase?filter=pending_delivery")}
-            />
-            <KpiTile
-              label="Low stock"
-              value={String(lowKpi)}
-              subtitle="Items below reorder"
-              onClick={() => navigate("/stock/low-stock")}
-            />
-            <KpiTile
-              label="Warehouse"
-              value={warehouseValue}
-              subtitle={warehouseSub}
-              onClick={() => navigate("/stock")}
-            />
-          </div>
-        </section>
+        {!loading && loadKind === "network" ? (
+          <FriendlyLoadError
+            message={HOME_NO_CONNECTION}
+            subtitle={HOME_RETRY_SUBTITLE}
+            onRetry={onRetryOverview}
+          />
+        ) : null}
+
+        {!loading && loadKind === "generic" ? (
+          <FriendlyLoadError
+            message={HOME_NO_CONNECTION}
+            subtitle={HOME_RETRY_SUBTITLE}
+            onRetry={onRetryOverview}
+          />
+        ) : null}
+
+        {!loading && !hasOverviewError ? (
+          <>
+            <section
+              className="home-page__card"
+              aria-label="Alerts"
+              data-slot="alerts"
+            >
+              <h2 className="home-page__card-title">Alerts</h2>
+              <div className="home-page__alerts">
+                {lowAlert > 0 ? (
+                  <button
+                    type="button"
+                    className="home-page__alert home-page__alert--amber"
+                    onClick={() => navigate("/stock/low-stock")}
+                  >
+                    Low stock · {lowAlert}
+                  </button>
+                ) : null}
+                {pending > 0 ? (
+                  <button
+                    type="button"
+                    className="home-page__alert home-page__alert--red home-page__alert--filled"
+                    onClick={() =>
+                      navigate("/purchase?filter=pending_delivery")
+                    }
+                  >
+                    Pending delivery · {pending}
+                  </button>
+                ) : null}
+                {outAlert > 0 ? (
+                  <button
+                    type="button"
+                    className="home-page__alert home-page__alert--red"
+                    onClick={() => navigate("/stock?status=out")}
+                  >
+                    Out of stock · {outAlert}
+                  </button>
+                ) : null}
+              </div>
+            </section>
+
+            <section
+              className="home-page__card home-page__card--tall"
+              aria-label="KPI grid"
+              data-slot="kpi-grid"
+            >
+              <h2 className="home-page__card-title">KPI grid</h2>
+              <div className="home-page__kpi-grid">
+                <KpiTile
+                  label="Purchases"
+                  value={String(purchaseCount)}
+                  subtitle={periodLabel}
+                  onClick={() => navigate("/purchase")}
+                />
+                <KpiTile
+                  label="Pending delivery"
+                  value={String(pending)}
+                  subtitle={
+                    pending > 0 ? "Needs action" : HOME_KPI_PENDING_CLEAR
+                  }
+                  accent={pending > 0}
+                  onClick={() =>
+                    navigate("/purchase?filter=pending_delivery")
+                  }
+                />
+                <KpiTile
+                  label="Low stock"
+                  value={String(lowKpi)}
+                  subtitle="Items below reorder"
+                  onClick={() => navigate("/stock/low-stock")}
+                />
+                <KpiTile
+                  label="Warehouse"
+                  value={warehouseValue}
+                  subtitle={warehouseSub}
+                  onClick={() => navigate("/stock")}
+                />
+              </div>
+            </section>
+
+            <section
+              className="home-page__card home-page__card--purchase"
+              aria-label="Purchase control center"
+              data-slot="purchase-center"
+            >
+              <h2 className="home-page__purchase-title">
+                Purchases ({periodLabel})
+              </h2>
+              {unitsLine ? (
+                <p className="home-page__purchase-units">{unitsLine}</p>
+              ) : (
+                <p className="home-page__muted">{HOME_NO_PURCHASES_IN_PERIOD}</p>
+              )}
+              {overview ? (
+                <p className="home-page__purchase-amount">
+                  <span>{formatRupee(overview.summary.total_purchase)}</span>
+                  <span className="home-page__purchase-meta">
+                    {" "}
+                    · {purchaseCount} bills
+                  </span>
+                </p>
+              ) : null}
+              <div className="home-page__purchase-chips">
+                {received > 0 ? (
+                  <span className="home-page__meta-chip">
+                    {received} received
+                  </span>
+                ) : null}
+                {pending > 0 ? (
+                  <span className="home-page__meta-chip">
+                    {pending} pending delivery
+                  </span>
+                ) : null}
+                {(overview?.summary.supplier_count ?? 0) > 0 ? (
+                  <span className="home-page__meta-chip">
+                    {overview!.summary.supplier_count} suppliers
+                  </span>
+                ) : null}
+                {(overview?.summary.broker_count ?? 0) > 0 ? (
+                  <span className="home-page__meta-chip">
+                    {overview!.summary.broker_count} brokers
+                  </span>
+                ) : null}
+              </div>
+              {showProfit && overview ? (
+                <p className="home-page__profit">
+                  Profit {formatRupee(overview.summary.total_profit)}
+                  {overview.summary.profit_percent != null
+                    ? ` (${overview.summary.profit_percent.toFixed(1)}%)`
+                    : ""}
+                </p>
+              ) : null}
+            </section>
+          </>
+        ) : null}
 
         <section
           className="home-page__card"
@@ -345,101 +478,59 @@ export function HomePage() {
           data-slot="delivery"
         >
           <h2 className="home-page__card-title">Delivery pipeline</h2>
-          <button
-            type="button"
-            className="home-page__pipeline"
-            onClick={() => navigate("/purchase?filter=pending_delivery")}
+          {hasOverviewError && loadKind !== "session" ? (
+            <SectionInlineError
+              message={HOME_DELIVERY_LOAD_ERROR}
+              onRetry={onRetryOverview}
+            />
+          ) : null}
+          {!hasOverviewError && showDeliveryPipeline ? (
+            <button
+              type="button"
+              className="home-page__pipeline"
+              onClick={() => navigate("/purchase?filter=pending_delivery")}
+            >
+              <span>
+                Pending <strong>{pending}</strong>
+              </span>
+              <span>
+                Received <strong>{received}</strong>
+              </span>
+            </button>
+          ) : null}
+        </section>
+
+        {!loading && loadKind !== "session" ? (
+          <section
+            className="home-page__card"
+            aria-label="Owner quick actions"
+            data-slot="tools"
           >
-            <span>
-              Pending <strong>{pending}</strong>
-            </span>
-            <span>
-              Received <strong>{received}</strong>
-            </span>
-          </button>
-        </section>
-
-        <section
-          className="home-page__card home-page__card--purchase"
-          aria-label="Purchase control center"
-          data-slot="purchase-center"
-        >
-          <h2 className="home-page__purchase-title">
-            Purchases ({periodLabel})
-          </h2>
-          {unitsLine ? (
-            <p className="home-page__purchase-units">{unitsLine}</p>
-          ) : (
-            <p className="home-page__muted">No purchases in period</p>
-          )}
-          {overview ? (
-            <p className="home-page__purchase-amount">
-              <span>{formatRupee(overview.summary.total_purchase)}</span>
-              <span className="home-page__purchase-meta">
-                {" "}
-                · {purchaseCount} bills
-              </span>
-            </p>
-          ) : null}
-          <div className="home-page__purchase-chips">
-            {received > 0 ? (
-              <span className="home-page__meta-chip">{received} received</span>
-            ) : null}
-            {pending > 0 ? (
-              <span className="home-page__meta-chip">
-                {pending} pending delivery
-              </span>
-            ) : null}
-            {(overview?.summary.supplier_count ?? 0) > 0 ? (
-              <span className="home-page__meta-chip">
-                {overview!.summary.supplier_count} suppliers
-              </span>
-            ) : null}
-            {(overview?.summary.broker_count ?? 0) > 0 ? (
-              <span className="home-page__meta-chip">
-                {overview!.summary.broker_count} brokers
-              </span>
-            ) : null}
-          </div>
-          {showProfit && overview ? (
-            <p className="home-page__profit">
-              Profit {formatRupee(overview.summary.total_profit)}
-              {overview.summary.profit_percent != null
-                ? ` (${overview.summary.profit_percent.toFixed(1)}%)`
-                : ""}
-            </p>
-          ) : null}
-        </section>
-
-        <section
-          className="home-page__card"
-          aria-label="Owner quick actions"
-          data-slot="tools"
-        >
-          <h2 className="home-page__card-title">Tools</h2>
-          <div className="home-page__tools" data-testid="home-owner-tools">
-            {HOME_OWNER_TOOLS.map((tool) => (
-              <button
-                key={tool.id}
-                type="button"
-                className="home-page__tool"
-                style={
-                  {
-                    "--tool-color": tool.color,
-                  } as CSSProperties
-                }
-                onClick={() => navigate(tool.path)}
-              >
-                <span className="home-page__tool-label">
-                  {tool.label}
-                  {tool.id === "low-stock" && lowKpi > 0
-                    ? ` (${lowKpi})`
-                    : ""}
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
+            <h2 className="home-page__card-title">Tools</h2>
+            <div className="home-page__tools" data-testid="home-owner-tools">
+              {HOME_OWNER_TOOLS.map((tool) => (
+                <button
+                  key={tool.id}
+                  type="button"
+                  className="home-page__tool"
+                  style={
+                    {
+                      "--tool-color": tool.color,
+                    } as CSSProperties
+                  }
+                  onClick={() => navigate(tool.path)}
+                >
+                  <span className="home-page__tool-label">
+                    {tool.label}
+                    {tool.id === "low-stock" && lowKpi > 0
+                      ? ` (${lowKpi})`
+                      : ""}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section
           className="home-page__card"
@@ -456,8 +547,83 @@ export function HomePage() {
               View all
             </button>
           </div>
+          {hasOverviewError && loadKind !== "session" ? (
+            <SectionInlineError
+              message={HOME_ACTIVITY_UNAVAILABLE}
+              onRetry={onRetryOverview}
+            />
+          ) : null}
+          {!loading && !hasOverviewError ? (
+            <div className="home-page__empty" data-testid="home-activity-empty">
+              <p className="home-page__empty-title">
+                {HOME_ACTIVITY_EMPTY_TITLE}
+              </p>
+              <p className="home-page__empty-sub">
+                {HOME_ACTIVITY_EMPTY_SUBTITLE}
+              </p>
+            </div>
+          ) : null}
         </section>
       </main>
+    </div>
+  );
+}
+
+function HomeSectionSkeleton({ rows }: { rows: number }) {
+  return (
+    <div className="home-page__skeleton" data-testid="home-section-skeleton">
+      {Array.from({ length: rows }, (_, i) => (
+        <div key={i} className="home-page__skeleton-bar" />
+      ))}
+    </div>
+  );
+}
+
+function FriendlyLoadError({
+  message,
+  subtitle,
+  onRetry,
+}: {
+  message: string;
+  subtitle: string;
+  onRetry: () => void;
+}) {
+  return (
+    <div
+      className="home-page__friendly-error"
+      role="alert"
+      data-testid="home-friendly-error"
+    >
+      <p className="home-page__friendly-error-msg">{message}</p>
+      <p className="home-page__friendly-error-sub">{subtitle}</p>
+      <button
+        type="button"
+        className="home-page__retry"
+        onClick={onRetry}
+      >
+        {HOME_RETRY_LABEL}
+      </button>
+    </div>
+  );
+}
+
+function SectionInlineError({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry: () => void;
+}) {
+  return (
+    <div className="home-page__inline-error" role="alert">
+      <p className="home-page__inline-error-msg">{message}</p>
+      <button
+        type="button"
+        className="home-page__retry home-page__retry--inline"
+        onClick={onRetry}
+      >
+        {HOME_RETRY_LABEL}
+      </button>
     </div>
   );
 }

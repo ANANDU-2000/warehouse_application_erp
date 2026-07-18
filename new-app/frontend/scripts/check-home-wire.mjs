@@ -44,7 +44,10 @@ const home = readFileSync(
 assert(home.includes("fetchHomeOverview"), "calls overview");
 assert(home.includes("useEffect"), "fetch effect");
 assert(home.includes("homePeriodApiDates"), "uses api dates");
-assert(home.includes("Loading dashboard"), "minimal loading");
+assert(
+  home.includes("HOME_LOADING_DASHBOARD") || home.includes("Loading dashboard"),
+  "minimal loading",
+);
 assert(!home.includes("/dashboard?"), "no dashboard month path");
 
 const login = readFileSync(

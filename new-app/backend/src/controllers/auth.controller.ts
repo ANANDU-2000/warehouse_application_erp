@@ -24,15 +24,12 @@ import {
   validateWithSchema,
   SchemaValidationError,
 } from "../validation/validate";
+import { sendDetail } from "../http/sendDetail";
 
 export type AuthControllerDeps = {
   users: UsersRepository;
   tokenIssuer: TokenIssuer;
 };
-
-function sendDetail(res: Response, status: number, detail: string): void {
-  res.status(status).json({ detail });
-}
 
 export function createAuthController(deps: AuthControllerDeps) {
   async function login(

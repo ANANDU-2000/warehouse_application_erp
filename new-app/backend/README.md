@@ -4,10 +4,10 @@ Node.js + Express + TypeScript API for the warehouse ERP migration.
 
 ## Status
 
-**Phase 3.7** — Zod validation for Login + Refresh request bodies.  
-Error handling middleware → **3.8**. Google OAuth still **501**.
+**Phase 3.8** — Error middleware returns `{ detail }` and maps domain throws.  
+Logging → **3.9**. Google OAuth still **501**.
 
-See `docs/39_Validation_Zod.md` (repo root docs).
+See `docs/40_Error_Handling.md` (repo root docs).
 
 ## Layout
 
@@ -17,9 +17,11 @@ src/
   controllers/    → health + auth
   services/       → Login foundation + jwtTokens + permissions
   repositories/   → users / businesses / memberships
-  auth/           → loginRequest wrapper + TokenIssuer
-  validation/     → Zod schemas (auth) + validateWithSchema
-  middleware/     → requestId, errorHandler, authz
+  auth/           → loginRequest + TokenIssuer
+  validation/     → Zod schemas
+  middleware/     → requestId, errorHandler ({ detail }), authz
+  errors/         → HttpError
+  http/           → sendDetail
   types/
   config/
 ```

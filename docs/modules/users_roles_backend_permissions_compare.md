@@ -13,10 +13,10 @@
 | 6 | PATCH merges only `PERMISSION_KEYS` into sparse JSON | Yes | Same | PASS |
 | 7 | Response uses effective map (not sparse only) | Yes | Same | PASS |
 | 8 | Empty permissions `{}` allowed | Yes | Zod default | PASS |
-| 9 | created-items / UI | Out of slice | Not added | N/A |
+| 9 | created-items / UI | Out of slice | See Slice 9 | N/A |
 
 **Smoke:** `npx vitest run tests/users/` (56 PASS); `tsc --noEmit` PASS.
 
 **Rollback:** Revert this commit; remove permissions routes + `usersPermissions.service` + `updatePermissionsJson`; restore boards to Slice 1–7.
 
-**Next (ask first):** created-items / profile satellites · Users UI · Subagent 4.
+**Next:** Slice 9 created-items — [`users_roles_backend_created_items_compare.md`](users_roles_backend_created_items_compare.md).

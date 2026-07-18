@@ -81,6 +81,16 @@ export type ProfileStatsRow = {
   items_created_total: number;
 };
 
+/** Row for user_created_items / CreatedItemOut. */
+export type CreatedItemRow = {
+  id: string;
+  name: string | null;
+  item_code: string | null;
+  category: string | null;
+  reorder_level: number | null;
+  updated_at: Date | null;
+};
+
 export class BusinessUsersRepository {
   constructor(private readonly client: SqlClient) {}
 
@@ -349,6 +359,47 @@ export class BusinessUsersRepository {
         { name: "createdAt", type: sql.DateTimeOffset, value: row.created_at },
       ],
     );
+  }
+
+  /**
+   * user_created_items — catalog rows created by user (non-deleted).
+   * Source: users.py:user_created_items
+   */
+  async listCreatedItemsByUser(
+    businessId: string,
+    userId: string,
+    limit: number,
+  ): Promise<CreatedItemRow[]> {
+    const rows = await queryMany<Record<string, unknown>>(
+      this.client,
+      `SELECT TOP (@limit)
+         ci.[id], ci.[name], ci.[item_code],
+         ic.[name] AS [category],
+         ci.[reorder_level],
+         COALESCE(ci.[last_stock_updated_at], ci.[created_at]) AS [updated_at]
+       FROM [catalog_items] ci
+       LEFT JOIN [item_categories] ic ON ic.[id] = ci.[category_id]
+       WHERE ci.[business_id] = @businessId
+         AND ci.[created_by_user_id] = @userId
+         AND ci.[deleted_at] IS NULL
+       ORDER BY ci.[created_at] DESC`,
+      [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: userId },
+        { name: "limit", type: sql.Int, value: limit },
+      ],
+    );
+    return rows.map((r) => ({
+      id: String(r.id),
+      name: (r.name as string | null) ?? null,
+      item_code: (r.item_code as string | null) ?? null,
+      category: (r.category as string | null) ?? null,
+      reorder_level:
+        r.reorder_level == null || r.reorder_level === ""
+          ? null
+          : Number(r.reorder_level),
+      updated_at: (r.updated_at as Date | null) ?? null,
+    }));
   }
 }
 

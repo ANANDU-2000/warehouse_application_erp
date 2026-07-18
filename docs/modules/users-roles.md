@@ -1,10 +1,10 @@
 # Module: Users & Roles
 
 **Queue:** 3 of 15  
-**Status:** Backend Slice 1–8 — through GET/PATCH permissions PASS (2026-07-18) · UI blocked  
-**Scope:** Analysis + core users admin APIs through permissions; profile satellites (created-items, …) / UI not started  
+**Status:** Backend Slice 1–9 — through created-items PASS (2026-07-18) · UI blocked  
+**Scope:** Analysis + users admin APIs + created-items satellite; stock-adjustments/purchases/ledger / UI not started  
 **Source of truth:** `source-app/`  
-**Compare:** `docs/modules/users_roles_backend_{list,create,profile,patch,delete,reset_password,credentials,permissions}_compare.md` 
+**Compare:** `docs/modules/users_roles_backend_*_compare.md` (incl. created_items) 
 
 ## Definition
 

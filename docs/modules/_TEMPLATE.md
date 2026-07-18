@@ -52,6 +52,10 @@ Copy to `docs/modules/<module>.md`. Fill only from `source-app/` + `docs/`. Neve
 
 - …
 
+## Implementation note (backend)
+
+Use the shared SQL pool from `new-app/backend/src/index.ts` (`connect` + repositories). On Windows local, driver may be `msnodesqlv8` — see `docs/44_Local_SQL_Bootstrap.md`. Do not open a separate Tedious-only connection path per module.
+
 ## Review PASS/FAIL
 
 | # | Section | Status | Evidence |

@@ -22,13 +22,13 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE**. Phase 3: **COMPLETE** (platform). Login E2E **L1 PASS** — next **L2** login DB commit (then L3 = 4.1 scaffold).
+**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: **4.1 Login UI SCAFFOLD** — next FIELDS after review.
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
 | # | Module | Status | Evidence |
 |---|---|---|---|
-| 1 | Login | 🟡 E2E L1 PASS | Analyze ✅ · L1 `GET /v1/me/businesses` ✅ (`docs/43`) · next L2 DB commit |
+| 1 | Login | 🟡 UI SCAFFOLD | Analyze ✅ · L1 me/businesses ✅ · UI Step 1 shell (`phase4/login-scaffold`) · next FIELDS |
 | 2 | Dashboard | ✅ Analyze+Review PASS | `docs/modules/dashboard.md`, `docs/matrix/dashboard_traceability.md` |
 | 3 | Users & Roles | ✅ Analyze+Review PASS | `docs/modules/users-roles.md`, `docs/matrix/users-roles_traceability.md`, `docs/matrix/roles_permissions_matrix.md` |
 | 4 | Products | ✅ Analyze+Review PASS | `docs/modules/products.md`, `docs/matrix/products_traceability.md`, branch `phase1/products-analysis` |
@@ -44,7 +44,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Login E2E in progress: **L1** ✅ `docs/43_Me_Businesses.md` → next **L2** login DB commit → L3 Phase 4.1 → L4 splash/login UI → L5 E2E PASS.
+**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Login UI Step 1 SCAFFOLD → next FIELDS after approve.
 
 ### Cursor operator setup (workspace)
 
@@ -102,19 +102,21 @@
 
 ## PHASE 4 — Frontend Migration (React + TypeScript) 🟡
 
-**Unlocked.** Phase 3 platform PASS. Next: **4.1 Project scaffold**.
+**Unlocked.** Phase 3 platform PASS. Login UI Step 1 SCAFFOLD in progress.
 
 | # | Task | Status |
 |---|---|---|
-| 4.1 | Project scaffold (Vite + React + TS + strict mode) | ⬜ |
-| 4.2 | Routing (mirrors Flutter navigation — pending 1.8) | 🔒 |
+| 4.1 | Project scaffold (Vite + React + TS + strict mode) | ✅ |
+| 4.2 | Routing (mirrors Flutter navigation — pending 1.8) | 🟡 |
 | 4.3 | Design system / theme port | 🔒 |
 | 4.4 | Shared components | 🔒 |
-| 4.5 | Per-module screens/forms | 🔒 |
+| 4.5 | Per-module screens/forms | 🟡 |
 | 4.6 | State management | 🔒 |
 | 4.7 | Responsive layout (mobile/tablet/desktop parity) | 🔒 |
 | 4.8 | Accessibility | 🔒 |
 | 4.9 | Phase 4 sign-off (per module) | 🔒 |
+
+**4.2 / 4.5 note:** `/login` route stub only (empty shell). Full route tree and Login fields deferred.
 
 ---
 
@@ -192,4 +194,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-18 — Local SQL bootstrap PASS (`44_Local_SQL_Bootstrap.md`, 46 tables / 103 FKs); next = Login E2E L2.*
+*Last updated: 2026-07-18 — Login UI Step 1 SCAFFOLD (`phase4/login-scaffold`, `docs/06`); next = FIELDS after review. SQL bootstrap branch hold merge.*

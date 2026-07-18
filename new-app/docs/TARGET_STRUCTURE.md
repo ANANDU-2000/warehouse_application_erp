@@ -2,14 +2,14 @@
 
 ## Frontend (`new-app/frontend/`)
 
-Phase 4. Not scaffolded yet.
+Phase 4.1 scaffold + Login Step 1 empty `/login` shell. See `docs/06_Master_Page_Build_Order.md`.
 
 ```
 frontend/
   src/
-    app/
-    features/
-    shared/
+    app/           # App, router
+    features/auth/ # LoginPage
+    shared/        # auth shell, theme tokens
 ```
 
 ## Backend (`new-app/backend/`) — Phase 3.1+

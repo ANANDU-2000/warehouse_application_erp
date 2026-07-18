@@ -12,8 +12,8 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 DONE | Next: ask Users DELETE/reset **or** Subagent 4 satellite ([`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md)) |
-| 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list+create+profile+PATCH PASS | DELETE/UI blocked — [`users_roles_backend_patch_compare.md`](modules/users_roles_backend_patch_compare.md) |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 DONE | Next: ask Users reset-password **or** Subagent 4 satellite ([`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md)) |
+| 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 through DELETE PASS | reset/UI blocked — [`users_roles_backend_delete_compare.md`](modules/users_roles_backend_delete_compare.md) |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
 | 6 | Suppliers/Brokers | 12 | ✅ `suppliers.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users **list+create+profile PASS**. Next: ask **PATCH** or one **Subagent 4 satellite**. Users UI blocked until enough users APIs.
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users **list+create+profile+PATCH PASS**. Next: ask **DELETE/reset** or one **Subagent 4 satellite**. Users UI blocked until enough users APIs.
 
 ---
 
@@ -98,6 +98,7 @@ Backend (wire in later steps): `POST /v1/auth/login`, `POST /v1/auth/refresh`, `
 | `GET /v1/businesses/:businessId/users` | Backend Slice 1 **PASS** — [`users_roles_backend_list_compare.md`](modules/users_roles_backend_list_compare.md) |
 | `POST /v1/businesses/:businessId/users` | Backend Slice 2 **PASS** — [`users_roles_backend_create_compare.md`](modules/users_roles_backend_create_compare.md) |
 | `GET /v1/businesses/:businessId/users/:userId` | Backend Slice 3 **PASS** — [`users_roles_backend_profile_compare.md`](modules/users_roles_backend_profile_compare.md) |
+| `PATCH /v1/businesses/:businessId/users/:userId` | Backend Slice 4 **PASS** — [`users_roles_backend_patch_compare.md`](modules/users_roles_backend_patch_compare.md) |
 | `/settings/users` | Users list UI — blocked until more APIs |
 | `/settings/users/:userId` | User detail UI — blocked |
 

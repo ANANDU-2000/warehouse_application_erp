@@ -1,10 +1,10 @@
 # Module: Users & Roles
 
 **Queue:** 3 of 15  
-**Status:** Backend Slice 1–4 — list + create + profile + PATCH PASS (2026-07-18) · UI blocked  
-**Scope:** Analysis + list/create/profile/patch APIs; delete/reset/UI not started  
+**Status:** Backend Slice 1–5 — list + create + profile + PATCH + DELETE PASS (2026-07-18) · UI blocked  
+**Scope:** Analysis + core mutate APIs through soft-delete; reset/permissions/UI not started  
 **Source of truth:** `source-app/`  
-**Compare:** [`users_roles_backend_list_compare.md`](users_roles_backend_list_compare.md) · [`users_roles_backend_create_compare.md`](users_roles_backend_create_compare.md) · [`users_roles_backend_profile_compare.md`](users_roles_backend_profile_compare.md) · [`users_roles_backend_patch_compare.md`](users_roles_backend_patch_compare.md) 
+**Compare:** `docs/modules/users_roles_backend_{list,create,profile,patch,delete}_compare.md` 
 
 ## Definition
 

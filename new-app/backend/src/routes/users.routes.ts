@@ -46,5 +46,13 @@ export function createUsersRoutes(
     (req, res, next) => void controller.patch(req, res, next),
   );
 
+  r.delete(
+    "/:userId",
+    authz.requireAuth,
+    authz.requireMembership,
+    createRequireRole("owner", "admin", "super_admin"),
+    (req, res, next) => void controller.remove(req, res, next),
+  );
+
   return r;
 }

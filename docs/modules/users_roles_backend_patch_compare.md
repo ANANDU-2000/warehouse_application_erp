@@ -24,4 +24,4 @@
 
 **Rollback:** Revert this commit; remove PATCH route + patch service/repo methods; restore boards to Slice 1–3.
 
-**Next (ask first):** DELETE · reset-password · permissions · Users UI · Subagent 4.
+**Next (ask first):** reset-password · permissions · Users UI · Subagent 4. DELETE: [`users_roles_backend_delete_compare.md`](users_roles_backend_delete_compare.md).

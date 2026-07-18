@@ -23,6 +23,11 @@ import {
   type PatchUserDeps,
 } from "../services/usersPatch.service";
 import {
+  deleteActorFromUser,
+  deleteUserForBusiness,
+  type DeleteUserDeps,
+} from "../services/usersDelete.service";
+import {
   userCreateInSchema,
   userPatchInSchema,
 } from "../validation/users.schemas";
@@ -39,6 +44,8 @@ export type UsersControllerDeps = {
   runInTransaction?: CreateUserDeps["runInTransaction"];
   /** Test seam for patch (shares pool txn pattern). */
   runPatchInTransaction?: PatchUserDeps["runInTransaction"];
+  /** Test seam for delete. */
+  runDeleteInTransaction?: DeleteUserDeps["runInTransaction"];
 };
 
 export function createUsersController(deps: UsersControllerDeps) {
@@ -200,6 +207,48 @@ export function createUsersController(deps: UsersControllerDeps) {
           },
         );
         res.json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async remove(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> {
+      try {
+        const businessId = req.params.businessId;
+        const userId = req.params.userId;
+        if (typeof businessId !== "string" || !businessId) {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        if (typeof userId !== "string" || !userId) {
+          sendDetail(res, 400, "userId required");
+          return;
+        }
+        const user = req.user;
+        const membership = req.membership;
+        if (!user || !membership) {
+          sendDetail(res, 401, "Not authenticated");
+          return;
+        }
+
+        await deleteUserForBusiness(
+          {
+            pool: deps.pool,
+            businessUsers: deps.businessUsers,
+            runInTransaction: deps.runDeleteInTransaction,
+          },
+          {
+            businessId,
+            userId,
+            actorMembershipRole: membership.role,
+            actor: deleteActorFromUser(user),
+          },
+        );
+        res.status(204).send();
       } catch (e) {
         next(e);
       }

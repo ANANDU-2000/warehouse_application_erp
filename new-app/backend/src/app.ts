@@ -28,6 +28,7 @@ import type { HomeActivityRepository } from "./repositories/homeActivity.reposit
 import type { ConnectionPool } from "mssql";
 import type { CreateUserDeps } from "./services/usersCreate.service";
 import type { PatchUserDeps } from "./services/usersPatch.service";
+import type { DeleteUserDeps } from "./services/usersDelete.service";
 import {
   createAuthzMiddleware,
   type AuthzMiddleware,
@@ -62,6 +63,8 @@ export type AppDeps = {
   runInTransaction?: CreateUserDeps["runInTransaction"];
   /** Test seam for PATCH …/users/:userId. */
   runPatchInTransaction?: PatchUserDeps["runInTransaction"];
+  /** Test seam for DELETE …/users/:userId. */
+  runDeleteInTransaction?: DeleteUserDeps["runInTransaction"];
 };
 
 /** Fail-closed users repo when SQL pool is not wired. */
@@ -262,6 +265,7 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
         pool: deps.pool,
         runInTransaction: deps.runInTransaction,
         runPatchInTransaction: deps.runPatchInTransaction,
+        runDeleteInTransaction: deps.runDeleteInTransaction,
       }),
       app.authz,
     ),

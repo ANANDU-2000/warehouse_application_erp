@@ -5,15 +5,21 @@ import { requestLog } from "./middleware/requestLog";
 import { apiRouter } from "./routes";
 import { createAuthRoutes } from "./routes/auth.routes";
 import { createMeRoutes } from "./routes/me.routes";
+import { createDashboardRoutes } from "./routes/dashboard.routes";
+import { createReportsRoutes } from "./routes/reports.routes";
 import {
   createAuthController,
   type AuthControllerDeps,
 } from "./controllers/auth.controller";
 import { createMeController } from "./controllers/me.controller";
+import { createDashboardController } from "./controllers/dashboard.controller";
+import { createReportsController } from "./controllers/reports.controller";
 import { JwtTokenIssuer } from "./auth/jwtTokenIssuer";
 import type { UsersRepository } from "./repositories/users.repository";
 import type { MembershipsRepository } from "./repositories/memberships.repository";
 import type { BusinessesRepository } from "./repositories/businesses.repository";
+import type { DashboardRepository } from "./repositories/dashboard.repository";
+import type { HomeOverviewRepository } from "./repositories/homeOverview.repository";
 import {
   createAuthzMiddleware,
   type AuthzMiddleware,
@@ -26,6 +32,9 @@ export type AppDeps = {
   users?: UsersRepository;
   memberships?: MembershipsRepository;
   businesses?: BusinessesRepository;
+  /** Dashboard Subagent 1 */
+  dashboard?: DashboardRepository;
+  homeOverview?: HomeOverviewRepository;
 };
 
 /** Fail-closed users repo when SQL pool is not wired. */
@@ -59,6 +68,35 @@ function unavailableBusinessesRepository(): BusinessesRepository {
   } as unknown as BusinessesRepository;
 }
 
+function unavailableDashboardRepository(): DashboardRepository {
+  const fail = async (): Promise<never> => {
+    throw new Error("Database pool not connected. Call connect() first.");
+  };
+  return {
+    monthLineAgg: fail,
+    monthPaidTotal: fail,
+    monthLineProfit: fail,
+    topItemSpend: fail,
+  } as unknown as DashboardRepository;
+}
+
+function unavailableHomeOverviewRepository(): HomeOverviewRepository {
+  const fail = async (): Promise<never> => {
+    throw new Error("Database pool not connected. Call connect() first.");
+  };
+  return {
+    snapshotSums: fail,
+    unitRollups: fail,
+    categoryNest: fail,
+    pendingDeliveryCount: fail,
+    supplierCount: fail,
+    brokerCount: fail,
+    receivedDeliveryCount: fail,
+    negativeStockCount: fail,
+    inventorySummary: fail,
+  } as unknown as HomeOverviewRepository;
+}
+
 export type AppWithAuthz = express.Express & {
   /** Authz middleware bundle — for future /v1/businesses/:businessId routes. */
   authz: AuthzMiddleware;
@@ -86,6 +124,22 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
   app.use(
     "/v1/me",
     createMeRoutes(createMeController({ memberships, businesses }), app.authz),
+  );
+
+  const dashboard = deps.dashboard ?? unavailableDashboardRepository();
+  const homeOverview =
+    deps.homeOverview ?? unavailableHomeOverviewRepository();
+
+  app.use(
+    "/v1/businesses/:businessId",
+    createDashboardRoutes(createDashboardController({ dashboard }), app.authz),
+  );
+  app.use(
+    "/v1/businesses/:businessId/reports",
+    createReportsRoutes(
+      createReportsController({ homeOverview }),
+      app.authz,
+    ),
   );
 
   app.use(errorHandler);

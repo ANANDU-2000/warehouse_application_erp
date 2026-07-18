@@ -10,3 +10,11 @@ export {
   MembershipsRepository,
   createMembershipsRepository,
 } from "./memberships.repository";
+export {
+  DashboardRepository,
+  createDashboardRepository,
+} from "./dashboard.repository";
+export {
+  HomeOverviewRepository,
+  createHomeOverviewRepository,
+} from "./homeOverview.repository";

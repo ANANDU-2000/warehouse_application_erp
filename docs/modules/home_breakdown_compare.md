@@ -15,8 +15,8 @@
 | State | Step |
 |---|---|
 | ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
-| 🟡 Current | `/home/breakdown-more` route loop **PASS** — ask before staff WIRE-2 |
-| ⬜ Pending | staff WIRE-2 · Users & Roles (backend blocked) |
+| 🟡 Current | `/home/breakdown-more` route loop **PASS** — staff WIRE-2a PASS; ask WIRE-2b |
+| ⬜ Pending | staff WIRE-2b+ · Users & Roles (backend blocked) |
 | ⏸ Deferred | Row tap · period sync · shell data fill; merge to `main`; Dashboard Subagent 4 |
 
 ---
@@ -74,7 +74,8 @@ Docs/checklist + compare smoke only: revert COMPARE commit. Application code unc
 
 ## 5. Next after Approve
 
-1. Ask before starting: **staff WIRE-2** bodies (warehouse stats / pending delivery / shift / activity feed)  
+1. Ask before starting: staff **WIRE-2b** pending delivery cards  
 2. Do **not** start Users & Roles UI until users list/CRUD APIs exist  
 3. Do **not** mark Dashboard module ✅ until Subagent 4 covers remaining routes  
 4. Hold merge of `ops/dashboard-module` to `main` until you review
+5. Staff WIRE-2a — **PASS** ([`staff_home_wire2a_compare.md`](staff_home_wire2a_compare.md))

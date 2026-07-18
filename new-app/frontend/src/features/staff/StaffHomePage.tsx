@@ -25,19 +25,29 @@ import {
 } from "./staffHomeFocus";
 import {
   fetchStaffHomeShell,
+  fetchStockTotals,
+  staffAppPeriodMonthDates,
   StaffHomeApiError,
   StaffHomeNetworkError,
   staffInitials,
   type StaffHomeShellCounts,
+  type StockTotalsOut,
 } from "./staffHomeApi";
 import {
   STAFF_HOME_ACTIVITY_EMPTY,
   STAFF_HOME_FLOOR_LOAD_ERROR,
   STAFF_HOME_NO_CONNECTION,
+  STAFF_HOME_PURCHASE_STATS_ERROR,
   STAFF_HOME_RETRY_LABEL,
   STAFF_HOME_RETRY_SUBTITLE,
   STAFF_HOME_SESSION_EXPIRED,
   STAFF_HOME_SHIFT_EMPTY,
+  STAFF_HOME_STATS_PURCHASES_SUBTITLE,
+  STAFF_HOME_STATS_PURCHASES_TITLE,
+  STAFF_HOME_STATS_UNIT_LABELS,
+  STAFF_HOME_STATS_WAREHOUSE_SUBTITLE,
+  STAFF_HOME_STATS_WAREHOUSE_TITLE,
+  STAFF_HOME_WAREHOUSE_STATS_ERROR,
 } from "./staffHomeLoadCopy";
 import {
   STAFF_HOME_CLOSE_LABEL,
@@ -147,12 +157,13 @@ function StaffFloorKpiSkeleton(): ReactElement {
 function SectionInlineError(props: {
   message: string;
   onRetry: () => void;
+  testId?: string;
 }): ReactElement {
   return (
     <div
       className="staff-home-inline-error"
       role="alert"
-      data-testid="staff-home-floor-error"
+      data-testid={props.testId ?? "staff-home-floor-error"}
     >
       <p className="staff-home-inline-error-msg">{props.message}</p>
       <button
@@ -161,6 +172,159 @@ function SectionInlineError(props: {
         onClick={props.onRetry}
       >
         {STAFF_HOME_RETRY_LABEL}
+      </button>
+    </div>
+  );
+}
+
+/** Flutter StaffHomeWarehousePurchaseStats._fmtNum */
+function fmtStatsNum(n: number): string {
+  if (!Number.isFinite(n)) return "0";
+  const rounded = Math.round(n);
+  if (Math.abs(n - rounded) < 0.001) return String(rounded);
+  return n.toFixed(1);
+}
+
+const EMPTY_TOTALS: StockTotalsOut = {
+  total_items: 0,
+  total_bags: 0,
+  total_kg: 0,
+  total_boxes: 0,
+  total_tins: 0,
+};
+
+function UnitStatsGrid(props: { totals: StockTotalsOut }): ReactElement {
+  const { totals } = props;
+  const cells: Array<{ label: string; value: number; color: string }> = [
+    {
+      label: STAFF_HOME_STATS_UNIT_LABELS.bags,
+      value: Number(totals.total_bags ?? 0),
+      color: "#0E4F46",
+    },
+    {
+      label: STAFF_HOME_STATS_UNIT_LABELS.kg,
+      value: Number(totals.total_kg ?? 0),
+      color: "#1565C0",
+    },
+    {
+      label: STAFF_HOME_STATS_UNIT_LABELS.box,
+      value: Number(totals.total_boxes ?? 0),
+      color: "#6A1B9A",
+    },
+    {
+      label: STAFF_HOME_STATS_UNIT_LABELS.tin,
+      value: Number(totals.total_tins ?? 0),
+      color: "#E65100",
+    },
+  ];
+  return (
+    <div className="staff-home-unit-grid">
+      <div className="staff-home-unit-row">
+        {cells.slice(0, 2).map((c) => (
+          <div key={c.label} className="staff-home-unit-cell">
+            <span className="staff-home-unit-value" style={{ color: c.color }}>
+              {fmtStatsNum(c.value)}
+            </span>
+            <span className="staff-home-unit-label">{c.label}</span>
+          </div>
+        ))}
+      </div>
+      <div className="staff-home-unit-row">
+        {cells.slice(2).map((c) => (
+          <div key={c.label} className="staff-home-unit-cell">
+            <span className="staff-home-unit-value" style={{ color: c.color }}>
+              {fmtStatsNum(c.value)}
+            </span>
+            <span className="staff-home-unit-label">{c.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function WarehousePurchaseStats(props: {
+  onHand: StockTotalsOut | null;
+  purchases: StockTotalsOut | null;
+  loadingOnHand: boolean;
+  loadingPurchases: boolean;
+  errorOnHand: boolean;
+  errorPurchases: boolean;
+  onRetryOnHand: () => void;
+  onRetryPurchases: () => void;
+  onOpenWarehouse: () => void;
+  onOpenPurchases: () => void;
+}): ReactElement {
+  return (
+    <div
+      className="staff-home-warehouse-stats"
+      data-testid="staff-home-warehouse-stats"
+    >
+      <button
+        type="button"
+        className="staff-home-stats-box"
+        onClick={props.onOpenWarehouse}
+        data-testid="staff-home-stats-warehouse"
+      >
+        <span className="staff-home-stats-box-title">
+          {STAFF_HOME_STATS_WAREHOUSE_TITLE}
+        </span>
+        <span className="staff-home-stats-box-sub">
+          {STAFF_HOME_STATS_WAREHOUSE_SUBTITLE}
+        </span>
+        <div className="staff-home-stats-box-body">
+          {props.loadingOnHand ? (
+            <div
+              className="staff-home-stats-progress"
+              role="status"
+              aria-label="Loading"
+            />
+          ) : null}
+          {props.errorOnHand ? (
+            <SectionInlineError
+              message={STAFF_HOME_WAREHOUSE_STATS_ERROR}
+              onRetry={props.onRetryOnHand}
+              testId="staff-home-warehouse-error"
+            />
+          ) : null}
+          {!props.loadingOnHand && !props.errorOnHand && props.onHand ? (
+            <UnitStatsGrid totals={props.onHand} />
+          ) : null}
+        </div>
+      </button>
+      <button
+        type="button"
+        className="staff-home-stats-box"
+        onClick={props.onOpenPurchases}
+        data-testid="staff-home-stats-purchases"
+      >
+        <span className="staff-home-stats-box-title">
+          {STAFF_HOME_STATS_PURCHASES_TITLE}
+        </span>
+        <span className="staff-home-stats-box-sub">
+          {STAFF_HOME_STATS_PURCHASES_SUBTITLE}
+        </span>
+        <div className="staff-home-stats-box-body">
+          {props.loadingPurchases ? (
+            <div
+              className="staff-home-stats-progress"
+              role="status"
+              aria-label="Loading"
+            />
+          ) : null}
+          {props.errorPurchases ? (
+            <SectionInlineError
+              message={STAFF_HOME_PURCHASE_STATS_ERROR}
+              onRetry={props.onRetryPurchases}
+              testId="staff-home-purchases-error"
+            />
+          ) : null}
+          {!props.loadingPurchases &&
+          !props.errorPurchases &&
+          props.purchases ? (
+            <UnitStatsGrid totals={props.purchases} />
+          ) : null}
+        </div>
       </button>
     </div>
   );
@@ -211,8 +375,25 @@ export function StaffHomePage(): ReactElement {
   const [loadKind, setLoadKind] = useState<LoadKind>(null);
   const [retryTick, setRetryTick] = useState(0);
 
+  const [onHand, setOnHand] = useState<StockTotalsOut | null>(null);
+  const [purchases, setPurchases] = useState<StockTotalsOut | null>(null);
+  const [loadingOnHand, setLoadingOnHand] = useState(true);
+  const [loadingPurchases, setLoadingPurchases] = useState(true);
+  const [errorOnHand, setErrorOnHand] = useState(false);
+  const [errorPurchases, setErrorPurchases] = useState(false);
+  const [whRetryTick, setWhRetryTick] = useState(0);
+  const [puRetryTick, setPuRetryTick] = useState(0);
+
   const reloadShell = useCallback(() => {
     setRetryTick((n) => n + 1);
+  }, []);
+
+  const reloadOnHand = useCallback(() => {
+    setWhRetryTick((n) => n + 1);
+  }, []);
+
+  const reloadPurchases = useCallback(() => {
+    setPuRetryTick((n) => n + 1);
   }, []);
 
   useEffect(() => {
@@ -253,6 +434,72 @@ export function StaffHomePage(): ReactElement {
       cancelled = true;
     };
   }, [retryTick]);
+
+  /* WIRE-2a: stockOnHandTotalsProvider + stockTotalsProvider(AppPeriod.month) */
+  useEffect(() => {
+    const biz = readPrimaryBusiness();
+    if (!biz?.id) {
+      setLoadingOnHand(false);
+      setOnHand(EMPTY_TOTALS);
+      setErrorOnHand(false);
+      return;
+    }
+    let cancelled = false;
+    setLoadingOnHand(true);
+    setErrorOnHand(false);
+    void fetchStockTotals({ businessId: biz.id })
+      .then((data) => {
+        if (!cancelled) {
+          setOnHand(data);
+          setLoadingOnHand(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setOnHand(null);
+          setErrorOnHand(true);
+          setLoadingOnHand(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [whRetryTick]);
+
+  useEffect(() => {
+    const biz = readPrimaryBusiness();
+    if (!biz?.id) {
+      setLoadingPurchases(false);
+      setPurchases(EMPTY_TOTALS);
+      setErrorPurchases(false);
+      return;
+    }
+    let cancelled = false;
+    setLoadingPurchases(true);
+    setErrorPurchases(false);
+    const { periodStart, periodEnd } = staffAppPeriodMonthDates();
+    void fetchStockTotals({
+      businessId: biz.id,
+      periodStart,
+      periodEnd,
+    })
+      .then((data) => {
+        if (!cancelled) {
+          setPurchases(data);
+          setLoadingPurchases(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setPurchases(null);
+          setErrorPurchases(true);
+          setLoadingPurchases(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [puRetryTick]);
 
   function onFocusChange(next: StaffHomeFocus): void {
     setFocus(next);
@@ -417,6 +664,18 @@ export function StaffHomePage(): ReactElement {
                 <StaffHomeSectionHeader
                   title={STAFF_HOME_SECTION.warehouse.title}
                   subtitle={STAFF_HOME_SECTION.warehouse.subtitle}
+                />
+                <WarehousePurchaseStats
+                  onHand={onHand}
+                  purchases={purchases}
+                  loadingOnHand={loadingOnHand}
+                  loadingPurchases={loadingPurchases}
+                  errorOnHand={errorOnHand}
+                  errorPurchases={errorPurchases}
+                  onRetryOnHand={reloadOnHand}
+                  onRetryPurchases={reloadPurchases}
+                  onOpenWarehouse={() => navigate("/staff/stock")}
+                  onOpenPurchases={() => navigate("/staff/deliveries")}
                 />
               </section>
 

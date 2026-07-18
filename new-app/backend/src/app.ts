@@ -117,6 +117,8 @@ function unavailableStaffHomeRepository(): StaffHomeRepository {
     listStock: fail,
     openingMissing: fail,
     variancesToday: fail,
+    stockTotalsOnHand: fail,
+    stockTotalsPurchased: fail,
   } as unknown as StaffHomeRepository;
 }
 

@@ -109,6 +109,53 @@ export function createStaffHomeController(deps: StaffHomeControllerDeps) {
         next(e);
       }
     },
+
+    /**
+     * GET …/stock/totals — stock_ops.stock_totals
+     * No period → on-hand; period_start+period_end → purchased in range.
+     */
+    async stockTotals(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string") {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        const periodStart =
+          typeof req.query.period_start === "string"
+            ? req.query.period_start.trim()
+            : "";
+        const periodEnd =
+          typeof req.query.period_end === "string"
+            ? req.query.period_end.trim()
+            : "";
+        if (periodStart && periodEnd) {
+          const iso = /^\d{4}-\d{2}-\d{2}$/;
+          if (!iso.test(periodStart.slice(0, 10)) || !iso.test(periodEnd.slice(0, 10))) {
+            sendDetail(
+              res,
+              400,
+              "Invalid period_start or period_end (use YYYY-MM-DD)",
+            );
+            return;
+          }
+          let dFrom = periodStart.slice(0, 10);
+          let dTo = periodEnd.slice(0, 10);
+          if (dFrom > dTo) {
+            const tmp = dFrom;
+            dFrom = dTo;
+            dTo = tmp;
+          }
+          res.json(
+            await deps.staffHome.stockTotalsPurchased(businessId, dFrom, dTo),
+          );
+          return;
+        }
+        res.json(await deps.staffHome.stockTotalsOnHand(businessId));
+      } catch (e) {
+        next(e);
+      }
+    },
   };
 }
 

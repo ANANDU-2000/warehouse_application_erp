@@ -44,6 +44,7 @@
     "test:staff-home-fields": "node scripts/check-staff-home-fields.mjs",
     "test:staff-home-buttons": "node scripts/check-staff-home-buttons.mjs",
     "test:staff-home-wire": "node scripts/check-staff-home-wire.mjs",
+    "test:staff-home-wire2a": "node scripts/check-staff-home-wire2a.mjs",
     "test:staff-home-states": "node scripts/check-staff-home-states.mjs",
     "test:staff-home-compare": "node scripts/check-staff-home-compare.mjs"
   },

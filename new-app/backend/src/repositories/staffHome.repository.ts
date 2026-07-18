@@ -1,11 +1,18 @@
 /**
- * Staff home WIRE — delivery pipeline + stock list/opening/variances.
+ * Staff home WIRE — delivery pipeline + stock list/opening/variances + totals.
  * Source: trade_purchase_service.get_trade_purchase_delivery_pipeline
  *         stock_helpers._stock_status_sql_filter / _query_items
- *         stock_ops.missing_opening_stock
+ *         stock_ops.missing_opening_stock / stock_totals / _stock_totals_purchased_in_period
  *         stock_audit.variances_today
  */
 import { sql } from "../config/database";
+import {
+  tradeLineQtyBagsExprSql,
+  tradeLineQtyBoxesExprSql,
+  tradeLineQtyTinsExprSql,
+  tradeLineWeightExprSql,
+  tradePurchaseStatusInReportsSql,
+} from "../services/tradeLineSql";
 import { queryMany, queryOne, type SqlClient } from "./sql";
 
 export type DeliveryPipelineOut = {
@@ -52,6 +59,15 @@ export type StockVarianceOut = {
   updated_at: string;
 };
 
+/** FastAPI StockTotalsOut — stock_ops.stock_totals */
+export type StockTotalsOut = {
+  total_items: number;
+  total_bags: number;
+  total_kg: number;
+  total_boxes: number;
+  total_tins: number;
+};
+
 type StatusCountRow = { delivery_status: string | null; c: number };
 type AmountRow = { total: number };
 type CountRow = { c: number };
@@ -67,6 +83,14 @@ type CatalogRow = {
 type NotifRow = {
   payload: string | null;
   created_at: Date;
+};
+
+type StockTotalsRow = {
+  total_items: number;
+  total_bags: number;
+  total_kg: number;
+  total_boxes: number;
+  total_tins: number;
 };
 
 function moneyStr(n: number): string {
@@ -284,6 +308,82 @@ export class StaffHomeRepository {
       });
     }
     return out;
+  }
+
+  /**
+   * On-hand warehouse totals — stock_ops.stock_totals (no period).
+   * Formula: CASE on catalog_items.default_unit bag/kg/box/tin.
+   */
+  async stockTotalsOnHand(businessId: string): Promise<StockTotalsOut> {
+    const row = await queryOne<StockTotalsRow>(
+      this.client,
+      `SELECT
+         COUNT(ci.[id]) AS total_items,
+         COALESCE(SUM(CASE WHEN ci.[default_unit] = N'bag' THEN ci.[current_stock] ELSE 0 END), 0) AS total_bags,
+         COALESCE(SUM(CASE
+           WHEN ci.[default_unit] = N'bag'
+             THEN ci.[current_stock] * COALESCE(ci.[default_kg_per_bag], 0)
+           WHEN ci.[default_unit] = N'kg'
+             THEN ci.[current_stock]
+           ELSE 0
+         END), 0) AS total_kg,
+         COALESCE(SUM(CASE WHEN ci.[default_unit] = N'box' THEN ci.[current_stock] ELSE 0 END), 0) AS total_boxes,
+         COALESCE(SUM(CASE WHEN ci.[default_unit] = N'tin' THEN ci.[current_stock] ELSE 0 END), 0) AS total_tins
+       FROM catalog_items ci
+       WHERE ci.[business_id] = @businessId
+         AND ci.[deleted_at] IS NULL`,
+      [{ name: "businessId", type: sql.UniqueIdentifier, value: businessId }],
+    );
+    return {
+      total_items: Number(row?.total_items ?? 0),
+      total_bags: Number(row?.total_bags ?? 0),
+      total_kg: Number(row?.total_kg ?? 0),
+      total_boxes: Number(row?.total_boxes ?? 0),
+      total_tins: Number(row?.total_tins ?? 0),
+    };
+  }
+
+  /**
+   * Purchased qty in [dateFrom, dateTo] — stock_ops._stock_totals_purchased_in_period.
+   * Uses trade_purchase_date_filter + trade line bag/box/tin/kg exprs.
+   */
+  async stockTotalsPurchased(
+    businessId: string,
+    dateFrom: string,
+    dateTo: string,
+  ): Promise<StockTotalsOut> {
+    const bags = tradeLineQtyBagsExprSql("tpl");
+    const boxes = tradeLineQtyBoxesExprSql("tpl");
+    const tins = tradeLineQtyTinsExprSql("tpl");
+    const kg = tradeLineWeightExprSql("tpl");
+    const statusOk = tradePurchaseStatusInReportsSql("tp");
+    const row = await queryOne<StockTotalsRow>(
+      this.client,
+      `SELECT
+         COUNT(DISTINCT tpl.[catalog_item_id]) AS total_items,
+         COALESCE(SUM(${bags}), 0) AS total_bags,
+         COALESCE(SUM(${kg}), 0) AS total_kg,
+         COALESCE(SUM(${boxes}), 0) AS total_boxes,
+         COALESCE(SUM(${tins}), 0) AS total_tins
+       FROM trade_purchase_lines tpl
+       INNER JOIN trade_purchases tp ON tp.[id] = tpl.[trade_purchase_id]
+       WHERE tp.[business_id] = @businessId
+         AND tp.[purchase_date] >= @dateFrom
+         AND tp.[purchase_date] <= @dateTo
+         AND ${statusOk}`,
+      [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "dateFrom", type: sql.Date, value: dateFrom },
+        { name: "dateTo", type: sql.Date, value: dateTo },
+      ],
+    );
+    return {
+      total_items: Number(row?.total_items ?? 0),
+      total_bags: Number(row?.total_bags ?? 0),
+      total_kg: Number(row?.total_kg ?? 0),
+      total_boxes: Number(row?.total_boxes ?? 0),
+      total_tins: Number(row?.total_tins ?? 0),
+    };
   }
 }
 

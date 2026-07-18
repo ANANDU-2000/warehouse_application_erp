@@ -44,6 +44,15 @@ export type OpeningMissingOut = {
   missing_count: number;
 };
 
+/** FastAPI StockTotalsOut */
+export type StockTotalsOut = {
+  total_items: number;
+  total_bags: number;
+  total_kg: number;
+  total_boxes: number;
+  total_tins: number;
+};
+
 export type StaffHomeShellCounts = {
   displayName: string;
   pending: number;
@@ -203,6 +212,43 @@ export async function fetchVariancesTodayCount(
   if (!res.ok) throw new StaffHomeApiError(res.status, await readDetail(res));
   const rows = (await res.json()) as unknown[];
   return Array.isArray(rows) ? rows.length : 0;
+}
+
+/**
+ * GET …/stock/totals — on-hand when no period; purchased when period_start/end set.
+ * Source: hexa_api.getStockTotals / stock_ops.stock_totals
+ */
+export async function fetchStockTotals(args: {
+  businessId: string;
+  periodStart?: string;
+  periodEnd?: string;
+}): Promise<StockTotalsOut> {
+  const qs = new URLSearchParams();
+  if (args.periodStart && args.periodEnd) {
+    qs.set("period_start", args.periodStart);
+    qs.set("period_end", args.periodEnd);
+  }
+  const q = qs.toString();
+  const res = await authGet(
+    `/v1/businesses/${encodeURIComponent(args.businessId)}/stock/totals${
+      q ? `?${q}` : ""
+    }`,
+  );
+  if (!res.ok) throw new StaffHomeApiError(res.status, await readDetail(res));
+  return (await res.json()) as StockTotalsOut;
+}
+
+/** AppPeriod.month — calendar month day 1 → today (app_period_provider.dart). */
+export function staffAppPeriodMonthDates(now = new Date()): {
+  periodStart: string;
+  periodEnd: string;
+} {
+  const y = now.getFullYear();
+  const m = now.getMonth();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const periodStart = `${y}-${pad(m + 1)}-01`;
+  const periodEnd = `${y}-${pad(m + 1)}-${pad(now.getDate())}`;
+  return { periodStart, periodEnd };
 }
 
 /** Parallel shell load — staff home WIRE scoped counts. */

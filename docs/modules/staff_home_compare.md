@@ -14,9 +14,9 @@
 | State | Step |
 |---|---|
 | ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
-| 🟡 Current | Staff `/staff/home` route loop **PASS** — ask before next work |
-| ⬜ Pending (ask first) | Users & Roles (Seq 3) **or** staff WIRE-2 |
-| ⏸ Deferred | Warehouse stats body, pending cards, shift/activity feeds, notifications merge, pull-refresh; merge to `main` |
+| 🟡 Current | Staff `/staff/home` COMPARE PASS · **WIRE-2a warehouse stats PASS** — ask before WIRE-2b |
+| ⬜ Pending (ask first) | staff WIRE-2b pending cards · Users & Roles (backend blocked) |
+| ⏸ Deferred | Shift/activity feeds, notifications merge, pull-refresh; merge to `main` |
 
 ---
 
@@ -45,10 +45,10 @@
 
 | Item | Why deferred |
 |---|---|
-| Warehouse & purchases stats body (`stock/totals`) | WIRE-2 |
-| Pending delivery card list (`trade-purchases` list) | WIRE-2 |
-| Shift today strip numbers (`activity-log` + `audit/feed`) | WIRE-2 |
-| Recent activity feed rows | Empty copy only; WIRE-2 |
+| Warehouse & purchases stats body (`stock/totals`) | **WIRE-2a PASS** — [`staff_home_wire2a_compare.md`](staff_home_wire2a_compare.md) |
+| Pending delivery card list (`trade-purchases` list) | WIRE-2b |
+| Shift today strip numbers (`activity-log` + `audit/feed`) | WIRE-2c |
+| Recent activity feed rows | Empty copy only; WIRE-2d |
 | Notifications unread badge merge | Bell navigates only |
 | Pull-to-refresh / auto-refresh listener | Not ported |
 | Profile sheet business title line | Name/role only this loop |
@@ -77,7 +77,8 @@ Docs/checklist only: revert COMPARE commit. Application code unchanged by this s
 
 ## 5. Next after Approve
 
-1. Ask before starting: Users & Roles (Seq 3) **or** staff WIRE-2 bodies  
+1. Ask before starting: staff **WIRE-2b** pending delivery cards **or** Users & Roles (still backend-blocked)  
 2. Do **not** mark full Dashboard module ✅ until Subagent 4 remaining routes are agreed  
 3. Hold merge of `ops/dashboard-module` to `main` until you review
 4. Splash `/splash` — **COMPARE PASS**
+5. WIRE-2a warehouse stats — **PASS** ([`staff_home_wire2a_compare.md`](staff_home_wire2a_compare.md))

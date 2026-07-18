@@ -29,3 +29,19 @@ export const STAFF_HOME_ACTIVITY_ERROR = "Could not load recent activity.";
 
 /** StaffHomeShiftSnapshotStrip empty title. */
 export const STAFF_HOME_SHIFT_EMPTY = "No activity today";
+
+/** StaffHomeWarehousePurchaseStats — SectionInlineError messages. */
+export const STAFF_HOME_WAREHOUSE_STATS_ERROR = "Warehouse stats unavailable";
+export const STAFF_HOME_PURCHASE_STATS_ERROR = "Purchase stats unavailable";
+
+/** Stats box chrome — staff_home_dashboard_widgets.dart */
+export const STAFF_HOME_STATS_WAREHOUSE_TITLE = "Warehouse";
+export const STAFF_HOME_STATS_WAREHOUSE_SUBTITLE = "On hand now";
+export const STAFF_HOME_STATS_PURCHASES_TITLE = "Purchases";
+export const STAFF_HOME_STATS_PURCHASES_SUBTITLE = "This month";
+export const STAFF_HOME_STATS_UNIT_LABELS = {
+  bags: "Bags",
+  kg: "KG",
+  box: "Box",
+  tin: "Tin",
+} as const;

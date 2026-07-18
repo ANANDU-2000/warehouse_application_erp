@@ -45,6 +45,12 @@ export function createStockRoutes(
 ): Router {
   const r = Router({ mergeParams: true });
   r.get(
+    "/totals",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void staffHome.stockTotals(req, res, next),
+  );
+  r.get(
     "/list",
     authz.requireAuth,
     authz.requireMembership,

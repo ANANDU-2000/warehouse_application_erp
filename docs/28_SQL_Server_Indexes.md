@@ -100,7 +100,7 @@ Postgres `WHERE …` indexes (low-stock, unread notifications, delivery filters,
 
 ## 7. Next
 
-**Phase 2.6** — RLS-equivalent strategy (Postgres RLS → SQL Server security policy or app-layer).
+**Phase 2.6** — done: see `docs/29_RLS_Equivalent_Strategy.md` (app-layer primary).
 
 ---
 

@@ -33,8 +33,14 @@ See `docs/27_SQL_Server_Constraints.md`.
 | `ddl/indexes/20_ix_core.sql` … `25_ix_ops_aux.sql` | **149** non-unique indexes |
 | `ddl/indexes/91_drop_indexes.sql` | Rollback |
 
-See `docs/28_SQL_Server_Indexes.md`. Partial/GIN indexes skipped.
+See `docs/28_SQL_Server_Indexes.md`.
 
-**RLS:** deferred to Phase **2.6**.
+## Tenancy / RLS (Phase 2.6)
+
+**Strategy:** app-layer `business_id` scoping in Node (Phase 3) — primary equivalent of Postgres `054` RLS.  
+**No** `CREATE SECURITY POLICY` scripts yet (optional later).  
+See `docs/29_RLS_Equivalent_Strategy.md`.
+
+**Next:** Phase **2.7** — procs/views/triggers only if source requires.
 
 Type mapping: `docs/25_SQL_Server_Type_Mapping.md`.

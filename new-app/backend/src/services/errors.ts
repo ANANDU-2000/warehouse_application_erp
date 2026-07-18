@@ -31,3 +31,13 @@ export class PasswordStrengthError extends Error {
     this.name = "PasswordStrengthError";
   }
 }
+
+/** Permission gate — mirrors permissions.py require_permission_key detail. */
+export class PermissionDeniedError extends Error {
+  readonly code = "PERMISSION_DENIED" as const;
+
+  constructor(permissionKey: string) {
+    super(`Permission denied: ${permissionKey}`);
+    this.name = "PermissionDeniedError";
+  }
+}

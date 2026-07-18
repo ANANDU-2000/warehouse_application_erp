@@ -4,6 +4,7 @@
  * DDL stores permissions_json as NVARCHAR — parse JSON string when present.
  */
 import type { MembershipRow } from "../repositories/types";
+import { PermissionDeniedError } from "./errors";
 
 export const PERMISSION_KEYS = [
   "stock_edit",
@@ -111,4 +112,17 @@ export function actorCanManageTarget(actorRole: string, targetRole: string): boo
     return false;
   }
   return true;
+}
+
+/**
+ * Raise if permission key is false — mirrors permissions.py require_permission_key.
+ * Source: source-app/backend/app/services/permissions.py
+ */
+export function requirePermissionKey(
+  key: string,
+  perms: Record<string, boolean>,
+): void {
+  if (!perms[key]) {
+    throw new PermissionDeniedError(key);
+  }
 }

@@ -5,6 +5,7 @@ export {
   AccountInactiveError,
   AccountBlockedError,
   PasswordStrengthError,
+  PermissionDeniedError,
 } from "./errors";
 
 export {
@@ -20,6 +21,7 @@ export {
   parsePermissionsJson,
   membershipPermissions,
   actorCanManageTarget,
+  requirePermissionKey,
 } from "./permissions.service";
 export type { PermissionKey, PermissionsMap } from "./permissions.service";
 

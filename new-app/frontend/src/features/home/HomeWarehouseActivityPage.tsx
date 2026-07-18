@@ -1,5 +1,5 @@
 /**
- * Owner `/home/activity` — Step 5 WIRE.
+ * Owner `/home/activity` — Step 6 STATES.
  * Source: home_warehouse_activity_page.dart + _fetchHomeWarehouseActivity.
  */
 import { useEffect, useRef, useState } from "react";
@@ -10,6 +10,9 @@ import {
   HOME_ACTIVITY_COL_QTY,
   HOME_ACTIVITY_COL_VERIFIED,
   HOME_ACTIVITY_CUSTOM_RANGE_ERROR,
+  HOME_ACTIVITY_EMPTY_SUBTITLE,
+  HOME_ACTIVITY_EMPTY_TITLE,
+  HOME_ACTIVITY_LOAD_ERROR,
   HOME_ACTIVITY_PERIOD_CAPTION,
   homeActivityPeriodTitle,
 } from "./homeActivityCopy";
@@ -17,6 +20,7 @@ import {
   fetchHomeWarehouseActivity,
   type HomeActivityItem,
 } from "./homeActivityFeed";
+import { HOME_RETRY_LABEL, HOME_RETRY_SUBTITLE } from "./homeLoadCopy";
 import {
   HOME_PERIOD_LABELS,
   HOME_PERIOD_ORDER,
@@ -46,17 +50,19 @@ function popOrGo(navigate: ReturnType<typeof useNavigate>, fallback: string) {
   navigate(fallback, { replace: true });
 }
 
-export const HOME_ACTIVITY_LOADING = "Loading activity…";
-
 export function HomeWarehouseActivityPage() {
   const navigate = useNavigate();
   const [period, setPeriod] = useState<HomePeriod>("month");
   const [customRange, setCustomRange] = useState<HomeCustomRange>(() =>
     defaultCustomRange(),
   );
-  const [items, setItems] = useState<HomeActivityItem[]>([]);
+  /** Flutter `_cachedItems` — null until first successful/empty snapshot. */
+  const [cachedItems, setCachedItems] = useState<HomeActivityItem[] | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
+  const [reloadTick, setReloadTick] = useState(0);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -83,6 +89,10 @@ export function HomeWarehouseActivityPage() {
     popOrGo(navigate, "/home");
   }
 
+  function handleRetry() {
+    setReloadTick((n) => n + 1);
+  }
+
   useEffect(() => {
     if (period === "custom" && !isValidCustomRange(customRange)) {
       return;
@@ -91,16 +101,17 @@ export function HomeWarehouseActivityPage() {
     debounceRef.current = setTimeout(() => {
       const session = readPrimaryBusiness();
       if (!session?.id) {
+        /* Flutter provider: session null → [] → HexaEmptyState */
         setLoading(false);
-        setLoadError("Session expired");
-        setItems([]);
+        setHasError(false);
+        setCachedItems([]);
         return;
       }
       abortRef.current?.abort();
       const ac = new AbortController();
       abortRef.current = ac;
       setLoading(true);
-      setLoadError(null);
+      setHasError(false);
       void fetchHomeWarehouseActivity({
         businessId: session.id,
         period,
@@ -109,15 +120,13 @@ export function HomeWarehouseActivityPage() {
       })
         .then((rows) => {
           if (ac.signal.aborted) return;
-          setItems(rows);
+          setCachedItems(rows);
+          setHasError(false);
           setLoading(false);
         })
-        .catch((err: unknown) => {
+        .catch(() => {
           if (ac.signal.aborted) return;
-          const msg =
-            err instanceof Error ? err.message : "Could not load activity";
-          setLoadError(msg);
-          setItems([]);
+          setHasError(true);
           setLoading(false);
         });
     }, 150);
@@ -125,10 +134,22 @@ export function HomeWarehouseActivityPage() {
       if (debounceRef.current) clearTimeout(debounceRef.current);
       abortRef.current?.abort();
     };
-  }, [period, customRange]);
+  }, [period, customRange, reloadTick]);
+
+  const displayItems = cachedItems;
+  const showSkeleton = loading && displayItems === null;
+  const showRefreshBanner =
+    loading && displayItems !== null && displayItems.length > 0;
+  const showError = !showSkeleton && hasError && displayItems === null;
+  const showEmpty =
+    !showSkeleton &&
+    !showError &&
+    (displayItems === null || displayItems.length === 0);
+  const showList =
+    !showSkeleton && !showError && displayItems !== null && displayItems.length > 0;
 
   const listTitle = homeActivityPeriodTitle(period);
-  const eventsLabel = `${items.length} events in period`;
+  const eventsLabel = `${displayItems?.length ?? 0} events in period`;
 
   return (
     <div
@@ -191,6 +212,14 @@ export function HomeWarehouseActivityPage() {
           >
             {HOME_ACTIVITY_PERIOD_CAPTION}
           </p>
+          {showRefreshBanner ? (
+            <div
+              className="home-activity-page__refresh-banner"
+              role="progressbar"
+              aria-label="Refreshing activity"
+              data-testid="home-activity-refresh-banner"
+            />
+          ) : null}
           {period === "custom" ? (
             <div
               className="home-activity-page__custom-range"
@@ -230,17 +259,28 @@ export function HomeWarehouseActivityPage() {
           aria-label="Activity list"
           aria-busy={loading}
         >
-          {loading ? (
-            <p className="home-activity-page__loading" role="status">
-              {HOME_ACTIVITY_LOADING}
-            </p>
+          {showSkeleton ? <HomeSectionSkeleton rows={8} /> : null}
+          {showError ? (
+            <FriendlyLoadError
+              message={HOME_ACTIVITY_LOAD_ERROR}
+              subtitle={HOME_RETRY_SUBTITLE}
+              onRetry={handleRetry}
+            />
           ) : null}
-          {!loading && loadError ? (
-            <p className="home-activity-page__load-error" role="alert">
-              {loadError}
-            </p>
+          {showEmpty ? (
+            <div
+              className="home-activity-page__empty"
+              data-testid="home-activity-empty"
+            >
+              <p className="home-activity-page__empty-title">
+                {HOME_ACTIVITY_EMPTY_TITLE}
+              </p>
+              <p className="home-activity-page__empty-sub">
+                {HOME_ACTIVITY_EMPTY_SUBTITLE}
+              </p>
+            </div>
           ) : null}
-          {!loading && !loadError ? (
+          {showList && displayItems ? (
             <div className="home-activity-page__card">
               <div className="home-activity-page__card-head">
                 <h2 className="home-activity-page__card-title">{listTitle}</h2>
@@ -257,13 +297,57 @@ export function HomeWarehouseActivityPage() {
                   {HOME_ACTIVITY_COL_VERIFIED}
                 </span>
               </div>
-              {items.map((item, i) => (
-                <ActivityRow key={`${item.kind}-${item.at.toISOString()}-${i}`} item={item} />
+              {displayItems.map((item, i) => (
+                <ActivityRow
+                  key={`${item.kind}-${item.at.toISOString()}-${i}`}
+                  item={item}
+                />
               ))}
             </div>
           ) : null}
         </section>
       </div>
+    </div>
+  );
+}
+
+function HomeSectionSkeleton({ rows }: { rows: number }) {
+  return (
+    <div
+      className="home-activity-page__skeleton"
+      data-testid="home-activity-section-skeleton"
+    >
+      {Array.from({ length: rows }, (_, i) => (
+        <div key={i} className="home-activity-page__skeleton-bar" />
+      ))}
+    </div>
+  );
+}
+
+function FriendlyLoadError({
+  message,
+  subtitle,
+  onRetry,
+}: {
+  message: string;
+  subtitle: string;
+  onRetry: () => void;
+}) {
+  return (
+    <div
+      className="home-activity-page__friendly-error"
+      role="alert"
+      data-testid="home-activity-friendly-error"
+    >
+      <p className="home-activity-page__friendly-error-msg">{message}</p>
+      <p className="home-activity-page__friendly-error-sub">{subtitle}</p>
+      <button
+        type="button"
+        className="home-activity-page__retry"
+        onClick={onRetry}
+      >
+        {HOME_RETRY_LABEL}
+      </button>
     </div>
   );
 }

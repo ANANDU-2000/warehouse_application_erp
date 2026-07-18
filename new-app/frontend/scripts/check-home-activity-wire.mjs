@@ -41,7 +41,10 @@ const repo = readFileSync(
 
 assert(page.includes("fetchHomeWarehouseActivity"), "page uses feed");
 assert(page.includes("events in period"), "events count label");
-assert(page.includes("HOME_ACTIVITY_LOADING") || page.includes("Loading activity"), "loading");
+assert(
+  page.includes("HomeSectionSkeleton") || page.includes("Loading activity"),
+  "loading UI",
+);
 assert(page.includes("150"), "debounce 150");
 assert(!page.includes("/dashboard?"), "no month dashboard");
 

@@ -22,4 +22,4 @@
 
 **Rollback:** Revert WIRE commit; remove homeActivity repo/routes; restore BUTTONS-only page (no feed fetch).
 
-**Next:** `/home/activity` STATES — skeleton, FriendlyLoadError + Retry, empty “No activity in this period”.
+**Next:** `/home/activity` STATES PASS — see [`home_activity_states_compare.md`](home_activity_states_compare.md). Next COMPARE.

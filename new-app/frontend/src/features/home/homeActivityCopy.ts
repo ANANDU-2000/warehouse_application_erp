@@ -1,5 +1,5 @@
 /**
- * Exact `/home/activity` LAYOUT/FIELDS copy — home_warehouse_activity_page.dart
+ * Exact `/home/activity` copy — home_warehouse_activity_page.dart
  */
 import type { HomePeriod } from "./homePeriod";
 
@@ -33,3 +33,15 @@ export function homeActivityPeriodTitle(period: HomePeriod): string {
 
 export const HOME_ACTIVITY_CUSTOM_RANGE_ERROR =
   "From date must be on or before To date";
+
+/** STATES — FriendlyLoadError message (fixed; never raw exception). */
+export const HOME_ACTIVITY_LOAD_ERROR = "Could not load activity";
+
+/**
+ * Full-page HexaEmptyState — home_warehouse_activity_page.dart
+ * (subtitle differs from compact home feed in homeLoadCopy.ts)
+ */
+export const HOME_ACTIVITY_EMPTY_TITLE = "No activity in this period";
+
+export const HOME_ACTIVITY_EMPTY_SUBTITLE =
+  "Deliveries, purchases, and stock updates appear here.";

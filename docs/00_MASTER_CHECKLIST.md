@@ -22,7 +22,7 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE**. Phase 3: **3.2 PASS** — next **3.3 Service layer**.
+**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE**. Phase 3: **3.3 PASS** — next **3.4 Controllers/routes**.
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
@@ -44,7 +44,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Phase 2 COMPLETE; Phase 3.2 repositories PASS — next: **3.3 service layer** (then Login module implement after auth gates).
+**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Phase 2 COMPLETE; Phase 3.3 services PASS — next: **3.4 controllers/routes** (Login HTTP after auth gates 3.5+).
 
 ### Cursor operator setup (workspace)
 
@@ -82,14 +82,14 @@
 
 ## PHASE 3 — Backend Migration (Node/Express) 🟡
 
-**Unlocked.** 3.2 PASS. Next: **3.3 Service layer**.
+**Unlocked.** 3.3 PASS. Next: **3.4 Controllers/routes**.
 
 | # | Task | Status | Evidence / notes |
 |---|---|---|---|
 | 3.1 | Folder structure (Clean Architecture: routes/controllers/services/repositories) | ✅ | `new-app/backend/`, `docs/33_Backend_Structure.md` — health only |
 | 3.2 | Repository pattern per table/aggregate | ✅ | `docs/34_Repository_Pattern.md` — mssql pool + users/businesses/memberships |
-| 3.3 | Service layer (business logic, ported 1:1 from FastAPI services) | ⬜ | **Next** — unlocked after 3.2 |
-| 3.4 | Controllers/routes (Express routers matching `18_API_Inventory.md` paths) | 🔒 | |
+| 3.3 | Service layer (business logic, ported 1:1 from FastAPI services) | ✅ | `docs/35_Service_Layer.md` — Login foundation (auth_login, passwords, permissions, eligibility) |
+| 3.4 | Controllers/routes (Express routers matching `18_API_Inventory.md` paths) | ⬜ | **Next** — unlocked after 3.3 |
 | 3.5 | Authentication (JWT, refresh, Google OAuth) | 🔒 | |
 | 3.6 | Authorization (role + `permissions_json` enforcement, business-scoping) | 🔒 | |
 | 3.7 | Validation layer (equivalent to Pydantic — e.g. Zod) | 🔒 | |
@@ -189,4 +189,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-18 — Phase 3.2 PASS (`34_Repository_Pattern.md`, core identity repos); next = 3.3 service layer.*
+*Last updated: 2026-07-18 — Phase 3.3 PASS (`35_Service_Layer.md`, Login foundation services); next = 3.4 controllers/routes.*

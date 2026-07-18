@@ -22,23 +22,23 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: **staff WIRE-2f** pull-refresh on `ops/dashboard-module` — STOP before Users & Roles / Subagent 4.
+**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: staff `/staff/home` **WIRE-2a–2f COMPLETE** on `ops/dashboard-module` — next is blocked / ask.
 
 ### Task board (Dashboard staff WIRE-2)
 
 | State | Step |
 |---|---|
-| ✅ Completed | Login/Splash/`/home`/`/staff/home`/`/home/activity`/`/home/breakdown-more` COMPARE · staff WIRE-2a–**2f** (incl. pull-refresh) |
-| 🟡 Current | staff WIRE-2f **PASS** — ask before Users & Roles / Subagent 4 |
-| ⬜ Pending | Users & Roles (backend blocked) |
-| ⏸ Deferred | Users & Roles UI (Seq 3 — backend me/businesses only); merge to `main`; Dashboard Subagent 4 |
+| ✅ Completed | Login/Splash/`/home`/`/staff/home`/`/home/activity`/`/home/breakdown-more` COMPARE · staff **WIRE-2a–2f COMPLETE** |
+| 🟡 Current | **WIRE-2 queue DONE** — boundary: ask before Users & Roles backend **or** one Subagent 4 satellite |
+| ⬜ Pending | Users & Roles (backend blocked) · pick Subagent 4 satellite — see [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
+| ⏸ Deferred | Users & Roles UI until users APIs; merge to `main`; full Dashboard Subagent 4 sign-off |
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
 | # | Module | Status | Evidence |
 |---|---|---|---|
 | 1 | Login | ✅ UI COMPARE PASS | COMPARE [`login_compare.md`](modules/login_compare.md) · Splash [`splash_compare.md`](modules/splash_compare.md) |
-| 2 | Dashboard | 🟡 staff WIRE-2f PASS | [`staff_home_wire2f_compare.md`](modules/staff_home_wire2f_compare.md) |
+| 2 | Dashboard | 🟡 WIRE-2 DONE · Subagent 4 pending | [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) · [`staff_home_wire2f_compare.md`](modules/staff_home_wire2f_compare.md) |
 | 3 | Users & Roles | ✅ Analyze+Review PASS | `docs/modules/users-roles.md`, `docs/matrix/users-roles_traceability.md`, `docs/matrix/roles_permissions_matrix.md` |
 | 4 | Products | ✅ Analyze+Review PASS | `docs/modules/products.md`, `docs/matrix/products_traceability.md`, branch `phase1/products-analysis` |
 | 5 | Categories | ✅ Analyze+Review PASS | `docs/modules/categories.md`, `docs/matrix/categories_traceability.md`, branch `phase1/categories-analysis` |
@@ -53,7 +53,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). Staff WIRE-2f PASS — ask before Users & Roles / Subagent 4. Users & Roles UI blocked until users APIs.
+**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). Staff WIRE-2 **COMPLETE**. Next: ask Users & Roles backend **or** one satellite from [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md). Users & Roles UI blocked until users APIs.
 
 ### Cursor operator setup (workspace)
 
@@ -111,7 +111,7 @@
 
 ## PHASE 4 — Frontend Migration (React + TypeScript) 🟡
 
-**Unlocked.** Phase 3 platform PASS. Login + Splash COMPARE PASS. Dashboard staff **WIRE-2f** PASS — ask before Users & Roles / Subagent 4.
+**Unlocked.** Phase 3 platform PASS. Login + Splash COMPARE PASS. Staff `/staff/home` WIRE-2 **COMPLETE**. Next: ask Users & Roles backend **or** Subagent 4 satellite.
 
 | # | Task | Status |
 |---|---|---|
@@ -125,7 +125,7 @@
 | 4.8 | Accessibility | 🔒 |
 | 4.9 | Phase 4 sign-off (per module) | 🔒 |
 
-**4.2 / 4.5 note:** Staff WIRE-2f pull-refresh PASS (`ops/dashboard-module`). Ask before Users & Roles / Subagent 4. Users & Roles UI blocked (backend). Owner routes + Splash COMPARE PASS.
+**4.2 / 4.5 note:** Staff WIRE-2a–2f COMPLETE (`ops/dashboard-module`). Ask before Users & Roles backend or one Subagent 4 satellite ([`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md)). Users & Roles UI blocked. Owner routes + Splash COMPARE PASS.
 
 ---
 
@@ -203,4 +203,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-18 — staff WIRE-2f pull-refresh PASS (`ops/dashboard-module`); ask before Users & Roles / Subagent 4.*
+*Last updated: 2026-07-18 — staff WIRE-2a–2f COMPLETE; closeout inventory [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md); ask before next.*

@@ -37,4 +37,4 @@
 
 **Smoke:** `npm run test:staff-home-wire`  
 **Rollback:** Revert WIRE commit; remove staffHome routes/repos; restore BUTTONS empty counts.  
-**Next:** Staff WIRE-2f PASS — see [`staff_home_wire2f_compare.md`](staff_home_wire2f_compare.md). Ask before Users & Roles / Subagent 4.
+**Next:** Staff WIRE-2 **COMPLETE**. Ask before Users & Roles backend or Subagent 4 — [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md).

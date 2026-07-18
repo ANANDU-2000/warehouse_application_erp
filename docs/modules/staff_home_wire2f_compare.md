@@ -15,4 +15,4 @@
 
 **Smoke:** `npm run test:staff-home-wire2f`  
 **Rollback:** Revert WIRE-2f commit; remove pull handlers / auto-refresh effect.  
-**Next:** Ask before Users & Roles (blocked) · Dashboard Subagent 4 · merge to `main`.
+**Next:** Staff WIRE-2 **COMPLETE**. Ask before Users & Roles backend or Subagent 4 satellite — [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md).

@@ -14,9 +14,9 @@
 | State | Step |
 |---|---|
 | ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
-| 🟡 Current | Staff WIRE-2f pull-refresh **PASS** — ask before Users & Roles / Subagent 4 |
-| ⬜ Pending (ask first) | Users & Roles (backend blocked) · Dashboard Subagent 4 |
-| ⏸ Deferred | Merge to `main` |
+| 🟡 Current | Staff WIRE-2 **COMPLETE** — ask before Users & Roles backend or Subagent 4 satellite |
+| ⬜ Pending (ask first) | Users & Roles (backend blocked) · pick satellite — [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md) |
+| ⏸ Deferred | Merge to `main`; full Subagent 4 sign-off |
 
 ---
 
@@ -77,9 +77,9 @@ Docs/checklist only: revert COMPARE commit. Application code unchanged by this s
 
 ## 5. Next after Approve
 
-1. Ask before starting: Users & Roles (still backend-blocked) · Dashboard Subagent 4  
+1. Ask before starting: **Users & Roles backend** APIs **or** one satellite from [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md)  
 2. Do **not** mark full Dashboard module ✅ until Subagent 4 remaining routes are agreed  
 3. Hold merge of `ops/dashboard-module` to `main` until you review
 4. Splash `/splash` — **COMPARE PASS**
-5. WIRE-2a–2f — **PASS**
+5. WIRE-2a–2f — **COMPLETE**
 

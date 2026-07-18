@@ -102,4 +102,8 @@
 
 ---
 
+**Phase 3.1** — done: see `docs/33_Backend_Structure.md`.
+
+---
+
 *Signed off as Phase 2 design complete: 2026-07-18 — agent Review PASS against checklist evidence.*

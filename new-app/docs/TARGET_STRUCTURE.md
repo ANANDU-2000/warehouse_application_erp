@@ -1,33 +1,40 @@
-# Target structure (planned — not implemented)
-
-This documents the intended Clean Architecture layout for `new-app/`. Folders exist as placeholders only during Phase 1.
+# Target structure
 
 ## Frontend (`new-app/frontend/`)
+
+Phase 4. Not scaffolded yet.
 
 ```
 frontend/
   src/
-    app/                 # router, providers, shell
+    app/
     features/
-      auth/              # Login, forgot/reset (after login.md PASS)
-      ...
-    shared/              # UI kit, hooks, api client
+    shared/
 ```
 
-## Backend (`new-app/backend/`)
+## Backend (`new-app/backend/`) — Phase 3.1+
+
+Clean Architecture layers (coding rules):
 
 ```
-backend/
-  src/
-    modules/
-      auth/              # routes, controllers, services, repositories
-      ...
-    shared/              # middleware, errors, config, db
+backend/src/
+  routes/
+  controllers/
+  services/
+  repositories/     # Phase 3.2+
+  middleware/
+  config/
+  types/
+  utils/
 ```
+
+Feature-specific folders (e.g. `modules/auth/`) may be introduced when implementing Login after repositories and auth phases unlock — without breaking the layer rule.
+
+See `docs/33_Backend_Structure.md`.
 
 ## Database (`new-app/database/`)
 
-Phase 2 only. No DDL in Phase 1.
+Phase 2 COMPLETE — DDL, constraints, indexes, migrate scripts. See `docs/PHASE2_SIGN_OFF.md`.
 
 ## Mapping rule
 

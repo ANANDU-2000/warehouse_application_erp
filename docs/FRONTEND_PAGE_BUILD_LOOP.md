@@ -66,7 +66,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 4 BUTTONS | ✅ | profile sheet + tools/CTAs — [`staff_home_buttons_compare.md`](modules/staff_home_buttons_compare.md) |
 | 5 WIRE | ✅ | scoped shell counts — [`staff_home_wire_compare.md`](modules/staff_home_wire_compare.md) |
 | 6 STATES | ✅ | skeleton / FriendlyLoadError — [`staff_home_states_compare.md`](modules/staff_home_states_compare.md) |
-| 7 COMPARE | ⬜ | next after approve |
+| 7 COMPARE | ✅ | in-scope PASS — [`staff_home_compare.md`](modules/staff_home_compare.md) |
 
 ### Prompt template (copy per page)
 

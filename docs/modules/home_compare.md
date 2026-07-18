@@ -42,9 +42,9 @@
 | Delivery stage breakdown (dispatched/arrived/…) | Bundle exposes pending/received only |
 | Analytics ring / comparison charts | Owner body secondary; unused month `/dashboard` charts |
 | Offline Synced/Offline state machine | Static Synced |
-| `/staff/home` full UI | Stub only; separate route loop |
+| `/staff/home` full UI | **COMPARE PASS** — [`staff_home_compare.md`](staff_home_compare.md) |
 | Splash session restore WIRE | Explicitly deferred (`docs/07`) |
-| Dashboard module Subagent 4 sign-off | Needs `/staff/home` (+ nested routes) COMPARE |
+| Dashboard module Subagent 4 sign-off | Ask before remaining Dashboard satellites / WIRE-2 |
 
 ---
 
@@ -68,6 +68,6 @@ Docs/checklist only: revert COMPARE commit. Application code unchanged by this s
 
 ## 5. Next after Approve
 
-1. Ask before starting: Splash WIRE (deferred) **or** `/staff/home` SCAFFOLD **or** Users & Roles module  
+1. Ask before starting: Splash WIRE (deferred) **or** staff WIRE-2 **or** Users & Roles module  
 2. Do **not** mark Dashboard module ✅ until Subagent 4 covers remaining Dashboard routes  
 3. Hold merge of `ops/dashboard-module` to `main` until you review

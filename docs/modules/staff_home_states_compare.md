@@ -29,4 +29,4 @@
 
 **Smoke:** `npm run test:staff-home-states`  
 **Rollback:** Revert STATES commit; restore WIRE minimal error paragraph.  
-**Next:** `/staff/home` COMPARE.
+**Next:** `/staff/home` COMPARE. Done → see [`staff_home_compare.md`](staff_home_compare.md).

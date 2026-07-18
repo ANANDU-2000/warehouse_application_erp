@@ -18,4 +18,4 @@
 
 **Rollback:** Revert LAYOUT commit; restore SCAFFOLD empty slots only.
 
-**Next:** `/home/breakdown-more` FIELDS — interactive search input + client filter state (no API).
+**Next:** `/home/breakdown-more` FIELDS PASS — see [`home_breakdown_fields_compare.md`](home_breakdown_fields_compare.md). Next BUTTONS.

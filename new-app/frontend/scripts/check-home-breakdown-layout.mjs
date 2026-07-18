@@ -35,7 +35,7 @@ assert(page.includes("HOME_BREAKDOWN_SEARCH_HINT"), "uses search hint");
 assert(page.includes("BackIcon") || page.includes("back-icon"), "back icon");
 assert(page.includes('aria-label="Back"'), "Back aria-label");
 assert(!page.includes("popOrGo"), "back inert — no popOrGo");
-assert(!page.includes("<input"), "no search input yet");
+/* FIELDS owns interactive search input */
 assert(!page.includes("fetch("), "no fetch");
 
 assert(page.includes('data-slot="total-header"'), "total-header slot");

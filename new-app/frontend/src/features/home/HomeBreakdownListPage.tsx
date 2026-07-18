@@ -1,7 +1,8 @@
 /**
- * Owner `/home/breakdown-more` — Step 2 LAYOUT.
- * Source: home_breakdown_list_page.dart — AppBar + Total card + search chrome; no API.
+ * Owner `/home/breakdown-more` — Step 3 FIELDS.
+ * Source: home_breakdown_list_page.dart — search TextField + clear; no API.
  */
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   HOME_BREAKDOWN_SEARCH_HINT,
@@ -23,7 +24,17 @@ export function HomeBreakdownListPage() {
   const tab = resolveTab(params.get("tab"));
   const title = homeBreakdownAppBarTitle(tab);
   /** Flutter: showBreakdownSearch only for non-category tabs. */
-  const showSearchChrome = tab !== "category";
+  const showSearch = tab !== "category";
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
+  /** Flutter `_breakdownSearchActive` — collapses total header chrome. */
+  const searchActive =
+    showSearch && (searchFocused || searchQuery.trim() !== "");
+
+  function clearSearch() {
+    setSearchQuery("");
+  }
 
   return (
     <div
@@ -35,12 +46,11 @@ export function HomeBreakdownListPage() {
         data-slot="appbar"
         data-testid="home-breakdown-slot-appbar"
       >
-        {/* LAYOUT: inert back chrome — navigate → BUTTONS */}
+        {/* LAYOUT/FIELDS: inert back — navigate → BUTTONS */}
         <span
           className="home-breakdown-page__back"
           data-slot="appbar-leading"
           aria-label="Back"
-          aria-hidden="false"
         >
           <BackIcon />
         </span>
@@ -48,43 +58,72 @@ export function HomeBreakdownListPage() {
       </header>
 
       <div className="home-breakdown-page__body">
+        {showSearch ? (
+          <section
+            className="home-breakdown-page__search"
+            data-slot="search"
+            data-testid="home-breakdown-slot-search"
+            aria-label="Search"
+          >
+            <div className="home-breakdown-page__search-chrome">
+              <SearchIcon />
+              <input
+                type="search"
+                className="home-breakdown-page__search-input"
+                placeholder={HOME_BREAKDOWN_SEARCH_HINT}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
+                aria-label={HOME_BREAKDOWN_SEARCH_HINT}
+                data-testid="home-breakdown-search-input"
+              />
+              {searchQuery.trim() !== "" ? (
+                <button
+                  type="button"
+                  className="home-breakdown-page__search-clear"
+                  aria-label="Clear"
+                  onClick={clearSearch}
+                  data-testid="home-breakdown-search-clear"
+                >
+                  <ClearIcon />
+                </button>
+              ) : null}
+            </div>
+          </section>
+        ) : (
+          <section
+            className="home-breakdown-page__search"
+            data-slot="search"
+            data-testid="home-breakdown-slot-search"
+            aria-label="Search"
+            hidden
+          />
+        )}
+
         <section
           className="home-breakdown-page__total-header"
           data-slot="total-header"
           data-testid="home-breakdown-slot-total-header"
           aria-label="Total header"
+          hidden={searchActive}
         >
-          <div className="home-breakdown-page__total-card">
-            <span className="home-breakdown-page__total-label">
-              {HOME_BREAKDOWN_TOTAL_LABEL}
-            </span>
-            <span
-              className="home-breakdown-page__total-amount home-breakdown-page__total-amount--placeholder"
-              aria-hidden="true"
-            >
-              —
-            </span>
-            <span
-              className="home-breakdown-page__total-units home-breakdown-page__total-units--placeholder"
-              aria-hidden="true"
-            >
-              —
-            </span>
-          </div>
-        </section>
-
-        <section
-          className="home-breakdown-page__search"
-          data-slot="search"
-          data-testid="home-breakdown-slot-search"
-          aria-label="Search"
-          hidden={!showSearchChrome}
-        >
-          {showSearchChrome ? (
-            <div className="home-breakdown-page__search-chrome">
-              <SearchIcon />
-              <span className="home-breakdown-page__search-hint">
-                {HOME_BREAKDOWN_SEARCH_HINT}
+          {!searchActive ? (
+            <div className="home-breakdown-page__total-card">
+              <span className="home-breakdown-page__total-label">
+                {HOME_BREAKDOWN_TOTAL_LABEL}
+              </span>
+              <span
+                className="home-breakdown-page__total-amount home-breakdown-page__total-amount--placeholder"
+                aria-hidden="true"
+              >
+                —
+              </span>
+              <span
+                className="home-breakdown-page__total-units home-breakdown-page__total-units--placeholder"
+                aria-hidden="true"
+              >
+                —
               </span>
             </div>
           ) : null}
@@ -127,6 +166,21 @@ function SearchIcon() {
       aria-hidden="true"
     >
       <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+    </svg>
+  );
+}
+
+function ClearIcon() {
+  return (
+    <svg
+      className="home-breakdown-page__clear-icon"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
     </svg>
   );
 }

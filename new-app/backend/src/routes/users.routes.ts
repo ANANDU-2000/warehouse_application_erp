@@ -47,6 +47,22 @@ export function createUsersRoutes(
   );
 
   r.get(
+    "/:userId/permissions",
+    authz.requireAuth,
+    authz.requireMembership,
+    createRequireRole("owner", "admin", "super_admin"),
+    (req, res, next) => void controller.getPermissions(req, res, next),
+  );
+
+  r.patch(
+    "/:userId/permissions",
+    authz.requireAuth,
+    authz.requireMembership,
+    createRequireRole("owner", "admin", "super_admin"),
+    (req, res, next) => void controller.patchPermissions(req, res, next),
+  );
+
+  r.get(
     "/:userId",
     authz.requireAuth,
     authz.requireMembership,

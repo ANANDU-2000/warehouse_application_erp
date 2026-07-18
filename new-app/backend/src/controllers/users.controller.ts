@@ -1,5 +1,5 @@
 /**
- * Users HTTP — list + create + profile + patch + delete + reset-password + credentials.
+ * Users HTTP — list + create + profile + patch + delete + reset + credentials + permissions.
  * Source: source-app/backend/app/routers/users.py
  */
 import type { Request, Response, NextFunction } from "express";
@@ -7,6 +7,7 @@ import type { ConnectionPool } from "mssql";
 import { sendDetail } from "../http/sendDetail";
 import type { BusinessUsersRepository } from "../repositories/businessUsers.repository";
 import type { BusinessesRepository } from "../repositories/businesses.repository";
+import type { MembershipsRepository } from "../repositories/memberships.repository";
 import {
   listUsersForBusiness,
   parseIncludeInactive,
@@ -34,8 +35,13 @@ import {
 } from "../services/usersResetPassword.service";
 import { getUserCredentialsForBusiness } from "../services/usersCredentials.service";
 import {
+  getPermissionsForBusiness,
+  patchPermissionsForBusiness,
+} from "../services/usersPermissions.service";
+import {
   userCreateInSchema,
   userPatchInSchema,
+  permissionsPatchInSchema,
 } from "../validation/users.schemas";
 import {
   SchemaValidationError,
@@ -45,6 +51,7 @@ import {
 export type UsersControllerDeps = {
   businessUsers: BusinessUsersRepository;
   businesses: BusinessesRepository;
+  memberships: MembershipsRepository;
   pool?: ConnectionPool;
   /** Test seam for create. */
   runInTransaction?: CreateUserDeps["runInTransaction"];
@@ -324,6 +331,74 @@ export function createUsersController(deps: UsersControllerDeps) {
           deps.businessUsers,
           businessId,
           userId,
+        );
+        res.json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async getPermissions(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> {
+      try {
+        const businessId = req.params.businessId;
+        const userId = req.params.userId;
+        if (typeof businessId !== "string" || !businessId) {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        if (typeof userId !== "string" || !userId) {
+          sendDetail(res, 400, "userId required");
+          return;
+        }
+        const out = await getPermissionsForBusiness(
+          deps.businessUsers,
+          businessId,
+          userId,
+        );
+        res.json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async patchPermissions(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> {
+      try {
+        const businessId = req.params.businessId;
+        const userId = req.params.userId;
+        if (typeof businessId !== "string" || !businessId) {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        if (typeof userId !== "string" || !userId) {
+          sendDetail(res, 400, "userId required");
+          return;
+        }
+
+        let body;
+        try {
+          body = validateWithSchema(permissionsPatchInSchema, req.body ?? {});
+        } catch (e) {
+          if (e instanceof SchemaValidationError) {
+            sendDetail(res, 422, e.detail);
+            return;
+          }
+          throw e;
+        }
+
+        const out = await patchPermissionsForBusiness(
+          deps.businessUsers,
+          deps.memberships,
+          businessId,
+          userId,
+          body,
         );
         res.json(out);
       } catch (e) {

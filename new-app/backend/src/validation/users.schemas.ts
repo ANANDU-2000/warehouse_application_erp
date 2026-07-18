@@ -63,6 +63,16 @@ export const userPatchInSchema = z.object({
 
 export type UserPatchIn = z.infer<typeof userPatchInSchema>;
 
+/**
+ * Mirrors PermissionsPatchIn — permissions dict of bools (default {}).
+ * Service ignores keys outside PERMISSION_KEYS.
+ */
+export const permissionsPatchInSchema = z.object({
+  permissions: z.record(z.string(), z.boolean()).optional().default({}),
+});
+
+export type PermissionsPatchInBody = z.infer<typeof permissionsPatchInSchema>;
+
 /** Digits-only phone — users.py:_phone_digits */
 export function phoneDigits(phone: string): string {
   return (phone || "").replace(/\D/g, "");

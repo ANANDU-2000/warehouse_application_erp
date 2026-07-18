@@ -96,6 +96,7 @@ function unavailableMembershipsRepository(): MembershipsRepository {
     findByUserAndBusiness: fail,
     insert: fail,
     updateRoleAndPermissions: fail,
+    updatePermissionsJson: fail,
   } as unknown as MembershipsRepository;
 }
 
@@ -265,6 +266,7 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
       createUsersController({
         businessUsers,
         businesses,
+        memberships,
         pool: deps.pool,
         runInTransaction: deps.runInTransaction,
         runPatchInTransaction: deps.runPatchInTransaction,

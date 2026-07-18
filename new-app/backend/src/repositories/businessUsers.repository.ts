@@ -28,10 +28,11 @@ export type TodayStatsRow = {
   items_created: number;
 };
 
-/** Load for patch/get with membership id + token_version. */
+/** Load for patch/get with membership id + token_version + permissions_json. */
 export type BusinessUserPatchLoad = BusinessUserMemberRow & {
   membership_id: string;
   token_version: number;
+  permissions_json: string | null;
 };
 
 const LIST_COLUMNS = `
@@ -45,7 +46,8 @@ const LIST_COLUMNS = `
 const PATCH_LOAD_COLUMNS = `
   ${LIST_COLUMNS},
   m.[id] AS [membership_id],
-  u.[token_version]
+  u.[token_version],
+  m.[permissions_json]
 `.trim();
 
 function asBool(v: unknown): boolean {
@@ -159,6 +161,12 @@ export class BusinessUsersRepository {
       ...mapMemberRow(row),
       membership_id: String(row.membership_id),
       token_version: Number(row.token_version ?? 0),
+      permissions_json:
+        row.permissions_json == null
+          ? null
+          : typeof row.permissions_json === "string"
+            ? row.permissions_json
+            : JSON.stringify(row.permissions_json),
     };
   }
 

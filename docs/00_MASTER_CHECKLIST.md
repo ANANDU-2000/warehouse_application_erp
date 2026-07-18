@@ -22,15 +22,15 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: staff WIRE-2 COMPLETE; Users & Roles Backend Slice 1–7 (list + create + profile + PATCH + DELETE + reset-password + credentials) PASS on `ops/dashboard-module` — ask before next.
+**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: staff WIRE-2 COMPLETE; Users & Roles Backend Slice 1–8 (through GET/PATCH permissions) PASS on `ops/dashboard-module` — ask before next.
 
 ### Task board (Dashboard staff WIRE-2)
 
 | State | Step |
 |---|---|
-| ✅ Completed | Login/Splash/home/staff COMPARE · WIRE-2a–2f · Users **Slice 1–7** (list + create + profile + PATCH + DELETE + reset-password + credentials) |
-| 🟡 Current | Users credentials **PASS** — ask before GET/PATCH permissions / Users UI **or** Subagent 4 satellite |
-| ⬜ Pending | Users permissions · Users UI · pick Subagent 4 — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
+| ✅ Completed | Login/Splash/home/staff COMPARE · WIRE-2a–2f · Users **Slice 1–8** (through GET/PATCH permissions) |
+| 🟡 Current | Users permissions **PASS** — ask before profile satellites / Users UI **or** Subagent 4 satellite |
+| ⬜ Pending | Users created-items/satellites · Users UI · pick Subagent 4 — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
 | ⏸ Deferred | Users UI until more APIs; merge to `main`; full Dashboard Subagent 4 sign-off |
 
 ### Phase 1 module analysis queue (strict — one at a time)
@@ -39,7 +39,7 @@
 |---|---|---|---|
 | 1 | Login | ✅ UI COMPARE PASS | COMPARE [`login_compare.md`](modules/login_compare.md) · Splash [`splash_compare.md`](modules/splash_compare.md) |
 | 2 | Dashboard | 🟡 WIRE-2 DONE · Subagent 4 pending | [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) · [`staff_home_wire2f_compare.md`](modules/staff_home_wire2f_compare.md) |
-| 3 | Users & Roles | 🟡 Backend Slice 1–7 through credentials PASS | list/create/profile/patch/delete/reset/credentials compare MDs under `docs/modules/users_roles_backend_*` |
+| 3 | Users & Roles | 🟡 Backend Slice 1–8 through permissions PASS | compare MDs under `docs/modules/users_roles_backend_*` (incl. permissions) |
 | 4 | Products | ✅ Analyze+Review PASS | `docs/modules/products.md`, `docs/matrix/products_traceability.md`, branch `phase1/products-analysis` |
 | 5 | Categories | ✅ Analyze+Review PASS | `docs/modules/categories.md`, `docs/matrix/categories_traceability.md`, branch `phase1/categories-analysis` |
 | 6 | Units | ✅ Analyze+Review PASS | `docs/modules/units.md`, `docs/matrix/units_traceability.md`, branch `phase1/units-analysis` |

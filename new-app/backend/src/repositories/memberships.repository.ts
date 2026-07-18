@@ -109,6 +109,27 @@ export class MembershipsRepository {
       ],
     );
   }
+
+  /** Update permissions_json only — patch_permissions. */
+  async updatePermissionsJson(
+    membershipId: string,
+    permissionsJson: string,
+  ): Promise<void> {
+    await queryOne(
+      this.client,
+      `UPDATE [memberships]
+       SET [permissions_json] = @permissionsJson
+       WHERE [id] = @id`,
+      [
+        { name: "id", type: sql.UniqueIdentifier, value: membershipId },
+        {
+          name: "permissionsJson",
+          type: sql.NVarChar(/* MAX */ -1),
+          value: permissionsJson,
+        },
+      ],
+    );
+  }
 }
 
 export function createMembershipsRepository(client: SqlClient): MembershipsRepository {

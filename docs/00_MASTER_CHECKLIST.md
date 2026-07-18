@@ -14,15 +14,37 @@
 | 1.3 | Module inventory (backend routers/services, frontend features) | ✅ | `03_Module_Inventory.md` |
 | 1.4 | API analysis (full endpoint inventory) | ✅ | `18_API_Inventory.md` |
 | 1.5 | Database analysis (tables, columns, FKs from ORM) | ✅ | `20_Database_Analysis.md` |
-| 1.6 | Business logic analysis (per-module rules, calculations) | ⬜ | Not started — deepest, riskiest gap right now |
-| 1.7 | UI/UX analysis (every screen, button, form, field) | ⬜ | Not started |
+| 1.6 | Business logic analysis (per-module rules, calculations) | 🟡 | Login ✅ `docs/modules/login.md` — remaining modules locked to queue below |
+| 1.7 | UI/UX analysis (every screen, button, form, field) | 🟡 | Login ✅ `docs/modules/login.md` — remaining modules locked to queue below |
 | 1.8 | User flow / navigation analysis | ✅ | `05_Navigation_Map.md` — resolved orphan-module question, found dual shell (Owner vs Staff), confirmed 1 dead route + 2 redirect-aliases |
 | 1.9 | Relationships / ER diagram | ⬜ | Not started (column-level DB doc exists; relationship/cardinality doc doesn't) |
 | 1.10 | Reports inventory | ⬜ | Not started |
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ⬜ | Flagged as unresolved in `03_Module_Inventory.md` |
 | 1.12 | Phase 1 sign-off | 🔒 | Blocked until 1.6–1.11 done |
 
-**Phase 1 status: ~55% complete.** Navigation is now confirmed truth, not inferred. Remaining gaps: business logic, per-screen field/button wireframe detail, ER relationships, reports inventory, roles/permissions matrix.
+**Phase 1 status: ~60% complete.** Login module Analyze+Review PASS. Remaining gaps: modules 2–15 per queue, ER relationships, reports inventory, roles/permissions matrix.
+
+### Phase 1 module analysis queue (strict — one at a time)
+
+| # | Module | Status | Evidence |
+|---|---|---|---|
+| 1 | Login | ✅ Analyze+Review PASS | `docs/modules/login.md`, `docs/matrix/login_traceability.md`, branch `phase1/login-analysis` |
+| 2 | Dashboard | 🔒 | Locked until Login PASS (done) — start next |
+| 3 | Users & Roles | 🔒 | |
+| 4 | Products | 🔒 | |
+| 5 | Categories | 🔒 | |
+| 6 | Units | 🔒 | |
+| 7 | Suppliers | 🔒 | |
+| 8 | Customers | 🔒 | |
+| 9 | Purchase Orders | 🔒 | |
+| 10 | Goods Receipt | 🔒 | |
+| 11 | Inventory | 🔒 | |
+| 12 | Stock Movement | 🔒 | |
+| 13 | Sales | 🔒 | |
+| 14 | Reports | 🔒 | |
+| 15 | Settings | 🔒 | |
+
+**Rule:** Do not start module N+1 analysis until module N Analyze+Review is PASS. Do not implement any module until its review PASS. Dashboard is next (still analysis only).
 
 ### Cursor operator setup (workspace)
 

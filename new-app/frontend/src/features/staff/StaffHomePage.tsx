@@ -1,16 +1,24 @@
-import type { ReactElement } from "react";
+import { useState, type ReactElement } from "react";
 import {
   STAFF_HOME_GREETING_AVATAR_FALLBACK,
   STAFF_HOME_GREETING_NAME_FALLBACK,
   STAFF_HOME_ROLE_LABEL,
   STAFF_HOME_SECTION,
 } from "./staffHomeCopy";
+import {
+  STAFF_HOME_FOCUS_HEADING,
+  STAFF_HOME_FOCUS_LABELS,
+  STAFF_HOME_FOCUS_ORDER,
+  readStaffHomeFocus,
+  writeStaffHomeFocus,
+  type StaffHomeFocus,
+} from "./staffHomeFocus";
 import "./StaffHomePage.css";
 
 /**
- * Staff home LAYOUT — greeting chrome + section headers (exact Flutter copy).
- * Source: source-app/flutter_app/lib/features/staff/presentation/staff_home_page.dart
- * FIELDS: focus filter chips. BUTTONS+: tile bodies / scan CTA / navigate / APIs.
+ * Staff home LAYOUT + FIELDS — greeting chrome, section headers, Home focus radios.
+ * Source: staff_home_page.dart + staff_home_providers.dart
+ * BUTTONS+: profile sheet, scan CTA, navigate / APIs.
  */
 
 function staffHomeLayoutDateLabel(now: Date): string {
@@ -35,6 +43,12 @@ function StaffHomeSectionHeader(props: {
 
 export function StaffHomePage(): ReactElement {
   const dateLabel = staffHomeLayoutDateLabel(new Date());
+  const [focus, setFocus] = useState<StaffHomeFocus>(() => readStaffHomeFocus());
+
+  function onFocusChange(next: StaffHomeFocus): void {
+    setFocus(next);
+    writeStaffHomeFocus(next);
+  }
 
   return (
     <div className="staff-home-page" data-testid="staff-home-page">
@@ -71,6 +85,57 @@ export function StaffHomePage(): ReactElement {
               <span className="staff-home-bell-icon" aria-hidden="true" />
             </button>
           </header>
+
+          <section
+            className="staff-home-card"
+            data-testid="staff-home-focus"
+            aria-labelledby="staff-home-focus-heading"
+          >
+            <h2
+              id="staff-home-focus-heading"
+              className="staff-home-focus-heading"
+            >
+              {STAFF_HOME_FOCUS_HEADING}
+            </h2>
+            <div
+              className="staff-home-focus-list"
+              role="radiogroup"
+              aria-labelledby="staff-home-focus-heading"
+            >
+              {STAFF_HOME_FOCUS_ORDER.map((value) => {
+                const selected = focus === value;
+                const inputId = `staff-home-focus-${value}`;
+                return (
+                  <label
+                    key={value}
+                    className={
+                      selected
+                        ? "staff-home-focus-option staff-home-focus-option--selected"
+                        : "staff-home-focus-option"
+                    }
+                    htmlFor={inputId}
+                  >
+                    <input
+                      id={inputId}
+                      type="radio"
+                      name="staff-home-focus"
+                      value={value}
+                      checked={selected}
+                      onChange={() => onFocusChange(value)}
+                    />
+                    <span
+                      className="staff-home-focus-radio"
+                      aria-hidden="true"
+                      data-selected={selected ? "true" : "false"}
+                    />
+                    <span className="staff-home-focus-label">
+                      {STAFF_HOME_FOCUS_LABELS[value]}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+          </section>
 
           <section
             className="staff-home-card"

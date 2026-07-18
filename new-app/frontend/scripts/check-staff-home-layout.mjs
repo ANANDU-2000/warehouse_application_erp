@@ -68,10 +68,8 @@ assert(page.includes("staffHomeLayoutDateLabel"), "date label helper");
 assert(page.includes('weekday: "short"'), "EEE-style weekday");
 assert(page.includes("disabled"), "bell inert");
 assert(!page.includes("fetch("), "no fetch in LAYOUT");
-assert(!page.includes("onClick"), "no onClick in LAYOUT");
 assert(!page.includes("useNavigate"), "no useNavigate in LAYOUT");
 assert(!page.includes("home-overview"), "no home-overview");
-assert(!page.includes("StaffHomeFocus"), "no focus chips yet (FIELDS)");
 assert(!page.includes("Scan barcode"), "no Scan barcode body (BUTTONS)");
 
 assert(css.includes("max-width: 560px"), "max-width 560");

@@ -19,4 +19,4 @@
 
 **Smoke:** `npm run test:staff-home-layout` (+ scaffold still PASS)  
 **Rollback:** Revert LAYOUT commit; restore SCAFFOLD empty slots.  
-**Next:** `/staff/home` FIELDS — `StaffHomeFocus` chips (exact labels).
+**Next:** `/staff/home` FIELDS — `StaffHomeFocus` radios (exact labels). Done → see [`staff_home_fields_compare.md`](staff_home_fields_compare.md).

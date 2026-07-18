@@ -24,7 +24,8 @@
     "test:home-states": "node scripts/check-home-states.mjs",
     "test:home-compare": "node scripts/check-home-compare.mjs",
     "test:staff-home-scaffold": "node scripts/check-staff-home-scaffold.mjs",
-    "test:staff-home-layout": "node scripts/check-staff-home-layout.mjs"
+    "test:staff-home-layout": "node scripts/check-staff-home-layout.mjs",
+    "test:staff-home-fields": "node scripts/check-staff-home-fields.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

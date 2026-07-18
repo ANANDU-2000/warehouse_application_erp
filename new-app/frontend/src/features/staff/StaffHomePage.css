@@ -82,6 +82,67 @@
   color: var(--staff-home-muted);
 }
 
+.staff-home-focus-heading {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--staff-home-title);
+  line-height: 1.25;
+}
+
+.staff-home-focus-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.staff-home-focus-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 4px 0;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.staff-home-focus-option input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  pointer-events: none;
+}
+
+.staff-home-focus-radio {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--staff-home-muted);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.staff-home-focus-radio[data-selected="true"] {
+  border-color: var(--staff-home-brand);
+}
+
+.staff-home-focus-radio[data-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: var(--staff-home-brand);
+}
+
+.staff-home-focus-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--staff-home-title);
+}
+
 .staff-home-bell {
   width: 40px;
   height: 40px;

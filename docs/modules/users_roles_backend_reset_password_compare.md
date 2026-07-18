@@ -14,10 +14,10 @@
 | 7 | No `token_version` bump on reset | Yes | Not set | PASS |
 | 8 | PASSWORD_RESET log (`target_user_id`, `target_name` = name\|username) | Yes | `insertActivityLog` | PASS |
 | 9 | 200 `{ new_password, login_email }` | Yes | Same | PASS |
-| 10 | credentials GET / permissions / UI | Out of slice | Not added | N/A |
+| 10 | credentials GET / permissions / UI | Out of slice | See Slice 7 | N/A |
 
 **Smoke:** `npx vitest run tests/users/` (44 PASS); `tsc --noEmit` PASS.
 
 **Rollback:** Revert this commit; remove reset-password route + `usersResetPassword.service`; restore boards to Slice 1–5.
 
-**Next (ask first):** credentials GET · permissions · Users UI · Subagent 4.
+**Next:** Slice 7 credentials — [`users_roles_backend_credentials_compare.md`](users_roles_backend_credentials_compare.md).

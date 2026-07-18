@@ -1,5 +1,5 @@
 /**
- * Users HTTP — list + create + profile + patch + delete + reset-password.
+ * Users HTTP — list + create + profile + patch + delete + reset-password + credentials.
  * Source: source-app/backend/app/routers/users.py
  */
 import type { Request, Response, NextFunction } from "express";
@@ -32,6 +32,7 @@ import {
   resetPasswordForBusiness,
   type ResetPasswordDeps,
 } from "../services/usersResetPassword.service";
+import { getUserCredentialsForBusiness } from "../services/usersCredentials.service";
 import {
   userCreateInSchema,
   userPatchInSchema,
@@ -296,6 +297,33 @@ export function createUsersController(deps: UsersControllerDeps) {
             actorMembershipRole: membership.role,
             actor: resetActorFromUser(user),
           },
+        );
+        res.json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async credentials(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> {
+      try {
+        const businessId = req.params.businessId;
+        const userId = req.params.userId;
+        if (typeof businessId !== "string" || !businessId) {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        if (typeof userId !== "string" || !userId) {
+          sendDetail(res, 400, "userId required");
+          return;
+        }
+        const out = await getUserCredentialsForBusiness(
+          deps.businessUsers,
+          businessId,
+          userId,
         );
         res.json(out);
       } catch (e) {

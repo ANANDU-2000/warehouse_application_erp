@@ -72,12 +72,12 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 
 | Step | Status | Evidence |
 |---|---|---|
-| 1 SCAFFOLD | ⬜ | |
-| 2 LAYOUT | ⬜ | |
-| 3 FIELDS | ⬜ | |
-| 4 BUTTONS | ⬜ | |
-| 5 WIRE | ⬜ | |
-| 6 STATES | ⬜ | |
+| 1 SCAFFOLD | ✅ | empty slots — [`home_breakdown_scaffold_compare.md`](modules/home_breakdown_scaffold_compare.md) |
+| 2 LAYOUT | ⬜ | AppBar / total-header chrome |
+| 3 FIELDS | ⬜ | search + tab query |
+| 4 BUTTONS | ⬜ | back popOrGo |
+| 5 WIRE | ⬜ | dashboard / shell reports |
+| 6 STATES | ⬜ | loading / empty |
 | 7 COMPARE | ⬜ | |
 
 ### Dashboard (staff `/staff/home`)

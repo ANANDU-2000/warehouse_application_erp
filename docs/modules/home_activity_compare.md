@@ -15,7 +15,7 @@
 | State | Step |
 |---|---|
 | ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
-| 🟡 Current | `/home/activity` route loop **PASS** — next `/home/breakdown-more` SCAFFOLD |
+| 🟡 Current | `/home/activity` route loop **PASS** — next `/home/breakdown-more` (SCAFFOLD PASS; LAYOUT next) |
 | ⬜ Pending | `/home/breakdown-more` page loop · staff WIRE-2 · Users & Roles (backend blocked) |
 | ⏸ Deferred | Pull-refresh · row detail sheet · write invalidation; merge to `main`; Dashboard Subagent 4 |
 

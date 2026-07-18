@@ -54,7 +54,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 4 BUTTONS | ✅ | header + tools + View all stubs — [`home_buttons_compare.md`](modules/home_buttons_compare.md) |
 | 5 WIRE | ✅ | `reports/home-overview` — [`home_wire_compare.md`](modules/home_wire_compare.md) |
 | 6 STATES | ✅ | skeleton + FriendlyLoadError/Retry + empty — [`home_states_compare.md`](modules/home_states_compare.md) |
-| 7 COMPARE | ⬜ | |
+| 7 COMPARE | ✅ | in-scope PASS — [`home_compare.md`](modules/home_compare.md) |
 
 ### Prompt template (copy per page)
 

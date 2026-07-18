@@ -21,7 +21,8 @@
     "test:home-fields": "node scripts/check-home-fields.mjs",
     "test:home-buttons": "node scripts/check-home-buttons.mjs",
     "test:home-wire": "node scripts/check-home-wire.mjs",
-    "test:home-states": "node scripts/check-home-states.mjs"
+    "test:home-states": "node scripts/check-home-states.mjs",
+    "test:home-compare": "node scripts/check-home-compare.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

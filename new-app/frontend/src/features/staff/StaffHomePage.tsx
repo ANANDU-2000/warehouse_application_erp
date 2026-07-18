@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactElement } from "react";
+import { useCallback, useEffect, useState, type ReactElement } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   clearPrimaryBusiness,
@@ -25,9 +25,20 @@ import {
 } from "./staffHomeFocus";
 import {
   fetchStaffHomeShell,
+  StaffHomeApiError,
+  StaffHomeNetworkError,
   staffInitials,
   type StaffHomeShellCounts,
 } from "./staffHomeApi";
+import {
+  STAFF_HOME_ACTIVITY_EMPTY,
+  STAFF_HOME_FLOOR_LOAD_ERROR,
+  STAFF_HOME_NO_CONNECTION,
+  STAFF_HOME_RETRY_LABEL,
+  STAFF_HOME_RETRY_SUBTITLE,
+  STAFF_HOME_SESSION_EXPIRED,
+  STAFF_HOME_SHIFT_EMPTY,
+} from "./staffHomeLoadCopy";
 import {
   STAFF_HOME_CLOSE_LABEL,
   STAFF_HOME_LOGOUT_BODY,
@@ -44,10 +55,12 @@ import {
 import "./StaffHomePage.css";
 
 /**
- * Staff home LAYOUT + FIELDS + BUTTONS + WIRE (scoped shell counts).
- * Source: staff_home_page.dart + staff_home_providers.dart
- * Deferred: warehouse stats body, pending cards, shift, activity, notifications.
+ * Staff home through STATES — exact Flutter load/error/empty copy.
+ * Source: staff_home_dashboard_widgets.dart + section_inline_error.dart
+ * COMPARE next.
  */
+
+type LoadKind = "session" | "network" | "floor" | null;
 
 function staffHomeLayoutDateLabel(now: Date): string {
   const weekday = now.toLocaleDateString("en-GB", { weekday: "short" });
@@ -116,6 +129,67 @@ function StaffHomeFocusRadios(props: {
   );
 }
 
+function StaffFloorKpiSkeleton(): ReactElement {
+  return (
+    <div
+      className="staff-home-floor-kpis staff-home-floor-kpis--skeleton"
+      data-testid="staff-home-floor-skeleton"
+      aria-busy="true"
+      aria-label="Loading floor counts"
+    >
+      <div className="staff-home-kpi-skel" />
+      <div className="staff-home-kpi-skel" />
+      <div className="staff-home-kpi-skel" />
+    </div>
+  );
+}
+
+function SectionInlineError(props: {
+  message: string;
+  onRetry: () => void;
+}): ReactElement {
+  return (
+    <div
+      className="staff-home-inline-error"
+      role="alert"
+      data-testid="staff-home-floor-error"
+    >
+      <p className="staff-home-inline-error-msg">{props.message}</p>
+      <button
+        type="button"
+        className="staff-home-retry"
+        onClick={props.onRetry}
+      >
+        {STAFF_HOME_RETRY_LABEL}
+      </button>
+    </div>
+  );
+}
+
+function FriendlyLoadError(props: {
+  message: string;
+  subtitle: string;
+  onRetry: () => void;
+}): ReactElement {
+  return (
+    <div
+      className="staff-home-friendly-error"
+      role="alert"
+      data-testid="staff-home-friendly-error"
+    >
+      <p className="staff-home-friendly-error-msg">{props.message}</p>
+      <p className="staff-home-friendly-error-sub">{props.subtitle}</p>
+      <button
+        type="button"
+        className="staff-home-retry"
+        onClick={props.onRetry}
+      >
+        {STAFF_HOME_RETRY_LABEL}
+      </button>
+    </div>
+  );
+}
+
 const EMPTY_COUNTS: StaffHomeShellCounts = {
   displayName: STAFF_HOME_GREETING_NAME_FALLBACK,
   pending: 0,
@@ -133,33 +207,52 @@ export function StaffHomePage(): ReactElement {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [counts, setCounts] = useState<StaffHomeShellCounts>(EMPTY_COUNTS);
-  const [wireError, setWireError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadKind, setLoadKind] = useState<LoadKind>(null);
+  const [retryTick, setRetryTick] = useState(0);
+
+  const reloadShell = useCallback(() => {
+    setRetryTick((n) => n + 1);
+  }, []);
 
   useEffect(() => {
     const biz = readPrimaryBusiness();
     if (!biz?.id) {
-      setWireError("No business session");
+      setLoading(false);
+      setLoadKind("session");
       return;
     }
     let cancelled = false;
+    setLoading(true);
+    setLoadKind(null);
     void fetchStaffHomeShell(biz.id)
       .then((shell) => {
         if (!cancelled) {
           setCounts(shell);
-          setWireError(null);
+          setLoadKind(null);
+          setLoading(false);
         }
       })
       .catch((err: unknown) => {
-        if (!cancelled) {
-          const msg =
-            err instanceof Error ? err.message : "Could not load floor counts";
-          setWireError(msg);
+        if (cancelled) return;
+        setLoading(false);
+        if (
+          err instanceof StaffHomeApiError &&
+          (err.status === 401 || err.status === 403)
+        ) {
+          setLoadKind("session");
+          return;
         }
+        if (err instanceof StaffHomeNetworkError) {
+          setLoadKind("network");
+          return;
+        }
+        setLoadKind("floor");
       });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [retryTick]);
 
   function onFocusChange(next: StaffHomeFocus): void {
     setFocus(next);
@@ -174,9 +267,16 @@ export function StaffHomePage(): ReactElement {
     navigate("/login", { replace: true });
   }
 
+  function onSessionExpiredRetry(): void {
+    clearTokens();
+    clearPrimaryBusiness();
+    navigate("/login", { replace: true });
+  }
+
   const tools = staffHomeToolsForFocus(focus);
   const displayName = counts.displayName || STAFF_HOME_GREETING_NAME_FALLBACK;
-  const avatarLetter = staffInitials(displayName) || STAFF_HOME_GREETING_AVATAR_FALLBACK;
+  const avatarLetter =
+    staffInitials(displayName) || STAFF_HOME_GREETING_AVATAR_FALLBACK;
 
   const showOpening = counts.openingCount > 0;
   const showMissing =
@@ -190,6 +290,10 @@ export function StaffHomePage(): ReactElement {
     counts.mismatchCount > 0;
   const showAttentionSection =
     showAttentionFlag && (showOpening || showMissing || showMismatch);
+
+  const showBlockingError =
+    !loading && (loadKind === "session" || loadKind === "network");
+  const showMain = !showBlockingError;
 
   return (
     <div className="staff-home-page" data-testid="staff-home-page">
@@ -205,6 +309,7 @@ export function StaffHomePage(): ReactElement {
               className="staff-home-greeting-main staff-home-greeting-main--button"
               onClick={() => setSheetOpen(true)}
               aria-label="Open profile"
+              disabled={loading}
             >
               <div className="staff-home-avatar" aria-hidden="true">
                 {avatarLetter}
@@ -224,258 +329,303 @@ export function StaffHomePage(): ReactElement {
               className="staff-home-bell"
               aria-label="Notifications"
               title="Notifications"
+              disabled={loading}
               onClick={() => navigate("/notifications")}
             >
               <span className="staff-home-bell-icon" aria-hidden="true" />
             </button>
           </header>
 
-          {wireError ? (
-            <p className="staff-home-wire-error" data-testid="staff-home-wire-error">
-              {wireError}
-            </p>
+          {!loading && loadKind === "session" ? (
+            <FriendlyLoadError
+              message={STAFF_HOME_SESSION_EXPIRED}
+              subtitle={STAFF_HOME_RETRY_SUBTITLE}
+              onRetry={onSessionExpiredRetry}
+            />
           ) : null}
 
-          <section
-            className="staff-home-card"
-            data-slot="floor-kpis"
-            data-testid="staff-home-slot-floor-kpis"
-            aria-label="Floor KPIs"
-          >
-            <div className="staff-home-floor-kpis">
-              <button
-                type="button"
-                className="staff-home-kpi"
-                onClick={() => navigate("/staff/deliveries")}
+          {!loading && loadKind === "network" ? (
+            <FriendlyLoadError
+              message={STAFF_HOME_NO_CONNECTION}
+              subtitle={STAFF_HOME_RETRY_SUBTITLE}
+              onRetry={reloadShell}
+            />
+          ) : null}
+
+          {showMain ? (
+            <>
+              <section
+                className="staff-home-card"
+                data-slot="floor-kpis"
+                data-testid="staff-home-slot-floor-kpis"
+                aria-label="Floor KPIs"
               >
-                <span className="staff-home-kpi-value">{counts.pending}</span>
-                <span className="staff-home-kpi-label">
-                  {STAFF_HOME_FLOOR_KPI_LABELS.pending}
-                </span>
-              </button>
-              <button
-                type="button"
-                className="staff-home-kpi"
-                onClick={() => navigate("/staff/deliveries")}
+                {loading ? (
+                  <StaffFloorKpiSkeleton />
+                ) : loadKind === "floor" ? (
+                  <SectionInlineError
+                    message={STAFF_HOME_FLOOR_LOAD_ERROR}
+                    onRetry={reloadShell}
+                  />
+                ) : (
+                  <div className="staff-home-floor-kpis">
+                    <button
+                      type="button"
+                      className="staff-home-kpi"
+                      onClick={() => navigate("/staff/deliveries")}
+                    >
+                      <span className="staff-home-kpi-value">
+                        {counts.pending}
+                      </span>
+                      <span className="staff-home-kpi-label">
+                        {STAFF_HOME_FLOOR_KPI_LABELS.pending}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      className="staff-home-kpi"
+                      onClick={() => navigate("/staff/deliveries")}
+                    >
+                      <span className="staff-home-kpi-value">
+                        {counts.delivered}
+                      </span>
+                      <span className="staff-home-kpi-label">
+                        {STAFF_HOME_FLOOR_KPI_LABELS.delivered}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      className="staff-home-kpi"
+                      onClick={() => navigate("/staff/low-stock")}
+                    >
+                      <span className="staff-home-kpi-value">
+                        {counts.lowStock}
+                      </span>
+                      <span className="staff-home-kpi-label">
+                        {STAFF_HOME_FLOOR_KPI_LABELS.lowStock}
+                      </span>
+                    </button>
+                  </div>
+                )}
+              </section>
+
+              <section
+                className="staff-home-card"
+                data-slot="warehouse"
+                data-testid="staff-home-slot-warehouse"
               >
-                <span className="staff-home-kpi-value">{counts.delivered}</span>
-                <span className="staff-home-kpi-label">
-                  {STAFF_HOME_FLOOR_KPI_LABELS.delivered}
-                </span>
-              </button>
-              <button
-                type="button"
-                className="staff-home-kpi"
-                onClick={() => navigate("/staff/low-stock")}
+                <StaffHomeSectionHeader
+                  title={STAFF_HOME_SECTION.warehouse.title}
+                  subtitle={STAFF_HOME_SECTION.warehouse.subtitle}
+                />
+              </section>
+
+              <section
+                className="staff-home-card"
+                data-slot="pending-deliveries"
+                data-testid="staff-home-slot-pending-deliveries"
               >
-                <span className="staff-home-kpi-value">{counts.lowStock}</span>
-                <span className="staff-home-kpi-label">
-                  {STAFF_HOME_FLOOR_KPI_LABELS.lowStock}
-                </span>
-              </button>
-            </div>
-          </section>
+                <StaffHomeSectionHeader
+                  title={STAFF_HOME_SECTION.pendingDeliveries.title}
+                  subtitle={STAFF_HOME_SECTION.pendingDeliveries.subtitle}
+                />
+              </section>
 
-          <section
-            className="staff-home-card"
-            data-slot="warehouse"
-            data-testid="staff-home-slot-warehouse"
-          >
-            <StaffHomeSectionHeader
-              title={STAFF_HOME_SECTION.warehouse.title}
-              subtitle={STAFF_HOME_SECTION.warehouse.subtitle}
-            />
-          </section>
+              <section
+                className="staff-home-card"
+                data-slot="shift-today"
+                data-testid="staff-home-slot-shift-today"
+              >
+                <StaffHomeSectionHeader
+                  title={STAFF_HOME_SECTION.shiftToday.title}
+                  subtitle={STAFF_HOME_SECTION.shiftToday.subtitle}
+                />
+                {!loading && loadKind === null ? (
+                  <p className="staff-home-empty-copy">{STAFF_HOME_SHIFT_EMPTY}</p>
+                ) : null}
+              </section>
 
-          <section
-            className="staff-home-card"
-            data-slot="pending-deliveries"
-            data-testid="staff-home-slot-pending-deliveries"
-          >
-            <StaffHomeSectionHeader
-              title={STAFF_HOME_SECTION.pendingDeliveries.title}
-              subtitle={STAFF_HOME_SECTION.pendingDeliveries.subtitle}
-            />
-          </section>
+              <section
+                className="staff-home-card"
+                data-slot="tools"
+                data-testid="staff-home-slot-tools"
+              >
+                <StaffHomeSectionHeader
+                  title={STAFF_HOME_SECTION.tools.title}
+                  subtitle={STAFF_HOME_SECTION.tools.subtitle}
+                />
+                <div className="staff-home-tools-grid">
+                  {tools.map((tool) => (
+                    <button
+                      key={tool.id}
+                      type="button"
+                      className="staff-home-tool"
+                      style={{
+                        ["--staff-tool-color" as string]: tool.color,
+                      }}
+                      disabled={loading}
+                      onClick={() => navigate(tool.path)}
+                    >
+                      <span className="staff-home-tool-label">
+                        {tool.label}
+                        {tool.badgeKey === "lowStock" && counts.lowStock > 0
+                          ? ` (${counts.lowStock})`
+                          : ""}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </section>
 
-          <section
-            className="staff-home-card"
-            data-slot="shift-today"
-            data-testid="staff-home-slot-shift-today"
-          >
-            <StaffHomeSectionHeader
-              title={STAFF_HOME_SECTION.shiftToday.title}
-              subtitle={STAFF_HOME_SECTION.shiftToday.subtitle}
-            />
-          </section>
+              <section
+                className="staff-home-card"
+                data-slot="quick-actions"
+                data-testid="staff-home-slot-quick-actions"
+              >
+                <StaffHomeSectionHeader
+                  title={STAFF_HOME_SECTION.quickActions.title}
+                  subtitle={STAFF_HOME_SECTION.quickActions.subtitle}
+                />
+                <div className="staff-home-quick-actions">
+                  {STAFF_HOME_QUICK_ACTIONS.map((action) => {
+                    let badge = 0;
+                    if (action.id === "deliveries") badge = counts.pending;
+                    if (action.id === "low-stock") badge = counts.lowStock;
+                    return (
+                      <button
+                        key={action.id}
+                        type="button"
+                        className="staff-home-quick-action"
+                        disabled={loading}
+                        onClick={() => navigate(action.path)}
+                      >
+                        {action.label}
+                        {badge > 0 ? ` (${badge})` : ""}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
 
-          <section
-            className="staff-home-card"
-            data-slot="tools"
-            data-testid="staff-home-slot-tools"
-          >
-            <StaffHomeSectionHeader
-              title={STAFF_HOME_SECTION.tools.title}
-              subtitle={STAFF_HOME_SECTION.tools.subtitle}
-            />
-            <div className="staff-home-tools-grid">
-              {tools.map((tool) => (
+              <section
+                className="staff-home-card"
+                data-slot="scan-cta"
+                data-testid="staff-home-slot-scan-cta"
+              >
+                <StaffHomeSectionHeader
+                  title={STAFF_HOME_SECTION.scanCta.title}
+                  subtitle={STAFF_HOME_SECTION.scanCta.subtitle}
+                />
                 <button
-                  key={tool.id}
                   type="button"
-                  className="staff-home-tool"
-                  style={{
-                    ["--staff-tool-color" as string]: tool.color,
-                  }}
-                  onClick={() => navigate(tool.path)}
+                  className="staff-home-scan-cta"
+                  disabled={loading}
+                  onClick={() => navigate(STAFF_HOME_SCAN_CTA_PATH)}
                 >
-                  <span className="staff-home-tool-label">
-                    {tool.label}
-                    {tool.badgeKey === "lowStock" && counts.lowStock > 0
-                      ? ` (${counts.lowStock})`
-                      : ""}
-                  </span>
+                  {STAFF_HOME_SCAN_CTA_LABEL}
                 </button>
-              ))}
-            </div>
-          </section>
+              </section>
 
-          <section
-            className="staff-home-card"
-            data-slot="quick-actions"
-            data-testid="staff-home-slot-quick-actions"
-          >
-            <StaffHomeSectionHeader
-              title={STAFF_HOME_SECTION.quickActions.title}
-              subtitle={STAFF_HOME_SECTION.quickActions.subtitle}
-            />
-            <div className="staff-home-quick-actions">
-              {STAFF_HOME_QUICK_ACTIONS.map((action) => {
-                let badge = 0;
-                if (action.id === "deliveries") badge = counts.pending;
-                if (action.id === "low-stock") badge = counts.lowStock;
-                return (
-                  <button
-                    key={action.id}
-                    type="button"
-                    className="staff-home-quick-action"
-                    onClick={() => navigate(action.path)}
-                  >
-                    {action.label}
-                    {badge > 0 ? ` (${badge})` : ""}
-                  </button>
-                );
-              })}
-            </div>
-          </section>
+              {showAttentionSection && !loading && loadKind === null ? (
+                <section
+                  className="staff-home-card"
+                  data-slot="needs-attention"
+                  data-testid="staff-home-slot-needs-attention"
+                >
+                  <StaffHomeSectionHeader
+                    title={STAFF_HOME_SECTION.needsAttention.title}
+                    subtitle={STAFF_HOME_SECTION.needsAttention.subtitle}
+                  />
+                  <div className="staff-home-attention-list">
+                    {showOpening ? (
+                      <button
+                        type="button"
+                        className="staff-home-attention"
+                        onClick={() =>
+                          navigate(STAFF_HOME_ATTENTION.opening.path)
+                        }
+                      >
+                        <span className="staff-home-attention-title">
+                          {STAFF_HOME_ATTENTION.opening.title}
+                        </span>
+                        <span className="staff-home-attention-sub">
+                          {STAFF_HOME_ATTENTION.opening.subtitle}
+                        </span>
+                        <span className="staff-home-attention-count">
+                          {counts.openingCount}
+                        </span>
+                      </button>
+                    ) : null}
+                    {showMissing ? (
+                      <button
+                        type="button"
+                        className="staff-home-attention"
+                        onClick={() =>
+                          navigate(STAFF_HOME_ATTENTION.missingBarcodes.path)
+                        }
+                      >
+                        <span className="staff-home-attention-title">
+                          {STAFF_HOME_ATTENTION.missingBarcodes.title}
+                        </span>
+                        <span className="staff-home-attention-sub">
+                          {STAFF_HOME_ATTENTION.missingBarcodes.subtitle}
+                        </span>
+                        <span className="staff-home-attention-count">
+                          {counts.missingCodeCount}
+                        </span>
+                      </button>
+                    ) : null}
+                    {showMismatch ? (
+                      <button
+                        type="button"
+                        className="staff-home-attention"
+                        onClick={() =>
+                          navigate(STAFF_HOME_ATTENTION.mismatch.path)
+                        }
+                      >
+                        <span className="staff-home-attention-title">
+                          {STAFF_HOME_ATTENTION.mismatch.title}
+                        </span>
+                        <span className="staff-home-attention-sub">
+                          {STAFF_HOME_ATTENTION.mismatch.subtitle}
+                        </span>
+                        <span className="staff-home-attention-count">
+                          {counts.mismatchCount}
+                        </span>
+                      </button>
+                    ) : null}
+                  </div>
+                </section>
+              ) : (
+                <section
+                  className="staff-home-card"
+                  data-slot="needs-attention"
+                  data-testid="staff-home-slot-needs-attention"
+                >
+                  <StaffHomeSectionHeader
+                    title={STAFF_HOME_SECTION.needsAttention.title}
+                    subtitle={STAFF_HOME_SECTION.needsAttention.subtitle}
+                  />
+                </section>
+              )}
 
-          <section
-            className="staff-home-card"
-            data-slot="scan-cta"
-            data-testid="staff-home-slot-scan-cta"
-          >
-            <StaffHomeSectionHeader
-              title={STAFF_HOME_SECTION.scanCta.title}
-              subtitle={STAFF_HOME_SECTION.scanCta.subtitle}
-            />
-            <button
-              type="button"
-              className="staff-home-scan-cta"
-              onClick={() => navigate(STAFF_HOME_SCAN_CTA_PATH)}
-            >
-              {STAFF_HOME_SCAN_CTA_LABEL}
-            </button>
-          </section>
-
-          {showAttentionSection ? (
-            <section
-              className="staff-home-card"
-              data-slot="needs-attention"
-              data-testid="staff-home-slot-needs-attention"
-            >
-              <StaffHomeSectionHeader
-                title={STAFF_HOME_SECTION.needsAttention.title}
-                subtitle={STAFF_HOME_SECTION.needsAttention.subtitle}
-              />
-              <div className="staff-home-attention-list">
-                {showOpening ? (
-                  <button
-                    type="button"
-                    className="staff-home-attention"
-                    onClick={() => navigate(STAFF_HOME_ATTENTION.opening.path)}
-                  >
-                    <span className="staff-home-attention-title">
-                      {STAFF_HOME_ATTENTION.opening.title}
-                    </span>
-                    <span className="staff-home-attention-sub">
-                      {STAFF_HOME_ATTENTION.opening.subtitle}
-                    </span>
-                    <span className="staff-home-attention-count">
-                      {counts.openingCount}
-                    </span>
-                  </button>
+              <section
+                className="staff-home-card"
+                data-slot="recent-activity"
+                data-testid="staff-home-slot-recent-activity"
+              >
+                <StaffHomeSectionHeader
+                  title={STAFF_HOME_SECTION.recentActivity.title}
+                  subtitle={STAFF_HOME_SECTION.recentActivity.subtitle}
+                />
+                {!loading && loadKind === null ? (
+                  <p className="staff-home-empty-copy">
+                    {STAFF_HOME_ACTIVITY_EMPTY}
+                  </p>
                 ) : null}
-                {showMissing ? (
-                  <button
-                    type="button"
-                    className="staff-home-attention"
-                    onClick={() =>
-                      navigate(STAFF_HOME_ATTENTION.missingBarcodes.path)
-                    }
-                  >
-                    <span className="staff-home-attention-title">
-                      {STAFF_HOME_ATTENTION.missingBarcodes.title}
-                    </span>
-                    <span className="staff-home-attention-sub">
-                      {STAFF_HOME_ATTENTION.missingBarcodes.subtitle}
-                    </span>
-                    <span className="staff-home-attention-count">
-                      {counts.missingCodeCount}
-                    </span>
-                  </button>
-                ) : null}
-                {showMismatch ? (
-                  <button
-                    type="button"
-                    className="staff-home-attention"
-                    onClick={() => navigate(STAFF_HOME_ATTENTION.mismatch.path)}
-                  >
-                    <span className="staff-home-attention-title">
-                      {STAFF_HOME_ATTENTION.mismatch.title}
-                    </span>
-                    <span className="staff-home-attention-sub">
-                      {STAFF_HOME_ATTENTION.mismatch.subtitle}
-                    </span>
-                    <span className="staff-home-attention-count">
-                      {counts.mismatchCount}
-                    </span>
-                  </button>
-                ) : null}
-              </div>
-            </section>
-          ) : (
-            <section
-              className="staff-home-card"
-              data-slot="needs-attention"
-              data-testid="staff-home-slot-needs-attention"
-            >
-              <StaffHomeSectionHeader
-                title={STAFF_HOME_SECTION.needsAttention.title}
-                subtitle={STAFF_HOME_SECTION.needsAttention.subtitle}
-              />
-            </section>
-          )}
-
-          <section
-            className="staff-home-card"
-            data-slot="recent-activity"
-            data-testid="staff-home-slot-recent-activity"
-          >
-            <StaffHomeSectionHeader
-              title={STAFF_HOME_SECTION.recentActivity.title}
-              subtitle={STAFF_HOME_SECTION.recentActivity.subtitle}
-            />
-          </section>
+              </section>
+            </>
+          ) : null}
         </div>
       </div>
 

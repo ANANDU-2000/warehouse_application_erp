@@ -31,4 +31,4 @@
 
 **Smoke:** `npm run test:staff-home-wire`  
 **Rollback:** Revert WIRE commit; remove staffHome routes/repos; restore BUTTONS empty counts.  
-**Next:** `/staff/home` STATES.
+**Next:** `/staff/home` STATES. Done → see [`staff_home_states_compare.md`](staff_home_states_compare.md).

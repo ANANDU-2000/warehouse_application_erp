@@ -1,4 +1,4 @@
-/* splash_page.dart LAYOUT — logo + fade + static spinner; no boot logic */
+/* splash_page.dart BUTTONS — error chrome + CTAs; no API wire */
 .splash-page {
   position: relative;
   min-height: 100dvh;
@@ -103,6 +103,66 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.splash-page__error {
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 420px;
+}
+
+.splash-page__error-text {
+  margin: 0;
+  padding: 0 40px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.45;
+  box-sizing: border-box;
+}
+
+.splash-page__retry {
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.splash-page__retry:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.splash-page__retry-icon {
+  flex-shrink: 0;
+}
+
+.splash-page__other-account {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.splash-page__other-account:hover {
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .splash-page__footer {

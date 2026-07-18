@@ -11,7 +11,7 @@
 
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
-| 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **2 LAYOUT** |
+| 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **4 BUTTONS** |
 | 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | ❌ | Blocked |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 me/businesses only | Blocked |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **2 LAYOUT** (current) → BUTTONS → WIRE restore later. Dashboard blocked until backend.
+Login UI: **COMPARE PASS**. Splash: **4 BUTTONS** (current) → WIRE restore later. Dashboard blocked until backend.
 
 ---
 
@@ -72,7 +72,7 @@ Live local SQL uses the pool wired in [`new-app/backend/src/index.ts`](../new-ap
 
 | Path | Notes |
 |---|---|
-| `/splash` | **Step 2 LAYOUT** |
+| `/splash` | **Step 4 BUTTONS** |
 | `/login` | **COMPARE PASS** |
 | `/forgot-password` | Stub only (full page later) |
 | `/home` | Post-login stub (Dashboard gated) |

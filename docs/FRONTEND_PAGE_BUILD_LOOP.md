@@ -40,6 +40,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 |---|---|---|
 | 1 SCAFFOLD | ✅ | `/splash` static shell (`SplashPage`) — no restore |
 | 2 LAYOUT | ✅ | `app_logo.png` + 800ms fade + static spinner — [`splash_layout_compare.md`](modules/splash_layout_compare.md) |
+| 4 BUTTONS | ✅ | Retry stub + Use another account → `/login` — [`splash_buttons_compare.md`](modules/splash_buttons_compare.md) |
 | 5 WIRE | ⬜ | tokens → refresh → me/businesses → home/login |
 | 7 COMPARE | ⬜ | |
 

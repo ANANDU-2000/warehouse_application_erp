@@ -1,5 +1,5 @@
 /**
- * Splash LAYOUT smoke checks.
+ * Splash LAYOUT smoke checks (chrome that must remain after BUTTONS).
  * Run: node scripts/check-splash-layout.mjs
  */
 import { readFileSync, existsSync } from "node:fs";
@@ -24,12 +24,10 @@ const splash = readFileSync(
 );
 assert(splash.includes("/brand/app_logo.png"), "logo src path");
 assert(splash.includes("onError"), "logo error fallback");
-assert(splash.includes("splash-page__spinner"), "static spinner");
+assert(splash.includes("splash-page__spinner"), "spinner class");
 assert(!splash.includes("fetch("), "no API fetch");
-assert(!/refresh/i.test(splash), "no refresh");
-assert(!splash.includes("useNavigate"), "no navigate hook");
+assert(!splash.includes("/auth/refresh"), "no auth refresh path");
 assert(!splash.includes("_boot"), "no boot");
-assert(!splash.includes("Retry"), "no Retry button");
 
 const css = readFileSync(
   join(root, "src/features/splash/SplashPage.css"),
@@ -40,7 +38,6 @@ assert(css.includes("800ms"), "fade 800ms");
 assert(css.includes("ease-out"), "ease-out curve");
 assert(css.includes("96px"), "logo box 96");
 assert(css.includes("border-radius: 22px"), "image clip r=22");
-assert(css.includes("margin-top: 48px"), "tagline to spinner 48");
 assert(css.includes("2.5px"), "spinner stroke 2.5");
 
 if (failures.length) {

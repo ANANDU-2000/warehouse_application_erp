@@ -160,8 +160,12 @@ function unavailableBusinessUsersRepository(): BusinessUsersRepository {
   };
   return {
     listForBusiness: fail,
+    findMemberByUserId: fail,
     activityCount7d: fail,
     todayStats: fail,
+    purchases7d: fail,
+    stockUpdates7d: fail,
+    profileStats: fail,
     insertActivityLog: fail,
   } as unknown as BusinessUsersRepository;
 }

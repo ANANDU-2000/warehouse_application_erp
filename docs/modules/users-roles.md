@@ -1,10 +1,10 @@
 # Module: Users & Roles
 
 **Queue:** 3 of 15  
-**Status:** Backend Slice 1–2 — `GET`+`POST …/users` PASS (2026-07-18) · UI blocked  
-**Scope:** Analysis + list + create APIs; profile/mutate/UI not started  
+**Status:** Backend Slice 1–3 — list + create + profile GET PASS (2026-07-18) · UI blocked  
+**Scope:** Analysis + list/create/profile APIs; mutate/UI not started  
 **Source of truth:** `source-app/`  
-**Compare:** [`users_roles_backend_list_compare.md`](users_roles_backend_list_compare.md) · [`users_roles_backend_create_compare.md`](users_roles_backend_create_compare.md) 
+**Compare:** [`users_roles_backend_list_compare.md`](users_roles_backend_list_compare.md) · [`users_roles_backend_create_compare.md`](users_roles_backend_create_compare.md) · [`users_roles_backend_profile_compare.md`](users_roles_backend_profile_compare.md) 
 
 ## Definition
 

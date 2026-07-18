@@ -43,6 +43,30 @@ function asBool(v: unknown): boolean {
   return Boolean(v);
 }
 
+function mapMemberRow(r: Record<string, unknown>): BusinessUserMemberRow {
+  return {
+    id: String(r.id),
+    name: (r.name as string | null) ?? null,
+    phone: (r.phone as string | null) ?? null,
+    email: String(r.email),
+    username: (r.username as string | null) ?? null,
+    role: String(r.role),
+    is_active: asBool(r.is_active),
+    is_blocked: asBool(r.is_blocked),
+    last_login_at: (r.last_login_at as Date | null) ?? null,
+    last_active_at: (r.last_active_at as Date | null) ?? null,
+    notes: (r.notes as string | null) ?? null,
+    created_at: (r.created_at as Date | null) ?? null,
+  };
+}
+
+export type ProfileStatsRow = {
+  stock_edits_total: number;
+  purchases_total: number;
+  scans_total: number;
+  items_created_total: number;
+};
+
 export class BusinessUsersRepository {
   constructor(private readonly client: SqlClient) {}
 
@@ -74,20 +98,30 @@ export class BusinessUsersRepository {
         },
       ],
     );
-    return rows.map((r) => ({
-      id: String(r.id),
-      name: (r.name as string | null) ?? null,
-      phone: (r.phone as string | null) ?? null,
-      email: String(r.email),
-      username: (r.username as string | null) ?? null,
-      role: String(r.role),
-      is_active: asBool(r.is_active),
-      is_blocked: asBool(r.is_blocked),
-      last_login_at: (r.last_login_at as Date | null) ?? null,
-      last_active_at: (r.last_active_at as Date | null) ?? null,
-      notes: (r.notes as string | null) ?? null,
-      created_at: (r.created_at as Date | null) ?? null,
-    }));
+    return rows.map(mapMemberRow);
+  }
+
+  /**
+   * _load_user_membership — biz + user id + deleted_at IS NULL (no is_active filter).
+   */
+  async findMemberByUserId(
+    businessId: string,
+    userId: string,
+  ): Promise<BusinessUserMemberRow | null> {
+    const row = await queryOne<Record<string, unknown>>(
+      this.client,
+      `SELECT ${LIST_COLUMNS}
+       FROM [users] u
+       INNER JOIN [memberships] m ON m.[user_id] = u.[id]
+       WHERE m.[business_id] = @businessId
+         AND u.[id] = @userId
+         AND u.[deleted_at] IS NULL`,
+      [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: userId },
+      ],
+    );
+    return row ? mapMemberRow(row) : null;
   }
 
   /**
@@ -141,6 +175,95 @@ export class BusinessUsersRepository {
       scans: counts.SCAN ?? 0,
       stock_updates: counts.STOCK_UPDATE ?? 0,
       items_created: counts.ITEM_CREATE ?? 0,
+    };
+  }
+
+  /**
+   * purchases_7d — TradePurchase count last 7d by created_at.
+   */
+  async purchases7d(businessId: string, userId: string): Promise<number> {
+    const row = await queryOne<{ c: number }>(
+      this.client,
+      `SELECT COUNT([id]) AS c
+       FROM [trade_purchases]
+       WHERE [business_id] = @businessId
+         AND [user_id] = @userId
+         AND [created_at] >= DATEADD(day, -7, SYSUTCDATETIME())`,
+      [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: userId },
+      ],
+    );
+    return Number(row?.c ?? 0);
+  }
+
+  /**
+   * stock_updates_7d — StockAdjustmentLog by updated_by last 7d via updated_at.
+   */
+  async stockUpdates7d(businessId: string, userId: string): Promise<number> {
+    const row = await queryOne<{ c: number }>(
+      this.client,
+      `SELECT COUNT([id]) AS c
+       FROM [stock_adjustment_log]
+       WHERE [business_id] = @businessId
+         AND [updated_by] = @userId
+         AND [updated_at] >= DATEADD(day, -7, SYSUTCDATETIME())`,
+      [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: userId },
+      ],
+    );
+    return Number(row?.c ?? 0);
+  }
+
+  /**
+   * _profile_stats — all-time stock edits, purchases, SCAN activity, items created.
+   */
+  async profileStats(
+    businessId: string,
+    userId: string,
+  ): Promise<ProfileStatsRow> {
+    const params = [
+      { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+      { name: "userId", type: sql.UniqueIdentifier, value: userId },
+    ];
+    const stock = await queryOne<{ c: number }>(
+      this.client,
+      `SELECT COUNT([id]) AS c
+       FROM [stock_adjustment_log]
+       WHERE [business_id] = @businessId AND [updated_by] = @userId`,
+      params,
+    );
+    const pur = await queryOne<{ c: number }>(
+      this.client,
+      `SELECT COUNT([id]) AS c
+       FROM [trade_purchases]
+       WHERE [business_id] = @businessId AND [user_id] = @userId`,
+      params,
+    );
+    const scans = await queryOne<{ c: number }>(
+      this.client,
+      `SELECT COUNT([id]) AS c
+       FROM [staff_activity_log]
+       WHERE [business_id] = @businessId
+         AND [user_id] = @userId
+         AND [action_type] = N'SCAN'`,
+      params,
+    );
+    const items = await queryOne<{ c: number }>(
+      this.client,
+      `SELECT COUNT([id]) AS c
+       FROM [catalog_items]
+       WHERE [business_id] = @businessId
+         AND [created_by_user_id] = @userId
+         AND [deleted_at] IS NULL`,
+      params,
+    );
+    return {
+      stock_edits_total: Number(stock?.c ?? 0),
+      purchases_total: Number(pur?.c ?? 0),
+      scans_total: Number(scans?.c ?? 0),
+      items_created_total: Number(items?.c ?? 0),
     };
   }
 

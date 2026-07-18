@@ -16,6 +16,7 @@ import {
   createUserForBusiness,
   type CreateUserDeps,
 } from "../services/usersCreate.service";
+import { getUserProfileForBusiness } from "../services/usersProfile.service";
 import {
   userCreateInSchema,
 } from "../validation/users.schemas";
@@ -108,6 +109,34 @@ export function createUsersController(deps: UsersControllerDeps) {
           },
         );
         res.status(201).json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async get(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> {
+      try {
+        const businessId = req.params.businessId;
+        const userId = req.params.userId;
+        if (typeof businessId !== "string" || !businessId) {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        if (typeof userId !== "string" || !userId) {
+          sendDetail(res, 400, "userId required");
+          return;
+        }
+        const out = await getUserProfileForBusiness(
+          deps.businessUsers,
+          deps.businesses,
+          businessId,
+          userId,
+        );
+        res.json(out);
       } catch (e) {
         next(e);
       }

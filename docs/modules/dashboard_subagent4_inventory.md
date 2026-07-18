@@ -50,7 +50,7 @@
 
 | Path | Blocker |
 |---|---|
-| `/settings/users` · `/settings/users/:userId` | List+create APIs exist; GET profile / mutate / UI still pending |
+| `/settings/users` · `/settings/users/:userId` | List+create+profile APIs exist; PATCH/mutate / UI still pending |
 
 ## Other known gaps (not full pages)
 
@@ -62,6 +62,6 @@
 
 ## Next (ask first)
 
-1. **Users GET profile / more users APIs**, or  
+1. **Users PATCH / more mutate APIs**, or  
 2. One **satellite** from the stub tables above (start page loop), or  
 3. Hold / merge review of `ops/dashboard-module` → `main`.

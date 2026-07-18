@@ -30,5 +30,13 @@ export function createUsersRoutes(
     (req, res, next) => void controller.create(req, res, next),
   );
 
+  r.get(
+    "/:userId",
+    authz.requireAuth,
+    authz.requireMembership,
+    createRequireRole("owner", "admin", "manager", "super_admin"),
+    (req, res, next) => void controller.get(req, res, next),
+  );
+
   return r;
 }

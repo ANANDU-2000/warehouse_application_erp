@@ -111,5 +111,5 @@ Purchase Orders, Stock, Reports, Settings, Barcode, Staff, Operations, Notificat
 
 ## Notes
 
-- **Login/Splash:** Do not modify unless a separate micro-plan says otherwise. Splash WIRE may still be deferred while Dashboard backend lands.
+- **Login/Splash:** Login + Splash COMPARE PASS — do not modify unless a separate micro-plan says otherwise.
 - **ROUTES source:** Prefer `docs/modules/<module>.md` Definition table + `docs/06` route buckets until `route_buckets_full.md` exists.

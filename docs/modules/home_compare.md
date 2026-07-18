@@ -43,7 +43,7 @@
 | Analytics ring / comparison charts | Owner body secondary; unused month `/dashboard` charts |
 | Offline Synced/Offline state machine | Static Synced |
 | `/staff/home` full UI | **COMPARE PASS** — [`staff_home_compare.md`](staff_home_compare.md) |
-| Splash session restore WIRE | Explicitly deferred (`docs/07`) |
+| Splash session restore WIRE | **Done** — [`splash_compare.md`](splash_compare.md) |
 | Dashboard module Subagent 4 sign-off | Ask before remaining Dashboard satellites / WIRE-2 |
 
 ---

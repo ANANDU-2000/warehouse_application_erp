@@ -11,7 +11,7 @@
 | ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · **STATES** |
 | 🟡 Current | STATES done — awaiting approve before COMPARE |
 | ⬜ Pending | **COMPARE** |
-| ⏸ Deferred | WIRE-2 bodies; pull-refresh; Splash WIRE |
+| ⏸ Deferred | WIRE-2 bodies; pull-refresh |
 
 ## Legacy vs New
 

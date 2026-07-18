@@ -154,6 +154,7 @@
 }
 
 .staff-home-bell {
+  position: relative;
   width: 40px;
   height: 40px;
   border: none;
@@ -190,6 +191,23 @@
   margin-left: -3px;
   border: 2px solid var(--staff-home-brand);
   border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.staff-home-bell-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #c62828;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 16px;
+  text-align: center;
   box-sizing: border-box;
 }
 

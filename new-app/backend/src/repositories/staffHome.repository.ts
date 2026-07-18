@@ -79,6 +79,39 @@ export type ActivityLogOut = {
   created_at: string;
 };
 
+/** FastAPI NotificationOut — notifications.py */
+export type NotificationOut = {
+  id: string;
+  kind: string;
+  title: string;
+  body: string | null;
+  priority: string;
+  category: string;
+  action_route: string | null;
+  triggered_by_user_id: string | null;
+  triggered_by_name: string | null;
+  related_item_id: string | null;
+  related_purchase_id: string | null;
+  related_supplier_id: string | null;
+  payload: Record<string, unknown> | null;
+  metadata: Record<string, unknown> | null;
+  read_at: string | null;
+  created_at: string;
+};
+
+/** FastAPI StockAlertsSummaryOut — stock_inventory.compute_stock_alerts_summary */
+export type StockAlertsSummaryOut = {
+  low_stock: number;
+  critical_stock: number;
+  out_of_stock: number;
+  active_out_of_stock: number;
+  missing_barcode: number;
+  missing_item_code: number;
+  missing_usage_logs: number;
+  eviction_count: number;
+  total_items: number;
+};
+
 type StatusCountRow = { delivery_status: string | null; c: number };
 type AmountRow = { total: number };
 type CountRow = { c: number };
@@ -113,6 +146,70 @@ type ActivityLogRow = {
   details: string | null;
   created_at: Date;
 };
+
+type NotificationDbRow = {
+  id: string;
+  kind: string;
+  title: string;
+  body: string | null;
+  priority: string;
+  category: string;
+  action_route: string | null;
+  triggered_by_user_id: string | null;
+  triggered_by_name: string | null;
+  related_item_id: string | null;
+  related_purchase_id: string | null;
+  related_supplier_id: string | null;
+  payload: string | null;
+  metadata: string | null;
+  read_at: Date | null;
+  created_at: Date;
+};
+
+type AlertsAggRow = {
+  total: number;
+  low: number;
+  critical: number;
+  out_n: number;
+  active_out: number;
+  missing_barcode: number;
+  missing_item_code: number;
+  eviction: number;
+};
+
+function parseJsonObject(
+  raw: string | null,
+): Record<string, unknown> | null {
+  if (!raw) return null;
+  try {
+    const v = JSON.parse(raw) as unknown;
+    return v && typeof v === "object" && !Array.isArray(v)
+      ? (v as Record<string, unknown>)
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function isoOrNull(d: Date | null): string | null {
+  if (!d) return null;
+  return d instanceof Date ? d.toISOString() : String(d);
+}
+
+function notificationVisibleToRole(
+  payload: Record<string, unknown> | null,
+  userRole: string,
+): boolean {
+  if (!payload) return true;
+  const roles = payload.target_roles;
+  if (!Array.isArray(roles) || roles.length === 0) return true;
+  const allowed = new Set(
+    roles
+      .map((r) => String(r).trim().toLowerCase())
+      .filter((s) => s.length > 0),
+  );
+  return allowed.has((userRole || "").trim().toLowerCase());
+}
 
 function moneyStr(n: number): string {
   return (Number.isFinite(n) ? n : 0).toFixed(2);
@@ -479,6 +576,209 @@ export class StaffHomeRepository {
             : String(r.created_at),
       };
     });
+  }
+
+  /**
+   * GET notifications — notifications.py list_notifications
+   */
+  async listNotifications(opts: {
+    businessId: string;
+    userId: string;
+    userRole: string;
+    page: number;
+    perPage: number;
+    kind: string | null;
+    category: string | null;
+    priority: string | null;
+    unreadOnly: boolean;
+    q: string | null;
+  }): Promise<NotificationOut[]> {
+    const page = Math.max(1, opts.page);
+    const perPage = Math.min(100, Math.max(1, opts.perPage));
+    const offset = (page - 1) * perPage;
+    const where: string[] = [
+      "n.[business_id] = @businessId",
+      "n.[user_id] = @userId",
+    ];
+    const params: SqlParam[] = [
+      { name: "businessId", type: sql.UniqueIdentifier, value: opts.businessId },
+      { name: "userId", type: sql.UniqueIdentifier, value: opts.userId },
+      { name: "offset", type: sql.Int, value: offset },
+      { name: "perPage", type: sql.Int, value: perPage },
+    ];
+    if (opts.kind) {
+      where.push("n.[kind] = @kind");
+      params.push({ name: "kind", type: sql.NVarChar(64), value: opts.kind });
+    }
+    if (opts.category) {
+      where.push("n.[category] = @category");
+      params.push({
+        name: "category",
+        type: sql.NVarChar(32),
+        value: opts.category,
+      });
+    }
+    if (opts.priority) {
+      where.push("n.[priority] = @priority");
+      params.push({
+        name: "priority",
+        type: sql.NVarChar(16),
+        value: opts.priority,
+      });
+    }
+    if (opts.unreadOnly) {
+      where.push("n.[read_at] IS NULL");
+    }
+    if (opts.q && opts.q.trim()) {
+      where.push(
+        `(n.[title] LIKE @q OR n.[body] LIKE @q)`,
+      );
+      params.push({
+        name: "q",
+        type: sql.NVarChar(140),
+        value: `%${opts.q.trim()}%`,
+      });
+    }
+
+    const rows = await queryMany<NotificationDbRow>(
+      this.client,
+      `SELECT n.[id], n.[kind], n.[title], n.[body], n.[priority], n.[category],
+              n.[action_route], n.[triggered_by_user_id], u.[name] AS triggered_by_name,
+              n.[related_item_id], n.[related_purchase_id], n.[related_supplier_id],
+              n.[payload], n.[metadata], n.[read_at], n.[created_at]
+       FROM notifications n
+       LEFT JOIN users u ON u.[id] = n.[triggered_by_user_id]
+       WHERE ${where.join(" AND ")}
+       ORDER BY n.[created_at] DESC
+       OFFSET @offset ROWS FETCH NEXT @perPage ROWS ONLY`,
+      params,
+    );
+
+    const out: NotificationOut[] = [];
+    for (const r of rows) {
+      const payload = parseJsonObject(r.payload);
+      if (!notificationVisibleToRole(payload, opts.userRole)) continue;
+      const name = (r.triggered_by_name ?? "").trim();
+      out.push({
+        id: r.id,
+        kind: r.kind,
+        title: r.title,
+        body: r.body,
+        priority: r.priority || "medium",
+        category: r.category || "system",
+        action_route: r.action_route,
+        triggered_by_user_id: r.triggered_by_user_id,
+        triggered_by_name: name.length > 0 ? name : null,
+        related_item_id: r.related_item_id,
+        related_purchase_id: r.related_purchase_id,
+        related_supplier_id: r.related_supplier_id,
+        payload,
+        metadata: parseJsonObject(r.metadata),
+        read_at: isoOrNull(r.read_at),
+        created_at:
+          r.created_at instanceof Date
+            ? r.created_at.toISOString()
+            : String(r.created_at),
+      });
+    }
+    return out;
+  }
+
+  /** GET notifications/unread-count */
+  async notificationsUnreadCount(
+    businessId: string,
+    userId: string,
+  ): Promise<number> {
+    const row = await queryOne<CountRow>(
+      this.client,
+      `SELECT COUNT([id]) AS c
+       FROM notifications
+       WHERE [business_id] = @businessId
+         AND [user_id] = @userId
+         AND [read_at] IS NULL`,
+      [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: userId },
+      ],
+    );
+    return Number(row?.c ?? 0);
+  }
+
+  /**
+   * GET stock/alerts/summary — compute_stock_alerts_summary
+   */
+  async stockAlertsSummary(
+    businessId: string,
+  ): Promise<StockAlertsSummaryOut> {
+    const row = await queryOne<AlertsAggRow>(
+      this.client,
+      `SELECT
+         COUNT(ci.[id]) AS total,
+         COALESCE(SUM(CASE WHEN
+           COALESCE(ci.[current_stock], 0) > 0
+           AND (
+             (COALESCE(ci.[reorder_level], 0) > 0
+               AND COALESCE(ci.[current_stock], 0) > COALESCE(ci.[reorder_level], 0) * 0.5
+               AND COALESCE(ci.[current_stock], 0) <= COALESCE(ci.[reorder_level], 0))
+             OR (COALESCE(ci.[reorder_level], 0) <= 0
+               AND COALESCE(ci.[current_stock], 0) < 1)
+           )
+         THEN 1 ELSE 0 END), 0) AS low,
+         COALESCE(SUM(CASE WHEN
+           COALESCE(ci.[current_stock], 0) > 0
+           AND COALESCE(ci.[reorder_level], 0) > 0
+           AND COALESCE(ci.[current_stock], 0) <= COALESCE(ci.[reorder_level], 0) * 0.5
+         THEN 1 ELSE 0 END), 0) AS critical,
+         COALESCE(SUM(CASE WHEN COALESCE(ci.[current_stock], 0) <= 0 THEN 1 ELSE 0 END), 0) AS out_n,
+         COALESCE(SUM(CASE WHEN
+           COALESCE(ci.[current_stock], 0) <= 0
+           AND (
+             (ci.[opening_stock_qty] IS NOT NULL AND ci.[opening_stock_qty] > 0)
+             OR ci.[last_purchase_at] IS NOT NULL
+           )
+         THEN 1 ELSE 0 END), 0) AS active_out,
+         COALESCE(SUM(CASE WHEN
+           ci.[barcode] IS NULL OR LTRIM(RTRIM(COALESCE(ci.[barcode], N''))) = N''
+         THEN 1 ELSE 0 END), 0) AS missing_barcode,
+         COALESCE(SUM(CASE WHEN
+           ci.[item_code] IS NULL OR LTRIM(RTRIM(COALESCE(ci.[item_code], N''))) = N''
+         THEN 1 ELSE 0 END), 0) AS missing_item_code,
+         COALESCE(SUM(CASE WHEN
+           ic.[is_perishable] = 1
+           AND COALESCE(ci.[current_stock], 0) > 0
+           AND ci.[eviction_days] IS NOT NULL
+           AND ci.[last_purchase_at] IS NOT NULL
+           AND DATEDIFF(day, ci.[last_purchase_at], SYSUTCDATETIME()) > ci.[eviction_days]
+         THEN 1 ELSE 0 END), 0) AS eviction
+       FROM catalog_items ci
+       INNER JOIN item_categories ic ON ic.[id] = ci.[category_id]
+       WHERE ci.[business_id] = @businessId
+         AND ci.[deleted_at] IS NULL`,
+      [{ name: "businessId", type: sql.UniqueIdentifier, value: businessId }],
+    );
+
+    const catalogTotal = Number(row?.total ?? 0);
+    const logged = await queryOne<CountRow>(
+      this.client,
+      `SELECT COUNT([id]) AS c
+       FROM daily_usage_logs
+       WHERE [business_id] = @businessId
+         AND [usage_date] = CAST(SYSUTCDATETIME() AS date)`,
+      [{ name: "businessId", type: sql.UniqueIdentifier, value: businessId }],
+    );
+    const loggedN = Number(logged?.c ?? 0);
+
+    return {
+      low_stock: Number(row?.low ?? 0),
+      critical_stock: Number(row?.critical ?? 0),
+      out_of_stock: Number(row?.out_n ?? 0),
+      active_out_of_stock: Number(row?.active_out ?? 0),
+      missing_barcode: Number(row?.missing_barcode ?? 0),
+      missing_item_code: Number(row?.missing_item_code ?? 0),
+      missing_usage_logs: Math.max(0, catalogTotal - loggedN),
+      eviction_count: Number(row?.eviction ?? 0),
+      total_items: catalogTotal,
+    };
   }
 }
 

@@ -20,6 +20,27 @@ export function createActivityLogRoutes(
   return r;
 }
 
+export function createNotificationsRoutes(
+  staffHome: StaffHomeController,
+  authz: AuthzMiddleware,
+): Router {
+  const r = Router({ mergeParams: true });
+  r.get(
+    "/unread-count",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) =>
+      void staffHome.notificationsUnreadCount(req, res, next),
+  );
+  r.get(
+    "/",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void staffHome.listNotifications(req, res, next),
+  );
+  return r;
+}
+
 export function createStaffHomeMeRoutes(
   controller: StaffHomeController,
   authz: AuthzMiddleware,
@@ -63,6 +84,12 @@ export function createStockRoutes(
     authz.requireAuth,
     authz.requireMembership,
     (req, res, next) => void staffHome.stockTotals(req, res, next),
+  );
+  r.get(
+    "/alerts/summary",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void staffHome.stockAlertsSummary(req, res, next),
   );
   r.get(
     "/list",

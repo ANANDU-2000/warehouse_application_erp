@@ -12,7 +12,7 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 staff WIRE-2d PASS | Next: ask notifications / Subagent 4 (Users & Roles UI blocked) |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 staff WIRE-2e PASS | Next: ask pull-refresh / Subagent 4 (Users & Roles UI blocked) |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 me/businesses only | Blocked |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2d** PASS → ask **notifications / Subagent 4**. Users & Roles UI blocked until users APIs.
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2e** PASS → ask **pull-refresh / Subagent 4**. Users & Roles UI blocked until users APIs.
 
 ---
 

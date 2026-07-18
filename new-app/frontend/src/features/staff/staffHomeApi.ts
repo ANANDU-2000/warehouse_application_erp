@@ -353,3 +353,79 @@ export async function fetchStaffHomeShell(
     mismatchCount: mismatch,
   };
 }
+
+/** FastAPI StockAlertsSummaryOut */
+export type StockAlertsSummaryOut = {
+  low_stock: number;
+  critical_stock: number;
+  out_of_stock: number;
+  active_out_of_stock: number;
+  missing_barcode: number;
+  missing_item_code: number;
+  missing_usage_logs: number;
+  eviction_count: number;
+  total_items: number;
+};
+
+/** GET …/stock/alerts/summary — stockStatusCountsProvider path */
+export async function fetchStockAlertsSummary(
+  businessId: string,
+): Promise<StockAlertsSummaryOut> {
+  const res = await authGet(
+    `/v1/businesses/${encodeURIComponent(businessId)}/stock/alerts/summary`,
+  );
+  if (!res.ok) throw new StaffHomeApiError(res.status, await readDetail(res));
+  const data = (await res.json()) as Partial<StockAlertsSummaryOut>;
+  return {
+    low_stock: Number(data.low_stock ?? 0),
+    critical_stock: Number(data.critical_stock ?? 0),
+    out_of_stock: Number(data.out_of_stock ?? 0),
+    active_out_of_stock: Number(data.active_out_of_stock ?? 0),
+    missing_barcode: Number(data.missing_barcode ?? 0),
+    missing_item_code: Number(data.missing_item_code ?? 0),
+    missing_usage_logs: Number(data.missing_usage_logs ?? 0),
+    eviction_count: Number(data.eviction_count ?? 0),
+    total_items: Number(data.total_items ?? 0),
+  };
+}
+
+/**
+ * GET …/notifications — Flutter listAppNotifications (paginate like hexa_api).
+ * Soft-fail empty on error is handled by caller for badge (orElse []).
+ */
+export async function fetchAppNotifications(
+  businessId: string,
+): Promise<Record<string, unknown>[]> {
+  const out: Record<string, unknown>[] = [];
+  const perPage = 50;
+  const maxPages = 20;
+  for (let page = 1; page <= maxPages; page++) {
+    const q = new URLSearchParams({
+      page: String(page),
+      per_page: String(perPage),
+    });
+    const res = await authGet(
+      `/v1/businesses/${encodeURIComponent(businessId)}/notifications?${q}`,
+    );
+    if (!res.ok) throw new StaffHomeApiError(res.status, await readDetail(res));
+    const data: unknown = await res.json();
+    if (!Array.isArray(data) || data.length === 0) break;
+    for (const e of data) {
+      if (e && typeof e === "object") out.push(e as Record<string, unknown>);
+    }
+    if (data.length < perPage) break;
+  }
+  return out;
+}
+
+/** GET …/notifications/unread-count — bundle companion (badge uses merge). */
+export async function fetchNotificationsUnreadCount(
+  businessId: string,
+): Promise<number> {
+  const res = await authGet(
+    `/v1/businesses/${encodeURIComponent(businessId)}/notifications/unread-count`,
+  );
+  if (!res.ok) throw new StaffHomeApiError(res.status, await readDetail(res));
+  const data = (await res.json()) as { unread?: number };
+  return Number(data.unread ?? 0);
+}

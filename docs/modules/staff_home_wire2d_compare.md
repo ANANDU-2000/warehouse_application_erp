@@ -21,4 +21,4 @@
 
 **Smoke:** `npm run test:staff-home-wire2d`  
 **Rollback:** Revert WIRE-2d commit; restore empty recent-activity slot; remove `/catalog/item/:itemId` stub if unused.  
-**Next:** Ask before notifications badge · pull-refresh · Users & Roles (blocked) · Dashboard Subagent 4.
+**Next:** Staff WIRE-2e PASS — [`staff_home_wire2e_compare.md`](staff_home_wire2e_compare.md). Ask before pull-refresh / Subagent 4.

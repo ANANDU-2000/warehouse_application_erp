@@ -25,7 +25,9 @@ import {
 } from "./staffHomeFocus";
 import {
   fetchActivityLogToday,
+  fetchAppNotifications,
   fetchStaffHomeShell,
+  fetchStockAlertsSummary,
   fetchStockAuditFeedToday,
   fetchStockTotals,
   fetchTradePurchasesRecent,
@@ -34,6 +36,7 @@ import {
   StaffHomeNetworkError,
   staffInitials,
   type StaffHomeShellCounts,
+  type StockAlertsSummaryOut,
   type StockTotalsOut,
 } from "./staffHomeApi";
 import {
@@ -83,6 +86,11 @@ import {
   staffActivityTimeAgo,
   type StaffRecentActivityItem,
 } from "./staffRecentActivity";
+import {
+  countStaffBellUnread,
+  readNotificationKindToggles,
+  staffBellBadgeLabel,
+} from "./staffBellBadge";
 import {
   STAFF_HOME_CLOSE_LABEL,
   STAFF_HOME_LOGOUT_BODY,
@@ -741,6 +749,7 @@ export function StaffHomePage(): ReactElement {
   );
   const [recentLoading, setRecentLoading] = useState(true);
   const [recentError, setRecentError] = useState(false);
+  const [bellCount, setBellCount] = useState(0);
 
   const reloadShell = useCallback(() => {
     setRetryTick((n) => n + 1);
@@ -945,6 +954,52 @@ export function StaffHomePage(): ReactElement {
     };
   }, [retryTick]);
 
+  /* WIRE-2e: notificationsUnreadCountProvider — merged feed unread */
+  useEffect(() => {
+    const biz = readPrimaryBusiness();
+    if (!biz?.id) {
+      setBellCount(0);
+      return;
+    }
+    let cancelled = false;
+    const emptyAlerts: StockAlertsSummaryOut = {
+      low_stock: 0,
+      critical_stock: 0,
+      out_of_stock: 0,
+      active_out_of_stock: 0,
+      missing_barcode: 0,
+      missing_item_code: 0,
+      missing_usage_logs: 0,
+      eviction_count: 0,
+      total_items: 0,
+    };
+    void Promise.all([
+      fetchAppNotifications(biz.id).catch(() => [] as Record<string, unknown>[]),
+      fetchStockAlertsSummary(biz.id).catch(() => emptyAlerts),
+    ]).then(([serverRows, alerts]) => {
+      if (cancelled) return;
+      const pending = pendingDeliveries.map((p) => ({
+        supplierName: null as string | null,
+        purchaseDate: (() => {
+          const d = new Date(p.purchaseDate);
+          return Number.isNaN(d.getTime()) ? new Date() : d;
+        })(),
+      }));
+      setBellCount(
+        countStaffBellUnread({
+          serverRows,
+          alerts,
+          openingCount: counts.openingCount,
+          pending,
+          enabledKinds: readNotificationKindToggles(),
+        }),
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [retryTick, pendingDeliveries, counts.openingCount]);
+
   function onFocusChange(next: StaffHomeFocus): void {
     setFocus(next);
     writeStaffHomeFocus(next);
@@ -1024,6 +1079,14 @@ export function StaffHomePage(): ReactElement {
               onClick={() => navigate("/notifications")}
             >
               <span className="staff-home-bell-icon" aria-hidden="true" />
+              {bellCount > 0 ? (
+                <span
+                  className="staff-home-bell-badge"
+                  data-testid="staff-home-bell-badge"
+                >
+                  {staffBellBadgeLabel(bellCount)}
+                </span>
+              ) : null}
             </button>
           </header>
 

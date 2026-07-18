@@ -28,6 +28,7 @@ import {
 } from "./middleware/authz";
 import {
   createActivityLogRoutes,
+  createNotificationsRoutes,
   createStaffHomeMeRoutes,
   createStockRoutes,
   createTradePurchasesRoutes,
@@ -121,6 +122,9 @@ function unavailableStaffHomeRepository(): StaffHomeRepository {
     stockTotalsOnHand: fail,
     stockTotalsPurchased: fail,
     listActivityLog: fail,
+    listNotifications: fail,
+    notificationsUnreadCount: fail,
+    stockAlertsSummary: fail,
   } as unknown as StaffHomeRepository;
 }
 
@@ -203,6 +207,10 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
   app.use(
     "/v1/businesses/:businessId/activity-log",
     createActivityLogRoutes(staffHomeController, app.authz),
+  );
+  app.use(
+    "/v1/businesses/:businessId/notifications",
+    createNotificationsRoutes(staffHomeController, app.authz),
   );
 
   app.use(errorHandler);

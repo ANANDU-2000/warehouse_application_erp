@@ -186,8 +186,7 @@ export function createStaffHomeController(deps: StaffHomeControllerDeps) {
             : null;
         const page = Number(req.query.page ?? 1) || 1;
         const perPage = Number(req.query.per_page ?? 50) || 50;
-        res.json(
-          await deps.staffHome.listActivityLog({
+        res.json(await deps.staffHome.listActivityLog({
             businessId,
             userId,
             period,
@@ -196,6 +195,94 @@ export function createStaffHomeController(deps: StaffHomeControllerDeps) {
             perPage,
           }),
         );
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    /**
+     * GET …/notifications — notifications.py list_notifications
+     */
+    async listNotifications(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string") {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        const user = req.user;
+        if (!user) {
+          sendDetail(res, 401, "Not authenticated");
+          return;
+        }
+        const membership = req.membership;
+        const userRole = (membership?.role ?? "").trim().toLowerCase();
+        const page = Number(req.query.page ?? 1) || 1;
+        const perPage = Number(req.query.per_page ?? 30) || 30;
+        const unreadOnly =
+          req.query.unread_only === "true" || req.query.unread_only === "1";
+        res.json(
+          await deps.staffHome.listNotifications({
+            businessId,
+            userId: user.id,
+            userRole,
+            page,
+            perPage,
+            kind:
+              typeof req.query.kind === "string" ? req.query.kind.trim() : null,
+            category:
+              typeof req.query.category === "string"
+                ? req.query.category.trim()
+                : null,
+            priority:
+              typeof req.query.priority === "string"
+                ? req.query.priority.trim()
+                : null,
+            unreadOnly,
+            q: typeof req.query.q === "string" ? req.query.q : null,
+          }),
+        );
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    /** GET …/notifications/unread-count */
+    async notificationsUnreadCount(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ) {
+      try {
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string") {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        const user = req.user;
+        if (!user) {
+          sendDetail(res, 401, "Not authenticated");
+          return;
+        }
+        const unread = await deps.staffHome.notificationsUnreadCount(
+          businessId,
+          user.id,
+        );
+        res.json({ unread });
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    /** GET …/stock/alerts/summary */
+    async stockAlertsSummary(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string") {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        res.json(await deps.staffHome.stockAlertsSummary(businessId));
       } catch (e) {
         next(e);
       }

@@ -1,0 +1,35 @@
+/* Staff /staff/home SCAFFOLD — empty slots; DesktopPageShell max 560; no API */
+.staff-home {
+  min-height: 100dvh;
+  width: 100%;
+  box-sizing: border-box;
+  background: #f7f9f6;
+  color: #0f172a;
+  padding: 16px;
+}
+
+.staff-home__shell {
+  max-width: 560px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+.staff-home__slot {
+  min-height: 56px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 14px;
+  box-sizing: border-box;
+}
+
+.staff-home__slot-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #64748b;
+}

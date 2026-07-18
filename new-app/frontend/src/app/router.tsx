@@ -1,14 +1,14 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { LoginPage } from "../features/auth/LoginPage";
 import { ForgotPasswordStubPage } from "../features/auth/ForgotPasswordStubPage";
-import { StaffHomeStubPage } from "../features/auth/PostAuthStub";
 import { SplashPage } from "../features/splash/SplashPage";
 import { HomePage } from "../features/home/HomePage";
 import { DashboardRouteStubPage } from "../features/home/DashboardRouteStubPage";
+import { StaffHomePage } from "../features/staff/StaffHomePage";
 
 /**
- * Splash + Login + owner /home + BUTTONS stub destinations.
- * Source: docs/05_Navigation_Map.md; dashboard.md §7/§10
+ * Splash + Login + owner /home + staff /staff/home SCAFFOLD + stub destinations.
+ * Source: docs/05_Navigation_Map.md; dashboard.md
  */
 export function AppRouter() {
   return (
@@ -22,7 +22,7 @@ export function AppRouter() {
           path="/home/activity"
           element={<DashboardRouteStubPage title="Warehouse activity" />}
         />
-        <Route path="/staff/home" element={<StaffHomeStubPage />} />
+        <Route path="/staff/home" element={<StaffHomePage />} />
         <Route
           path="/notifications"
           element={<DashboardRouteStubPage title="Notifications" />}

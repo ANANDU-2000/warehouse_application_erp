@@ -56,6 +56,14 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 6 STATES | ✅ | skeleton + FriendlyLoadError/Retry + empty — [`home_states_compare.md`](modules/home_states_compare.md) |
 | 7 COMPARE | ✅ | in-scope PASS — [`home_compare.md`](modules/home_compare.md) |
 
+### Dashboard (staff `/staff/home`)
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | empty section slots — [`staff_home_scaffold_compare.md`](modules/staff_home_scaffold_compare.md) |
+| 2 LAYOUT | ⬜ | |
+| 7 COMPARE | ⬜ | |
+
 ### Prompt template (copy per page)
 
 ```

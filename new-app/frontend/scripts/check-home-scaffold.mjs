@@ -53,7 +53,10 @@ assert(
 const router = readFileSync(join(root, "src/app/router.tsx"), "utf8");
 assert(router.includes("HomePage"), "router imports HomePage");
 assert(router.includes('path="/home"'), "home route");
-assert(router.includes("StaffHomeStubPage"), "staff stub kept");
+assert(
+  router.includes("StaffHomePage") || router.includes("StaffHomeStubPage"),
+  "staff home route component",
+);
 
 const css = readFileSync(
   join(root, "src/features/home/HomePage.css"),

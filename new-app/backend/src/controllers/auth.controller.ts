@@ -1,13 +1,11 @@
 /**
- * Auth HTTP adapters — Phase 3.4 Login surface.
- * Business rules: 3.3 services. JWT: 3.5 via TokenIssuer. No login DB writes (Unknown #1).
+ * Auth HTTP adapters — Login + refresh (Phase 3.4/3.5).
+ * Business rules: 3.3 services. JWT: JwtTokenIssuer. No login DB writes (Unknown #1).
  * Source: source-app/backend/app/routers/auth.py
  */
 import type { Request, Response, NextFunction } from "express";
 import type { UsersRepository } from "../repositories/users.repository";
-import {
-  resolveUserByEmail,
-} from "../services/authLogin.service";
+import { resolveUserByEmail } from "../services/authLogin.service";
 import { verifyPassword } from "../services/passwords.service";
 import { assertAccountEligible } from "../services/accountEligibility.service";
 import {
@@ -20,6 +18,7 @@ import {
 } from "../auth/loginRequest";
 import type { TokenIssuer } from "../auth/tokenIssuer";
 import { TokenIssuanceUnavailableError } from "../auth/tokenIssuer";
+import { decodeRefreshToken } from "../services/jwtTokens.service";
 
 export type AuthControllerDeps = {
   users: UsersRepository;
@@ -28,6 +27,17 @@ export type AuthControllerDeps = {
 
 function sendDetail(res: Response, status: number, detail: string): void {
   res.status(status).json({ detail });
+}
+
+function parseRefreshBody(body: unknown): string | null {
+  if (body == null || typeof body !== "object" || Array.isArray(body)) {
+    return null;
+  }
+  const raw = (body as Record<string, unknown>).refresh_token;
+  if (typeof raw !== "string" || raw.length < 1) {
+    return null;
+  }
+  return raw;
 }
 
 export function createAuthController(deps: AuthControllerDeps) {
@@ -69,7 +79,52 @@ export function createAuthController(deps: AuthControllerDeps) {
       }
 
       // device_token accepted but not persisted — Unknown #1 / login writes deferred.
-      // Session / last_login / staff audit deferred.
+
+      try {
+        const pair = await deps.tokenIssuer.issue(user);
+        res.status(200).json(pair);
+      } catch (e) {
+        if (e instanceof TokenIssuanceUnavailableError) {
+          sendDetail(res, 503, e.message);
+          return;
+        }
+        sendDetail(
+          res,
+          503,
+          "Sign-in is temporarily unavailable. Try again shortly.",
+        );
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * POST /refresh — parity with auth.py refresh_token (no deleted/blocked invent).
+   */
+  async function refresh(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const refreshToken = parseRefreshBody(req.body);
+      if (!refreshToken) {
+        sendDetail(res, 401, "Invalid refresh token");
+        return;
+      }
+
+      const userId = decodeRefreshToken(refreshToken);
+      if (!userId) {
+        sendDetail(res, 401, "Invalid refresh token");
+        return;
+      }
+
+      const user = await deps.users.findById(userId);
+      if (!user) {
+        sendDetail(res, 401, "User not found");
+        return;
+      }
 
       try {
         const pair = await deps.tokenIssuer.issue(user);
@@ -100,11 +155,11 @@ export function createAuthController(deps: AuthControllerDeps) {
 
   return {
     login,
+    refresh,
     register: notImplemented("Phase later — register"),
     forgotPassword: notImplemented("Phase later — forgot-password"),
     resetPassword: notImplemented("Phase later — reset-password"),
-    google: notImplemented("Phase 3.5 — Google OAuth"),
-    refresh: notImplemented("Phase 3.5 — refresh"),
+    google: notImplemented("Phase later — Google OAuth"),
   };
 }
 

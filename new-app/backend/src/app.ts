@@ -7,7 +7,7 @@ import {
   createAuthController,
   type AuthControllerDeps,
 } from "./controllers/auth.controller";
-import { NotImplementedTokenIssuer } from "./auth/tokenIssuer";
+import { JwtTokenIssuer } from "./auth/jwtTokenIssuer";
 import type { UsersRepository } from "./repositories/users.repository";
 
 export type AppDeps = {
@@ -15,7 +15,7 @@ export type AppDeps = {
   auth?: Partial<AuthControllerDeps>;
 };
 
-/** Fail-closed users repo when SQL pool is not wired (Phase 3.4 default). */
+/** Fail-closed users repo when SQL pool is not wired. */
 function unavailableUsersRepository(): UsersRepository {
   const fail = async (): Promise<never> => {
     throw new Error("Database pool not connected. Call connect() first.");
@@ -34,7 +34,7 @@ export function createApp(deps: AppDeps = {}) {
 
   const authDeps: AuthControllerDeps = {
     users: deps.auth?.users ?? unavailableUsersRepository(),
-    tokenIssuer: deps.auth?.tokenIssuer ?? new NotImplementedTokenIssuer(),
+    tokenIssuer: deps.auth?.tokenIssuer ?? new JwtTokenIssuer(),
   };
   app.use("/v1/auth", createAuthRoutes(createAuthController(authDeps)));
 

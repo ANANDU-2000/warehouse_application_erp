@@ -22,7 +22,7 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE**. Phase 3: **3.4 PASS** — next **3.5 Authentication (JWT)**.
+**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE**. Phase 3: **3.5 PASS** (JWT+refresh; Google deferred) — next **3.6 Authorization**.
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
@@ -44,7 +44,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Phase 2 COMPLETE; Phase 3.4 Login HTTP PASS — next: **3.5 JWT** (then enable TokenPair on login).
+**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Phase 2 COMPLETE; Phase 3.5 JWT+refresh PASS — next: **3.6 authorization middleware** (Bearer + membership).
 
 ### Cursor operator setup (workspace)
 
@@ -82,7 +82,7 @@
 
 ## PHASE 3 — Backend Migration (Node/Express) 🟡
 
-**Unlocked.** 3.4 PASS. Next: **3.5 Authentication (JWT)**.
+**Unlocked.** 3.5 PASS (JWT + refresh). Next: **3.6 Authorization**.
 
 | # | Task | Status | Evidence / notes |
 |---|---|---|---|
@@ -90,8 +90,8 @@
 | 3.2 | Repository pattern per table/aggregate | ✅ | `docs/34_Repository_Pattern.md` — mssql pool + users/businesses/memberships |
 | 3.3 | Service layer (business logic, ported 1:1 from FastAPI services) | ✅ | `docs/35_Service_Layer.md` — Login foundation (auth_login, passwords, permissions, eligibility) |
 | 3.4 | Controllers/routes (Express routers matching `18_API_Inventory.md` paths) | ✅ | `docs/36_Controllers_Routes.md` — `/v1/auth/login` wired; other auth 501; JWT via TokenIssuer → 3.5 |
-| 3.5 | Authentication (JWT, refresh, Google OAuth) | ⬜ | **Next** — unlocked after 3.4 |
-| 3.6 | Authorization (role + `permissions_json` enforcement, business-scoping) | 🔒 | |
+| 3.5 | Authentication (JWT, refresh, Google OAuth) | ✅ | `docs/37_Authentication_JWT.md` — JWT+refresh; **Google OAuth still 501** (deferred; Login UI has no button) |
+| 3.6 | Authorization (role + `permissions_json` enforcement, business-scoping) | ⬜ | **Next** — unlocked after 3.5 |
 | 3.7 | Validation layer (equivalent to Pydantic — e.g. Zod) | 🔒 | |
 | 3.8 | Error handling middleware | 🔒 | |
 | 3.9 | Logging | 🔒 | |
@@ -189,4 +189,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-18 — Phase 3.4 PASS (`36_Controllers_Routes.md`, `/v1/auth/login`); next = 3.5 JWT.*
+*Last updated: 2026-07-18 — Phase 3.5 PASS (`37_Authentication_JWT.md`, JWT+refresh; Google deferred); next = 3.6 authorization.*

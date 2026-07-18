@@ -14,7 +14,9 @@ export function createAuthRoutes(controller: AuthController): Router {
   router.post("/forgot-password", controller.forgotPassword);
   router.post("/reset-password", controller.resetPassword);
   router.post("/google", controller.google);
-  router.post("/refresh", controller.refresh);
+  router.post("/refresh", (req, res, next) => {
+    void controller.refresh(req, res, next);
+  });
 
   return router;
 }

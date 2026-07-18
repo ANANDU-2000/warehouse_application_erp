@@ -26,3 +26,13 @@ export type { PermissionKey, PermissionsMap } from "./permissions.service";
 export { normalizeLoginEmail, resolveUserByEmail } from "./authLogin.service";
 
 export { assertAccountEligible } from "./accountEligibility.service";
+
+export {
+  createAccessToken,
+  createRefreshToken,
+  decodeAccessToken,
+  decodeRefreshToken,
+  accessExpiresInSeconds,
+  getJwtSettings,
+} from "./jwtTokens.service";
+export type { AccessTokenClaims, JwtSettings } from "./jwtTokens.service";

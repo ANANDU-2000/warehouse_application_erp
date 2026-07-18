@@ -43,9 +43,7 @@ assert(page.includes('data-slot="period-filter"'), "period-filter slot");
 assert(page.includes('data-slot="activity-list"'), "list slot");
 
 assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("navigate("), "no navigate (BUTTONS)");
-assert(!page.includes("useNavigate"), "no useNavigate");
-/* FIELDS may add HomePeriod chips + onClick — LAYOUT chrome only below */
+/* BUTTONS may useNavigate + popOrGo — LAYOUT chrome only below */
 
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "bg brandBackground");
 assert(css.includes("#64748b") || css.includes("#64748B"), "caption muted");

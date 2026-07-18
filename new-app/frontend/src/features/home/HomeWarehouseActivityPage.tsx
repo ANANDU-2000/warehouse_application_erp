@@ -1,9 +1,10 @@
 /**
- * Owner `/home/activity` — Step 3 FIELDS.
- * Source: home_period_filter_row.dart + `_periodTitle` on activity page.
- * Period chips + custom dates (client state). No back navigate / API.
+ * Owner `/home/activity` — Step 4 BUTTONS.
+ * Source: home_warehouse_activity_page.dart AppBar leading → popOrGo('/home').
+ * Period chips + custom dates. No feed API (WIRE).
  */
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   HOME_ACTIVITY_APPBAR_TITLE,
   HOME_ACTIVITY_COL_BILL,
@@ -25,7 +26,23 @@ import {
 } from "./homePeriod";
 import "./HomeWarehouseActivityPage.css";
 
+/** Flutter navigation_ext.popOrGo — pop when stack allows, else go fallback. */
+function popOrGo(navigate: ReturnType<typeof useNavigate>, fallback: string) {
+  const idx =
+    typeof window !== "undefined" &&
+    window.history.state &&
+    typeof (window.history.state as { idx?: unknown }).idx === "number"
+      ? (window.history.state as { idx: number }).idx
+      : 0;
+  if (idx > 0) {
+    navigate(-1);
+    return;
+  }
+  navigate(fallback, { replace: true });
+}
+
 export function HomeWarehouseActivityPage() {
+  const navigate = useNavigate();
   const [period, setPeriod] = useState<HomePeriod>("month");
   const [customRange, setCustomRange] = useState<HomeCustomRange>(() =>
     defaultCustomRange(),
@@ -50,6 +67,10 @@ export function HomeWarehouseActivityPage() {
     setCustomRange((prev) => ({ ...prev, endInclusive: parsed }));
   }
 
+  function handleBack() {
+    popOrGo(navigate, "/home");
+  }
+
   const listTitle = homeActivityPeriodTitle(period);
 
   return (
@@ -62,13 +83,15 @@ export function HomeWarehouseActivityPage() {
         data-slot="appbar"
         data-testid="home-activity-slot-appbar"
       >
-        <span
+        <button
+          type="button"
           className="home-activity-page__back"
           data-slot="appbar-leading"
-          aria-hidden="true"
+          aria-label="Back"
+          onClick={handleBack}
         >
           <BackIcon />
-        </span>
+        </button>
         <h1 className="home-activity-page__title">{HOME_ACTIVITY_APPBAR_TITLE}</h1>
       </header>
 

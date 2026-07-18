@@ -17,4 +17,4 @@
 
 **Rollback:** Revert FIELDS commit; restore LAYOUT muted period strip (no chips).
 
-**Next:** `/home/activity` BUTTONS — back → `/home` (still no API).
+**Next:** `/home/activity` BUTTONS PASS — see [`home_activity_buttons_compare.md`](home_activity_buttons_compare.md). Next WIRE (activity feed APIs).

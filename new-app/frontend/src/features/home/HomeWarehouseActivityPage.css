@@ -33,8 +33,24 @@
   justify-content: center;
   width: 48px;
   height: 48px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
   color: var(--home-activity-text);
   flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  font-family: inherit;
+}
+
+.home-activity-page__back:hover {
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.home-activity-page__back:focus-visible {
+  outline: 2px solid #0e4f46;
+  outline-offset: 2px;
 }
 
 .home-activity-page__back-icon {

@@ -68,6 +68,7 @@ Docs/checklist only: revert COMPARE commit. Application code unchanged by this s
 
 ## 5. Next after Approve
 
-1. Ask before starting: Splash WIRE (deferred) **or** staff WIRE-2 **or** Users & Roles module  
-2. Do **not** mark Dashboard module ✅ until Subagent 4 covers remaining Dashboard routes  
-3. Hold merge of `ops/dashboard-module` to `main` until you review
+1. Ask before starting: Users & Roles (Seq 3) **or** staff WIRE-2  
+2. Splash `/splash` — **COMPARE PASS** ([`splash_compare.md`](splash_compare.md))  
+3. Do **not** mark Dashboard module ✅ until Subagent 4 covers remaining Dashboard routes  
+4. Hold merge of `ops/dashboard-module` to `main` until you review

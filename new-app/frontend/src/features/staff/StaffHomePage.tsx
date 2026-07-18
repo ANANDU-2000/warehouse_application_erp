@@ -3,7 +3,6 @@ import {
   STAFF_HOME_GREETING_AVATAR_FALLBACK,
   STAFF_HOME_GREETING_NAME_FALLBACK,
   STAFF_HOME_ROLE_LABEL,
-  STAFF_HOME_SCAN_CTA_LABEL,
   STAFF_HOME_SECTION,
 } from "./staffHomeCopy";
 import "./StaffHomePage.css";
@@ -11,7 +10,7 @@ import "./StaffHomePage.css";
 /**
  * Staff home LAYOUT — greeting chrome + section headers (exact Flutter copy).
  * Source: source-app/flutter_app/lib/features/staff/presentation/staff_home_page.dart
- * FIELDS: focus filter chips. BUTTONS+: tile bodies / navigate / APIs.
+ * FIELDS: focus filter chips. BUTTONS+: tile bodies / scan CTA / navigate / APIs.
  */
 
 function staffHomeLayoutDateLabel(now: Date): string {
@@ -74,11 +73,13 @@ export function StaffHomePage(): ReactElement {
           </header>
 
           <section
-            className="staff-home-slot staff-home-slot--bare"
+            className="staff-home-card"
             data-slot="floor-kpis"
             data-testid="staff-home-slot-floor-kpis"
             aria-label="Floor KPIs"
-          />
+          >
+            <h2 className="staff-home-slot-label">Floor KPIs</h2>
+          </section>
 
           <section
             className="staff-home-card"
@@ -144,11 +145,6 @@ export function StaffHomePage(): ReactElement {
               title={STAFF_HOME_SECTION.scanCta.title}
               subtitle={STAFF_HOME_SECTION.scanCta.subtitle}
             />
-            <div className="staff-home-scan-cta" aria-hidden="true">
-              <span className="staff-home-scan-cta-label">
-                {STAFF_HOME_SCAN_CTA_LABEL}
-              </span>
-            </div>
           </section>
 
           <section

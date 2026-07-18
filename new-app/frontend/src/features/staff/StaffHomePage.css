@@ -130,8 +130,12 @@
   box-sizing: border-box;
 }
 
-.staff-home-slot--bare {
-  min-height: 0;
+.staff-home-slot-label {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--staff-home-title);
+  line-height: 1.25;
 }
 
 .staff-home-section-header {
@@ -151,24 +155,4 @@
   font-size: 12px;
   color: var(--staff-home-muted);
   line-height: 1.35;
-}
-
-.staff-home-scan-cta {
-  height: 52px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(
-    90deg,
-    var(--staff-home-brand),
-    color-mix(in srgb, var(--staff-home-brand) 82%, transparent)
-  );
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--staff-home-brand) 35%, transparent);
-}
-
-.staff-home-scan-cta-label {
-  color: #fff;
-  font-weight: 900;
-  font-size: 16px;
 }

@@ -42,6 +42,3 @@ export const STAFF_HOME_SECTION = {
     subtitle: "Latest stock and warehouse updates",
   },
 } as const;
-
-/** Scan CTA button label — visual chrome in LAYOUT; navigate in BUTTONS. */
-export const STAFF_HOME_SCAN_CTA_LABEL = "Scan barcode";

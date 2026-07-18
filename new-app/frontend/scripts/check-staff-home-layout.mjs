@@ -48,11 +48,12 @@ assert(
   copy.includes('subtitle: "Latest stock and warehouse updates"'),
   "Recent activity subtitle",
 );
-assert(copy.includes('STAFF_HOME_SCAN_CTA_LABEL = "Scan barcode"'), "Scan barcode");
+assert(!copy.includes("STAFF_HOME_SCAN_CTA_LABEL"), "Scan barcode deferred to BUTTONS");
 
 assert(page.includes("STAFF_HOME_SECTION"), "uses STAFF_HOME_SECTION");
 assert(page.includes("STAFF_HOME_ROLE_LABEL"), "uses role label");
 assert(page.includes("staff-home-greeting"), "greeting class");
+assert(page.includes("Floor KPIs"), "floor-kpis title label");
 assert(page.includes('data-testid="staff-home-slot-greeting"'), "greeting slot");
 assert(page.includes('data-testid="staff-home-slot-floor-kpis"'), "floor-kpis slot");
 assert(page.includes('data-testid="staff-home-slot-warehouse"'), "warehouse slot");
@@ -67,15 +68,19 @@ assert(page.includes("staffHomeLayoutDateLabel"), "date label helper");
 assert(page.includes('weekday: "short"'), "EEE-style weekday");
 assert(page.includes("disabled"), "bell inert");
 assert(!page.includes("fetch("), "no fetch in LAYOUT");
+assert(!page.includes("onClick"), "no onClick in LAYOUT");
+assert(!page.includes("useNavigate"), "no useNavigate in LAYOUT");
 assert(!page.includes("home-overview"), "no home-overview");
 assert(!page.includes("StaffHomeFocus"), "no focus chips yet (FIELDS)");
+assert(!page.includes("Scan barcode"), "no Scan barcode body (BUTTONS)");
 
 assert(css.includes("max-width: 560px"), "max-width 560");
 assert(css.includes("#0e4f46") || css.includes("#0E4F46"), "brand primary");
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "brand background");
-assert(css.includes("border-radius: 16px"), "avatar/scan radius 16");
+assert(css.includes("border-radius: 16px"), "avatar radius 16");
 assert(css.includes("border-radius: 12px"), "card radius 12");
 assert(css.includes("#e5e7eb") || css.includes("#E5E7EB"), "card border");
+assert(!css.includes("staff-home-scan-cta"), "no scan CTA body styles");
 
 if (failures.length) {
   console.error("Staff home LAYOUT checks FAILED:");

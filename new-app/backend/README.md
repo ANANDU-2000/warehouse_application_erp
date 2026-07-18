@@ -4,10 +4,10 @@ Node.js + Express + TypeScript API for the warehouse ERP migration.
 
 ## Status
 
-**Phase 3.10** — `withTransaction` + `SqlClient` (pool or Transaction).  
-Phase 3 sign-off → **3.11**. Google OAuth still **501**.
+**Phase 3 platform COMPLETE** — see `docs/PHASE3_SIGN_OFF.md`.  
+Next: Phase **4.1** React scaffold (or Login `GET /v1/me/businesses` micro-plan). Google OAuth still **501**.
 
-See `docs/42_Transactions.md` (repo root docs).
+See `docs/PHASE3_SIGN_OFF.md` (repo root docs).
 
 ## Layout
 

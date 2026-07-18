@@ -22,7 +22,7 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE**. Phase 3: **3.10 PASS** — next **3.11 Phase 3 sign-off**.
+**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE**. Phase 3: **COMPLETE** (platform) — next **4.1 Project scaffold**.
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
@@ -44,7 +44,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Phase 2 COMPLETE; Phase 3.10 transactions PASS — next: **3.11 Phase 3 sign-off** (per module) and/or Login completion (`GET /v1/me/businesses`, Unknown #1).
+**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Phase 3 platform COMPLETE (`PHASE3_SIGN_OFF.md`); next: **4.1 React scaffold** or Login completion (`GET /v1/me/businesses`, Unknown #1) as a focused micro-plan.
 
 ### Cursor operator setup (workspace)
 
@@ -80,9 +80,9 @@
 
 ---
 
-## PHASE 3 — Backend Migration (Node/Express) 🟡
+## PHASE 3 — Backend Migration (Node/Express) ✅
 
-**Unlocked.** 3.10 PASS. Next: **3.11 Phase 3 sign-off**.
+**COMPLETE (platform).** 3.1–3.11 PASS. Sign-off: `docs/PHASE3_SIGN_OFF.md`. Next: **Phase 4.1 Project scaffold** (or Login completion micro-plan).
 
 | # | Task | Status | Evidence / notes |
 |---|---|---|---|
@@ -96,14 +96,17 @@
 | 3.8 | Error handling middleware | ✅ | `docs/40_Error_Handling.md` — `{ detail }` + domain error mapping |
 | 3.9 | Logging | ✅ | `docs/41_Logging.md` — JSON logger + requestId access trail |
 | 3.10 | Transactions (multi-table writes — e.g. purchase commit-stock flow) | ✅ | `docs/42_Transactions.md` — `withTransaction` + SqlClient; GR logic deferred |
-| 3.11 | Phase 3 sign-off (per module, not all at once — see Implementation Rule) | ⬜ | **Next** — unlocked after 3.10 |
+| 3.11 | Phase 3 sign-off (per module, not all at once — see Implementation Rule) | ✅ | `docs/PHASE3_SIGN_OFF.md` — platform PASS; Login gaps deferred |
 
 ---
 
-## PHASE 4 — Frontend Migration (React + TypeScript) 🔒
+## PHASE 4 — Frontend Migration (React + TypeScript) 🟡
+
+**Unlocked.** Phase 3 platform PASS. Next: **4.1 Project scaffold**.
+
 | # | Task | Status |
 |---|---|---|
-| 4.1 | Project scaffold (Vite + React + TS + strict mode) | 🔒 |
+| 4.1 | Project scaffold (Vite + React + TS + strict mode) | ⬜ |
 | 4.2 | Routing (mirrors Flutter navigation — pending 1.8) | 🔒 |
 | 4.3 | Design system / theme port | 🔒 |
 | 4.4 | Shared components | 🔒 |
@@ -189,4 +192,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-18 — Phase 3.10 PASS (`42_Transactions.md`, withTransaction + SqlClient); next = 3.11 Phase 3 sign-off.*
+*Last updated: 2026-07-18 — Phase 3 platform PASS (`PHASE3_SIGN_OFF.md`); next = 4.1 React scaffold (or Login completion micro-plan).*

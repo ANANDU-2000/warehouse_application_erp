@@ -22,23 +22,23 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: **Dashboard `/staff/home` COMPARE PASS** on `ops/dashboard-module` — ask before next work.
+**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: **Splash WIRE PASS** on `ops/dashboard-module` — STOP before Splash COMPARE.
 
-### Task board (Dashboard `/staff/home`)
+### Task board (Splash `/splash`)
 
 | State | Step |
 |---|---|
-| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE (scoped) · STATES · **COMPARE** |
-| 🟡 Current | Staff `/staff/home` route **PASS** — ask before next |
-| ⬜ Pending (ask first) | Splash WIRE **or** staff WIRE-2 **or** Users & Roles |
-| ⏸ Deferred | WIRE-2 bodies; merge `ops/dashboard-module` → `main`; full Dashboard module ✅ |
+| ✅ Completed | Login COMPARE · Owner `/home` COMPARE · Staff `/staff/home` COMPARE · Splash SCAFFOLD · LAYOUT · BUTTONS · **WIRE** |
+| 🟡 Current | Splash WIRE **PASS** — ask before Splash COMPARE |
+| ⬜ Pending (ask first) | Splash **COMPARE** · then Users & Roles **or** staff WIRE-2 |
+| ⏸ Deferred | SessionCache offline restore; Login `notice=` snack; merge `ops/dashboard-module` → `main`; full Dashboard module ✅ |
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
 | # | Module | Status | Evidence |
 |---|---|---|---|
-| 1 | Login | ✅ UI COMPARE PASS | COMPARE [`login_compare.md`](modules/login_compare.md) · Splash SCAFFOLD next |
-| 2 | Dashboard | 🟡 `/staff/home` COMPARE PASS | [`staff_home_compare.md`](modules/staff_home_compare.md) — ask before Splash WIRE / WIRE-2 / Users & Roles |
+| 1 | Login | ✅ UI COMPARE PASS | COMPARE [`login_compare.md`](modules/login_compare.md) · Splash WIRE done |
+| 2 | Dashboard | 🟡 `/home`+`/staff/home` COMPARE PASS | Staff [`staff_home_compare.md`](modules/staff_home_compare.md) · Splash WIRE [`splash_wire_compare.md`](modules/splash_wire_compare.md) |
 | 3 | Users & Roles | ✅ Analyze+Review PASS | `docs/modules/users-roles.md`, `docs/matrix/users-roles_traceability.md`, `docs/matrix/roles_permissions_matrix.md` |
 | 4 | Products | ✅ Analyze+Review PASS | `docs/modules/products.md`, `docs/matrix/products_traceability.md`, branch `phase1/products-analysis` |
 | 5 | Categories | ✅ Analyze+Review PASS | `docs/modules/categories.md`, `docs/matrix/categories_traceability.md`, branch `phase1/categories-analysis` |
@@ -53,7 +53,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). Dashboard `/staff/home` COMPARE PASS — ask before next. Splash WIRE deferred.
+**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). Splash WIRE PASS — ask before Splash COMPARE.
 
 ### Cursor operator setup (workspace)
 
@@ -111,7 +111,7 @@
 
 ## PHASE 4 — Frontend Migration (React + TypeScript) 🟡
 
-**Unlocked.** Phase 3 platform PASS. Login COMPARE PASS. Splash UI Step 4 BUTTONS done — next WIRE after review.
+**Unlocked.** Phase 3 platform PASS. Login COMPARE PASS. Splash UI Step 5 **WIRE** done — next Splash COMPARE after Approve.
 
 | # | Task | Status |
 |---|---|---|
@@ -125,7 +125,7 @@
 | 4.8 | Accessibility | 🔒 |
 | 4.9 | Phase 4 sign-off (per module) | 🔒 |
 
-**4.2 / 4.5 note:** Dashboard `/staff/home` COMPARE PASS (`ops/dashboard-module`). Ask before Splash WIRE / WIRE-2 / Users & Roles. Owner `/home` COMPARE PASS.
+**4.2 / 4.5 note:** Splash `/splash` WIRE PASS (`ops/dashboard-module`). Ask before Splash COMPARE. Owner `/home` + staff `/staff/home` COMPARE PASS.
 
 ---
 
@@ -203,4 +203,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-18 — Dashboard `/staff/home` COMPARE PASS (`ops/dashboard-module`); ask before next work. Splash WIRE deferred.*
+*Last updated: 2026-07-18 — Splash `/splash` WIRE PASS (`ops/dashboard-module`); ask before Splash COMPARE.*

@@ -1,30 +1,95 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  SPLASH_SESSION_REFRESH_ERROR,
+  SPLASH_USE_ANOTHER_ACCOUNT,
+  SPLASH_WARMUP_DELAY_MS,
+  SPLASH_WARMUP_RETRY,
+  SPLASH_RETRY_LABEL,
+} from "./splashCopy";
+import { restoreSessionWithWebTimeout } from "./splashRestore";
+import { clearTokens, readTokens } from "../../shared/auth/tokenStore";
+import { clearPrimaryBusiness } from "../../shared/auth/sessionStore";
 import "./SplashPage.css";
 
-/** Exact legacy string from splash_page.dart (failed token refresh path). */
-const SESSION_REFRESH_ERROR =
-  "We couldn't refresh your session. Check your connection and tap Retry.";
-
 /**
- * Splash — Step 4 BUTTONS.
- * Error chrome: Retry (local stub) + Use another account → /login.
- * No session restore API wire.
+ * Splash — Step 5 WIRE.
+ * Source: splash_page.dart _boot + session_notifier.restore (web 8s + one warmup).
  */
 export function SplashPage() {
   const navigate = useNavigate();
   const [logoFailed, setLogoFailed] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(SESSION_REFRESH_ERROR);
+  const [busy, setBusy] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const warmupRetried = useRef(false);
+  const bootGen = useRef(0);
+
+  const boot = useCallback(async () => {
+    const gen = ++bootGen.current;
+    setBusy(true);
+    setError(null);
+
+    let result = await restoreSessionWithWebTimeout();
+    if (gen !== bootGen.current) return;
+
+    if (!result.ok && result.reason === "timeout") {
+      if (!warmupRetried.current) {
+        warmupRetried.current = true;
+        setBusy(true);
+        setError(SPLASH_WARMUP_RETRY);
+        await new Promise((r) => setTimeout(r, SPLASH_WARMUP_DELAY_MS));
+        if (gen !== bootGen.current) return;
+        return boot();
+      }
+      /* Flutter: continue to token check after second timeout */
+      result = { ok: false, reason: "soft_fail" };
+    }
+
+    if (gen !== bootGen.current) return;
+
+    if (result.ok) {
+      navigate(result.homePath, { replace: true });
+      return;
+    }
+
+    if (result.reason === "session_expired") {
+      clearTokens();
+      clearPrimaryBusiness();
+      navigate("/login?notice=session_expired", { replace: true });
+      return;
+    }
+
+    if (result.reason === "no_tokens") {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    /* soft_fail — tokens present → Retry chrome; else /login */
+    const tokens = readTokens();
+    if (tokens) {
+      setBusy(false);
+      setError(SPLASH_SESSION_REFRESH_ERROR);
+      return;
+    }
+    navigate("/login", { replace: true });
+  }, [navigate]);
+
+  useEffect(() => {
+    void boot();
+    return () => {
+      bootGen.current += 1;
+    };
+  }, [boot]);
 
   function handleRetry() {
     if (busy) return;
-    setBusy(true);
-    setError(null);
-    window.setTimeout(() => {
-      setBusy(false);
-      setError(SESSION_REFRESH_ERROR);
-    }, 300);
+    void boot();
+  }
+
+  function handleUseAnotherAccount() {
+    clearTokens();
+    clearPrimaryBusiness();
+    navigate("/login");
   }
 
   return (
@@ -60,14 +125,14 @@ export function SplashPage() {
               onClick={handleRetry}
             >
               <RefreshIcon />
-              Retry
+              {SPLASH_RETRY_LABEL}
             </button>
             <button
               type="button"
               className="splash-page__other-account"
-              onClick={() => navigate("/login")}
+              onClick={handleUseAnotherAccount}
             >
-              Use another account
+              {SPLASH_USE_ANOTHER_ACCOUNT}
             </button>
           </div>
         ) : null}

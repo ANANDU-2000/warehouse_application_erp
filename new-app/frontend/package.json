@@ -16,6 +16,7 @@
     "test:splash-scaffold": "node scripts/check-splash-scaffold.mjs",
     "test:splash-layout": "node scripts/check-splash-layout.mjs",
     "test:splash-buttons": "node scripts/check-splash-buttons.mjs",
+    "test:splash-wire": "node scripts/check-splash-wire.mjs",
     "test:home-scaffold": "node scripts/check-home-scaffold.mjs",
     "test:home-layout": "node scripts/check-home-layout.mjs",
     "test:home-fields": "node scripts/check-home-fields.mjs",

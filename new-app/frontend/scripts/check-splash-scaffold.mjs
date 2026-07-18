@@ -24,10 +24,8 @@ const splash = readFileSync(
 );
 assert(splash.includes("Harisree Warehouse"), "appName");
 assert(splash.includes("Stock · Purchase · Delivery"), "tagline");
-assert(!splash.includes("fetch("), "no API");
-assert(!splash.includes("navigate"), "no navigate");
-assert(!splash.includes("refresh"), "no refresh");
-assert(!splash.includes("_boot"), "no boot");
+assert(splash.includes("splash-page"), "splash root class");
+/* WIRE may navigate/boot — SCAFFOLD chrome only */
 
 const css = readFileSync(
   join(root, "src/features/splash/SplashPage.css"),

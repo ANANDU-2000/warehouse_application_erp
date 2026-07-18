@@ -1,9 +1,9 @@
 /**
- * Owner `/home/breakdown-more` — Step 3 FIELDS.
- * Source: home_breakdown_list_page.dart — search TextField + clear; no API.
+ * Owner `/home/breakdown-more` — Step 4 BUTTONS.
+ * Source: home_breakdown_list_page.dart AppBar leading popOrGo('/home').
  */
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   HOME_BREAKDOWN_SEARCH_HINT,
   HOME_BREAKDOWN_TOTAL_LABEL,
@@ -15,11 +15,27 @@ import {
 } from "./homeBreakdownTab";
 import "./HomeBreakdownListPage.css";
 
+/** Flutter navigation_ext.popOrGo — pop when stack allows, else go fallback. */
+function popOrGo(navigate: ReturnType<typeof useNavigate>, fallback: string) {
+  const idx =
+    typeof window !== "undefined" &&
+    window.history.state &&
+    typeof (window.history.state as { idx?: unknown }).idx === "number"
+      ? (window.history.state as { idx: number }).idx
+      : 0;
+  if (idx > 0) {
+    navigate(-1);
+    return;
+  }
+  navigate(fallback, { replace: true });
+}
+
 function resolveTab(raw: string | null): HomeBreakdownTab {
   return homeBreakdownTabFromQuery(raw) ?? "category";
 }
 
 export function HomeBreakdownListPage() {
+  const navigate = useNavigate();
   const [params] = useSearchParams();
   const tab = resolveTab(params.get("tab"));
   const title = homeBreakdownAppBarTitle(tab);
@@ -36,6 +52,10 @@ export function HomeBreakdownListPage() {
     setSearchQuery("");
   }
 
+  function handleBack() {
+    popOrGo(navigate, "/home");
+  }
+
   return (
     <div
       className="home-breakdown-page"
@@ -46,14 +66,15 @@ export function HomeBreakdownListPage() {
         data-slot="appbar"
         data-testid="home-breakdown-slot-appbar"
       >
-        {/* LAYOUT/FIELDS: inert back — navigate → BUTTONS */}
-        <span
+        <button
+          type="button"
           className="home-breakdown-page__back"
           data-slot="appbar-leading"
           aria-label="Back"
+          onClick={handleBack}
         >
           <BackIcon />
-        </span>
+        </button>
         <h1 className="home-breakdown-page__title">{title}</h1>
       </header>
 

@@ -34,7 +34,7 @@ assert(page.includes("type=\"search\"") || page.includes("type='search'"), "sear
 assert(page.includes("clearSearch") || page.includes("search-clear"), "clear");
 assert(page.includes("searchActive"), "searchActive collapses total");
 assert(page.includes('tab !== "category"') || page.includes("showSearch"), "hide on category");
-assert(!page.includes("popOrGo"), "no back BUTTONS");
+/* BUTTONS owns popOrGo */
 assert(!page.includes("fetch("), "no fetch");
 
 assert(search.includes("breakdownRowMatchesQuery"), "match helper");

@@ -26,7 +26,7 @@ assert(page.includes('data-slot="total-header"'), "total-header slot");
 assert(page.includes('data-slot="search"'), "search slot");
 assert(page.includes('data-slot="ranked-list"'), "ranked-list slot");
 assert(!page.includes("fetch("), "no fetch in SCAFFOLD");
-assert(!page.includes("popOrGo"), "no back BUTTONS yet");
+/* BUTTONS owns popOrGo */
 
 const tabPath = join(root, "src/features/home/homeBreakdownTab.ts");
 assert(existsSync(tabPath), "homeBreakdownTab.ts exists");

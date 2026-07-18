@@ -16,4 +16,4 @@
 
 **Rollback:** Revert FIELDS commit; restore LAYOUT static search hint (no input).
 
-**Next:** `/home/breakdown-more` BUTTONS — back `popOrGo('/home')`.
+**Next:** `/home/breakdown-more` BUTTONS PASS — see [`home_breakdown_buttons_compare.md`](home_breakdown_buttons_compare.md). Next WIRE.

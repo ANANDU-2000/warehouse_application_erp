@@ -34,8 +34,7 @@ assert(page.includes("HOME_BREAKDOWN_TOTAL_LABEL"), "uses Total constant");
 assert(page.includes("HOME_BREAKDOWN_SEARCH_HINT"), "uses search hint");
 assert(page.includes("BackIcon") || page.includes("back-icon"), "back icon");
 assert(page.includes('aria-label="Back"'), "Back aria-label");
-assert(!page.includes("popOrGo"), "back inert — no popOrGo");
-/* FIELDS owns interactive search input */
+/* BUTTONS owns popOrGo */
 assert(!page.includes("fetch("), "no fetch");
 
 assert(page.includes('data-slot="total-header"'), "total-header slot");
@@ -50,7 +49,7 @@ assert(css.includes("border-radius: 8px"), "total card r8");
 assert(css.includes("border-radius: 12px"), "search r12");
 assert(css.includes("font-weight: 800"), "title w800");
 assert(css.includes("font-weight: 900"), "amount w900");
-assert(css.includes("pointer-events: none"), "back inert");
+assert(css.includes("cursor: pointer"), "back clickable CSS");
 assert(css.includes("96px"), "body bottom pad 96");
 
 if (failures.length) {

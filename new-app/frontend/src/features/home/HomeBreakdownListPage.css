@@ -31,10 +31,24 @@
   justify-content: center;
   width: 48px;
   height: 48px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
   flex-shrink: 0;
   color: var(--home-breakdown-text);
-  /* LAYOUT: inert — no pointer / navigate until BUTTONS */
-  pointer-events: none;
+  cursor: pointer;
+  border-radius: 50%;
+  font-family: inherit;
+}
+
+.home-breakdown-page__back:hover {
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.home-breakdown-page__back:focus-visible {
+  outline: 2px solid #0e4f46;
+  outline-offset: 2px;
 }
 
 .home-breakdown-page__back-icon {

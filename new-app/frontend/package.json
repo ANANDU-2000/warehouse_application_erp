@@ -35,6 +35,7 @@
     "test:home-breakdown-scaffold": "node scripts/check-home-breakdown-scaffold.mjs",
     "test:home-breakdown-layout": "node scripts/check-home-breakdown-layout.mjs",
     "test:home-breakdown-fields": "node scripts/check-home-breakdown-fields.mjs",
+    "test:home-breakdown-buttons": "node scripts/check-home-breakdown-buttons.mjs",
     "test:staff-home-scaffold": "node scripts/check-staff-home-scaffold.mjs",
     "test:staff-home-layout": "node scripts/check-staff-home-layout.mjs",
     "test:staff-home-fields": "node scripts/check-staff-home-fields.mjs",

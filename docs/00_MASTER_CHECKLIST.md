@@ -14,15 +14,15 @@
 | 1.3 | Module inventory (backend routers/services, frontend features) | ✅ | `03_Module_Inventory.md` |
 | 1.4 | API analysis (full endpoint inventory) | ✅ | `18_API_Inventory.md` |
 | 1.5 | Database analysis (tables, columns, FKs from ORM) | ✅ | `20_Database_Analysis.md` |
-| 1.6 | Business logic analysis (per-module rules, calculations) | 🟡 | Login ✅ · … · Suppliers ✅ · Customers ✅ (absent) — see module queue |
-| 1.7 | UI/UX analysis (every screen, button, form, field) | 🟡 | Login ✅ · … · Suppliers ✅ · Customers ✅ (absent) — see module queue |
+| 1.6 | Business logic analysis (per-module rules, calculations) | 🟡 | Login ✅ · … · Customers ✅ · Purchase Orders ✅ — see module queue |
+| 1.7 | UI/UX analysis (every screen, button, form, field) | 🟡 | Login ✅ · … · Customers ✅ · Purchase Orders ✅ — see module queue |
 | 1.8 | User flow / navigation analysis | ✅ | `05_Navigation_Map.md` — resolved orphan-module question, found dual shell (Owner vs Staff), confirmed 1 dead route + 2 redirect-aliases |
 | 1.9 | Relationships / ER diagram | ⬜ | Not started (column-level DB doc exists; relationship/cardinality doc doesn't) |
 | 1.10 | Reports inventory | ⬜ | Not started |
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | 🔒 | Blocked until 1.6–1.11 done |
 
-**Phase 1 status: ~92% complete.** Login through Customers Analyze+Review PASS (Customers = confirmed absent). Remaining: modules 9–15, ER, reports inventory.
+**Phase 1 status: ~94% complete.** Login through Purchase Orders Analyze+Review PASS. Remaining: modules 10–15, ER, reports inventory.
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
@@ -36,15 +36,15 @@
 | 6 | Units | ✅ Analyze+Review PASS | `docs/modules/units.md`, `docs/matrix/units_traceability.md`, branch `phase1/units-analysis` |
 | 7 | Suppliers | ✅ Analyze+Review PASS | `docs/modules/suppliers.md`, `docs/matrix/suppliers_traceability.md`, branch `phase1/suppliers-analysis` |
 | 8 | Customers | ✅ Analyze+Review PASS | `docs/modules/customers.md`, `docs/matrix/customers_traceability.md` — **absent in source**; branch `phase1/customers-analysis` |
-| 9 | Purchase Orders | 🔒 | Next analysis — still locked for implement |
-| 10 | Goods Receipt | 🔒 | |
+| 9 | Purchase Orders | ✅ Analyze+Review PASS | `docs/modules/purchase-orders.md`, `docs/matrix/purchase_orders_traceability.md`, branch `phase1/purchase-orders-analysis` |
+| 10 | Goods Receipt | 🔒 | Next analysis — still locked for implement |
 | 11 | Inventory | 🔒 | |
 | 12 | Stock Movement | 🔒 | |
 | 13 | Sales | 🔒 | |
 | 14 | Reports | 🔒 | |
 | 15 | Settings | 🔒 | |
 
-**Rule:** Do not start module N+1 analysis until module N Analyze+Review is PASS. Do not implement any module until its review PASS. Next: Purchase Orders analysis only.
+**Rule:** Do not start module N+1 analysis until module N Analyze+Review is PASS. Do not implement any module until its review PASS. Next: Goods Receipt analysis only.
 
 ### Cursor operator setup (workspace)
 

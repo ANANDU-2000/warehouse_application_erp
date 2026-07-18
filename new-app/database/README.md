@@ -1,5 +1,20 @@
 # Database (Phase 2)
 
-Do **not** add SQL Server DDL here until Phase 1 analysis is complete for the relevant tables and Phase 2 is unlocked in `docs/00_MASTER_CHECKLIST.md`.
+SQL Server DDL lives under [`ddl/`](ddl/).
 
-Login-related tables (documented in `docs/modules/login.md`): `users`, `user_sessions`, `password_reset_tokens`, `memberships`, `businesses`, `staff_activity_log` (LOGIN action).
+| File | Contents |
+|---|---|
+| `ddl/00_schema.sql` | Header + `USE [dbo]` |
+| `ddl/01_core.sql` | businesses, users, memberships, sessions, tokens, admin/usage/webhook logs, business_goals |
+| `ddl/02_catalog.sql` | categories, catalog items/variants/defaults, units & packaging intelligence |
+| `ddl/03_contacts.sql` | brokers, suppliers, broker_supplier_m2m |
+| `ddl/04_trade.sql` | trade purchases/lines/drafts, lifecycle events, damage reports |
+| `ddl/05_stock.sql` | stock movements, adjustments, counts, audits, disputes, reorder, staff purchase logs |
+| `ddl/06_ops_aux.sql` | notifications, report views, activity, daily usage, checklists |
+
+**46 tables** total. See `docs/26_SQL_Server_DDL.md`.
+
+**Foreign keys:** deferred to Phase **2.4** (columns present as `UNIQUEIDENTIFIER`; no `REFERENCES` yet).  
+**Indexes (non-unique):** deferred to Phase **2.5**.
+
+Type mapping: `docs/25_SQL_Server_Type_Mapping.md`.

@@ -22,7 +22,7 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Analysis + module queue + ER + sign-off PASS. Phase 2: **2.1+2.2 PASS** — next **2.3 SQL Server DDL**.
+**Phase 1 status: COMPLETE.** Analysis + module queue + ER + sign-off PASS. Phase 2: **2.1–2.3 PASS** — next **2.4 Constraints (FK/UNIQUE/CHECK)**.
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
@@ -63,14 +63,14 @@
 
 ## PHASE 2 — Database Design & SQL Server Migration 🟡
 
-**In progress.** 2.1 + 2.2 PASS. Next: **2.3 SQL Server DDL**.
+**In progress.** 2.1–2.3 PASS. Next: **2.4 Constraints (FK / remaining UNIQUE / CHECK)**.
 
 | # | Task | Status | Evidence / notes |
 |---|---|---|---|
 | 2.1 | ER diagram + relationship/cardinality doc | ✅ | `docs/21_ER_SQL_Server_Note.md` cites Phase 1 `23`/`24` |
 | 2.2 | Data type mapping table (Postgres → SQL Server, incl. JSONB, UUID, NUMERIC precision) | ✅ | `docs/25_SQL_Server_Type_Mapping.md` |
-| 2.3 | SQL Server DDL — tables | ⬜ | **Next** — unlocked after 2.2 |
-| 2.4 | Constraints (PK, FK, UNIQUE, CHECK) | 🔒 | |
+| 2.3 | SQL Server DDL — tables | ✅ | `new-app/database/ddl/*.sql` (46 tables), `docs/26_SQL_Server_DDL.md` — PKs + UniqueConstraints; FKs deferred to 2.4 |
+| 2.4 | Constraints (PK, FK, UNIQUE, CHECK) | ⬜ | **Next** — unlocked after 2.3; PKs/UNIQUEs already in 2.3 DDL |
 | 2.5 | Indexes | 🔒 | |
 | 2.6 | RLS-equivalent strategy (Postgres RLS → SQL Server security policy or app-layer) | 🔒 | |
 | 2.7 | Stored procedures / views / triggers (only if source DB logic requires them) | 🔒 | |
@@ -186,4 +186,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-18 — Phase 2.1+2.2 PASS (`21_ER_SQL_Server_Note.md`, `25_SQL_Server_Type_Mapping.md`); next = 2.3 SQL Server DDL.*
+*Last updated: 2026-07-18 — Phase 2.1–2.3 PASS (`25_SQL_Server_Type_Mapping.md`, `26_SQL_Server_DDL.md`, `new-app/database/ddl/`); next = 2.4 Constraints.*

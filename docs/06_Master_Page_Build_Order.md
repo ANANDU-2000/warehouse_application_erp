@@ -11,7 +11,7 @@
 
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
-| 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | **YES** — UI Step 3 FIELDS |
+| 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | **YES** — UI Step 4 BUTTONS |
 | 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | ❌ | Blocked |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 me/businesses only | Blocked |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI steps: **1 SCAFFOLD** ✅ → **2 LAYOUT** ✅ → **3 FIELDS** (current) → 4 BUTTONS/WIRE → splash later.
+Login UI steps: **1 SCAFFOLD** ✅ → **2 LAYOUT** ✅ → **3 FIELDS** ✅ → **4 BUTTONS** (current) → 5 WIRE → splash later.
 
 ---
 
@@ -73,8 +73,8 @@ Live local SQL uses the pool wired in [`new-app/backend/src/index.ts`](../new-ap
 | Path | Notes |
 |---|---|
 | `/splash` | Later (session restore gate) |
-| `/login` | **Step 3 FIELDS** |
-| `/forgot-password` | Later |
+| `/login` | **Step 4 BUTTONS** |
+| `/forgot-password` | Stub only (full page later) |
 | `/reset-password` | Later |
 | `/get-started` | Unknown — needs opening (likely redirect to login) |
 

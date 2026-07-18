@@ -29,7 +29,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 1 SCAFFOLD | ✅ | `phase4/login-scaffold` — `/login` + `AuthPageShell` + empty `AuthFormCard` |
 | 2 LAYOUT | ✅ | Brand mint/primary, `getstarted_bg.png`, warehouse icon + titles |
 | 3 FIELDS | ✅ | email/password + obscure + validators (`loginValidation.ts`) — no buttons/API |
-| 4 BUTTONS | ⬜ | Sign In + Forgot link |
+| 4 BUTTONS | ✅ | Sign In + Forgot stub + helper/© — no live API |
 | 5 WIRE | ⬜ | `POST /v1/auth/login` then `GET /v1/me/businesses` |
 | 6 STATES | ⬜ | validation / 401 / network banner |
 | 7 COMPARE | ⬜ | Full Login PASS/FAIL |

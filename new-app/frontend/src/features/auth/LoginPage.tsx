@@ -1,26 +1,46 @@
 import { useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { Link } from "react-router-dom";
 import { AuthPageShell } from "../../shared/auth/AuthPageShell";
 import { AuthFormCard } from "../../shared/auth/AuthFormCard";
 import { hexaColors } from "../../shared/theme/colors";
-import { emailError, passwordError } from "./loginValidation";
+import {
+  emailError,
+  isLoginFormValid,
+  passwordError,
+} from "./loginValidation";
 import "./LoginPage.css";
 
 /**
- * Login page — Step 3 FIELDS.
- * Email + password + obscure toggle. No Sign In / Forgot / API.
- * Spec: docs/modules/login.md §6–9; login_page.dart; auth_input_styles.dart.
- * Body keys for later WIRE: `email`, `password` (auth.schemas.ts).
+ * Login page — Step 4 BUTTONS.
+ * Sign In + Forgot + helper/©. No live API (stub onSignIn).
+ * Spec: docs/modules/login.md §10–11; login_page.dart FilledButton/TextButton.
  */
 export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [obscure, setObscure] = useState(true);
-  /** Flutter `_showValidation` — stays false until BUTTONS flips it. */
-  const [showValidation] = useState(false);
+  const [showValidation, setShowValidation] = useState(false);
+  /** Flutter `_loading` — stays false until WIRE drives real login. */
+  const [loading] = useState(false);
   const passwordRef = useRef<HTMLInputElement>(null);
 
+  const formValid = isLoginFormValid(email, password);
   const eErr = emailError(email, showValidation);
   const pErr = passwordError(password, showValidation);
+
+  /** Flutter `_signIn` body deferred to WIRE — no fetch here. */
+  function onSignInStub() {
+    /* no-op until WIRE */
+  }
+
+  function attemptSignIn() {
+    if (loading) return;
+    if (!formValid) {
+      setShowValidation(true);
+      return;
+    }
+    onSignInStub();
+  }
 
   function onEmailKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
@@ -32,12 +52,13 @@ export function LoginPage() {
   function onPasswordKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
       e.preventDefault();
-      /* Flutter calls _signIn when valid — deferred to BUTTONS/WIRE. */
+      attemptSignIn();
     }
   }
 
   function onCardSubmit(e: FormEvent) {
     e.preventDefault();
+    attemptSignIn();
   }
 
   return (
@@ -78,6 +99,7 @@ export function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   onKeyDown={onEmailKeyDown}
+                  disabled={loading}
                   aria-invalid={eErr != null}
                   aria-describedby={eErr ? "login-email-error" : undefined}
                 />
@@ -106,6 +128,7 @@ export function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={onPasswordKeyDown}
+                  disabled={loading}
                   aria-invalid={pErr != null}
                   aria-describedby={pErr ? "login-password-error" : undefined}
                 />
@@ -115,6 +138,7 @@ export function LoginPage() {
                   title={obscure ? "Show password" : "Hide password"}
                   aria-label={obscure ? "Show password" : "Hide password"}
                   onClick={() => setObscure((v) => !v)}
+                  disabled={loading}
                 >
                   {obscure ? <VisibilityIcon /> : <VisibilityOffIcon />}
                 </button>
@@ -129,6 +153,33 @@ export function LoginPage() {
                 </p>
               ) : null}
             </div>
+
+            <button
+              type="submit"
+              className="login-page__submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <span className="login-page__spinner" aria-label="Loading" />
+              ) : (
+                "Sign In"
+              )}
+            </button>
+
+            {loading ? (
+              <span className="login-page__forgot login-page__forgot--disabled">
+                Forgot password?
+              </span>
+            ) : (
+              <Link to="/forgot-password" className="login-page__forgot">
+                Forgot password?
+              </Link>
+            )}
+
+            <p className="login-page__helper">
+              Contact your manager to reset password
+            </p>
+            <p className="login-page__copyright">© 2026</p>
           </form>
         </AuthFormCard>
       </AuthPageShell>

@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "test:layout": "node scripts/check-login-layout.mjs",
-    "test:fields": "node scripts/check-login-fields.mjs"
+    "test:fields": "node scripts/check-login-fields.mjs",
+    "test:buttons": "node scripts/check-login-buttons.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

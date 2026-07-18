@@ -130,3 +130,78 @@
   font-weight: 500;
   color: #d32f2f;
 }
+
+/* login_page.dart FilledButton — height 50, radius 10, brandPrimary */
+.login-page__submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 50px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #0e4f46;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-page__submit:disabled {
+  background: #e5e7eb;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.login-page__spinner {
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: login-spin 0.7s linear infinite;
+}
+
+@keyframes login-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.login-page__forgot {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 4px 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.login-page__forgot:hover {
+  text-decoration: underline;
+}
+
+.login-page__forgot--disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.login-page__helper {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #64748b;
+}
+
+.login-page__copyright {
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: 11px;
+  color: #757575;
+}

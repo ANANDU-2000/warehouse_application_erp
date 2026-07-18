@@ -42,8 +42,7 @@ assert(loginSrc.includes('name="password"'), "password input name=password");
 assert(loginSrc.includes('placeholder="Email"'), "Email placeholder");
 assert(loginSrc.includes('placeholder="Password"'), "Password placeholder");
 assert(loginSrc.includes("Show password"), "visibility toggle");
-assert(!loginSrc.includes("Sign in with"), "no Sign In CTA button yet");
-assert(!/forgot-password/i.test(loginSrc), "no forgot link yet");
+assert(!loginSrc.includes("Sign in with fingerprint"), "no biometric button yet");
 assert(!loginSrc.includes("fetch("), "no API fetch");
 assert(!loginSrc.includes("/v1/auth"), "no auth API path");
 

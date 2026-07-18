@@ -861,3 +861,131 @@
   background: var(--staff-home-brand);
   color: #fff;
 }
+
+/* WIRE-2d recent activity */
+.staff-home-recent-loading {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.staff-home-recent-spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid #d7e2df;
+  border-top-color: #0e4f46;
+  border-radius: 50%;
+  animation: staff-home-spin 0.8s linear infinite;
+}
+
+@keyframes staff-home-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.staff-home-recent-error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--staff-home-muted);
+}
+
+.staff-home-recent-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.staff-home-recent-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 0;
+  padding: 8px 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  box-sizing: border-box;
+}
+
+.staff-home-recent-row--static {
+  cursor: default;
+}
+
+.staff-home-recent-avatar {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(14, 79, 70, 0.12);
+  position: relative;
+}
+
+.staff-home-recent-avatar::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1.5px solid #0e4f46;
+  border-radius: 2px;
+}
+
+.staff-home-recent-avatar--scan::before {
+  border-radius: 1px;
+  box-shadow: inset 0 0 0 1px #0e4f46;
+}
+
+.staff-home-recent-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.staff-home-recent-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--staff-home-title);
+}
+
+.staff-home-recent-sub {
+  font-size: 12px;
+  color: var(--staff-home-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.staff-home-recent-when {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--staff-home-muted);
+}
+
+.staff-home-recent-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.staff-home-recent-full-log {
+  margin: 0;
+  padding: 8px 4px;
+  border: none;
+  background: transparent;
+  color: #0e4f46;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}

@@ -14,8 +14,8 @@
 | 7 | Empty: title + subtitle → `/barcode/scan` | Exact copy | Exact | PASS |
 | 8 | Tiles: Scans / Stock / Purchases / Deliveries | Yes | Same labels + values | PASS |
 | 9 | Not `home-overview` | Staff never | No call | PASS |
-| 10 | Recent activity feed rows | Separate strip | **Deferred WIRE-2d** | N/A |
+| 10 | Recent activity feed rows | Separate strip | **WIRE-2d PASS** — [`staff_home_wire2d_compare.md`](staff_home_wire2d_compare.md) | PASS |
 
 **Smoke:** `npm run test:staff-home-wire2c`  
 **Rollback:** Revert WIRE-2c commit; restore empty shift slot; unmount `activity-log` + `/audit/feed` alias if unused elsewhere.  
-**Next:** Staff WIRE-2d — Recent activity feed. Stop until approved.
+**Next:** Staff WIRE-2d PASS — [`staff_home_wire2d_compare.md`](staff_home_wire2d_compare.md). Ask before notifications / Subagent 4.

@@ -38,6 +38,10 @@ import {
 } from "./staffHomeApi";
 import {
   STAFF_HOME_ACTIVITY_EMPTY,
+  STAFF_HOME_ACTIVITY_ERROR,
+  STAFF_HOME_ACTIVITY_FULL_LOG,
+  STAFF_HOME_ACTIVITY_INNER_SUBTITLE,
+  STAFF_HOME_ACTIVITY_INNER_TITLE,
   STAFF_HOME_FLOOR_LOAD_ERROR,
   STAFF_HOME_MARK_ARRIVED,
   STAFF_HOME_NO_CONNECTION,
@@ -73,6 +77,12 @@ import {
   summarizeStaffToday,
   type StaffTodayActivitySummary,
 } from "./staffShiftSummary";
+import {
+  buildStaffRecentActivity,
+  loadBarcodeRecentScans,
+  staffActivityTimeAgo,
+  type StaffRecentActivityItem,
+} from "./staffRecentActivity";
 import {
   STAFF_HOME_CLOSE_LABEL,
   STAFF_HOME_LOGOUT_BODY,
@@ -570,6 +580,101 @@ function ShiftSnapshotStrip(props: {
   );
 }
 
+/** StaffHomeRecentActivitySection — activity log + local scans */
+function RecentActivitySection(props: {
+  loading: boolean;
+  error: boolean;
+  items: StaffRecentActivityItem[];
+  onOpenActivity: () => void;
+  onOpenItem: (itemId: string) => void;
+}): ReactElement {
+  return (
+    <div
+      className="staff-home-recent-activity"
+      data-testid="staff-home-recent-activity"
+    >
+      <StaffHomeSectionHeader
+        title={STAFF_HOME_ACTIVITY_INNER_TITLE}
+        subtitle={STAFF_HOME_ACTIVITY_INNER_SUBTITLE}
+      />
+      {props.loading ? (
+        <div
+          className="staff-home-recent-loading"
+          data-testid="staff-home-recent-loading"
+        >
+          <div className="staff-home-recent-spinner" aria-label="Loading" />
+        </div>
+      ) : null}
+      {!props.loading && props.error ? (
+        <p className="staff-home-recent-error">{STAFF_HOME_ACTIVITY_ERROR}</p>
+      ) : null}
+      {!props.loading && !props.error && props.items.length === 0 ? (
+        <p className="staff-home-empty-copy">{STAFF_HOME_ACTIVITY_EMPTY}</p>
+      ) : null}
+      {!props.loading && !props.error && props.items.length > 0 ? (
+        <ul className="staff-home-recent-list">
+          {props.items.map((item, idx) => {
+            const tap =
+              item.itemId != null && item.itemId.length > 0
+                ? () => props.onOpenItem(item.itemId!)
+                : undefined;
+            return (
+              <li key={`${item.label}-${item.when.getTime()}-${idx}`}>
+                {tap ? (
+                  <button
+                    type="button"
+                    className="staff-home-recent-row"
+                    onClick={tap}
+                  >
+                    <RecentActivityRowBody item={item} />
+                  </button>
+                ) : (
+                  <div className="staff-home-recent-row staff-home-recent-row--static">
+                    <RecentActivityRowBody item={item} />
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+      <div className="staff-home-recent-footer">
+        <button
+          type="button"
+          className="staff-home-recent-full-log"
+          onClick={props.onOpenActivity}
+        >
+          {STAFF_HOME_ACTIVITY_FULL_LOG}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function RecentActivityRowBody(props: {
+  item: StaffRecentActivityItem;
+}): ReactElement {
+  return (
+    <>
+      <span
+        className={`staff-home-recent-avatar${
+          props.item.isScan ? " staff-home-recent-avatar--scan" : ""
+        }`}
+        aria-hidden="true"
+      />
+      <span className="staff-home-recent-text">
+        <span className="staff-home-recent-title">{props.item.label}</span>
+        {props.item.subtitle ? (
+          <span className="staff-home-recent-sub">{props.item.subtitle}</span>
+        ) : null}
+      </span>
+      <span className="staff-home-recent-when">
+        {staffActivityTimeAgo(props.item.when)}
+      </span>
+    </>
+  );
+}
+
 function FriendlyLoadError(props: {
   message: string;
   subtitle: string;
@@ -631,6 +736,11 @@ export function StaffHomePage(): ReactElement {
   );
   const [shiftLoading, setShiftLoading] = useState(true);
   const [shiftError, setShiftError] = useState(false);
+  const [recentItems, setRecentItems] = useState<StaffRecentActivityItem[]>(
+    [],
+  );
+  const [recentLoading, setRecentLoading] = useState(true);
+  const [recentError, setRecentError] = useState(false);
 
   const reloadShell = useCallback(() => {
     setRetryTick((n) => n + 1);
@@ -799,6 +909,36 @@ export function StaffHomePage(): ReactElement {
         setShiftSummary(emptyStaffTodaySummary());
         setShiftError(true);
         setShiftLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [retryTick]);
+
+  /* WIRE-2d: staffRecentActivityProvider — activity-log + local scans */
+  useEffect(() => {
+    const biz = readPrimaryBusiness();
+    if (!biz?.id) {
+      setRecentLoading(false);
+      setRecentItems([]);
+      setRecentError(false);
+      return;
+    }
+    let cancelled = false;
+    setRecentLoading(true);
+    setRecentError(false);
+    void fetchActivityLogToday(biz.id)
+      .then((activityRows) => {
+        if (cancelled) return;
+        const scans = loadBarcodeRecentScans(8);
+        setRecentItems(buildStaffRecentActivity({ activityRows, scans }));
+        setRecentLoading(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setRecentItems([]);
+        setRecentError(true);
+        setRecentLoading(false);
       });
     return () => {
       cancelled = true;
@@ -1199,11 +1339,15 @@ export function StaffHomePage(): ReactElement {
                   title={STAFF_HOME_SECTION.recentActivity.title}
                   subtitle={STAFF_HOME_SECTION.recentActivity.subtitle}
                 />
-                {!loading && loadKind === null ? (
-                  <p className="staff-home-empty-copy">
-                    {STAFF_HOME_ACTIVITY_EMPTY}
-                  </p>
-                ) : null}
+                <RecentActivitySection
+                  loading={recentLoading}
+                  error={recentError}
+                  items={recentItems}
+                  onOpenActivity={() => navigate("/staff/activity")}
+                  onOpenItem={(itemId) =>
+                    navigate(`/catalog/item/${itemId}?source=scan`)
+                  }
+                />
               </section>
             </>
           ) : null}

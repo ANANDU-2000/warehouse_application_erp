@@ -10,10 +10,11 @@
 | **Completed (this step)** | Profile name; floor KPI counts; low-stock badge; attention tile counts + gates; thin backends for Flutter paths |
 | **Current** | `/staff/home` WIRE scoped — PASS when smoke/build green |
 | **Pending next** | `/staff/home` **STATES** (skeleton / FriendlyLoadError / empty copy) |
-| **Deferred (WIRE-2)** | Recent activity · notifications · pull-refresh |
+| **Deferred (WIRE-2)** | Notifications · pull-refresh |
 | **Completed WIRE-2a** | Warehouse & Purchases stats — [`staff_home_wire2a_compare.md`](staff_home_wire2a_compare.md) |
 | **Completed WIRE-2b** | Pending delivery cards — [`staff_home_wire2b_compare.md`](staff_home_wire2b_compare.md) |
 | **Completed WIRE-2c** | Shift today strip — [`staff_home_wire2c_compare.md`](staff_home_wire2c_compare.md) |
+| **Completed WIRE-2d** | Recent activity feed — [`staff_home_wire2d_compare.md`](staff_home_wire2d_compare.md) |
 
 ## Legacy vs New
 
@@ -29,9 +30,9 @@
 | 8 | Floor labels | Pending / Delivered / Low stock | exact | PASS |
 | 9 | Attention titles | Opening stock / Missing barcodes / Stock mismatch | exact | PASS |
 | 10 | Focus gates | `staffHomeShows*` | same | PASS |
-| 11 | Warehouse / pending cards / shift / activity / notif | Yes | WIRE-2a–2c PASS; activity/notif deferred | N/A |
+| 11 | Warehouse / pending cards / shift / activity / notif | Yes | WIRE-2a–2d PASS; notif deferred | N/A |
 | 12 | Full error/Retry UX | Yes | Minimal message — **STATES** | N/A |
 
 **Smoke:** `npm run test:staff-home-wire`  
 **Rollback:** Revert WIRE commit; remove staffHome routes/repos; restore BUTTONS empty counts.  
-**Next:** Staff WIRE-2c PASS — see [`staff_home_wire2c_compare.md`](staff_home_wire2c_compare.md). Next WIRE-2d recent activity (ask first).
+**Next:** Staff WIRE-2d PASS — see [`staff_home_wire2d_compare.md`](staff_home_wire2d_compare.md). Ask before notifications / Subagent 4.

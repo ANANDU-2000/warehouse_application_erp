@@ -19,4 +19,4 @@
 
 **Smoke:** `npm run test:staff-home-wire2b`  
 **Rollback:** Revert WIRE-2b commit; restore empty pending slot; remove receive stubs if unused.  
-**Next:** Staff WIRE-2c PASS — [`staff_home_wire2c_compare.md`](staff_home_wire2c_compare.md). Next WIRE-2d recent activity.
+**Next:** Staff WIRE-2c PASS — [`staff_home_wire2c_compare.md`](staff_home_wire2c_compare.md). WIRE-2d PASS — [`staff_home_wire2d_compare.md`](staff_home_wire2d_compare.md).

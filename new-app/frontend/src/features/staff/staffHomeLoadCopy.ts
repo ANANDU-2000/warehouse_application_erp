@@ -27,6 +27,14 @@ export const STAFF_HOME_ACTIVITY_EMPTY =
 /** StaffHomeRecentActivitySection error. */
 export const STAFF_HOME_ACTIVITY_ERROR = "Could not load recent activity.";
 
+/** StaffHomeRecentActivitySection TextButton. */
+export const STAFF_HOME_ACTIVITY_FULL_LOG = "Full activity log";
+
+/** Inner header inside StaffHomeRecentActivitySection (Flutter double header). */
+export const STAFF_HOME_ACTIVITY_INNER_TITLE = "Recent activity";
+export const STAFF_HOME_ACTIVITY_INNER_SUBTITLE =
+  "Scans, stock updates, and purchases today";
+
 /** StaffHomeShiftSnapshotStrip empty title. */
 export const STAFF_HOME_SHIFT_EMPTY = "No activity today";
 

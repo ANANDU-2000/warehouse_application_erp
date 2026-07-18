@@ -18,4 +18,4 @@
 
 **Smoke:** `npm run test:staff-home-wire2a`  
 **Rollback:** Revert WIRE-2a commit; remove `/totals` route + warehouse body bind.  
-**Next:** Staff WIRE-2b PASS — see [`staff_home_wire2b_compare.md`](staff_home_wire2b_compare.md). WIRE-2c shift strip PASS — [`staff_home_wire2c_compare.md`](staff_home_wire2c_compare.md).
+**Next:** Staff WIRE-2b PASS — see [`staff_home_wire2b_compare.md`](staff_home_wire2b_compare.md). WIRE-2c/2d PASS — [`staff_home_wire2c_compare.md`](staff_home_wire2c_compare.md) · [`staff_home_wire2d_compare.md`](staff_home_wire2d_compare.md).

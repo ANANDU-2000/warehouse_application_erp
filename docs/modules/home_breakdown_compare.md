@@ -15,8 +15,8 @@
 | State | Step |
 |---|---|
 | ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
-| 🟡 Current | `/home/breakdown-more` route loop **PASS** — staff WIRE-2c PASS; ask WIRE-2d |
-| ⬜ Pending | staff WIRE-2d · Users & Roles (backend blocked) |
+| 🟡 Current | `/home/breakdown-more` route loop **PASS** — staff WIRE-2d PASS; ask notifications / Subagent 4 |
+| ⬜ Pending | notifications · pull-refresh · Users & Roles (backend blocked) |
 | ⏸ Deferred | Row tap · period sync · shell data fill; merge to `main`; Dashboard Subagent 4 |
 
 ---

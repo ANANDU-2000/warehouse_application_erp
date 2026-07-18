@@ -4,10 +4,10 @@ Node.js + Express + TypeScript API for the warehouse ERP migration.
 
 ## Status
 
-**Phase 3.8** — Error middleware returns `{ detail }` and maps domain throws.  
-Logging → **3.9**. Google OAuth still **501**.
+**Phase 3.9** — Structured JSON logging + HTTP access trail (`requestId`).  
+Transactions → **3.10**. Google OAuth still **501**.
 
-See `docs/40_Error_Handling.md` (repo root docs).
+See `docs/41_Logging.md` (repo root docs).
 
 ## Layout
 
@@ -15,15 +15,16 @@ See `docs/40_Error_Handling.md` (repo root docs).
 src/
   routes/         → /api/health + /v1/auth/*
   controllers/    → health + auth
-  services/       → Login foundation + jwtTokens + permissions
-  repositories/   → users / businesses / memberships
-  auth/           → loginRequest + TokenIssuer
-  validation/     → Zod schemas
-  middleware/     → requestId, errorHandler ({ detail }), authz
-  errors/         → HttpError
-  http/           → sendDetail
+  services/
+  repositories/
+  auth/
+  validation/
+  middleware/     → requestId, requestLog, errorHandler, authz
+  logging/        → JSON logger
+  errors/
+  http/
   types/
-  config/
+  config/         → env (SQL, JWT, LOG_LEVEL)
 ```
 
 ## Endpoints (current)
@@ -31,8 +32,8 @@ src/
 | Method | Path | Notes |
 |---|---|---|
 | GET | `/api/health` | Liveness |
-| POST | `/v1/auth/login` | Zod body; 200 TokenPair |
-| POST | `/v1/auth/refresh` | Zod body; 200 TokenPair or 401 |
+| POST | `/v1/auth/login` | 200 TokenPair |
+| POST | `/v1/auth/refresh` | 200 TokenPair or 401 |
 | POST | `/v1/auth/{register,forgot-password,reset-password,google}` | 501 stubs |
 
 ## Scripts
@@ -44,4 +45,4 @@ npm test
 npm run build && npm start
 ```
 
-Copy `.env.example` → `.env`. Set `JWT_*` for production (no `change-me`; ≥32 chars).
+Copy `.env.example` → `.env`. Set `JWT_*` and `LOG_LEVEL` as needed.

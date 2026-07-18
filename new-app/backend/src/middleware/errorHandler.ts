@@ -2,6 +2,7 @@
  * Express error middleware — Phase 3.8.
  * Client payload always `{ detail: string }` (auth/authz parity).
  * Unknown errors: 500 + safe message; never leak stack/SQL.
+ * Logging: Phase 3.9 structured logger.
  * Source intent: source-app/backend/app/main.py global_exception_handler
  */
 import type { NextFunction, Request, Response } from "express";
@@ -16,6 +17,7 @@ import { SchemaValidationError } from "../validation/validate";
 import { LoginRequestValidationError } from "../auth/loginRequest";
 import { TokenIssuanceUnavailableError } from "../auth/tokenIssuer";
 import { sendDetail } from "../http/sendDetail";
+import { logger } from "../logging/logger";
 
 type Mapped = { status: number; detail: string };
 
@@ -45,7 +47,7 @@ function mapKnownError(err: unknown): Mapped | null {
 
 export function errorHandler(
   err: unknown,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction,
 ): void {
@@ -55,9 +57,14 @@ export function errorHandler(
     return;
   }
 
-  if (process.env.NODE_ENV !== "test") {
-    // eslint-disable-next-line no-console
-    console.error(err);
+  const log = req.requestId
+    ? logger.child({ requestId: req.requestId })
+    : logger;
+  const message = err instanceof Error ? err.message : String(err);
+  const fields: Record<string, unknown> = { err: message };
+  if (err instanceof Error && err.stack) {
+    fields.stack = err.stack;
   }
+  log.error("Unhandled", fields);
   sendDetail(res, 500, "Internal Server Error");
 }

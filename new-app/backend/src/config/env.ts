@@ -24,6 +24,8 @@ export const env = {
     accessTtlMinutes: Number(process.env.JWT_ACCESS_TTL_MINUTES ?? 15),
     refreshTtlDays: Number(process.env.JWT_REFRESH_TTL_DAYS ?? 30),
   },
+  /** Phase 3.9 — mirrors FastAPI settings.log_level intent. */
+  logLevel: (process.env.LOG_LEVEL ?? "info").toLowerCase(),
 };
 
 /**

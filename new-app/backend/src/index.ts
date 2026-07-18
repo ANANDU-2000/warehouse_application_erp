@@ -1,9 +1,12 @@
 import { createApp } from "./app";
 import { env } from "./config/env";
+import { logger } from "./logging/logger";
 
 const app = createApp();
 
 app.listen(env.port, () => {
-  // eslint-disable-next-line no-console
-  console.log(`warehouse-erp-backend listening on :${env.port} (${env.nodeEnv})`);
+  logger.info("server.listen", {
+    port: env.port,
+    nodeEnv: env.nodeEnv,
+  });
 });

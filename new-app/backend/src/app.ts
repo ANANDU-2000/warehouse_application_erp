@@ -1,6 +1,7 @@
 import express from "express";
 import { errorHandler } from "./middleware/errorHandler";
 import { requestId } from "./middleware/requestId";
+import { requestLog } from "./middleware/requestLog";
 import { apiRouter } from "./routes";
 import { createAuthRoutes } from "./routes/auth.routes";
 import {
@@ -54,6 +55,7 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
   const app = express() as AppWithAuthz;
   app.use(express.json());
   app.use(requestId);
+  app.use(requestLog);
   app.use("/api", apiRouter);
 
   const users = deps.users ?? deps.auth?.users ?? unavailableUsersRepository();

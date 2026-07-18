@@ -42,9 +42,9 @@ assert(page.includes('data-slot="period-caption"'), "period-caption slot");
 assert(page.includes('data-slot="activity-list"'), "activity-list slot");
 assert(!page.includes("fetch("), "no fetch");
 assert(!page.includes("navigate("), "no navigate CTA");
-assert(!page.includes("HomePeriod"), "no period chips");
 assert(!page.includes("trade-purchases"), "no trade-purchases API");
 assert(!page.includes("stock/audit"), "no stock audit API");
+/* FIELDS may use HomePeriod — SCAFFOLD slots still required */
 
 const router = readFileSync(join(root, "src/app/router.tsx"), "utf8");
 assert(

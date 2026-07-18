@@ -45,8 +45,7 @@ assert(page.includes('data-slot="activity-list"'), "list slot");
 assert(!page.includes("fetch("), "no fetch");
 assert(!page.includes("navigate("), "no navigate (BUTTONS)");
 assert(!page.includes("useNavigate"), "no useNavigate");
-assert(!page.includes("HomePeriod"), "no period enum (FIELDS)");
-assert(!page.includes("onClick"), "no click handlers yet");
+/* FIELDS may add HomePeriod chips + onClick — LAYOUT chrome only below */
 
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "bg brandBackground");
 assert(css.includes("#64748b") || css.includes("#64748B"), "caption muted");
@@ -54,7 +53,7 @@ assert(css.includes("font-size: 11px"), "caption 11px");
 assert(css.includes("border-radius: 16px"), "card r16");
 assert(css.includes("#f1f5f9") || css.includes("#F1F5F9"), "table header bg");
 assert(css.includes("border-radius: 10px"), "table header r10");
-assert(css.includes("height: 32px"), "period strip 32");
+assert(css.includes("height: 32px"), "period chips row 32");
 assert(css.includes("font-weight: 800"), "title w800");
 
 if (failures.length) {

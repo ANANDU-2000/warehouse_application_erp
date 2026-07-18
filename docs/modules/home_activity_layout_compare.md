@@ -17,4 +17,4 @@
 
 **Rollback:** Revert LAYOUT commit; restore SCAFFOLD empty slots only.
 
-**Next:** `/home/activity` FIELDS — period chips (shared `homePeriod` labels) — still no API.
+**Next:** `/home/activity` FIELDS PASS — see [`home_activity_fields_compare.md`](home_activity_fields_compare.md). Next BUTTONS (back → `/home`).

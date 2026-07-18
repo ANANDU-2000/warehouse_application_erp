@@ -1,6 +1,8 @@
 /**
- * Exact `/home/activity` LAYOUT copy — home_warehouse_activity_page.dart
+ * Exact `/home/activity` LAYOUT/FIELDS copy — home_warehouse_activity_page.dart
  */
+import type { HomePeriod } from "./homePeriod";
+
 export const HOME_ACTIVITY_APPBAR_TITLE = "Warehouse activity";
 
 export const HOME_ACTIVITY_PERIOD_CAPTION =
@@ -10,3 +12,24 @@ export const HOME_ACTIVITY_PERIOD_CAPTION =
 export const HOME_ACTIVITY_COL_BILL = "Bill · Entered by";
 export const HOME_ACTIVITY_COL_QTY = "Qty · Bags · Tins";
 export const HOME_ACTIVITY_COL_VERIFIED = "Verified by";
+
+/** Flutter `_periodTitle` — card section title by period. */
+export function homeActivityPeriodTitle(period: HomePeriod): string {
+  switch (period) {
+    case "today":
+      return "Recent activity (today)";
+    case "week":
+      return "Recent activity (week)";
+    case "month":
+      return "Recent activity (month)";
+    case "year":
+      return "Recent activity (year)";
+    case "allTime":
+      return "Recent activity (all time)";
+    case "custom":
+      return "Recent activity (custom range)";
+  }
+}
+
+export const HOME_ACTIVITY_CUSTOM_RANGE_ERROR =
+  "From date must be on or before To date";

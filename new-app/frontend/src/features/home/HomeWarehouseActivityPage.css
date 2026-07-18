@@ -62,13 +62,41 @@
   box-sizing: border-box;
 }
 
-/* LAYOUT: muted strip placeholder — chips in FIELDS */
-.home-activity-page__period-strip {
-  height: 32px;
-  margin: 0 var(--home-activity-gutter);
-  border-radius: 999px;
-  background: var(--home-activity-header-bg);
+.home-activity-page__period-filter {
+  margin: 0;
   box-sizing: border-box;
+}
+
+.home-activity-page__period-chips {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  overflow-x: auto;
+  padding: 0 var(--home-activity-gutter);
+  scrollbar-width: thin;
+  box-sizing: border-box;
+}
+
+.home-activity-page__period-chip {
+  flex-shrink: 0;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--home-activity-border);
+  background: var(--home-activity-header-bg);
+  color: var(--home-activity-text);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.home-activity-page__period-chip--selected {
+  background: #0e4f46;
+  border-color: #0e4f46;
+  color: #ffffff;
 }
 
 /* Flutter: fromLTRB(16, 2, 16, 0); fontSize 11; Color(0xFF64748B) */
@@ -78,6 +106,43 @@
   font-size: 11px;
   color: var(--home-activity-muted);
   line-height: 1.35;
+}
+
+.home-activity-page__custom-range {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: flex-end;
+  padding: 8px var(--home-activity-gutter) 0;
+  box-sizing: border-box;
+}
+
+.home-activity-page__custom-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--home-activity-muted);
+}
+
+.home-activity-page__custom-field input[type="date"] {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--home-activity-border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--home-activity-text);
+  background: #ffffff;
+}
+
+.home-activity-page__custom-error {
+  margin: 0;
+  width: 100%;
+  font-size: 12px;
+  font-weight: 600;
+  color: #b91c1c;
 }
 
 /* Flutter: SliverPadding fromLTRB(16, 12, 16, 24) + Card r16 */
@@ -95,10 +160,17 @@
   box-sizing: border-box;
 }
 
-/* Title/events line — filled in FIELDS/WIRE */
+/* Flutter: pad fromLTRB(16, 14, 16, 0) + HexaOp.cardTitle */
 .home-activity-page__card-head {
-  min-height: 14px;
   margin: 14px 16px 0;
+}
+
+.home-activity-page__card-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--home-activity-text);
 }
 
 /* Flutter _ActivityTableHeader: pad H14 V8, bg #F1F5F9, r10 */

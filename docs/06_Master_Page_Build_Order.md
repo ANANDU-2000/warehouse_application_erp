@@ -12,7 +12,7 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 `/home`+`/staff/home` COMPARE PASS | Splash COMPARE done — ask before Users & Roles / WIRE-2 |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 `/home`+`/staff/home` COMPARE · `/home/activity` SCAFFOLD | Next: activity LAYOUT (Users & Roles UI blocked) |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 me/businesses only | Blocked |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home` COMPARE PASS. Next (ask): Users & Roles or staff WIRE-2.
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home` COMPARE PASS. **`/home/activity` SCAFFOLD** (current) → LAYOUT next. Users & Roles UI blocked until users APIs.
 
 ---
 
@@ -75,8 +75,8 @@ Live local SQL uses the pool wired in [`new-app/backend/src/index.ts`](../new-ap
 | `/splash` | **Step 7 COMPARE PASS** |
 | `/login` | **COMPARE PASS** |
 | `/forgot-password` | Stub only (full page later) |
-| `/home` | **COMPARE PASS** (owner) |
-| `/staff/home` | **COMPARE PASS** (in-scope) |
+| `/home` | **COMPARE PASS** (owner) — see Seq 2 |
+| `/staff/home` | **COMPARE PASS** (in-scope) — see Seq 2 |
 | `/reset-password` | Later |
 | `/get-started` | Unknown — needs opening (likely redirect to login) |
 
@@ -87,9 +87,9 @@ Backend (wire in later steps): `POST /v1/auth/login`, `POST /v1/auth/refresh`, `
 | Path | Notes |
 |---|---|
 | `/home` | Owner dashboard |
-| `/home/activity` | Nested under `/home` |
-| `/home/breakdown-more` | Nested under `/home` |
-| `/staff/home` | Staff shell home |
+| `/home/activity` | Nested under `/home` — **Step 1 SCAFFOLD** |
+| `/home/breakdown-more` | Nested under `/home` — not started |
+| `/staff/home` | **COMPARE PASS** (in-scope; WIRE-2 deferred) |
 
 ### Seq 3 — Users & Roles
 

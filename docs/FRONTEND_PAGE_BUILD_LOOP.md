@@ -56,6 +56,18 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 6 STATES | ✅ | skeleton + FriendlyLoadError/Retry + empty — [`home_states_compare.md`](modules/home_states_compare.md) |
 | 7 COMPARE | ✅ | in-scope PASS — [`home_compare.md`](modules/home_compare.md) |
 
+### Dashboard (owner `/home/activity`)
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | empty slots — [`home_activity_scaffold_compare.md`](modules/home_activity_scaffold_compare.md) |
+| 2 LAYOUT | ⬜ | AppBar / caption chrome |
+| 3 FIELDS | ⬜ | period chips (shared home period) |
+| 4 BUTTONS | ⬜ | back → `/home` |
+| 5 WIRE | ⬜ | activity full feed APIs |
+| 6 STATES | ⬜ | skeleton / error / empty |
+| 7 COMPARE | ⬜ | |
+
 ### Dashboard (staff `/staff/home`)
 
 | Step | Status | Evidence |

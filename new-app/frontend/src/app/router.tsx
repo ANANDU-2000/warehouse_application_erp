@@ -3,11 +3,12 @@ import { LoginPage } from "../features/auth/LoginPage";
 import { ForgotPasswordStubPage } from "../features/auth/ForgotPasswordStubPage";
 import { SplashPage } from "../features/splash/SplashPage";
 import { HomePage } from "../features/home/HomePage";
+import { HomeWarehouseActivityPage } from "../features/home/HomeWarehouseActivityPage";
 import { DashboardRouteStubPage } from "../features/home/DashboardRouteStubPage";
 import { StaffHomePage } from "../features/staff/StaffHomePage";
 
 /**
- * Splash + Login + owner /home + staff /staff/home + stub destinations.
+ * Splash + Login + owner /home + /home/activity SCAFFOLD + staff /staff/home + stubs.
  * Source: docs/05_Navigation_Map.md; dashboard.md
  */
 export function AppRouter() {
@@ -18,10 +19,7 @@ export function AppRouter() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordStubPage />} />
         <Route path="/home" element={<HomePage />} />
-        <Route
-          path="/home/activity"
-          element={<DashboardRouteStubPage title="Warehouse activity" />}
-        />
+        <Route path="/home/activity" element={<HomeWarehouseActivityPage />} />
         <Route path="/staff/home" element={<StaffHomePage />} />
         <Route
           path="/staff/settings"

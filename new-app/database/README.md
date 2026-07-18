@@ -14,19 +14,27 @@ SQL Server DDL lives under [`ddl/`](ddl/).
 | `ddl/05_stock.sql` | stock movements, adjustments, counts, audits, disputes, reorder, staff purchase logs |
 | `ddl/06_ops_aux.sql` | notifications, report views, activity, daily usage, checklists |
 
-**46 tables** total. See `docs/26_SQL_Server_DDL.md`.
+**46 tables** — `docs/26_SQL_Server_DDL.md`.
 
 ## Constraints (Phase 2.4)
 
 | File | Contents |
 |---|---|
-| `ddl/constraints/10_fk_core.sql` … `15_fk_ops_aux.sql` | **103** ORM FKs from `docs/23` |
-| `ddl/constraints/16_check.sql` | **6** CHECKs from latest Postgres SQL |
-| `ddl/constraints/90_drop_constraints.sql` | Rollback DROP CONSTRAINT |
+| `ddl/constraints/10_fk_*.sql` … `15_fk_*.sql` | **103** ORM FKs |
+| `ddl/constraints/16_check.sql` | **6** CHECKs |
+| `ddl/constraints/90_drop_constraints.sql` | Rollback |
 
-See `docs/27_SQL_Server_Constraints.md`. Soft UUID columns remain without FK.
+See `docs/27_SQL_Server_Constraints.md`.
 
-**Indexes (non-unique):** deferred to Phase **2.5**.  
+## Indexes (Phase 2.5)
+
+| File | Contents |
+|---|---|
+| `ddl/indexes/20_ix_core.sql` … `25_ix_ops_aux.sql` | **149** non-unique indexes |
+| `ddl/indexes/91_drop_indexes.sql` | Rollback |
+
+See `docs/28_SQL_Server_Indexes.md`. Partial/GIN indexes skipped.
+
 **RLS:** deferred to Phase **2.6**.
 
 Type mapping: `docs/25_SQL_Server_Type_Mapping.md`.

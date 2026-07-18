@@ -110,7 +110,7 @@
 
 ## 9. Next
 
-**Phase 2.5** — non-unique indexes (ORM `index=True` and Postgres index scripts).
+**Phase 2.5** — done: see `docs/28_SQL_Server_Indexes.md` and `new-app/database/ddl/indexes/`.
 
 ---
 

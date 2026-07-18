@@ -22,7 +22,7 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Analysis + module queue + ER + sign-off PASS. Phase 2: **2.1–2.4 PASS** — next **2.5 Indexes**.
+**Phase 1 status: COMPLETE.** Analysis + module queue + ER + sign-off PASS. Phase 2: **2.1–2.5 PASS** — next **2.6 RLS-equivalent strategy**.
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
@@ -63,7 +63,7 @@
 
 ## PHASE 2 — Database Design & SQL Server Migration 🟡
 
-**In progress.** 2.1–2.4 PASS. Next: **2.5 Indexes**.
+**In progress.** 2.1–2.5 PASS. Next: **2.6 RLS-equivalent strategy**.
 
 | # | Task | Status | Evidence / notes |
 |---|---|---|---|
@@ -71,8 +71,8 @@
 | 2.2 | Data type mapping table (Postgres → SQL Server, incl. JSONB, UUID, NUMERIC precision) | ✅ | `docs/25_SQL_Server_Type_Mapping.md` |
 | 2.3 | SQL Server DDL — tables | ✅ | `new-app/database/ddl/*.sql` (46 tables), `docs/26_SQL_Server_DDL.md` — PKs + UniqueConstraints; FKs deferred to 2.4 |
 | 2.4 | Constraints (PK, FK, UNIQUE, CHECK) | ✅ | `new-app/database/ddl/constraints/` — 103 FKs + 6 CHECKs; `docs/27_SQL_Server_Constraints.md`; PKs/UNIQUEs remain in 2.3 DDL |
-| 2.5 | Indexes | ⬜ | **Next** — unlocked after 2.4 |
-| 2.6 | RLS-equivalent strategy (Postgres RLS → SQL Server security policy or app-layer) | 🔒 | |
+| 2.5 | Indexes | ✅ | `new-app/database/ddl/indexes/` — 149 non-unique; `docs/28_SQL_Server_Indexes.md` |
+| 2.6 | RLS-equivalent strategy (Postgres RLS → SQL Server security policy or app-layer) | ⬜ | **Next** — unlocked after 2.5 |
 | 2.7 | Stored procedures / views / triggers (only if source DB logic requires them) | 🔒 | |
 | 2.8 | Migration/seed scripts | 🔒 | |
 | 2.9 | Schema verification against source (row-for-row structural diff) | 🔒 | |
@@ -186,4 +186,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-18 — Phase 2.1–2.4 PASS (`26_SQL_Server_DDL.md`, `27_SQL_Server_Constraints.md`, `ddl/constraints/`); next = 2.5 Indexes.*
+*Last updated: 2026-07-18 — Phase 2.1–2.5 PASS (`28_SQL_Server_Indexes.md`, `ddl/indexes/`); next = 2.6 RLS strategy.*

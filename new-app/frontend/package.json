@@ -11,7 +11,8 @@
     "test:layout": "node scripts/check-login-layout.mjs",
     "test:fields": "node scripts/check-login-fields.mjs",
     "test:buttons": "node scripts/check-login-buttons.mjs",
-    "test:wire": "node scripts/check-login-wire.mjs"
+    "test:wire": "node scripts/check-login-wire.mjs",
+    "test:states": "node scripts/check-login-states.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

@@ -31,7 +31,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 3 FIELDS | ✅ | email/password + obscure + validators (`loginValidation.ts`) — no buttons/API |
 | 4 BUTTONS | ✅ | Sign In + Forgot stub + helper/© — no live API |
 | 5 WIRE | ✅ | `POST /v1/auth/login` → tokens → `GET /v1/me/businesses` → home stubs |
-| 6 STATES | ⬜ | network banner / full §12 messages |
+| 6 STATES | ✅ | network banner + full §12 HTTP error mapping |
 | 7 COMPARE | ⬜ | Full Login PASS/FAIL |
 
 ### Prompt template (copy per page)

@@ -2,9 +2,11 @@ import { useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthPageShell } from "../../shared/auth/AuthPageShell";
 import { AuthFormCard } from "../../shared/auth/AuthFormCard";
+import { AuthNetworkErrorBanner } from "../../shared/auth/AuthNetworkErrorBanner";
 import { hexaColors } from "../../shared/theme/colors";
 import {
   AuthApiError,
+  AuthNetworkError,
   login as apiLogin,
   meBusinesses,
 } from "../../shared/api/authApi";
@@ -15,15 +17,13 @@ import {
   isLoginFormValid,
   passwordError,
 } from "./loginValidation";
+import { mapLoginError, MSG_GENERIC } from "./mapLoginError";
 import "./LoginPage.css";
 
-const MSG_401 = "Invalid email or password. Try again.";
-const MSG_GENERIC = "Something went wrong. Please try again.";
-
 /**
- * Login page — Step 5 WIRE.
- * POST /v1/auth/login → store tokens → GET /v1/me/businesses → home stub.
- * Spec: docs/modules/login.md §13–14, §18–22; session_notifier _loginImpl.
+ * Login page — Step 6 STATES.
+ * Full §12 error mapping + AuthNetworkErrorBanner + Retry.
+ * Spec: login.md §10–12; login_page.dart _signIn / _retryAfterNetwork.
  */
 export function LoginPage() {
   const navigate = useNavigate();
@@ -33,14 +33,58 @@ export function LoginPage() {
   const [showValidation, setShowValidation] = useState(false);
   const [loading, setLoading] = useState(false);
   const [inlineAuthError, setInlineAuthError] = useState<string | null>(null);
+  const [showNetworkBanner, setShowNetworkBanner] = useState(false);
+  const [bannerTitle, setBannerTitle] = useState("Can't reach server");
+  const [bannerDetail, setBannerDetail] = useState<string | null>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
   const formValid = isLoginFormValid(email, password);
   const eErr = emailError(email, showValidation);
   const pErr = passwordError(password, showValidation);
 
+  function applyMappedError(err: unknown) {
+    if (err instanceof AuthNetworkError) {
+      const mapped = mapLoginError(err, { network: true, message: err.message });
+      setShowNetworkBanner(true);
+      setBannerTitle(mapped.bannerTitle ?? "Can't reach server");
+      setBannerDetail(mapped.bannerDetail ?? null);
+      setInlineAuthError(null);
+      return;
+    }
+    if (err instanceof AuthApiError) {
+      const mapped = mapLoginError(err, {
+        status: err.status,
+        detail: err.detail,
+      });
+      if (mapped.kind === "network") {
+        setShowNetworkBanner(true);
+        setBannerTitle(mapped.bannerTitle ?? "Can't reach server");
+        setBannerDetail(mapped.bannerDetail ?? null);
+        setInlineAuthError(null);
+      } else {
+        setShowNetworkBanner(false);
+        setInlineAuthError(mapped.inlineMessage ?? MSG_GENERIC);
+      }
+      return;
+    }
+    const mapped = mapLoginError(err, {
+      network: true,
+      message: err instanceof Error ? err.message : undefined,
+    });
+    if (mapped.kind === "network") {
+      setShowNetworkBanner(true);
+      setBannerTitle(mapped.bannerTitle ?? "Can't reach server");
+      setBannerDetail(mapped.bannerDetail ?? null);
+      setInlineAuthError(null);
+    } else {
+      setInlineAuthError(MSG_GENERIC);
+    }
+  }
+
   async function onSignIn() {
     setInlineAuthError(null);
+    setShowNetworkBanner(false);
+    setBannerDetail(null);
     setLoading(true);
     try {
       const pair = await apiLogin(email.trim(), password);
@@ -57,11 +101,7 @@ export function LoginPage() {
       navigate(authenticatedHomePath(businesses), { replace: true });
     } catch (err) {
       clearTokens();
-      if (err instanceof AuthApiError && err.status === 401) {
-        setInlineAuthError(MSG_401);
-      } else {
-        setInlineAuthError(MSG_GENERIC);
-      }
+      applyMappedError(err);
     } finally {
       setLoading(false);
     }
@@ -74,6 +114,18 @@ export function LoginPage() {
       return;
     }
     void onSignIn();
+  }
+
+  /** Flutter `_retryAfterNetwork`. */
+  function retryAfterNetwork() {
+    setShowNetworkBanner(false);
+    setBannerDetail(null);
+    setInlineAuthError(null);
+    if (formValid) {
+      void onSignIn();
+    } else {
+      setShowValidation(true);
+    }
   }
 
   function onEmailKeyDown(e: KeyboardEvent<HTMLInputElement>) {
@@ -115,6 +167,14 @@ export function LoginPage() {
               </div>
             </div>
             <h2 className="login-page__sign-in">Sign In</h2>
+
+            {showNetworkBanner ? (
+              <AuthNetworkErrorBanner
+                onRetry={retryAfterNetwork}
+                title={bannerTitle}
+                detail={bannerDetail}
+              />
+            ) : null}
 
             <div className="login-page__field">
               <div

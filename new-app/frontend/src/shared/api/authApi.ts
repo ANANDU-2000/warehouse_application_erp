@@ -36,6 +36,14 @@ export class AuthApiError extends Error {
   }
 }
 
+/** Transport failure — no HTTP response (Flutter isDioNoConnectionError). */
+export class AuthNetworkError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AuthNetworkError";
+  }
+}
+
 async function readDetail(res: Response): Promise<string> {
   try {
     const body: unknown = await res.json();
@@ -53,11 +61,20 @@ async function readDetail(res: Response): Promise<string> {
   return "Something went wrong. Please try again.";
 }
 
+async function fetchAuth(input: string, init?: RequestInit): Promise<Response> {
+  try {
+    return await fetch(input, init);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Failed to fetch";
+    throw new AuthNetworkError(msg);
+  }
+}
+
 export async function login(
   email: string,
   password: string,
 ): Promise<TokenPair> {
-  const res = await fetch("/v1/auth/login", {
+  const res = await fetchAuth("/v1/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -71,7 +88,7 @@ export async function login(
 export async function meBusinesses(
   accessToken: string,
 ): Promise<BusinessBrief[]> {
-  const res = await fetch("/v1/me/businesses", {
+  const res = await fetchAuth("/v1/me/businesses", {
     method: "GET",
     headers: { Authorization: `Bearer ${accessToken}` },
   });

@@ -39,7 +39,7 @@ const login = readFileSync(
 assert(login.includes("apiLogin"), "calls login API");
 assert(login.includes("meBusinesses"), "calls meBusinesses");
 assert(login.includes("writeTokens"), "stores tokens");
-assert(login.includes("Invalid email or password. Try again."), "401 copy");
+assert(login.includes("Invalid email or password. Try again.") || login.includes("mapLoginError"), "401 via mapLoginError");
 assert(!login.includes("onSignInStub"), "stub removed");
 
 const vite = readFileSync(join(root, "vite.config.ts"), "utf8");

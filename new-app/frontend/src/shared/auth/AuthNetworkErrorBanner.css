@@ -1,0 +1,54 @@
+/* auth_network_error_banner.dart */
+.auth-network-banner {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+}
+
+.auth-network-banner__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.auth-network-banner__icon {
+  flex-shrink: 0;
+  color: #e65100;
+  display: flex;
+  margin-top: 1px;
+}
+
+.auth-network-banner__title {
+  flex: 1;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #e65100;
+}
+
+.auth-network-banner__retry {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  padding: 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0e4f46;
+  cursor: pointer;
+}
+
+.auth-network-banner__retry:hover {
+  text-decoration: underline;
+}
+
+.auth-network-banner__detail {
+  margin: 6px 0 0 28px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #e65100;
+}

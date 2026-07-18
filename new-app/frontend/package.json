@@ -33,6 +33,7 @@
     "test:home-activity-states": "node scripts/check-home-activity-states.mjs",
     "test:home-activity-compare": "node scripts/check-home-activity-compare.mjs",
     "test:home-breakdown-scaffold": "node scripts/check-home-breakdown-scaffold.mjs",
+    "test:home-breakdown-layout": "node scripts/check-home-breakdown-layout.mjs",
     "test:staff-home-scaffold": "node scripts/check-staff-home-scaffold.mjs",
     "test:staff-home-layout": "node scripts/check-staff-home-layout.mjs",
     "test:staff-home-fields": "node scripts/check-staff-home-fields.mjs",

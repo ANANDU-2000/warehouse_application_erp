@@ -15,4 +15,4 @@
 
 **Rollback:** Revert SCAFFOLD commit; remove `/home/breakdown-more` route and page files.
 
-**Next:** `/home/breakdown-more` LAYOUT — AppBar chrome + total-header card shell (no API).
+**Next:** `/home/breakdown-more` LAYOUT PASS — see [`home_breakdown_layout_compare.md`](home_breakdown_layout_compare.md). Next FIELDS.

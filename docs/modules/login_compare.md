@@ -35,7 +35,7 @@
 | Biometric sign-in | Out of Login UI slices; no dedicated biometric API |
 | Query snackbars (`msg`/`notice`) | STATES deferred snackbars |
 | Full Forgot / Reset pages | Stub route only; full FIELDS/API later |
-| Splash `/splash` session restore | Next micro-plan after COMPARE Approve |
+| Splash `/splash` session restore | **Done** — [`splash_compare.md`](splash_compare.md) |
 | Google OAuth button | Not on legacy LoginPage; backend 501 |
 | Login L2 DB commit | Unknown #1 intentional; TokenPair works without it |
 | Real Dashboard `/home` UI | Home stubs only; Dashboard backend not built |
@@ -70,6 +70,6 @@ Docs/checklist only: revert COMPARE commit. Application code unchanged by this s
 
 ## 6. Next after Approve
 
-1. Splash `/splash` (session restore gate) — SCAFFOLD first  
-2. Dashboard — blocked until Dashboard backend exists  
-3. Hold merge of `phase4/login-scaffold` / `ops/local-sql-bootstrap` to `main` until you review
+1. Ask before starting: Users & Roles (Seq 3) **or** staff WIRE-2  
+2. Splash `/splash` — **COMPARE PASS** ([`splash_compare.md`](splash_compare.md))  
+3. Hold merge of `phase4/login-scaffold` / `ops/local-sql-bootstrap` / `ops/dashboard-module` to `main` until you review

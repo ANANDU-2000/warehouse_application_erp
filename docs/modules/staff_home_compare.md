@@ -15,7 +15,7 @@
 |---|---|
 | ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
 | 🟡 Current | Staff `/staff/home` route loop **PASS** — ask before next work |
-| ⬜ Pending (ask first) | Splash WIRE **or** WIRE-2 staff bodies **or** Users & Roles |
+| ⬜ Pending (ask first) | Users & Roles (Seq 3) **or** staff WIRE-2 |
 | ⏸ Deferred | Warehouse stats body, pending cards, shift/activity feeds, notifications merge, pull-refresh; merge to `main` |
 
 ---
@@ -53,7 +53,7 @@
 | Pull-to-refresh / auto-refresh listener | Not ported |
 | Profile sheet business title line | Name/role only this loop |
 | Nested staff routes full pages | Stubs only |
-| Splash session restore WIRE | Explicitly deferred |
+| Splash session restore WIRE | **Done** — [`splash_compare.md`](splash_compare.md) |
 | Dashboard module Subagent 4 sign-off | Needs remaining Dashboard satellites + ask |
 | Owner `/home` | Separate COMPARE PASS already |
 
@@ -77,6 +77,7 @@ Docs/checklist only: revert COMPARE commit. Application code unchanged by this s
 
 ## 5. Next after Approve
 
-1. Ask before starting: Splash WIRE **or** staff WIRE-2 bodies **or** Users & Roles module  
+1. Ask before starting: Users & Roles (Seq 3) **or** staff WIRE-2 bodies  
 2. Do **not** mark full Dashboard module ✅ until Subagent 4 remaining routes are agreed  
 3. Hold merge of `ops/dashboard-module` to `main` until you review
+4. Splash `/splash` — **COMPARE PASS**

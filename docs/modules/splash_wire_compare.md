@@ -23,4 +23,4 @@
 
 **Rollback:** Revert Splash WIRE commit; restore BUTTONS stub Retry (`setTimeout` 300ms); remove `splashRestore.ts` / `refreshTokens` if unused elsewhere; keep BUTTONS labels.
 
-**Next:** Splash COMPARE (Step 7) — full Legacy vs New table — then ask before Users & Roles / staff WIRE-2 / Dashboard sign-off.
+**Next:** Splash COMPARE PASS — see [`splash_compare.md`](splash_compare.md). Ask before Users & Roles / staff WIRE-2.

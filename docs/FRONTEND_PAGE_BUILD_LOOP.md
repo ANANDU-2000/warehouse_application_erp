@@ -42,7 +42,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 2 LAYOUT | ✅ | `app_logo.png` + 800ms fade + static spinner — [`splash_layout_compare.md`](modules/splash_layout_compare.md) |
 | 4 BUTTONS | ✅ | Retry + Use another account → `/login` — [`splash_buttons_compare.md`](modules/splash_buttons_compare.md) |
 | 5 WIRE | ✅ | tokens → refresh → me/businesses → home/login — [`splash_wire_compare.md`](modules/splash_wire_compare.md) |
-| 7 COMPARE | ⬜ | Full splash Legacy vs New (after WIRE Approve) |
+| 7 COMPARE | ✅ | in-scope PASS — [`splash_compare.md`](modules/splash_compare.md) |
 
 ### Dashboard (owner `/home`)
 

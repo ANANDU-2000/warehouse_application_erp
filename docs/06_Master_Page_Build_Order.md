@@ -11,8 +11,8 @@
 
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
-| 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **5 WIRE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 `/home`+`/staff/home` COMPARE PASS | Splash WIRE done — ask before Splash COMPARE / WIRE-2 / Users & Roles |
+| 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 `/home`+`/staff/home` COMPARE PASS | Splash COMPARE done — ask before Users & Roles / WIRE-2 |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 me/businesses only | Blocked |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **5 WIRE** (current) → COMPARE next. Dashboard `/home`+`/staff/home` COMPARE PASS.
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home` COMPARE PASS. Next (ask): Users & Roles or staff WIRE-2.
 
 ---
 
@@ -72,7 +72,7 @@ Live local SQL uses the pool wired in [`new-app/backend/src/index.ts`](../new-ap
 
 | Path | Notes |
 |---|---|
-| `/splash` | **Step 5 WIRE** |
+| `/splash` | **Step 7 COMPARE PASS** |
 | `/login` | **COMPARE PASS** |
 | `/forgot-password` | Stub only (full page later) |
 | `/home` | **COMPARE PASS** (owner) |

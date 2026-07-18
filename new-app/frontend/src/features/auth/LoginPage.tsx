@@ -1,8 +1,15 @@
 import { useRef, useState, type FormEvent, type KeyboardEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthPageShell } from "../../shared/auth/AuthPageShell";
 import { AuthFormCard } from "../../shared/auth/AuthFormCard";
 import { hexaColors } from "../../shared/theme/colors";
+import {
+  AuthApiError,
+  login as apiLogin,
+  meBusinesses,
+} from "../../shared/api/authApi";
+import { authenticatedHomePath } from "../../shared/auth/postAuthRoute";
+import { clearTokens, writeTokens } from "../../shared/auth/tokenStore";
 import {
   emailError,
   isLoginFormValid,
@@ -10,27 +17,54 @@ import {
 } from "./loginValidation";
 import "./LoginPage.css";
 
+const MSG_401 = "Invalid email or password. Try again.";
+const MSG_GENERIC = "Something went wrong. Please try again.";
+
 /**
- * Login page — Step 4 BUTTONS.
- * Sign In + Forgot + helper/©. No live API (stub onSignIn).
- * Spec: docs/modules/login.md §10–11; login_page.dart FilledButton/TextButton.
+ * Login page — Step 5 WIRE.
+ * POST /v1/auth/login → store tokens → GET /v1/me/businesses → home stub.
+ * Spec: docs/modules/login.md §13–14, §18–22; session_notifier _loginImpl.
  */
 export function LoginPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [obscure, setObscure] = useState(true);
   const [showValidation, setShowValidation] = useState(false);
-  /** Flutter `_loading` — stays false until WIRE drives real login. */
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [inlineAuthError, setInlineAuthError] = useState<string | null>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
   const formValid = isLoginFormValid(email, password);
   const eErr = emailError(email, showValidation);
   const pErr = passwordError(password, showValidation);
 
-  /** Flutter `_signIn` body deferred to WIRE — no fetch here. */
-  function onSignInStub() {
-    /* no-op until WIRE */
+  async function onSignIn() {
+    setInlineAuthError(null);
+    setLoading(true);
+    try {
+      const pair = await apiLogin(email.trim(), password);
+      writeTokens({
+        access_token: pair.access_token,
+        refresh_token: pair.refresh_token,
+      });
+      const businesses = await meBusinesses(pair.access_token);
+      if (businesses.length === 0) {
+        clearTokens();
+        setInlineAuthError(MSG_GENERIC);
+        return;
+      }
+      navigate(authenticatedHomePath(businesses), { replace: true });
+    } catch (err) {
+      clearTokens();
+      if (err instanceof AuthApiError && err.status === 401) {
+        setInlineAuthError(MSG_401);
+      } else {
+        setInlineAuthError(MSG_GENERIC);
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   function attemptSignIn() {
@@ -39,7 +73,7 @@ export function LoginPage() {
       setShowValidation(true);
       return;
     }
-    onSignInStub();
+    void onSignIn();
   }
 
   function onEmailKeyDown(e: KeyboardEvent<HTMLInputElement>) {
@@ -153,6 +187,12 @@ export function LoginPage() {
                 </p>
               ) : null}
             </div>
+
+            {inlineAuthError ? (
+              <p className="login-page__auth-error" role="alert">
+                {inlineAuthError}
+              </p>
+            ) : null}
 
             <button
               type="submit"

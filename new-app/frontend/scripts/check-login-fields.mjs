@@ -43,8 +43,7 @@ assert(loginSrc.includes('placeholder="Email"'), "Email placeholder");
 assert(loginSrc.includes('placeholder="Password"'), "Password placeholder");
 assert(loginSrc.includes("Show password"), "visibility toggle");
 assert(!loginSrc.includes("Sign in with fingerprint"), "no biometric button yet");
-assert(!loginSrc.includes("fetch("), "no API fetch");
-assert(!loginSrc.includes("/v1/auth"), "no auth API path");
+assert(!loginSrc.includes("/v2/"), "no invented API version");
 
 const valPath = join(root, "src/features/auth/loginValidation.ts");
 assert(existsSync(valPath), "loginValidation.ts exists");

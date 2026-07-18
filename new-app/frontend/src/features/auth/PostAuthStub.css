@@ -1,0 +1,36 @@
+.post-auth-stub {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #e8f5f2;
+  box-sizing: border-box;
+}
+
+.post-auth-stub__title {
+  margin: 0 0 8px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.post-auth-stub__body {
+  margin: 0 0 16px;
+  max-width: 420px;
+  text-align: center;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.post-auth-stub__link {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0e4f46;
+  text-decoration: none;
+}
+
+.post-auth-stub__link:hover {
+  text-decoration: underline;
+}

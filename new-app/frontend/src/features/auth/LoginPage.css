@@ -131,7 +131,14 @@
   color: #d32f2f;
 }
 
-/* login_page.dart FilledButton — height 50, radius 10, brandPrimary */
+/* login_page.dart inline auth error */
+.login-page__auth-error {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #d32f2f;
+}
+
 .login-page__submit {
   display: flex;
   align-items: center;

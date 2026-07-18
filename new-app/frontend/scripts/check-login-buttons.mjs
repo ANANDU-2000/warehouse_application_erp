@@ -27,9 +27,7 @@ assert(
   "helper text",
 );
 assert(loginSrc.includes("© 2026"), "copyright");
-assert(loginSrc.includes("onSignInStub"), "API stub not live");
-assert(!loginSrc.includes("fetch("), "no fetch");
-assert(!loginSrc.includes("/v1/auth"), "no auth API path");
+assert(loginSrc.includes("apiLogin") || loginSrc.includes("onSignIn"), "sign-in wired");
 assert(!loginSrc.includes("Sign in with fingerprint"), "no biometric");
 
 const css = readFileSync(

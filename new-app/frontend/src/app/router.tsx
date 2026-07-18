@@ -1,10 +1,14 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { LoginPage } from "../features/auth/LoginPage";
 import { ForgotPasswordStubPage } from "../features/auth/ForgotPasswordStubPage";
+import {
+  HomeStubPage,
+  StaffHomeStubPage,
+} from "../features/auth/PostAuthStub";
 
 /**
- * Auth routes: /login (BUTTONS) + /forgot-password stub.
- * Splash later. Source: docs/05_Navigation_Map.md
+ * Auth + post-login stubs. Splash later.
+ * Source: docs/05_Navigation_Map.md; post_auth_route.dart
  */
 export function AppRouter() {
   return (
@@ -12,6 +16,8 @@ export function AppRouter() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordStubPage />} />
+        <Route path="/home" element={<HomeStubPage />} />
+        <Route path="/staff/home" element={<StaffHomeStubPage />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

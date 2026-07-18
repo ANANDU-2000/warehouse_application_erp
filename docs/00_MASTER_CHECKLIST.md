@@ -35,7 +35,7 @@
 | 0.5 | Operator flow doc | ✅ | `docs/CURSOR_SETUP.md` |
 | 0.6 | User: paste GitHub PAT into local `.cursor/mcp.json` + restart Cursor | ⬜ | Manual |
 | 0.7 | User: confirm Indexing covers whole workspace | ⬜ | Manual |
-| 0.8 | Git remote → `ANANDU-2000/warehouse_application_erp` + first push | 🟡 | In progress |
+| 0.8 | Git remote → `ANANDU-2000/warehouse_application_erp` + first push | ✅ | `main` pushed; make repo **private** if not already |
 
 ---
 

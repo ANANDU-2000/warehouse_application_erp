@@ -14,15 +14,15 @@
 | 1.3 | Module inventory (backend routers/services, frontend features) | ✅ | `03_Module_Inventory.md` |
 | 1.4 | API analysis (full endpoint inventory) | ✅ | `18_API_Inventory.md` |
 | 1.5 | Database analysis (tables, columns, FKs from ORM) | ✅ | `20_Database_Analysis.md` |
-| 1.6 | Business logic analysis (per-module rules, calculations) | 🟡 | Login ✅ · … · Stock Movement ✅ · Sales ✅ — see module queue |
-| 1.7 | UI/UX analysis (every screen, button, form, field) | 🟡 | Login ✅ · … · Stock Movement ✅ · Sales ✅ — see module queue |
+| 1.6 | Business logic analysis (per-module rules, calculations) | 🟡 | Login ✅ · … · Sales ✅ · Reports ✅ — see module queue |
+| 1.7 | UI/UX analysis (every screen, button, form, field) | 🟡 | Login ✅ · … · Sales ✅ · Reports ✅ — see module queue |
 | 1.8 | User flow / navigation analysis | ✅ | `05_Navigation_Map.md` — resolved orphan-module question, found dual shell (Owner vs Staff), confirmed 1 dead route + 2 redirect-aliases |
 | 1.9 | Relationships / ER diagram | ⬜ | Not started (column-level DB doc exists; relationship/cardinality doc doesn't) |
-| 1.10 | Reports inventory | ⬜ | Not started |
+| 1.10 | Reports inventory | ✅ | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md` — closes with module #14 |
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | 🔒 | Blocked until 1.6–1.11 done |
 
-**Phase 1 status: ~98.5% complete.** Login through Sales Analyze+Review PASS. Remaining: modules 14–15, ER, reports inventory.
+**Phase 1 status: ~99% complete.** Login through Reports Analyze+Review PASS. Remaining: module 15 Settings, ER diagram.
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
@@ -41,10 +41,10 @@
 | 11 | Inventory | ✅ Analyze+Review PASS | `docs/modules/inventory.md`, `docs/matrix/inventory_traceability.md`, branch `phase1/inventory-analysis` |
 | 12 | Stock Movement | ✅ Analyze+Review PASS | `docs/modules/stock-movement.md`, `docs/matrix/stock_movement_traceability.md`, branch `phase1/stock-movement-analysis` |
 | 13 | Sales | ✅ Analyze+Review PASS | `docs/modules/sales.md`, `docs/matrix/sales_traceability.md` — **no Sales product module**; `sale` = stock kind; branch `phase1/sales-analysis` |
-| 14 | Reports | 🔒 | Next analysis — still locked for implement |
-| 15 | Settings | 🔒 | |
+| 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
+| 15 | Settings | 🔒 | Next analysis — still locked for implement |
 
-**Rule:** Do not start module N+1 analysis until module N Analyze+Review is PASS. Do not implement any module until its review PASS. Next: Reports analysis only.
+**Rule:** Do not start module N+1 analysis until module N Analyze+Review is PASS. Do not implement any module until its review PASS. Next: Settings analysis only.
 
 ### Cursor operator setup (workspace)
 
@@ -183,4 +183,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-18 — Sales Analyze+Review PASS (module absent; sale kind only); next = Reports analysis only.*
+*Last updated: 2026-07-18 — Reports Analyze+Review PASS (1.10 closed); next = Settings analysis only.*

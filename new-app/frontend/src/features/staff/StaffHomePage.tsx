@@ -26,6 +26,7 @@ import {
 import {
   fetchStaffHomeShell,
   fetchStockTotals,
+  fetchTradePurchasesRecent,
   staffAppPeriodMonthDates,
   StaffHomeApiError,
   StaffHomeNetworkError,
@@ -36,6 +37,7 @@ import {
 import {
   STAFF_HOME_ACTIVITY_EMPTY,
   STAFF_HOME_FLOOR_LOAD_ERROR,
+  STAFF_HOME_MARK_ARRIVED,
   STAFF_HOME_NO_CONNECTION,
   STAFF_HOME_PURCHASE_STATS_ERROR,
   STAFF_HOME_RETRY_LABEL,
@@ -47,8 +49,19 @@ import {
   STAFF_HOME_STATS_UNIT_LABELS,
   STAFF_HOME_STATS_WAREHOUSE_SUBTITLE,
   STAFF_HOME_STATS_WAREHOUSE_TITLE,
+  STAFF_HOME_VERIFY,
   STAFF_HOME_WAREHOUSE_STATS_ERROR,
+  staffHomeViewAllDeliveries,
 } from "./staffHomeLoadCopy";
+import {
+  cardSubtitle,
+  cardTitle,
+  deliveryNeedsStaffAction,
+  showMarkArrived,
+  staffPendingDeliveriesFromRows,
+  type StaffPendingPurchase,
+  type TradePurchaseListRow,
+} from "./staffPendingDeliveries";
 import {
   STAFF_HOME_CLOSE_LABEL,
   STAFF_HOME_LOGOUT_BODY,
@@ -330,6 +343,66 @@ function WarehousePurchaseStats(props: {
   );
 }
 
+/**
+ * StaffHomePendingDeliveryCards — display + CTAs navigate to /staff/receive
+ * until mark-arrived / verify write APIs exist.
+ */
+function PendingDeliveryCards(props: {
+  pending: StaffPendingPurchase[];
+  onOpenReceive: () => void;
+}): ReactElement | null {
+  if (props.pending.length === 0) return null;
+  const shown = props.pending.slice(0, 3);
+  return (
+    <div
+      className="staff-home-pending-list"
+      data-testid="staff-home-pending-cards"
+    >
+      {shown.map((p) => {
+        const mark = showMarkArrived(p.deliveryStatus);
+        const verify = deliveryNeedsStaffAction(p.deliveryStatus);
+        return (
+          <div key={p.id} className="staff-home-delivery-card">
+            <p className="staff-home-delivery-title">{cardTitle(p)}</p>
+            <p className="staff-home-delivery-meta">{cardSubtitle(p)}</p>
+            {mark || verify ? (
+              <div className="staff-home-delivery-actions">
+                {mark ? (
+                  <button
+                    type="button"
+                    className="staff-home-delivery-btn staff-home-delivery-btn--filled"
+                    onClick={props.onOpenReceive}
+                  >
+                    {STAFF_HOME_MARK_ARRIVED}
+                  </button>
+                ) : null}
+                {verify ? (
+                  <button
+                    type="button"
+                    className="staff-home-delivery-btn staff-home-delivery-btn--outline"
+                    onClick={props.onOpenReceive}
+                  >
+                    {STAFF_HOME_VERIFY}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        );
+      })}
+      {props.pending.length > 3 ? (
+        <button
+          type="button"
+          className="staff-home-view-all-deliveries"
+          onClick={props.onOpenReceive}
+        >
+          {staffHomeViewAllDeliveries(props.pending.length)}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 function FriendlyLoadError(props: {
   message: string;
   subtitle: string;
@@ -383,6 +456,9 @@ export function StaffHomePage(): ReactElement {
   const [errorPurchases, setErrorPurchases] = useState(false);
   const [whRetryTick, setWhRetryTick] = useState(0);
   const [puRetryTick, setPuRetryTick] = useState(0);
+  const [pendingDeliveries, setPendingDeliveries] = useState<
+    StaffPendingPurchase[]
+  >([]);
 
   const reloadShell = useCallback(() => {
     setRetryTick((n) => n + 1);
@@ -500,6 +576,29 @@ export function StaffHomePage(): ReactElement {
       cancelled = true;
     };
   }, [puRetryTick]);
+
+  /* WIRE-2b: staffPendingDeliveriesProvider via trade-purchases limit 50 */
+  useEffect(() => {
+    const biz = readPrimaryBusiness();
+    if (!biz?.id) {
+      setPendingDeliveries([]);
+      return;
+    }
+    let cancelled = false;
+    void fetchTradePurchasesRecent(biz.id)
+      .then((rows) => {
+        if (cancelled) return;
+        setPendingDeliveries(
+          staffPendingDeliveriesFromRows(rows as TradePurchaseListRow[]),
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setPendingDeliveries([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [retryTick]);
 
   function onFocusChange(next: StaffHomeFocus): void {
     setFocus(next);
@@ -679,16 +778,30 @@ export function StaffHomePage(): ReactElement {
                 />
               </section>
 
-              <section
-                className="staff-home-card"
-                data-slot="pending-deliveries"
-                data-testid="staff-home-slot-pending-deliveries"
-              >
-                <StaffHomeSectionHeader
-                  title={STAFF_HOME_SECTION.pendingDeliveries.title}
-                  subtitle={STAFF_HOME_SECTION.pendingDeliveries.subtitle}
+              {pendingDeliveries.length > 0 ? (
+                <section
+                  className="staff-home-card"
+                  data-slot="pending-deliveries"
+                  data-testid="staff-home-slot-pending-deliveries"
+                >
+                  <StaffHomeSectionHeader
+                    title={STAFF_HOME_SECTION.pendingDeliveries.title}
+                    subtitle={STAFF_HOME_SECTION.pendingDeliveries.subtitle}
+                  />
+                  <PendingDeliveryCards
+                    pending={pendingDeliveries}
+                    onOpenReceive={() => navigate("/staff/receive")}
+                  />
+                </section>
+              ) : (
+                <section
+                  className="staff-home-card"
+                  data-slot="pending-deliveries"
+                  data-testid="staff-home-slot-pending-deliveries"
+                  hidden
+                  aria-hidden="true"
                 />
-              </section>
+              )}
 
               <section
                 className="staff-home-card"

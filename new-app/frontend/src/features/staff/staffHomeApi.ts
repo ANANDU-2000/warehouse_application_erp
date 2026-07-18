@@ -251,6 +251,44 @@ export function staffAppPeriodMonthDates(now = new Date()): {
   return { periodStart, periodEnd };
 }
 
+/**
+ * Recent trade purchases snapshot — api_read_snapshots tradePurchasesRecentSnapshot
+ * listTradePurchases(limit: 50), include_lines default false.
+ */
+export async function fetchTradePurchasesRecent(
+  businessId: string,
+): Promise<Record<string, unknown>[]> {
+  const want = 50;
+  const out: Record<string, unknown>[] = [];
+  let offset = 0;
+  const pageMax = 50;
+  while (out.length < want) {
+    const pageSize = Math.min(pageMax, want - out.length);
+    const q = new URLSearchParams({
+      limit: String(pageSize),
+      offset: String(offset),
+      include_lines: "false",
+    });
+    const res = await authGet(
+      `/v1/businesses/${encodeURIComponent(businessId)}/trade-purchases?${q}`,
+    );
+    if (!res.ok) {
+      if (res.status === 422) return out;
+      throw new StaffHomeApiError(res.status, await readDetail(res));
+    }
+    const data: unknown = await res.json();
+    const page = Array.isArray(data)
+      ? data.map((e) =>
+          e && typeof e === "object" ? (e as Record<string, unknown>) : {},
+        )
+      : [];
+    out.push(...page);
+    if (page.length < pageSize) break;
+    offset += page.length;
+  }
+  return out;
+}
+
 /** Parallel shell load — staff home WIRE scoped counts. */
 export async function fetchStaffHomeShell(
   businessId: string,

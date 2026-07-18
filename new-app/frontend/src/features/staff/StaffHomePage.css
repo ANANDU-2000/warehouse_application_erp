@@ -324,6 +324,87 @@
   white-space: nowrap;
 }
 
+/* WIRE-2b pending delivery cards */
+.staff-home-card[hidden] {
+  display: none;
+}
+
+.staff-home-pending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.staff-home-delivery-card {
+  margin: 0 0 8px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid var(--staff-home-border);
+  border-radius: 12px;
+}
+
+.staff-home-delivery-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--staff-home-title);
+  line-height: 1.25;
+}
+
+.staff-home-delivery-meta {
+  margin: 4px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+.staff-home-delivery-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.staff-home-delivery-btn {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.staff-home-delivery-btn--filled {
+  border: none;
+  background: #0e4f46;
+  color: #fff;
+}
+
+.staff-home-delivery-btn--outline {
+  border: 1px solid var(--staff-home-border);
+  background: #fff;
+  color: var(--staff-home-title);
+}
+
+.staff-home-view-all-deliveries {
+  margin: 0;
+  padding: 10px 8px;
+  border: none;
+  background: transparent;
+  color: #0e4f46;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+}
+
 .staff-home-slot-label {
   margin: 0;
   font-size: 16px;

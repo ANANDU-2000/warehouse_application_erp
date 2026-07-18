@@ -14,9 +14,9 @@
 | State | Step |
 |---|---|
 | ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
-| 🟡 Current | Staff `/staff/home` COMPARE PASS · **WIRE-2a warehouse stats PASS** — ask before WIRE-2b |
-| ⬜ Pending (ask first) | staff WIRE-2b pending cards · Users & Roles (backend blocked) |
-| ⏸ Deferred | Shift/activity feeds, notifications merge, pull-refresh; merge to `main` |
+| 🟡 Current | Staff WIRE-2b pending cards **PASS** — ask before WIRE-2c |
+| ⬜ Pending (ask first) | staff WIRE-2c shift strip · Users & Roles (backend blocked) |
+| ⏸ Deferred | Activity feed, notifications merge, pull-refresh; merge to `main` |
 
 ---
 
@@ -45,8 +45,8 @@
 
 | Item | Why deferred |
 |---|---|
-| Warehouse & purchases stats body (`stock/totals`) | **WIRE-2a PASS** — [`staff_home_wire2a_compare.md`](staff_home_wire2a_compare.md) |
-| Pending delivery card list (`trade-purchases` list) | WIRE-2b |
+| Warehouse & purchases stats body (`stock/totals`) | **WIRE-2a PASS** |
+| Pending delivery card list (`trade-purchases` list) | **WIRE-2b PASS** — [`staff_home_wire2b_compare.md`](staff_home_wire2b_compare.md) |
 | Shift today strip numbers (`activity-log` + `audit/feed`) | WIRE-2c |
 | Recent activity feed rows | Empty copy only; WIRE-2d |
 | Notifications unread badge merge | Bell navigates only |
@@ -77,8 +77,9 @@ Docs/checklist only: revert COMPARE commit. Application code unchanged by this s
 
 ## 5. Next after Approve
 
-1. Ask before starting: staff **WIRE-2b** pending delivery cards **or** Users & Roles (still backend-blocked)  
+1. Ask before starting: staff **WIRE-2c** shift strip **or** Users & Roles (still backend-blocked)  
 2. Do **not** mark full Dashboard module ✅ until Subagent 4 remaining routes are agreed  
 3. Hold merge of `ops/dashboard-module` to `main` until you review
 4. Splash `/splash` — **COMPARE PASS**
-5. WIRE-2a warehouse stats — **PASS** ([`staff_home_wire2a_compare.md`](staff_home_wire2a_compare.md))
+5. WIRE-2a warehouse · WIRE-2b pending cards — **PASS**
+

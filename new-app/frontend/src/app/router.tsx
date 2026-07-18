@@ -59,6 +59,14 @@ export function AppRouter() {
           element={<DashboardRouteStubPage title="Staff deliveries" />}
         />
         <Route
+          path="/staff/receive"
+          element={<DashboardRouteStubPage title="Receive shipment" />}
+        />
+        <Route
+          path="/staff/receive/:purchaseId"
+          element={<DashboardRouteStubPage title="Receive shipment" />}
+        />
+        <Route
           path="/staff/scan"
           element={<DashboardRouteStubPage title="Staff scan" />}
         />

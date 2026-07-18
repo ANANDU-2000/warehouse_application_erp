@@ -30,6 +30,13 @@ export const STAFF_HOME_ACTIVITY_ERROR = "Could not load recent activity.";
 /** StaffHomeShiftSnapshotStrip empty title. */
 export const STAFF_HOME_SHIFT_EMPTY = "No activity today";
 
+/** Pending delivery cards — staff_home_pending_delivery_cards.dart */
+export const STAFF_HOME_MARK_ARRIVED = "Mark arrived";
+export const STAFF_HOME_VERIFY = "Verify";
+export function staffHomeViewAllDeliveries(count: number): string {
+  return `View all ${count} deliveries`;
+}
+
 /** StaffHomeWarehousePurchaseStats — SectionInlineError messages. */
 export const STAFF_HOME_WAREHOUSE_STATS_ERROR = "Warehouse stats unavailable";
 export const STAFF_HOME_PURCHASE_STATS_ERROR = "Purchase stats unavailable";

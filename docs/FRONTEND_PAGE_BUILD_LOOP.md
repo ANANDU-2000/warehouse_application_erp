@@ -78,7 +78,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 4 BUTTONS | ✅ | back popOrGo `/home` — [`home_breakdown_buttons_compare.md`](modules/home_breakdown_buttons_compare.md) |
 | 5 WIRE | ✅ | home-overview Total + rows — [`home_breakdown_wire_compare.md`](modules/home_breakdown_wire_compare.md) |
 | 6 STATES | ✅ | cold spinner / silent empty — [`home_breakdown_states_compare.md`](modules/home_breakdown_states_compare.md) |
-| 7 COMPARE | ⬜ | |
+| 7 COMPARE | ✅ | in-scope PASS — [`home_breakdown_compare.md`](modules/home_breakdown_compare.md) |
 
 ### Dashboard (staff `/staff/home`)
 

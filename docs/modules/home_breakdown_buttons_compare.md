@@ -14,4 +14,4 @@
 
 **Rollback:** Revert BUTTONS commit; restore inert back `<span>` (LAYOUT/FIELDS).
 
-**Next:** `/home/breakdown-more` STATES PASS — see [`home_breakdown_states_compare.md`](home_breakdown_states_compare.md). Next COMPARE.
+**Next:** `/home/breakdown-more` COMPARE PASS — see [`home_breakdown_compare.md`](home_breakdown_compare.md). Ask before staff WIRE-2.

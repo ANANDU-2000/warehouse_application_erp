@@ -19,4 +19,4 @@
 
 **Rollback:** Revert STATES commit; restore WIRE `Loading…` paragraph + raw error alert.
 
-**Next:** `/home/breakdown-more` COMPARE — full Legacy vs New for this route.
+**Next:** `/home/breakdown-more` COMPARE PASS — see [`home_breakdown_compare.md`](home_breakdown_compare.md). Ask before staff WIRE-2.

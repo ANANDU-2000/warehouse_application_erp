@@ -38,6 +38,7 @@
     "test:home-breakdown-buttons": "node scripts/check-home-breakdown-buttons.mjs",
     "test:home-breakdown-wire": "node scripts/check-home-breakdown-wire.mjs",
     "test:home-breakdown-states": "node scripts/check-home-breakdown-states.mjs",
+    "test:home-breakdown-compare": "node scripts/check-home-breakdown-compare.mjs",
     "test:staff-home-scaffold": "node scripts/check-staff-home-scaffold.mjs",
     "test:staff-home-layout": "node scripts/check-staff-home-layout.mjs",
     "test:staff-home-fields": "node scripts/check-staff-home-fields.mjs",

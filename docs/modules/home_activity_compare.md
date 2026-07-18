@@ -15,8 +15,8 @@
 | State | Step |
 |---|---|
 | ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
-| 🟡 Current | `/home/activity` route loop **PASS** — next `/home/breakdown-more` (SCAFFOLD PASS; LAYOUT next) |
-| ⬜ Pending | `/home/breakdown-more` page loop · staff WIRE-2 · Users & Roles (backend blocked) |
+| 🟡 Current | `/home/activity` route loop **PASS** — `/home/breakdown-more` COMPARE PASS; ask staff WIRE-2 |
+| ⬜ Pending | staff WIRE-2 · Users & Roles (backend blocked) |
 | ⏸ Deferred | Pull-refresh · row detail sheet · write invalidation; merge to `main`; Dashboard Subagent 4 |
 
 ---
@@ -50,7 +50,7 @@
 | Row tap / activity detail sheet | Satellite UI; not this loop |
 | Business-write invalidation listeners | No write-event bus on new-app yet |
 | Compact home-feed empty subtitle | Different string on `/home` feed — already COMPARE PASS there |
-| `/home/breakdown-more` | Next nested route — not started |
+| `/home/breakdown-more` | Next nested route — COMPARE PASS |
 | Staff WIRE-2 bodies | Separate staff route deferral |
 | Dashboard module Subagent 4 sign-off | Needs remaining Dashboard satellites |
 

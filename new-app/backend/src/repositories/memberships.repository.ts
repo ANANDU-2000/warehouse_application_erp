@@ -51,6 +51,41 @@ export class MembershipsRepository {
       ],
     );
   }
+
+  /** Insert membership for create_user. */
+  async insert(row: {
+    id: string;
+    user_id: string;
+    business_id: string;
+    role: string;
+    permissions_json: string;
+    created_at: Date;
+  }): Promise<void> {
+    await queryOne(
+      this.client,
+      `INSERT INTO [memberships] (
+         [id], [user_id], [business_id], [role], [permissions_json], [created_at]
+       ) VALUES (
+         @id, @userId, @businessId, @role, @permissionsJson, @createdAt
+       )`,
+      [
+        { name: "id", type: sql.UniqueIdentifier, value: row.id },
+        { name: "userId", type: sql.UniqueIdentifier, value: row.user_id },
+        {
+          name: "businessId",
+          type: sql.UniqueIdentifier,
+          value: row.business_id,
+        },
+        { name: "role", type: sql.NVarChar(32), value: row.role },
+        {
+          name: "permissionsJson",
+          type: sql.NVarChar(/* MAX */ -1),
+          value: row.permissions_json,
+        },
+        { name: "createdAt", type: sql.DateTimeOffset, value: row.created_at },
+      ],
+    );
+  }
 }
 
 export function createMembershipsRepository(client: SqlClient): MembershipsRepository {

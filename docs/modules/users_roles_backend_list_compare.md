@@ -25,4 +25,4 @@
 
 **Rollback:** Revert this commit; unmount `/v1/businesses/:businessId/users`; remove `businessUsers` from `createApp` / `index.ts`; delete `businessUsers.repository.ts`, `usersList.service.ts`, `users.controller.ts`, `users.routes.ts`, compare MD.
 
-**Next (ask first):** POST create / GET by id / more users APIs, **or** Users UI SCAFFOLD (still blocked until enough APIs), **or** one Subagent 4 satellite.
+**Next (ask first):** GET `/{user_id}` profile · other mutate APIs · Users UI · Subagent 4 satellite. Slice 2 create: [`users_roles_backend_create_compare.md`](users_roles_backend_create_compare.md).

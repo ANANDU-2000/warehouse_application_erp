@@ -143,6 +143,44 @@ export class BusinessUsersRepository {
       items_created: counts.ITEM_CREATE ?? 0,
     };
   }
+
+  /**
+   * log_staff_activity / log_user_lifecycle — insert staff_activity_log row.
+   * Source: staff_audit.py:log_staff_activity
+   */
+  async insertActivityLog(row: {
+    id: string;
+    business_id: string;
+    user_id: string;
+    user_name: string | null;
+    action_type: string;
+    details: string | null;
+    created_at: Date;
+  }): Promise<void> {
+    await queryOne(
+      this.client,
+      `INSERT INTO [staff_activity_log] (
+         [id], [business_id], [user_id], [user_name], [action_type],
+         [item_id], [item_name], [details], [created_at]
+       ) VALUES (
+         @id, @businessId, @userId, @userName, @actionType,
+         NULL, NULL, @details, @createdAt
+       )`,
+      [
+        { name: "id", type: sql.UniqueIdentifier, value: row.id },
+        {
+          name: "businessId",
+          type: sql.UniqueIdentifier,
+          value: row.business_id,
+        },
+        { name: "userId", type: sql.UniqueIdentifier, value: row.user_id },
+        { name: "userName", type: sql.NVarChar(255), value: row.user_name },
+        { name: "actionType", type: sql.NVarChar(50), value: row.action_type },
+        { name: "details", type: sql.NVarChar(/* MAX */ -1), value: row.details },
+        { name: "createdAt", type: sql.DateTimeOffset, value: row.created_at },
+      ],
+    );
+  }
 }
 
 export function createBusinessUsersRepository(

@@ -1,5 +1,5 @@
 /**
- * Business-scoped users routes — list slice.
+ * Business-scoped users routes — list + create.
  * Prefix mounted at /v1/businesses/:businessId/users
  * Source: source-app/backend/app/routers/users.py
  */
@@ -20,6 +20,14 @@ export function createUsersRoutes(
     authz.requireMembership,
     createRequireRole("owner", "admin", "manager", "super_admin"),
     (req, res, next) => void controller.list(req, res, next),
+  );
+
+  r.post(
+    "/",
+    authz.requireAuth,
+    authz.requireMembership,
+    createRequireRole("owner", "admin", "super_admin"),
+    (req, res, next) => void controller.create(req, res, next),
   );
 
   return r;

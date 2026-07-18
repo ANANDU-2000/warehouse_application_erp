@@ -25,6 +25,8 @@ import type { DashboardRepository } from "./repositories/dashboard.repository";
 import type { HomeOverviewRepository } from "./repositories/homeOverview.repository";
 import type { StaffHomeRepository } from "./repositories/staffHome.repository";
 import type { HomeActivityRepository } from "./repositories/homeActivity.repository";
+import type { ConnectionPool } from "mssql";
+import type { CreateUserDeps } from "./services/usersCreate.service";
 import {
   createAuthzMiddleware,
   type AuthzMiddleware,
@@ -53,6 +55,10 @@ export type AppDeps = {
   homeActivity?: HomeActivityRepository;
   /** Users & Roles — business user list */
   businessUsers?: BusinessUsersRepository;
+  /** SQL pool for transactional user create. */
+  pool?: ConnectionPool;
+  /** Test seam for POST …/users. */
+  runInTransaction?: CreateUserDeps["runInTransaction"];
 };
 
 /** Fail-closed users repo when SQL pool is not wired. */
@@ -63,6 +69,9 @@ function unavailableUsersRepository(): UsersRepository {
   return {
     findById: fail,
     findByEmail: fail,
+    usernameExists: fail,
+    emailExistsActive: fail,
+    insert: fail,
   } as unknown as UsersRepository;
 }
 
@@ -74,6 +83,7 @@ function unavailableMembershipsRepository(): MembershipsRepository {
     findById: fail,
     listByUserId: fail,
     findByUserAndBusiness: fail,
+    insert: fail,
   } as unknown as MembershipsRepository;
 }
 
@@ -152,6 +162,7 @@ function unavailableBusinessUsersRepository(): BusinessUsersRepository {
     listForBusiness: fail,
     activityCount7d: fail,
     todayStats: fail,
+    insertActivityLog: fail,
   } as unknown as BusinessUsersRepository;
 }
 
@@ -234,7 +245,12 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
   app.use(
     "/v1/businesses/:businessId/users",
     createUsersRoutes(
-      createUsersController({ businessUsers, businesses }),
+      createUsersController({
+        businessUsers,
+        businesses,
+        pool: deps.pool,
+        runInTransaction: deps.runInTransaction,
+      }),
       app.authz,
     ),
   );

@@ -33,6 +33,7 @@ async function main(): Promise<void> {
         memberships: createMembershipsRepository(pool),
         businesses: createBusinessesRepository(pool),
         businessUsers: createBusinessUsersRepository(pool),
+        pool,
         dashboard: createDashboardRepository(pool),
         homeOverview: createHomeOverviewRepository(pool),
         staffHome: createStaffHomeRepository(pool),

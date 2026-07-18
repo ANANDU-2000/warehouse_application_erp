@@ -46,11 +46,11 @@
 | `/reports` | Reports |
 | `/settings` | Settings |
 
-### Seq 3 — Users & Roles (blocked)
+### Seq 3 — Users & Roles (partial backend)
 
 | Path | Blocker |
 |---|---|
-| `/settings/users` · `/settings/users/:userId` | Users CRUD/list APIs not in new-app backend (docs: me/businesses only) |
+| `/settings/users` · `/settings/users/:userId` | List+create APIs exist; GET profile / mutate / UI still pending |
 
 ## Other known gaps (not full pages)
 
@@ -62,6 +62,6 @@
 
 ## Next (ask first)
 
-1. **Users & Roles backend** APIs (unblocks Seq 3), or  
+1. **Users GET profile / more users APIs**, or  
 2. One **satellite** from the stub tables above (start page loop), or  
 3. Hold / merge review of `ops/dashboard-module` → `main`.

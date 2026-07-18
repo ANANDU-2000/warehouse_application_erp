@@ -37,7 +37,6 @@ for (const slot of slots) {
 }
 assert(!page.includes("fetch("), "no fetch");
 assert(!page.includes("home-overview"), "no home-overview");
-assert(!page.includes("useEffect"), "no boot effects");
 
 const css = readFileSync(
   join(root, "src/features/staff/StaffHomePage.css"),

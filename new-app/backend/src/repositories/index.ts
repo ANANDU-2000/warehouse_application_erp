@@ -18,3 +18,7 @@ export {
   HomeOverviewRepository,
   createHomeOverviewRepository,
 } from "./homeOverview.repository";
+export {
+  StaffHomeRepository,
+  createStaffHomeRepository,
+} from "./staffHome.repository";

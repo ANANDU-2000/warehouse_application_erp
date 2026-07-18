@@ -20,10 +20,17 @@ import type { MembershipsRepository } from "./repositories/memberships.repositor
 import type { BusinessesRepository } from "./repositories/businesses.repository";
 import type { DashboardRepository } from "./repositories/dashboard.repository";
 import type { HomeOverviewRepository } from "./repositories/homeOverview.repository";
+import type { StaffHomeRepository } from "./repositories/staffHome.repository";
 import {
   createAuthzMiddleware,
   type AuthzMiddleware,
 } from "./middleware/authz";
+import {
+  createStaffHomeMeRoutes,
+  createStockRoutes,
+  createTradePurchasesRoutes,
+} from "./routes/staffHome.routes";
+import { createStaffHomeController } from "./controllers/staffHome.controller";
 
 export type AppDeps = {
   /** Injected for tests / when pool is ready. */
@@ -35,6 +42,7 @@ export type AppDeps = {
   /** Dashboard Subagent 1 */
   dashboard?: DashboardRepository;
   homeOverview?: HomeOverviewRepository;
+  staffHome?: StaffHomeRepository;
 };
 
 /** Fail-closed users repo when SQL pool is not wired. */
@@ -97,6 +105,18 @@ function unavailableHomeOverviewRepository(): HomeOverviewRepository {
   } as unknown as HomeOverviewRepository;
 }
 
+function unavailableStaffHomeRepository(): StaffHomeRepository {
+  const fail = async (): Promise<never> => {
+    throw new Error("Database pool not connected. Call connect() first.");
+  };
+  return {
+    deliveryPipeline: fail,
+    listStock: fail,
+    openingMissing: fail,
+    variancesToday: fail,
+  } as unknown as StaffHomeRepository;
+}
+
 export type AppWithAuthz = express.Express & {
   /** Authz middleware bundle — for future /v1/businesses/:businessId routes. */
   authz: AuthzMiddleware;
@@ -126,6 +146,13 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
     createMeRoutes(createMeController({ memberships, businesses }), app.authz),
   );
 
+  const staffHome = deps.staffHome ?? unavailableStaffHomeRepository();
+  const staffHomeController = createStaffHomeController({
+    users,
+    staffHome,
+  });
+  app.use("/v1/me", createStaffHomeMeRoutes(staffHomeController, app.authz));
+
   const dashboard = deps.dashboard ?? unavailableDashboardRepository();
   const homeOverview =
     deps.homeOverview ?? unavailableHomeOverviewRepository();
@@ -140,6 +167,14 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
       createReportsController({ homeOverview }),
       app.authz,
     ),
+  );
+  app.use(
+    "/v1/businesses/:businessId/trade-purchases",
+    createTradePurchasesRoutes(staffHomeController, app.authz),
+  );
+  app.use(
+    "/v1/businesses/:businessId/stock",
+    createStockRoutes(staffHomeController, app.authz),
   );
 
   app.use(errorHandler);

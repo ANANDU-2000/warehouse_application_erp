@@ -12,7 +12,7 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **4 BUTTONS** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 `/staff/home` BUTTONS | Tools + sheet — WIRE next |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 `/staff/home` WIRE | Shell counts wired — STATES next |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 me/businesses only | Blocked |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
@@ -76,7 +76,7 @@ Live local SQL uses the pool wired in [`new-app/backend/src/index.ts`](../new-ap
 | `/login` | **COMPARE PASS** |
 | `/forgot-password` | Stub only (full page later) |
 | `/home` | **COMPARE PASS** (owner) |
-| `/staff/home` | **BUTTONS** (tools + profile sheet + CTAs) |
+| `/staff/home` | **WIRE** (scoped shell counts) |
 | `/reset-password` | Later |
 | `/get-started` | Unknown — needs opening (likely redirect to login) |
 

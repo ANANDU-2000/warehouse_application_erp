@@ -1,8 +1,13 @@
-import { useState, type ReactElement } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { useNavigate } from "react-router-dom";
-import { clearPrimaryBusiness } from "../../shared/auth/sessionStore";
+import {
+  clearPrimaryBusiness,
+  readPrimaryBusiness,
+} from "../../shared/auth/sessionStore";
 import { clearTokens } from "../../shared/auth/tokenStore";
 import {
+  STAFF_HOME_ATTENTION,
+  STAFF_HOME_FLOOR_KPI_LABELS,
   STAFF_HOME_GREETING_AVATAR_FALLBACK,
   STAFF_HOME_GREETING_NAME_FALLBACK,
   STAFF_HOME_ROLE_LABEL,
@@ -13,9 +18,16 @@ import {
   STAFF_HOME_FOCUS_LABELS,
   STAFF_HOME_FOCUS_ORDER,
   readStaffHomeFocus,
+  staffHomeShowsBarcodeTools,
+  staffHomeShowsPurchaseTools,
   writeStaffHomeFocus,
   type StaffHomeFocus,
 } from "./staffHomeFocus";
+import {
+  fetchStaffHomeShell,
+  staffInitials,
+  type StaffHomeShellCounts,
+} from "./staffHomeApi";
 import {
   STAFF_HOME_CLOSE_LABEL,
   STAFF_HOME_LOGOUT_BODY,
@@ -32,9 +44,9 @@ import {
 import "./StaffHomePage.css";
 
 /**
- * Staff home LAYOUT + FIELDS + BUTTONS.
- * Source: staff_home_page.dart + staff_home_dashboard_widgets.dart
- * WIRE+: floor KPIs / counts / attention / activity APIs.
+ * Staff home LAYOUT + FIELDS + BUTTONS + WIRE (scoped shell counts).
+ * Source: staff_home_page.dart + staff_home_providers.dart
+ * Deferred: warehouse stats body, pending cards, shift, activity, notifications.
  */
 
 function staffHomeLayoutDateLabel(now: Date): string {
@@ -104,12 +116,50 @@ function StaffHomeFocusRadios(props: {
   );
 }
 
+const EMPTY_COUNTS: StaffHomeShellCounts = {
+  displayName: STAFF_HOME_GREETING_NAME_FALLBACK,
+  pending: 0,
+  delivered: 0,
+  lowStock: 0,
+  openingCount: 0,
+  missingCodeCount: 0,
+  mismatchCount: 0,
+};
+
 export function StaffHomePage(): ReactElement {
   const navigate = useNavigate();
   const dateLabel = staffHomeLayoutDateLabel(new Date());
   const [focus, setFocus] = useState<StaffHomeFocus>(() => readStaffHomeFocus());
   const [sheetOpen, setSheetOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
+  const [counts, setCounts] = useState<StaffHomeShellCounts>(EMPTY_COUNTS);
+  const [wireError, setWireError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const biz = readPrimaryBusiness();
+    if (!biz?.id) {
+      setWireError("No business session");
+      return;
+    }
+    let cancelled = false;
+    void fetchStaffHomeShell(biz.id)
+      .then((shell) => {
+        if (!cancelled) {
+          setCounts(shell);
+          setWireError(null);
+        }
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          const msg =
+            err instanceof Error ? err.message : "Could not load floor counts";
+          setWireError(msg);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function onFocusChange(next: StaffHomeFocus): void {
     setFocus(next);
@@ -125,6 +175,21 @@ export function StaffHomePage(): ReactElement {
   }
 
   const tools = staffHomeToolsForFocus(focus);
+  const displayName = counts.displayName || STAFF_HOME_GREETING_NAME_FALLBACK;
+  const avatarLetter = staffInitials(displayName) || STAFF_HOME_GREETING_AVATAR_FALLBACK;
+
+  const showOpening = counts.openingCount > 0;
+  const showMissing =
+    staffHomeShowsBarcodeTools(focus) && counts.missingCodeCount > 0;
+  const showMismatch = counts.mismatchCount > 0;
+  const showAttentionFlag =
+    (staffHomeShowsPurchaseTools(focus) && counts.pending > 0) ||
+    counts.lowStock > 0 ||
+    counts.openingCount > 0 ||
+    (staffHomeShowsBarcodeTools(focus) && counts.missingCodeCount > 0) ||
+    counts.mismatchCount > 0;
+  const showAttentionSection =
+    showAttentionFlag && (showOpening || showMissing || showMismatch);
 
   return (
     <div className="staff-home-page" data-testid="staff-home-page">
@@ -142,13 +207,11 @@ export function StaffHomePage(): ReactElement {
               aria-label="Open profile"
             >
               <div className="staff-home-avatar" aria-hidden="true">
-                {STAFF_HOME_GREETING_AVATAR_FALLBACK}
+                {avatarLetter}
               </div>
               <div className="staff-home-greeting-text">
                 <p className="staff-home-greeting-name-row">
-                  <span className="staff-home-greeting-name">
-                    {STAFF_HOME_GREETING_NAME_FALLBACK}
-                  </span>
+                  <span className="staff-home-greeting-name">{displayName}</span>
                   <span className="staff-home-greeting-role">
                     {STAFF_HOME_ROLE_LABEL}
                   </span>
@@ -167,13 +230,50 @@ export function StaffHomePage(): ReactElement {
             </button>
           </header>
 
+          {wireError ? (
+            <p className="staff-home-wire-error" data-testid="staff-home-wire-error">
+              {wireError}
+            </p>
+          ) : null}
+
           <section
             className="staff-home-card"
             data-slot="floor-kpis"
             data-testid="staff-home-slot-floor-kpis"
             aria-label="Floor KPIs"
           >
-            <h2 className="staff-home-slot-label">Floor KPIs</h2>
+            <div className="staff-home-floor-kpis">
+              <button
+                type="button"
+                className="staff-home-kpi"
+                onClick={() => navigate("/staff/deliveries")}
+              >
+                <span className="staff-home-kpi-value">{counts.pending}</span>
+                <span className="staff-home-kpi-label">
+                  {STAFF_HOME_FLOOR_KPI_LABELS.pending}
+                </span>
+              </button>
+              <button
+                type="button"
+                className="staff-home-kpi"
+                onClick={() => navigate("/staff/deliveries")}
+              >
+                <span className="staff-home-kpi-value">{counts.delivered}</span>
+                <span className="staff-home-kpi-label">
+                  {STAFF_HOME_FLOOR_KPI_LABELS.delivered}
+                </span>
+              </button>
+              <button
+                type="button"
+                className="staff-home-kpi"
+                onClick={() => navigate("/staff/low-stock")}
+              >
+                <span className="staff-home-kpi-value">{counts.lowStock}</span>
+                <span className="staff-home-kpi-label">
+                  {STAFF_HOME_FLOOR_KPI_LABELS.lowStock}
+                </span>
+              </button>
+            </div>
           </section>
 
           <section
@@ -229,7 +329,12 @@ export function StaffHomePage(): ReactElement {
                   }}
                   onClick={() => navigate(tool.path)}
                 >
-                  <span className="staff-home-tool-label">{tool.label}</span>
+                  <span className="staff-home-tool-label">
+                    {tool.label}
+                    {tool.badgeKey === "lowStock" && counts.lowStock > 0
+                      ? ` (${counts.lowStock})`
+                      : ""}
+                  </span>
                 </button>
               ))}
             </div>
@@ -245,16 +350,22 @@ export function StaffHomePage(): ReactElement {
               subtitle={STAFF_HOME_SECTION.quickActions.subtitle}
             />
             <div className="staff-home-quick-actions">
-              {STAFF_HOME_QUICK_ACTIONS.map((action) => (
-                <button
-                  key={action.id}
-                  type="button"
-                  className="staff-home-quick-action"
-                  onClick={() => navigate(action.path)}
-                >
-                  {action.label}
-                </button>
-              ))}
+              {STAFF_HOME_QUICK_ACTIONS.map((action) => {
+                let badge = 0;
+                if (action.id === "deliveries") badge = counts.pending;
+                if (action.id === "low-stock") badge = counts.lowStock;
+                return (
+                  <button
+                    key={action.id}
+                    type="button"
+                    className="staff-home-quick-action"
+                    onClick={() => navigate(action.path)}
+                  >
+                    {action.label}
+                    {badge > 0 ? ` (${badge})` : ""}
+                  </button>
+                );
+              })}
             </div>
           </section>
 
@@ -276,16 +387,84 @@ export function StaffHomePage(): ReactElement {
             </button>
           </section>
 
-          <section
-            className="staff-home-card"
-            data-slot="needs-attention"
-            data-testid="staff-home-slot-needs-attention"
-          >
-            <StaffHomeSectionHeader
-              title={STAFF_HOME_SECTION.needsAttention.title}
-              subtitle={STAFF_HOME_SECTION.needsAttention.subtitle}
-            />
-          </section>
+          {showAttentionSection ? (
+            <section
+              className="staff-home-card"
+              data-slot="needs-attention"
+              data-testid="staff-home-slot-needs-attention"
+            >
+              <StaffHomeSectionHeader
+                title={STAFF_HOME_SECTION.needsAttention.title}
+                subtitle={STAFF_HOME_SECTION.needsAttention.subtitle}
+              />
+              <div className="staff-home-attention-list">
+                {showOpening ? (
+                  <button
+                    type="button"
+                    className="staff-home-attention"
+                    onClick={() => navigate(STAFF_HOME_ATTENTION.opening.path)}
+                  >
+                    <span className="staff-home-attention-title">
+                      {STAFF_HOME_ATTENTION.opening.title}
+                    </span>
+                    <span className="staff-home-attention-sub">
+                      {STAFF_HOME_ATTENTION.opening.subtitle}
+                    </span>
+                    <span className="staff-home-attention-count">
+                      {counts.openingCount}
+                    </span>
+                  </button>
+                ) : null}
+                {showMissing ? (
+                  <button
+                    type="button"
+                    className="staff-home-attention"
+                    onClick={() =>
+                      navigate(STAFF_HOME_ATTENTION.missingBarcodes.path)
+                    }
+                  >
+                    <span className="staff-home-attention-title">
+                      {STAFF_HOME_ATTENTION.missingBarcodes.title}
+                    </span>
+                    <span className="staff-home-attention-sub">
+                      {STAFF_HOME_ATTENTION.missingBarcodes.subtitle}
+                    </span>
+                    <span className="staff-home-attention-count">
+                      {counts.missingCodeCount}
+                    </span>
+                  </button>
+                ) : null}
+                {showMismatch ? (
+                  <button
+                    type="button"
+                    className="staff-home-attention"
+                    onClick={() => navigate(STAFF_HOME_ATTENTION.mismatch.path)}
+                  >
+                    <span className="staff-home-attention-title">
+                      {STAFF_HOME_ATTENTION.mismatch.title}
+                    </span>
+                    <span className="staff-home-attention-sub">
+                      {STAFF_HOME_ATTENTION.mismatch.subtitle}
+                    </span>
+                    <span className="staff-home-attention-count">
+                      {counts.mismatchCount}
+                    </span>
+                  </button>
+                ) : null}
+              </div>
+            </section>
+          ) : (
+            <section
+              className="staff-home-card"
+              data-slot="needs-attention"
+              data-testid="staff-home-slot-needs-attention"
+            >
+              <StaffHomeSectionHeader
+                title={STAFF_HOME_SECTION.needsAttention.title}
+                subtitle={STAFF_HOME_SECTION.needsAttention.subtitle}
+              />
+            </section>
+          )}
 
           <section
             className="staff-home-card"
@@ -316,12 +495,10 @@ export function StaffHomePage(): ReactElement {
           >
             <div className="staff-home-sheet-profile">
               <div className="staff-home-avatar staff-home-avatar--sheet">
-                {STAFF_HOME_GREETING_AVATAR_FALLBACK}
+                {avatarLetter}
               </div>
               <div>
-                <p className="staff-home-sheet-name">
-                  {STAFF_HOME_GREETING_NAME_FALLBACK}
-                </p>
+                <p className="staff-home-sheet-name">{displayName}</p>
                 <p className="staff-home-sheet-role">Role: Staff</p>
               </div>
             </div>

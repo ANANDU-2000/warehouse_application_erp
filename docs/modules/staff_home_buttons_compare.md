@@ -20,4 +20,4 @@
 
 **Smoke:** `npm run test:staff-home-buttons`  
 **Rollback:** Revert BUTTONS commit; restore FIELDS page-body focus + inert bell.  
-**Next:** `/staff/home` WIRE — staff floor providers / counts (not owner home-overview).
+**Next:** `/staff/home` WIRE — staff floor providers / counts (not owner home-overview). Done → see [`staff_home_wire_compare.md`](staff_home_wire_compare.md).

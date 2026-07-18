@@ -64,7 +64,8 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 2 LAYOUT | ✅ | greeting + section headers — [`staff_home_layout_compare.md`](modules/staff_home_layout_compare.md) |
 | 3 FIELDS | ✅ | Home focus radios — [`staff_home_fields_compare.md`](modules/staff_home_fields_compare.md) |
 | 4 BUTTONS | ✅ | profile sheet + tools/CTAs — [`staff_home_buttons_compare.md`](modules/staff_home_buttons_compare.md) |
-| 5 WIRE | ⬜ | staff floor APIs next |
+| 5 WIRE | ✅ | scoped shell counts — [`staff_home_wire_compare.md`](modules/staff_home_wire_compare.md) |
+| 6 STATES | ⬜ | skeleton / FriendlyLoadError next |
 | 7 COMPARE | ⬜ | |
 
 ### Prompt template (copy per page)

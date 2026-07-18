@@ -42,3 +42,28 @@ export const STAFF_HOME_SECTION = {
     subtitle: "Latest stock and warehouse updates",
   },
 } as const;
+
+/** Needs attention tiles — staff_home_page.dart */
+export const STAFF_HOME_ATTENTION = {
+  opening: {
+    title: "Opening stock",
+    subtitle: "Items need initial stock setup",
+    path: "/stock/opening-setup",
+  },
+  missingBarcodes: {
+    title: "Missing barcodes",
+    subtitle: "Items need labels before bulk print",
+    path: "/stock/missing-barcodes",
+  },
+  mismatch: {
+    title: "Stock mismatch",
+    subtitle: "Physical count differs from system",
+    path: "/reports",
+  },
+} as const;
+
+export const STAFF_HOME_FLOOR_KPI_LABELS = {
+  pending: "Pending",
+  delivered: "Delivered",
+  lowStock: "Low stock",
+} as const;

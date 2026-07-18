@@ -26,7 +26,8 @@
     "test:staff-home-scaffold": "node scripts/check-staff-home-scaffold.mjs",
     "test:staff-home-layout": "node scripts/check-staff-home-layout.mjs",
     "test:staff-home-fields": "node scripts/check-staff-home-fields.mjs",
-    "test:staff-home-buttons": "node scripts/check-staff-home-buttons.mjs"
+    "test:staff-home-buttons": "node scripts/check-staff-home-buttons.mjs",
+    "test:staff-home-wire": "node scripts/check-staff-home-wire.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

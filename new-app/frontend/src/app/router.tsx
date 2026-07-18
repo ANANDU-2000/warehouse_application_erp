@@ -100,6 +100,14 @@ export function AppRouter() {
           element={<DashboardRouteStubPage title="Reorder" />}
         />
         <Route
+          path="/stock/opening-setup"
+          element={<DashboardRouteStubPage title="Opening stock setup" />}
+        />
+        <Route
+          path="/stock/missing-barcodes"
+          element={<DashboardRouteStubPage title="Missing barcodes" />}
+        />
+        <Route
           path="/reports"
           element={<DashboardRouteStubPage title="Reports" />}
         />

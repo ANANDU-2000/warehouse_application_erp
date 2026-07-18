@@ -1,0 +1,34 @@
+# Staff `/staff/home` — WIRE compare (Step 5, scoped)
+
+**Branch:** `ops/dashboard-module`  
+**Sources:** `dashboard.md` §16 Staff home; `staff_home_providers.dart`; FastAPI `me.py`, `trade_purchase_service.get_trade_purchase_delivery_pipeline`, `stock_helpers` / `stock_ops` / `stock_audit`
+
+## Status tracker
+
+| Status | Item |
+|---|---|
+| **Completed (this step)** | Profile name; floor KPI counts; low-stock badge; attention tile counts + gates; thin backends for Flutter paths |
+| **Current** | `/staff/home` WIRE scoped — PASS when smoke/build green |
+| **Pending next** | `/staff/home` **STATES** (skeleton / FriendlyLoadError / empty copy) |
+| **Deferred (WIRE-2)** | Warehouse stats body (`stock/totals`), pending delivery cards (`trade-purchases` list), shift strip (`activity-log` + `audit/feed`), recent activity feed, notifications unread merge, pull-to-refresh / auto-refresh |
+
+## Legacy vs New
+
+| # | Check | Legacy | New | Status |
+|---|---|---|---|---|
+| 1 | Display name | `GET /v1/me/profile` | same | PASS |
+| 2 | Delivery pipeline | `…/trade-purchases/delivery-pipeline` | same + pending sum helper | PASS |
+| 3 | Low stock count | `…/stock/list?status=low&per_page=8&sort=stock_asc` → items.length | same | PASS |
+| 4 | Opening missing | `…/stock/opening/missing` → `missing_count` | same | PASS |
+| 5 | Missing item_code | Flutter pages + client filter | `missing_item_code=true` → `total` (same FastAPI filter) | PASS |
+| 6 | Variances today | `…/stock/variances/today` → length | same | PASS |
+| 7 | Not `home-overview` | Staff never | No staff call | PASS |
+| 8 | Floor labels | Pending / Delivered / Low stock | exact | PASS |
+| 9 | Attention titles | Opening stock / Missing barcodes / Stock mismatch | exact | PASS |
+| 10 | Focus gates | `staffHomeShows*` | same | PASS |
+| 11 | Warehouse / pending cards / shift / activity / notif | Yes | **Deferred WIRE-2** | N/A |
+| 12 | Full error/Retry UX | Yes | Minimal message — **STATES** | N/A |
+
+**Smoke:** `npm run test:staff-home-wire`  
+**Rollback:** Revert WIRE commit; remove staffHome routes/repos; restore BUTTONS empty counts.  
+**Next:** `/staff/home` STATES.

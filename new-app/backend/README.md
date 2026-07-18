@@ -4,10 +4,10 @@ Node.js + Express + TypeScript API for the warehouse ERP migration.
 
 ## Status
 
-**Phase 3.6** — Authorization middleware (`app.authz`: Bearer user, membership, role, permission).  
-Validation (Zod) → **3.7**. Google OAuth still **501**.
+**Phase 3.7** — Zod validation for Login + Refresh request bodies.  
+Error handling middleware → **3.8**. Google OAuth still **501**.
 
-See `docs/38_Authorization.md` (repo root docs).
+See `docs/39_Validation_Zod.md` (repo root docs).
 
 ## Layout
 
@@ -17,9 +17,10 @@ src/
   controllers/    → health + auth
   services/       → Login foundation + jwtTokens + permissions
   repositories/   → users / businesses / memberships
-  auth/           → loginRequest + TokenIssuer
-  middleware/     → requestId, errorHandler, authz (auth + membership)
-  types/          → Express Request augmentation
+  auth/           → loginRequest wrapper + TokenIssuer
+  validation/     → Zod schemas (auth) + validateWithSchema
+  middleware/     → requestId, errorHandler, authz
+  types/
   config/
 ```
 
@@ -28,11 +29,9 @@ src/
 | Method | Path | Notes |
 |---|---|---|
 | GET | `/api/health` | Liveness |
-| POST | `/v1/auth/login` | 200 TokenPair |
-| POST | `/v1/auth/refresh` | 200 TokenPair or 401 |
+| POST | `/v1/auth/login` | Zod body; 200 TokenPair |
+| POST | `/v1/auth/refresh` | Zod body; 200 TokenPair or 401 |
 | POST | `/v1/auth/{register,forgot-password,reset-password,google}` | 501 stubs |
-
-Protected business routes are not mounted yet; use `createApp().authz` when adding `/v1/businesses/:businessId/...`.
 
 ## Scripts
 

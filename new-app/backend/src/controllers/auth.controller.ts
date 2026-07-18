@@ -1,6 +1,6 @@
 /**
  * Auth HTTP adapters — Login + refresh (Phase 3.4/3.5).
- * Business rules: 3.3 services. JWT: JwtTokenIssuer. No login DB writes (Unknown #1).
+ * Validation: Zod (Phase 3.7). JWT: JwtTokenIssuer. No login DB writes (Unknown #1).
  * Source: source-app/backend/app/routers/auth.py
  */
 import type { Request, Response, NextFunction } from "express";
@@ -19,6 +19,11 @@ import {
 import type { TokenIssuer } from "../auth/tokenIssuer";
 import { TokenIssuanceUnavailableError } from "../auth/tokenIssuer";
 import { decodeRefreshToken } from "../services/jwtTokens.service";
+import { refreshRequestSchema } from "../validation/auth.schemas";
+import {
+  validateWithSchema,
+  SchemaValidationError,
+} from "../validation/validate";
 
 export type AuthControllerDeps = {
   users: UsersRepository;
@@ -27,17 +32,6 @@ export type AuthControllerDeps = {
 
 function sendDetail(res: Response, status: number, detail: string): void {
   res.status(status).json({ detail });
-}
-
-function parseRefreshBody(body: unknown): string | null {
-  if (body == null || typeof body !== "object" || Array.isArray(body)) {
-    return null;
-  }
-  const raw = (body as Record<string, unknown>).refresh_token;
-  if (typeof raw !== "string" || raw.length < 1) {
-    return null;
-  }
-  return raw;
 }
 
 export function createAuthController(deps: AuthControllerDeps) {
@@ -108,10 +102,20 @@ export function createAuthController(deps: AuthControllerDeps) {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const refreshToken = parseRefreshBody(req.body);
-      if (!refreshToken) {
-        sendDetail(res, 401, "Invalid refresh token");
-        return;
+      let refreshToken: string;
+      try {
+        const parsed = validateWithSchema(
+          refreshRequestSchema,
+          req.body,
+          "Invalid refresh token",
+        );
+        refreshToken = parsed.refresh_token;
+      } catch (e) {
+        if (e instanceof SchemaValidationError) {
+          sendDetail(res, 401, "Invalid refresh token");
+          return;
+        }
+        throw e;
       }
 
       const userId = decodeRefreshToken(refreshToken);

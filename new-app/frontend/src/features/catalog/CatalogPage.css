@@ -1,0 +1,94 @@
+/**
+ * Catalog hub SCAFFOLD — layout container only (brand tokens later in LAYOUT).
+ * Source regions: catalog_page.dart Scaffold + DesktopPageShell.
+ */
+.catalog-page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  background: #f7f9f6;
+  color: #0f172a;
+}
+
+.catalog-page__appbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 56px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+}
+
+.catalog-page__appbar-leading,
+.catalog-page__appbar-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.catalog-page__appbar-actions {
+  margin-left: auto;
+  gap: 4px;
+}
+
+.catalog-page__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.catalog-page__shell {
+  flex: 1;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 16px 100px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.catalog-page__search {
+  min-height: 40px;
+  margin-top: 8px;
+}
+
+.catalog-page__suggestions {
+  min-height: 0;
+}
+
+.catalog-page__grid {
+  flex: 1;
+  min-height: 120px;
+}
+
+.catalog-page__empty {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.catalog-page__empty-title {
+  margin: 0 0 8px;
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+
+.catalog-page__empty-sub {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #5c6578;
+}
+
+.catalog-page__fab {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  min-width: 48px;
+  min-height: 48px;
+  pointer-events: none;
+}

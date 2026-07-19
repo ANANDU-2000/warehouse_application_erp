@@ -63,10 +63,9 @@
 
 ## Next (ask first)
 
-1. **Catalog UI SCAFFOLD** — `/catalog` page loop step 1, **or**  
-2. Categories trade-summary / insights APIs, **or**  
-3. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11).
+1. **Catalog LAYOUT** — `/catalog` page loop step 2, **or**  
+2. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11).
 
 **Do not** invent purchase/barcode UI.
 
-*(Categories Slice 2 — [`categories_backend_slice2.md`](categories_backend_slice2.md). Products Slice 7 — [`products_backend_slice7.md`](products_backend_slice7.md).)*
+*(Catalog SCAFFOLD — [`catalog_scaffold_compare.md`](catalog_scaffold_compare.md). Categories Slice 2 — [`categories_backend_slice2.md`](categories_backend_slice2.md).)*

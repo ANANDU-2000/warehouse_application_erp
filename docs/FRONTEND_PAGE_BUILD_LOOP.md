@@ -213,6 +213,18 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 6 STATES | ✅ | ListSkeleton 6 + FriendlyLoadError — [`staff_deliveries_states_compare.md`](modules/staff_deliveries_states_compare.md) |
 | 7 COMPARE | ✅ | Aggregator SCAFFOLD→STATES — [`staff_deliveries_compare.md`](modules/staff_deliveries_compare.md) |
 
+### Catalog hub (`/catalog`) — Seq 4
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | AppBar + empty slots + staff gate — [`catalog_scaffold_compare.md`](modules/catalog_scaffold_compare.md) |
+| 2 LAYOUT | ⬜ | — |
+| 3 FIELDS | ⬜ | — |
+| 4 BUTTONS | ⬜ | — |
+| 5 WIRE | ⬜ | — |
+| 6 STATES | ⬜ | — |
+| 7 COMPARE | ⬜ | — |
+
 ### Prompt template (copy per page)
 
 ```

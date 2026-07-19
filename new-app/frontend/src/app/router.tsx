@@ -17,13 +17,14 @@ import { StaffPurchaseHistoryPage } from "../features/staff/purchaseHistory/Staf
 import { StaffLowStockPage } from "../features/staff/lowStock/StaffLowStockPage";
 import { StaffActivityPage } from "../features/staff/activity/StaffActivityPage";
 import { StaffDeliveriesPage } from "../features/staff/deliveries/StaffDeliveriesPage";
+import { CatalogPage } from "../features/catalog/CatalogPage";
 
 /**
  * Splash + Login + owner /home + activity + breakdown-more + staff /staff/home +
  * users + notifications + staff search + staff items + staff stock +
  * staff purchase-history + staff low-stock + staff activity COMPARE +
- * staff deliveries SCAFFOLD + stubs.
- * Source: docs/05_Navigation_Map.md; dashboard.md
+ * staff deliveries COMPARE + catalog hub SCAFFOLD + stubs.
+ * Source: docs/05_Navigation_Map.md; dashboard.md; categories.md
  */
 export function AppRouter() {
   return (
@@ -73,6 +74,7 @@ export function AppRouter() {
           path="/staff/scan"
           element={<DashboardRouteStubPage title="Staff scan" />}
         />
+        <Route path="/catalog" element={<CatalogPage />} />
         <Route
           path="/catalog/taxonomy"
           element={<DashboardRouteStubPage title="Categories" />}

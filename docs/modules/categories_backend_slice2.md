@@ -9,9 +9,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1 · **Categories Slice 2** |
-| 🟡 Current | Categories Slice 2 PASS — ask before trade-summary/insights **or** catalog UI SCAFFOLD |
-| ⬜ Pending | trade-summary · insights · catalog UI pages |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · **Catalog hub SCAFFOLD** |
+| 🟡 Current | See [`catalog_scaffold_compare.md`](catalog_scaffold_compare.md) |
+| ⬜ Pending | Catalog LAYOUT→COMPARE · trade-summary/insights · other catalog routes |
 | ⏸ Deferred | purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New

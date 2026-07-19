@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · **STATES** |
-| 🟡 Current | STATES PASS — ask before **COMPARE** |
-| ⬜ Pending | COMPARE · other Subagent 4 stubs |
+| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
+| 🟡 Current | COMPARE PASS — ask before next Subagent 4 stub |
+| ⬜ Pending | Other Subagent 4 stubs |
 | ⏸ Deferred | Purchase-due synthetics; Approve/Review card actions |
 
 ## Legacy vs New
@@ -32,4 +32,4 @@
 
 **Rollback:** Revert STATES commit; restore WIRE raw `loadErrorMessage` + ungated empty; remove load-subtitle helper + this compare + script; boards → ask before STATES.
 
-**Next (ask first):** `/notifications` COMPARE.
+**Next (ask first):** `/notifications` COMPARE — done → [`notifications_compare.md`](notifications_compare.md). Ask before next Subagent 4 stub.

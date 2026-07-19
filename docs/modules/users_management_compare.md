@@ -73,9 +73,9 @@ Docs/checklist + smoke script only: revert COMPARE commit. Application code unch
 
 ## 5. Next after Approve
 
-1. Ask before: **`/notifications` COMPARE** — [`notifications_states_compare.md`](notifications_states_compare.md), **or**  
+1. Ask before: **next Subagent 4 stub** — [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md), **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
 **Do not merge to `main` unless asked.**
 
-*(Notifications STATES done — see [`notifications_states_compare.md`](notifications_states_compare.md).)*
+*(Notifications COMPARE done — see [`notifications_compare.md`](notifications_compare.md).)*

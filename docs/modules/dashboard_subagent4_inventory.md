@@ -36,7 +36,7 @@
 
 | Path | Stub title |
 |---|---|
-| `/notifications` | **STATES PASS** — [`notifications_states_compare.md`](notifications_states_compare.md); COMPARE next |
+| `/notifications` | **COMPARE PASS** — [`notifications_compare.md`](notifications_compare.md); ask next stub |
 | `/barcode/scan` | Barcode scan |
 | `/barcode/bulk-print` | Bulk print labels |
 | `/catalog/item/:itemId` | Catalog item |
@@ -63,7 +63,7 @@
 
 ## Next (ask first)
 
-1. **`/notifications` COMPARE** (page loop step 7), **or**  
+1. **Next unlockable Subagent 4 stub** (not Settings hub) from the list above, **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Notifications STATES done — see [`notifications_states_compare.md`](notifications_states_compare.md). `/staff/settings` skipped — Settings implement locked.)*
+*(Notifications COMPARE done — see [`notifications_compare.md`](notifications_compare.md). `/staff/settings` skipped — Settings implement locked.)*

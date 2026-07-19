@@ -32,4 +32,4 @@
 
 **Rollback:** Revert SCAFFOLD commit; restore route → `DashboardRouteStubPage` title “Notifications”; remove `NotificationsPage*` + copy + filters + this compare + script; boards → ask before notifications SCAFFOLD.
 
-**Next (ask first):** `/notifications` LAYOUT — done → [`notifications_layout_compare.md`](notifications_layout_compare.md). FIELDS — done → [`notifications_fields_compare.md`](notifications_fields_compare.md). BUTTONS — done → [`notifications_buttons_compare.md`](notifications_buttons_compare.md). WIRE — done → [`notifications_wire_compare.md`](notifications_wire_compare.md). Ask before COMPARE.
+**Next (ask first):** `/notifications` LAYOUT — done → [`notifications_layout_compare.md`](notifications_layout_compare.md). FIELDS — done → [`notifications_fields_compare.md`](notifications_fields_compare.md). BUTTONS — done → [`notifications_buttons_compare.md`](notifications_buttons_compare.md). WIRE — done → [`notifications_wire_compare.md`](notifications_wire_compare.md). Ask before next Subagent 4 stub.

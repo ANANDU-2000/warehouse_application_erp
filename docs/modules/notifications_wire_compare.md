@@ -36,4 +36,4 @@
 
 **Rollback:** Revert WIRE commit; restore BUTTONS stubs (no fetch); remove mark-all/clear/patch backend routes + feed/api/card; remove this compare + script; boards → ask before WIRE.
 
-**Next (ask first):** `/notifications` STATES — done → [`notifications_states_compare.md`](notifications_states_compare.md). Ask before COMPARE.
+**Next (ask first):** `/notifications` STATES — done → [`notifications_states_compare.md`](notifications_states_compare.md). Ask before next Subagent 4 stub.

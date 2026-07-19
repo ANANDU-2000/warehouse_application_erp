@@ -9,8 +9,8 @@
 | State | Step |
 |---|---|
 | ✅ Completed | Staff activity COMPARE · Staff deliveries **SCAFFOLD** |
-| 🟡 Current | `/staff/deliveries` **SCAFFOLD PASS** — ask before LAYOUT |
-| ⬜ Pending | LAYOUT → COMPARE · other Subagent 4 stubs |
+| 🟡 Current | superseded — see [`staff_deliveries_layout_compare.md`](staff_deliveries_layout_compare.md) |
+| ⬜ Pending | FIELDS → COMPARE · other Subagent 4 stubs |
 | ⏸ Deferred | back/scan handlers · trade-purchases grouping · ListSkeleton / FriendlyLoadError · receive body · barcode · purchase entry · Settings · merge to `main` |
 
 ## Legacy vs New

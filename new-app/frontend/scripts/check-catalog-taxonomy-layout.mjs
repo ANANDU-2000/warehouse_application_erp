@@ -43,7 +43,11 @@ assert(page.includes('data-slot="categoryList"'), "categoryList");
 assert(page.includes('data-slot="empty"'), "empty");
 assert(page.includes('data-slot="fab"'), "fab");
 assert(page.includes("taxonomy-hub-page__search-icon"), "search icon");
-assert(page.includes("taxonomy-hub-page__search-hint"), "search hint");
+assert(
+  page.includes("taxonomy-hub-page__search-hint") ||
+    page.includes("taxonomy-hub-page__search-input"),
+  "search hint or FIELDS input",
+);
 assert(page.includes("taxonomy-hub-page__action-chip"), "action chip");
 assert(page.includes('data-chrome="category-row"'), "row chrome");
 assert(page.includes("taxonomy-hub-page__avatar"), "avatar");

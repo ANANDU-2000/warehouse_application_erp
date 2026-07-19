@@ -125,6 +125,7 @@
     "test:catalog-compare": "node scripts/check-catalog-compare.mjs",
     "test:catalog-taxonomy-scaffold": "node scripts/check-catalog-taxonomy-scaffold.mjs",
     "test:catalog-taxonomy-layout": "node scripts/check-catalog-taxonomy-layout.mjs",
+    "test:catalog-taxonomy-fields": "node scripts/check-catalog-taxonomy-fields.mjs",
     "test:staff-deliveries-layout": "node scripts/check-staff-deliveries-layout.mjs",
     "test:staff-deliveries-fields": "node scripts/check-staff-deliveries-fields.mjs",
     "test:staff-deliveries-buttons": "node scripts/check-staff-deliveries-buttons.mjs",

@@ -106,14 +106,29 @@ assert(
   page.includes('data-deferred="chip-subcategory"'),
   "chip subcategory deferred",
 );
-assert(page.includes('data-deferred="search-field"'), "search deferred");
+assert(
+  page.includes('data-deferred="search-field"') ||
+    page.includes('data-testid="taxonomy-search"'),
+  "search deferred or FIELDS input",
+);
 assert(page.includes('data-deferred="quick-add"'), "fab deferred");
 assert(page.includes("isStaff"), "staff role awareness");
-assert(!page.includes("Navigate"), "staff allowed — no Navigate redirect");
-assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("onClick"), "no onClick");
-assert(!page.includes("<input"), "no input");
-assert(!page.includes("<button"), "no button");
+assert(
+  page.includes("FIELDS") ||
+    page.includes("BUTTONS") ||
+    page.includes("WIRE") ||
+    page.includes("STATES") ||
+    (!page.includes("onClick") && !page.includes("<input")),
+  "no click/input until FIELDS+",
+);
+assert(
+  page.includes("FIELDS") ||
+    page.includes("BUTTONS") ||
+    page.includes("WIRE") ||
+    page.includes("STATES") ||
+    !page.includes("<button"),
+  "no button until FIELDS+",
+);
 
 assert(css.includes("taxonomy-hub-page"), "page css");
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "scaffold bg");

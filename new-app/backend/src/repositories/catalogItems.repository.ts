@@ -62,9 +62,107 @@ export type ListCatalogItemsOpts = {
   perPage: number;
 };
 
+export type CatalogItemInsert = {
+  id: string;
+  businessId: string;
+  categoryId: string;
+  typeId: string;
+  name: string;
+  defaultUnit: string;
+  defaultKgPerBag: number | null;
+  defaultItemsPerBox: number | null;
+  defaultWeightPerTin: number | null;
+  defaultPurchaseUnit: string | null;
+  defaultSaleUnit: string | null;
+  hsnCode: string | null;
+  itemCode: string | null;
+  barcode: string | null;
+  publicToken: string;
+  taxPercent: number | null;
+  defaultLandingCost: number | null;
+  defaultSellingCost: number | null;
+  packageType: string | null;
+  sellingUnit: string | null;
+  stockUnit: string | null;
+  displayUnit: string | null;
+  packageSize: number | null;
+  packageMeasurement: string | null;
+  validationStatus: string | null;
+};
+
+export type CatalogSmartFields = {
+  normalizedName: string | null;
+  sellingUnit: string | null;
+  stockUnit: string | null;
+  displayUnit: string | null;
+  packageType: string | null;
+  packageSize: number | null;
+  packageMeasurement: string | null;
+  conversionFactor: number | null;
+  unitConfidence: number | null;
+  smartClassification: string | null;
+  defaultKgPerBag: number | null;
+  validationStatus: string | null;
+};
+
 export type CatalogItemsRepository = {
   list(opts: ListCatalogItemsOpts): Promise<CatalogItemEnriched[]>;
   getById(businessId: string, itemId: string): Promise<CatalogItemEnriched | null>;
+  categoryExists(businessId: string, categoryId: string): Promise<boolean>;
+  verifyTypeInCategory(
+    businessId: string,
+    categoryId: string,
+    typeId: string,
+  ): Promise<void>;
+  getOrCreateGeneralTypeId(
+    businessId: string,
+    categoryId: string,
+  ): Promise<string>;
+  findDupItemId(
+    businessId: string,
+    categoryId: string,
+    typeId: string | null,
+    name: string,
+    excludeId?: string,
+  ): Promise<string | null>;
+  nextItemCode(businessId: string): Promise<string>;
+  assertSupplierIdsInBusiness(
+    businessId: string,
+    supplierIds: string[],
+  ): Promise<void>;
+  assertBrokerIdsInBusiness(
+    businessId: string,
+    brokerIds: string[],
+  ): Promise<void>;
+  getCategoryName(businessId: string, categoryId: string): Promise<string | null>;
+  insertItem(row: CatalogItemInsert): Promise<void>;
+  updateSmartFields(itemId: string, fields: CatalogSmartFields): Promise<void>;
+  replaceDefaultSuppliers(
+    businessId: string,
+    itemId: string,
+    supplierIds: string[],
+  ): Promise<void>;
+  replaceDefaultBrokers(
+    businessId: string,
+    itemId: string,
+    brokerIds: string[],
+  ): Promise<void>;
+  seedSupplierItemDefaults(
+    businessId: string,
+    itemId: string,
+    supplierIds: string[],
+  ): Promise<void>;
+  patchItem(args: {
+    businessId: string;
+    itemId: string;
+    categoryId: string;
+    typeId: string | null;
+    patch: Record<string, unknown>;
+  }): Promise<void>;
+  countTradeLines(itemId: string): Promise<number>;
+  listVariantIds(businessId: string, itemId: string): Promise<string[]>;
+  countArchivedEntryLinesForVariants(variantIds: string[]): Promise<number>;
+  deleteItem(businessId: string, itemId: string): Promise<void>;
 };
 
 const ITEM_SELECT = `
@@ -452,6 +550,574 @@ export function createCatalogItemsRepository(
       if (!raw) return null;
       const [one] = await enrich(db, businessId, [mapRow(raw)]);
       return one ?? null;
+    },
+
+    async categoryExists(businessId, categoryId) {
+      const row = await queryOne<Record<string, unknown>>(
+        db,
+        `SELECT [id] FROM item_categories
+         WHERE [id] = @categoryId AND [business_id] = @businessId`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "categoryId", type: sql.UniqueIdentifier, value: categoryId },
+        ],
+      );
+      return row != null;
+    },
+
+    async verifyTypeInCategory(businessId, categoryId, typeId) {
+      const row = await queryOne<Record<string, unknown>>(
+        db,
+        `SELECT ct.[id]
+         FROM category_types ct
+         INNER JOIN item_categories ic ON ic.[id] = ct.[category_id]
+         WHERE ct.[id] = @typeId AND ct.[category_id] = @categoryId
+           AND ic.[business_id] = @businessId`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "categoryId", type: sql.UniqueIdentifier, value: categoryId },
+          { name: "typeId", type: sql.UniqueIdentifier, value: typeId },
+        ],
+      );
+      if (!row) {
+        const { HttpError } = await import("../errors/httpError");
+        throw new HttpError(400, "type_id not found for this category");
+      }
+    },
+
+    async getOrCreateGeneralTypeId(businessId, categoryId) {
+      const existing = await queryOne<Record<string, unknown>>(
+        db,
+        `SELECT [id] FROM category_types
+         WHERE [category_id] = @categoryId AND LOWER([name]) = N'general'`,
+        [{ name: "categoryId", type: sql.UniqueIdentifier, value: categoryId }],
+      );
+      if (existing) return String(existing.id);
+      const cat = await queryOne<Record<string, unknown>>(
+        db,
+        `SELECT [id] FROM item_categories
+         WHERE [id] = @categoryId AND [business_id] = @businessId`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "categoryId", type: sql.UniqueIdentifier, value: categoryId },
+        ],
+      );
+      if (!cat) {
+        const { HttpError } = await import("../errors/httpError");
+        throw new HttpError(400, "category_id not found in this business");
+      }
+      const { randomUUID } = await import("node:crypto");
+      const id = randomUUID();
+      await queryOne(
+        db,
+        `INSERT INTO category_types ([id], [category_id], [name], [created_at])
+         VALUES (@id, @categoryId, N'General', SYSUTCDATETIME())`,
+        [
+          { name: "id", type: sql.UniqueIdentifier, value: id },
+          { name: "categoryId", type: sql.UniqueIdentifier, value: categoryId },
+        ],
+      );
+      return id;
+    },
+
+    async findDupItemId(businessId, categoryId, typeId, name, excludeId) {
+      const { normName } = await import("../validation/catalogItems.schemas");
+      const params: SqlParam[] = [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "categoryId", type: sql.UniqueIdentifier, value: categoryId },
+        { name: "name", type: sql.NVarChar(512), value: normName(name) },
+      ];
+      let sqlText = `SELECT TOP 1 [id] FROM catalog_items
+        WHERE [business_id] = @businessId AND [category_id] = @categoryId
+          AND LOWER(LTRIM(RTRIM([name]))) = @name
+          AND [deleted_at] IS NULL`;
+      if (typeId != null) {
+        sqlText += ` AND [type_id] = @typeId`;
+        params.push({
+          name: "typeId",
+          type: sql.UniqueIdentifier,
+          value: typeId,
+        });
+      } else {
+        sqlText += ` AND [type_id] IS NULL`;
+      }
+      if (excludeId) {
+        sqlText += ` AND [id] <> @excludeId`;
+        params.push({
+          name: "excludeId",
+          type: sql.UniqueIdentifier,
+          value: excludeId,
+        });
+      }
+      const row = await queryOne<Record<string, unknown>>(db, sqlText, params);
+      return row ? String(row.id) : null;
+    },
+
+    async nextItemCode(businessId) {
+      const rows = await queryMany<Record<string, unknown>>(
+        db,
+        `SELECT [item_code] FROM catalog_items
+         WHERE [business_id] = @businessId AND [item_code] LIKE N'ITM-%'`,
+        [{ name: "businessId", type: sql.UniqueIdentifier, value: businessId }],
+      );
+      let maxN = 0;
+      const re = /^ITM-(\d+)$/i;
+      for (const r of rows) {
+        const m = re.exec(String(r.item_code ?? "").trim());
+        if (m) maxN = Math.max(maxN, Number(m[1]));
+      }
+      return `ITM-${String(maxN + 1).padStart(4, "0")}`;
+    },
+
+    async assertSupplierIdsInBusiness(businessId, supplierIds) {
+      if (supplierIds.length === 0) return;
+      const params: SqlParam[] = [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+      ];
+      const ph = supplierIds.map((id, i) => {
+        const n = `s${i}`;
+        params.push({ name: n, type: sql.UniqueIdentifier, value: id });
+        return `@${n}`;
+      });
+      const row = await queryOne<Record<string, unknown>>(
+        db,
+        `SELECT COUNT(*) AS [c] FROM suppliers
+         WHERE [business_id] = @businessId AND [id] IN (${ph.join(",")})`,
+        params,
+      );
+      if (Number(row?.c ?? 0) !== supplierIds.length) {
+        const { HttpError } = await import("../errors/httpError");
+        throw new HttpError(
+          400,
+          "One or more default_supplier_ids are invalid for this business",
+        );
+      }
+    },
+
+    async assertBrokerIdsInBusiness(businessId, brokerIds) {
+      if (brokerIds.length === 0) return;
+      const params: SqlParam[] = [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+      ];
+      const ph = brokerIds.map((id, i) => {
+        const n = `b${i}`;
+        params.push({ name: n, type: sql.UniqueIdentifier, value: id });
+        return `@${n}`;
+      });
+      const row = await queryOne<Record<string, unknown>>(
+        db,
+        `SELECT COUNT(*) AS [c] FROM brokers
+         WHERE [business_id] = @businessId AND [id] IN (${ph.join(",")})`,
+        params,
+      );
+      if (Number(row?.c ?? 0) !== brokerIds.length) {
+        const { HttpError } = await import("../errors/httpError");
+        throw new HttpError(
+          400,
+          "One or more default_broker_ids are invalid for this business",
+        );
+      }
+    },
+
+    async getCategoryName(businessId, categoryId) {
+      const row = await queryOne<Record<string, unknown>>(
+        db,
+        `SELECT [name] FROM item_categories
+         WHERE [id] = @categoryId AND [business_id] = @businessId`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "categoryId", type: sql.UniqueIdentifier, value: categoryId },
+        ],
+      );
+      return row?.name != null ? String(row.name) : null;
+    },
+
+    async insertItem(row) {
+      await queryOne(
+        db,
+        `INSERT INTO catalog_items (
+           [id], [business_id], [category_id], [type_id], [name],
+           [default_unit], [default_kg_per_bag], [default_items_per_box],
+           [default_weight_per_tin], [default_purchase_unit], [default_sale_unit],
+           [hsn_code], [item_code], [barcode], [public_token], [tax_percent],
+           [default_landing_cost], [default_selling_cost],
+           [package_type], [selling_unit], [stock_unit], [display_unit],
+           [package_size], [package_measurement], [validation_status],
+           [auto_detect_enabled], [stock_version], [opening_stock_locked], [created_at]
+         ) VALUES (
+           @id, @businessId, @categoryId, @typeId, @name,
+           @defaultUnit, @dkg, @dbox, @dwt, @purchaseU, @saleU,
+           @hsn, @itemCode, @barcode, @publicToken, @tax,
+           @landing, @selling,
+           @packageType, @sellingUnit, @stockUnit, @displayUnit,
+           @packageSize, @packageMeasurement, @validationStatus,
+           1, 0, 0, SYSUTCDATETIME()
+         )`,
+        [
+          { name: "id", type: sql.UniqueIdentifier, value: row.id },
+          { name: "businessId", type: sql.UniqueIdentifier, value: row.businessId },
+          { name: "categoryId", type: sql.UniqueIdentifier, value: row.categoryId },
+          { name: "typeId", type: sql.UniqueIdentifier, value: row.typeId },
+          { name: "name", type: sql.NVarChar(512), value: row.name },
+          { name: "defaultUnit", type: sql.NVarChar(32), value: row.defaultUnit },
+          { name: "dkg", type: sql.Decimal(12, 3), value: row.defaultKgPerBag },
+          { name: "dbox", type: sql.Decimal(12, 3), value: row.defaultItemsPerBox },
+          { name: "dwt", type: sql.Decimal(12, 3), value: row.defaultWeightPerTin },
+          { name: "purchaseU", type: sql.NVarChar(32), value: row.defaultPurchaseUnit },
+          { name: "saleU", type: sql.NVarChar(32), value: row.defaultSaleUnit },
+          { name: "hsn", type: sql.NVarChar(32), value: row.hsnCode },
+          { name: "itemCode", type: sql.NVarChar(64), value: row.itemCode },
+          { name: "barcode", type: sql.NVarChar(64), value: row.barcode },
+          { name: "publicToken", type: sql.NVarChar(64), value: row.publicToken },
+          { name: "tax", type: sql.Decimal(5, 2), value: row.taxPercent },
+          { name: "landing", type: sql.Decimal(12, 2), value: row.defaultLandingCost },
+          { name: "selling", type: sql.Decimal(12, 2), value: row.defaultSellingCost },
+          { name: "packageType", type: sql.NVarChar(32), value: row.packageType },
+          { name: "sellingUnit", type: sql.NVarChar(32), value: row.sellingUnit },
+          { name: "stockUnit", type: sql.NVarChar(32), value: row.stockUnit },
+          { name: "displayUnit", type: sql.NVarChar(32), value: row.displayUnit },
+          { name: "packageSize", type: sql.Decimal(14, 4), value: row.packageSize },
+          { name: "packageMeasurement", type: sql.NVarChar(16), value: row.packageMeasurement },
+          { name: "validationStatus", type: sql.NVarChar(32), value: row.validationStatus },
+        ],
+      );
+    },
+
+    async updateSmartFields(itemId, fields) {
+      await queryOne(
+        db,
+        `UPDATE catalog_items SET
+           [normalized_name] = @normalizedName,
+           [selling_unit] = @sellingUnit,
+           [stock_unit] = @stockUnit,
+           [display_unit] = @displayUnit,
+           [package_type] = @packageType,
+           [package_size] = @packageSize,
+           [package_measurement] = @packageMeasurement,
+           [conversion_factor] = @conversionFactor,
+           [unit_confidence] = @unitConfidence,
+           [smart_classification] = @smartClassification,
+           [default_kg_per_bag] = @defaultKgPerBag,
+           [validation_status] = @validationStatus
+         WHERE [id] = @itemId`,
+        [
+          { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+          { name: "normalizedName", type: sql.NVarChar(512), value: fields.normalizedName },
+          { name: "sellingUnit", type: sql.NVarChar(32), value: fields.sellingUnit },
+          { name: "stockUnit", type: sql.NVarChar(32), value: fields.stockUnit },
+          { name: "displayUnit", type: sql.NVarChar(32), value: fields.displayUnit },
+          { name: "packageType", type: sql.NVarChar(32), value: fields.packageType },
+          { name: "packageSize", type: sql.Decimal(14, 4), value: fields.packageSize },
+          { name: "packageMeasurement", type: sql.NVarChar(16), value: fields.packageMeasurement },
+          { name: "conversionFactor", type: sql.Decimal(14, 6), value: fields.conversionFactor },
+          { name: "unitConfidence", type: sql.Decimal(5, 2), value: fields.unitConfidence },
+          { name: "smartClassification", type: sql.NVarChar(64), value: fields.smartClassification },
+          { name: "defaultKgPerBag", type: sql.Decimal(12, 3), value: fields.defaultKgPerBag },
+          { name: "validationStatus", type: sql.NVarChar(32), value: fields.validationStatus },
+        ],
+      );
+    },
+
+    async replaceDefaultSuppliers(businessId, itemId, supplierIds) {
+      await queryOne(
+        db,
+        `DELETE FROM catalog_item_default_suppliers
+         WHERE [business_id] = @businessId AND [catalog_item_id] = @itemId`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+        ],
+      );
+      const { randomUUID } = await import("node:crypto");
+      for (let order = 0; order < supplierIds.length; order++) {
+        await queryOne(
+          db,
+          `INSERT INTO catalog_item_default_suppliers
+             ([id], [business_id], [catalog_item_id], [supplier_id], [sort_order])
+           VALUES (@id, @businessId, @itemId, @supplierId, @ord)`,
+          [
+            { name: "id", type: sql.UniqueIdentifier, value: randomUUID() },
+            { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+            { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+            { name: "supplierId", type: sql.UniqueIdentifier, value: supplierIds[order] },
+            { name: "ord", type: sql.Int, value: order },
+          ],
+        );
+      }
+    },
+
+    async replaceDefaultBrokers(businessId, itemId, brokerIds) {
+      await queryOne(
+        db,
+        `DELETE FROM catalog_item_default_brokers
+         WHERE [business_id] = @businessId AND [catalog_item_id] = @itemId`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+        ],
+      );
+      const { randomUUID } = await import("node:crypto");
+      for (let order = 0; order < brokerIds.length; order++) {
+        await queryOne(
+          db,
+          `INSERT INTO catalog_item_default_brokers
+             ([id], [business_id], [catalog_item_id], [broker_id], [sort_order])
+           VALUES (@id, @businessId, @itemId, @brokerId, @ord)`,
+          [
+            { name: "id", type: sql.UniqueIdentifier, value: randomUUID() },
+            { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+            { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+            { name: "brokerId", type: sql.UniqueIdentifier, value: brokerIds[order] },
+            { name: "ord", type: sql.Int, value: order },
+          ],
+        );
+      }
+    },
+
+    async seedSupplierItemDefaults(businessId, itemId, supplierIds) {
+      const { randomUUID } = await import("node:crypto");
+      for (const sid of supplierIds) {
+        const ex = await queryOne<Record<string, unknown>>(
+          db,
+          `SELECT [id] FROM supplier_item_defaults
+           WHERE [business_id] = @businessId AND [catalog_item_id] = @itemId
+             AND [supplier_id] = @supplierId`,
+          [
+            { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+            { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+            { name: "supplierId", type: sql.UniqueIdentifier, value: sid },
+          ],
+        );
+        if (ex) continue;
+        await queryOne(
+          db,
+          `INSERT INTO supplier_item_defaults
+             ([id], [business_id], [supplier_id], [catalog_item_id],
+              [purchase_count], [updated_at])
+           VALUES (@id, @businessId, @supplierId, @itemId, 0, SYSUTCDATETIME())`,
+          [
+            { name: "id", type: sql.UniqueIdentifier, value: randomUUID() },
+            { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+            { name: "supplierId", type: sql.UniqueIdentifier, value: sid },
+            { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+          ],
+        );
+      }
+    },
+
+    async patchItem(args) {
+      const { coerceBoxItemsPerBox } = await import(
+        "../validation/catalogItems.schemas"
+      );
+      const p = args.patch;
+      const sets: string[] = [
+        "[category_id] = @categoryId",
+        "[type_id] = @typeId",
+      ];
+      const params: SqlParam[] = [
+        { name: "businessId", type: sql.UniqueIdentifier, value: args.businessId },
+        { name: "itemId", type: sql.UniqueIdentifier, value: args.itemId },
+        { name: "categoryId", type: sql.UniqueIdentifier, value: args.categoryId },
+        { name: "typeId", type: sql.UniqueIdentifier, value: args.typeId },
+      ];
+      if ("name" in p && p.name != null) {
+        sets.push("[name] = @name");
+        params.push({ name: "name", type: sql.NVarChar(512), value: p.name });
+      }
+      let unit = typeof p.default_unit === "string" ? p.default_unit : null;
+      if ("default_unit" in p) {
+        sets.push("[default_unit] = @defaultUnit");
+        params.push({
+          name: "defaultUnit",
+          type: sql.NVarChar(32),
+          value: p.default_unit,
+        });
+        unit = String(p.default_unit);
+        // Formula source: catalog.py update — clear extras when unit ≠ type;
+        // only set matching field when key present (switching TO bag keeps old kg if unset).
+        if (unit !== "bag") {
+          sets.push("[default_kg_per_bag] = @dkg");
+          params.push({ name: "dkg", type: sql.Decimal(12, 3), value: null });
+        } else if ("default_kg_per_bag" in p) {
+          sets.push("[default_kg_per_bag] = @dkg");
+          params.push({
+            name: "dkg",
+            type: sql.Decimal(12, 3),
+            value: p.default_kg_per_bag ?? null,
+          });
+        }
+        if (unit !== "box") {
+          sets.push("[default_items_per_box] = @dbox");
+          params.push({ name: "dbox", type: sql.Decimal(12, 3), value: null });
+        } else if ("default_items_per_box" in p) {
+          sets.push("[default_items_per_box] = @dbox");
+          params.push({
+            name: "dbox",
+            type: sql.Decimal(12, 3),
+            value: coerceBoxItemsPerBox(
+              p.default_items_per_box as number | null | undefined,
+            ),
+          });
+        }
+        if (unit !== "tin") {
+          sets.push("[default_weight_per_tin] = @dwt");
+          params.push({ name: "dwt", type: sql.Decimal(12, 3), value: null });
+        } else if ("default_weight_per_tin" in p) {
+          sets.push("[default_weight_per_tin] = @dwt");
+          params.push({
+            name: "dwt",
+            type: sql.Decimal(12, 3),
+            value: p.default_weight_per_tin ?? null,
+          });
+        }
+      } else {
+        if ("default_kg_per_bag" in p) {
+          sets.push("[default_kg_per_bag] = @dkgOnly");
+          params.push({
+            name: "dkgOnly",
+            type: sql.Decimal(12, 3),
+            value: p.default_kg_per_bag,
+          });
+        }
+        if ("default_items_per_box" in p) {
+          sets.push("[default_items_per_box] = @dboxOnly");
+          params.push({
+            name: "dboxOnly",
+            type: sql.Decimal(12, 3),
+            value: p.default_items_per_box,
+          });
+        }
+        if ("default_weight_per_tin" in p) {
+          sets.push("[default_weight_per_tin] = @dwtOnly");
+          params.push({
+            name: "dwtOnly",
+            type: sql.Decimal(12, 3),
+            value: p.default_weight_per_tin,
+          });
+        }
+      }
+      if ("default_purchase_unit" in p) {
+        sets.push("[default_purchase_unit] = @purchaseU");
+        params.push({
+          name: "purchaseU",
+          type: sql.NVarChar(32),
+          value: p.default_purchase_unit,
+        });
+      }
+      if ("default_sale_unit" in p) {
+        sets.push("[default_sale_unit] = @saleU");
+        params.push({
+          name: "saleU",
+          type: sql.NVarChar(32),
+          value: p.default_sale_unit,
+        });
+      }
+      if ("hsn_code" in p) {
+        sets.push("[hsn_code] = @hsn");
+        params.push({ name: "hsn", type: sql.NVarChar(32), value: p.hsn_code });
+      }
+      if ("item_code" in p) {
+        sets.push("[item_code] = @itemCode");
+        params.push({
+          name: "itemCode",
+          type: sql.NVarChar(64),
+          value: p.item_code,
+        });
+      }
+      if ("tax_percent" in p) {
+        sets.push("[tax_percent] = @tax");
+        params.push({
+          name: "tax",
+          type: sql.Decimal(5, 2),
+          value: p.tax_percent,
+        });
+      }
+      if ("default_landing_cost" in p) {
+        sets.push("[default_landing_cost] = @landing");
+        params.push({
+          name: "landing",
+          type: sql.Decimal(12, 2),
+          value: p.default_landing_cost,
+        });
+      }
+      if ("default_selling_cost" in p) {
+        sets.push("[default_selling_cost] = @selling");
+        params.push({
+          name: "selling",
+          type: sql.Decimal(12, 2),
+          value: p.default_selling_cost,
+        });
+      }
+      if ("reorder_level" in p) {
+        sets.push("[reorder_level] = @reorder");
+        params.push({
+          name: "reorder",
+          type: sql.Decimal(12, 3),
+          value: p.reorder_level ?? 0,
+        });
+      }
+      await queryOne(
+        db,
+        `UPDATE catalog_items SET ${sets.join(", ")}
+         WHERE [id] = @itemId AND [business_id] = @businessId`,
+        params,
+      );
+    },
+
+    async countTradeLines(itemId) {
+      const row = await queryOne<Record<string, unknown>>(
+        db,
+        `SELECT COUNT(*) AS [c] FROM trade_purchase_lines
+         WHERE [catalog_item_id] = @itemId`,
+        [{ name: "itemId", type: sql.UniqueIdentifier, value: itemId }],
+      );
+      return Number(row?.c ?? 0);
+    },
+
+    async listVariantIds(businessId, itemId) {
+      const rows = await queryMany<Record<string, unknown>>(
+        db,
+        `SELECT [id] FROM catalog_variants
+         WHERE [business_id] = @businessId AND [catalog_item_id] = @itemId`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+        ],
+      );
+      return rows.map((r) => String(r.id));
+    },
+
+    async countArchivedEntryLinesForVariants(variantIds) {
+      if (variantIds.length === 0) return 0;
+      try {
+        const params: SqlParam[] = [];
+        const ph = variantIds.map((id, i) => {
+          const n = `v${i}`;
+          params.push({ name: n, type: sql.UniqueIdentifier, value: id });
+          return `@${n}`;
+        });
+        const row = await queryOne<Record<string, unknown>>(
+          db,
+          `SELECT COUNT(*) AS [c] FROM _archived_entry_line_items
+           WHERE [catalog_variant_id] IN (${ph.join(",")})`,
+          params,
+        );
+        return Number(row?.c ?? 0);
+      } catch {
+        return 0;
+      }
+    },
+
+    async deleteItem(businessId, itemId) {
+      await queryOne(
+        db,
+        `DELETE FROM catalog_items
+         WHERE [id] = @itemId AND [business_id] = @businessId`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+        ],
+      );
     },
   };
 }

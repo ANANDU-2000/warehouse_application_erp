@@ -19,7 +19,7 @@ import { TokenIssuanceUnavailableError } from "../auth/tokenIssuer";
 import { sendDetail } from "../http/sendDetail";
 import { logger } from "../logging/logger";
 
-type Mapped = { status: number; detail: string };
+type Mapped = { status: number; detail: string | Record<string, unknown> };
 
 function mapKnownError(err: unknown): Mapped | null {
   if (err instanceof HttpError) {

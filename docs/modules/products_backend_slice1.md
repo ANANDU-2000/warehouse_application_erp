@@ -9,9 +9,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Dashboard Subagent 4 nest · **Products Slice 1 GET list+detail** |
-| 🟡 Current | Products backend Slice 1 PASS — ask before Slice 2 (writes / fuzzy / variants) |
-| ⬜ Pending | POST/PATCH/DELETE catalog-items · from-scan · batch · variants · fuzzy-check · bulk-archive · frontend |
+| ✅ Completed | Dashboard Subagent 4 nest · **Products Slice 1 GET list+detail** · **Slice 2 POST/PATCH/DELETE** |
+| 🟡 Current | Products backend Slice 2 PASS — ask before Slice 3 (batch / fuzzy / variants) or catalog UI |
+| ⬜ Pending | batch · from-scan · fuzzy-check · variants · bulk-archive · frontend |
 | ⏸ Deferred | purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New

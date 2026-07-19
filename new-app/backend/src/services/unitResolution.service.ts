@@ -408,3 +408,27 @@ export function resolveForCatalogItem(
     canonical_unit_type: textRes.canonical_unit_type || textRes.selling_unit,
   };
 }
+
+/** Formula source: unit_resolution_service.py:merge_unit_resolution_into_catalog_row */
+export function mergeUnitResolutionIntoCatalogRow(
+  item: CatalogItemUnitFields & { name: string },
+  ur: UnitResolution,
+): void {
+  item.selling_unit = ur.selling_unit;
+  item.stock_unit = ur.stock_unit;
+  item.display_unit = ur.display_unit || ur.selling_unit;
+  item.package_type = ur.package_type;
+  item.package_size = ur.package_size;
+  item.package_measurement = ur.package_measurement;
+  item.conversion_factor = ur.conversion_factor;
+  item.unit_confidence = ur.confidence;
+  item.smart_classification = ur.rule_id;
+  if (
+    ur.package_measurement === "KG" &&
+    ur.selling_unit === "BAG" &&
+    ur.package_size != null &&
+    item.default_kg_per_bag == null
+  ) {
+    item.default_kg_per_bag = ur.package_size;
+  }
+}

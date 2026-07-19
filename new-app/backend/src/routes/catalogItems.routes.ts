@@ -1,6 +1,6 @@
 /**
- * Catalog items routes — GET /catalog-items, GET /catalog-items/:itemId
- * Source: catalog.py prefix /v1/businesses/{business_id}
+ * Catalog items routes — GET/POST/PATCH/DELETE
+ * Source: catalog.py
  */
 import { Router } from "express";
 import type { AuthzMiddleware } from "../middleware/authz";
@@ -17,11 +17,30 @@ export function createCatalogItemsRoutes(
     authz.requireMembership,
     (req, res, next) => void catalog.list(req, res, next),
   );
+  r.post(
+    "/",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void catalog.create(req, res, next),
+  );
   r.get(
     "/:itemId",
     authz.requireAuth,
     authz.requireMembership,
     (req, res, next) => void catalog.getById(req, res, next),
+  );
+  r.patch(
+    "/:itemId",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void catalog.update(req, res, next),
+  );
+  r.delete(
+    "/:itemId",
+    authz.requireAuth,
+    authz.requireMembership,
+    authz.requireOwnerMembership,
+    (req, res, next) => void catalog.remove(req, res, next),
   );
   return r;
 }

@@ -50,6 +50,7 @@ import { createStaffHomeController } from "./controllers/staffHome.controller";
 import { createHomeActivityController } from "./controllers/homeActivity.controller";
 import { createSearchController } from "./controllers/search.controller";
 import { createCatalogItemsController } from "./controllers/catalogItems.controller";
+import { createCatalogItemsWriteService } from "./services/catalogItemsWrite.service";
 
 export type AppDeps = {
   /** Injected for tests / when pool is ready. */
@@ -65,8 +66,16 @@ export type AppDeps = {
   homeActivity?: HomeActivityRepository;
   /** Unified search — search.py */
   search?: SearchRepository;
-  /** Products Slice 1 — catalog.py GET catalog-items */
+  /** Products Slice 1–2 — catalog.py catalog-items */
   catalogItems?: CatalogItemsRepository;
+  /** Test seam for catalog POST/PATCH/DELETE transactions. */
+  catalogWriteRunInTransaction?: <T>(
+    fn: (tx: import("./repositories/sql").SqlClient) => Promise<T>,
+  ) => Promise<T>;
+  /** Test seam — bind write ops to injected catalogItems mock. */
+  catalogWriteRepoForClient?: (
+    client: import("./repositories/sql").SqlClient,
+  ) => CatalogItemsRepository;
   /** Users & Roles — business user list */
   businessUsers?: BusinessUsersRepository;
   /** SQL pool for transactional user create. */
@@ -200,7 +209,28 @@ function unavailableCatalogItemsRepository(): CatalogItemsRepository {
   const fail = async (): Promise<never> => {
     throw new Error("Database pool not connected. Call connect() first.");
   };
-  return { list: fail, getById: fail };
+  return {
+    list: fail,
+    getById: fail,
+    categoryExists: fail,
+    verifyTypeInCategory: fail,
+    getOrCreateGeneralTypeId: fail,
+    findDupItemId: fail,
+    nextItemCode: fail,
+    assertSupplierIdsInBusiness: fail,
+    assertBrokerIdsInBusiness: fail,
+    getCategoryName: fail,
+    insertItem: fail,
+    updateSmartFields: fail,
+    replaceDefaultSuppliers: fail,
+    replaceDefaultBrokers: fail,
+    seedSupplierItemDefaults: fail,
+    patchItem: fail,
+    countTradeLines: fail,
+    listVariantIds: fail,
+    countArchivedEntryLinesForVariants: fail,
+    deleteItem: fail,
+  };
 }
 
 function unavailableBusinessUsersRepository(): BusinessUsersRepository {
@@ -306,10 +336,19 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
 
   const catalogItems =
     deps.catalogItems ?? unavailableCatalogItemsRepository();
+  const catalogWrite = createCatalogItemsWriteService({
+    catalogItems,
+    pool: deps.pool,
+    runInTransaction: deps.catalogWriteRunInTransaction,
+    repoForClient: deps.catalogWriteRepoForClient,
+  });
   app.use(
     "/v1/businesses/:businessId/catalog-items",
     createCatalogItemsRoutes(
-      createCatalogItemsController({ catalogItems }),
+      createCatalogItemsController({
+        catalogItems,
+        write: catalogWrite,
+      }),
       app.authz,
     ),
   );

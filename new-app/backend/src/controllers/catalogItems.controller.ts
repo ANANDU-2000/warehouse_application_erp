@@ -1,6 +1,5 @@
 /**
- * Catalog items controller — GET list + GET by id
- * Source: catalog.py list_catalog_items / get_catalog_item
+ * Catalog items controller — list/get + Slice 2 create/patch/delete
  */
 import type { Request, Response, NextFunction } from "express";
 import { HttpError } from "../errors/httpError";
@@ -11,9 +10,11 @@ import {
   maybeRedactCatalogOut,
   toCatalogItemOut,
 } from "../services/catalogItems.service";
+import type { CatalogItemsWriteService } from "../services/catalogItemsWrite.service";
 
 export type CatalogItemsControllerDeps = {
   catalogItems: CatalogItemsRepository;
+  write?: CatalogItemsWriteService;
 };
 
 function parsePage(raw: unknown, fallback: number): number {
@@ -69,6 +70,69 @@ export function createCatalogItemsController(deps: CatalogItemsControllerDeps) {
         }
         const role = req.membership?.role ?? null;
         res.json(maybeRedactCatalogOut(toCatalogItemOut(row), role));
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async create(req: Request, res: Response, next: NextFunction) {
+      try {
+        if (!deps.write) {
+          sendDetail(res, 503, "Catalog writes unavailable");
+          return;
+        }
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string") {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        const role = req.membership?.role ?? null;
+        const out = await deps.write.create(businessId, req.body, role);
+        res.status(201).json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async update(req: Request, res: Response, next: NextFunction) {
+      try {
+        if (!deps.write) {
+          sendDetail(res, 503, "Catalog writes unavailable");
+          return;
+        }
+        const businessId = req.params.businessId;
+        const itemId = req.params.itemId;
+        if (typeof businessId !== "string" || typeof itemId !== "string") {
+          sendDetail(res, 400, "businessId and itemId required");
+          return;
+        }
+        const role = req.membership?.role ?? null;
+        const out = await deps.write.update(
+          businessId,
+          itemId,
+          req.body,
+          role,
+        );
+        res.json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async remove(req: Request, res: Response, next: NextFunction) {
+      try {
+        if (!deps.write) {
+          sendDetail(res, 503, "Catalog writes unavailable");
+          return;
+        }
+        const businessId = req.params.businessId;
+        const itemId = req.params.itemId;
+        if (typeof businessId !== "string" || typeof itemId !== "string") {
+          sendDetail(res, 400, "businessId and itemId required");
+          return;
+        }
+        await deps.write.remove(businessId, itemId);
+        res.status(204).send();
       } catch (e) {
         next(e);
       }

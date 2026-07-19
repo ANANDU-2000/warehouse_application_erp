@@ -1,7 +1,7 @@
 /**
- * User profile — WIRE (Step 5).
- * Source: user_profile_page.dart AppBar/edit/more/permissions;
- * user_profile_header.dart Edit user + PopupMenu
+ * User profile — STATES (Step 6).
+ * Source: user_profile_page.dart profileAsync.when + _PermissionsTab async.when;
+ * HexaErrorCard.fromError; FriendlyLoadError; CircularProgressIndicator.
  */
 import {
   useCallback,
@@ -30,7 +30,6 @@ import {
   USER_PROFILE_FIELD_ROLE,
   USER_PROFILE_LAST_ACTIVE_PREFIX,
   USER_PROFILE_LOAD_ERROR,
-  USER_PROFILE_LOADING,
   USER_PROFILE_MORE_ACTIVATE,
   USER_PROFILE_MORE_BLOCK,
   USER_PROFILE_MORE_COPY_EMAIL,
@@ -42,6 +41,7 @@ import {
   USER_PROFILE_NEW_PASSWORD_TITLE,
   USER_PROFILE_NOT_FOUND,
   USER_PROFILE_PERMISSIONS_SAVED,
+  USER_PROFILE_PERMS_VIEW_ONLY,
   USER_PROFILE_RETRY,
   USER_PROFILE_ROLE_ADMIN,
   USER_PROFILE_ROLE_MANAGER,
@@ -82,6 +82,10 @@ import {
   UsersNetworkError,
   type BusinessUserProfile,
 } from "./usersApi";
+import {
+  mapUserFacingError,
+  mapUsersLoadSubtitle,
+} from "./usersLoadSubtitle";
 import "./UserProfilePage.css";
 
 function popOrGo(
@@ -163,6 +167,9 @@ export function UserProfilePage() {
   const [loadError, setLoadError] = useState<unknown | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [retryTick, setRetryTick] = useState(0);
+  const [permLoading, setPermLoading] = useState(false);
+  const [permError, setPermError] = useState<unknown | null>(null);
+  const [permRetryTick, setPermRetryTick] = useState(0);
 
   const permKeys = useMemo(() => {
     const keys: string[] = [];
@@ -181,25 +188,21 @@ export function UserProfilePage() {
       setLoading(false);
       setLoadError(null);
       setNotFound(false);
+      setPermDraft({});
+      setPermLoading(false);
+      setPermError(null);
       return;
     }
 
     setLoading(true);
     setLoadError(null);
     setNotFound(false);
+    setPermDraft({});
+    setPermError(null);
 
     try {
       const data = await getBusinessUser({ businessId, userId });
       setProfile(data);
-
-      if (sessionCanAdminUsers(session)) {
-        try {
-          const perms = await getUserPermissions({ businessId, userId });
-          setPermDraft({ ...perms.permissions });
-        } catch {
-          setPermDraft({});
-        }
-      }
     } catch (e) {
       setProfile(null);
       if (e instanceof UsersApiError && e.status === 404) {
@@ -210,11 +213,36 @@ export function UserProfilePage() {
     } finally {
       setLoading(false);
     }
-  }, [businessId, session, userId]);
+  }, [businessId, userId]);
+
+  const loadPermissions = useCallback(async () => {
+    if (!businessId || !userId || !profile) {
+      setPermLoading(false);
+      return;
+    }
+
+    setPermLoading(true);
+    setPermError(null);
+
+    try {
+      const perms = await getUserPermissions({ businessId, userId });
+      setPermDraft({ ...perms.permissions });
+    } catch (e) {
+      setPermDraft({});
+      setPermError(e);
+    } finally {
+      setPermLoading(false);
+    }
+  }, [businessId, profile, userId]);
 
   useEffect(() => {
     void loadProfile();
   }, [loadProfile, retryTick]);
+
+  useEffect(() => {
+    if (!profile) return;
+    void loadPermissions();
+  }, [loadPermissions, permRetryTick, profile]);
 
   if (!sessionCanManageUsers(session)) {
     return <Navigate to="/settings" replace />;
@@ -251,6 +279,10 @@ export function UserProfilePage() {
 
   function onRetry() {
     setRetryTick((n) => n + 1);
+  }
+
+  function onRetryPermissions() {
+    setPermRetryTick((n) => n + 1);
   }
 
   function togglePerm(key: string) {
@@ -300,8 +332,7 @@ export function UserProfilePage() {
         permissions: permDraft,
       });
       setToast(USER_PROFILE_PERMISSIONS_SAVED);
-      const perms = await getUserPermissions({ businessId, userId });
-      setPermDraft({ ...perms.permissions });
+      await loadPermissions();
     } catch (e) {
       setToast(actionErrorMessage(e));
     }
@@ -385,17 +416,19 @@ export function UserProfilePage() {
 
   if (loading) {
     bodyContent = (
-      <p
-        className="user-profile__meta"
+      <div
+        className="user-profile__cold-load"
         data-testid="user-profile-loading"
+        aria-busy="true"
+        aria-label="Loading"
       >
-        {USER_PROFILE_LOADING}
-      </p>
+        <span className="user-profile__spinner-ring" aria-hidden="true" />
+      </div>
     );
   } else if (notFound) {
     bodyContent = (
       <p
-        className="user-profile__meta"
+        className="user-profile__not-found"
         data-testid="user-profile-not-found"
       >
         {USER_PROFILE_NOT_FOUND}
@@ -403,17 +436,13 @@ export function UserProfilePage() {
     );
   } else if (loadError) {
     bodyContent = (
-      <div data-testid="user-profile-load-error">
-        <p className="user-profile__meta">{USER_PROFILE_LOAD_ERROR}</p>
-        <button
-          type="button"
-          className="user-profile__edit-btn"
-          data-testid="user-profile-retry"
-          onClick={onRetry}
-        >
-          {USER_PROFILE_RETRY}
-        </button>
-      </div>
+      <UserProfileFriendlyLoadError
+        message={USER_PROFILE_LOAD_ERROR}
+        subtitle={mapUsersLoadSubtitle(loadError)}
+        onRetry={onRetry}
+        testId="user-profile-friendly-error"
+        retryTestId="user-profile-retry"
+      />
     );
   } else {
     bodyContent = (
@@ -684,55 +713,91 @@ export function UserProfilePage() {
               className="user-profile__perms"
               data-testid="user-profile-permissions"
             >
-              {USER_PERMISSION_GROUPS.map((group) => (
+              {permLoading ? (
                 <div
-                  key={group.title}
-                  className="user-profile__perm-group"
-                  data-testid={`user-profile-perm-group-${group.title}`}
+                  className="user-profile__cold-load user-profile__cold-load--tab"
+                  data-testid="user-profile-perms-loading"
+                  aria-busy="true"
+                  aria-label="Loading"
                 >
-                  <h3 className="user-profile__perm-group-title">
-                    {group.title}
-                  </h3>
-                  {group.permissions.map((p) => {
-                    const checked = permDraft[p.key] ?? false;
-                    return (
-                      <label
-                        key={p.key}
-                        className="user-profile__perm-row"
-                        data-testid={`user-profile-perm-${p.key}`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          disabled={!canAdmin}
-                          onChange={() => togglePerm(p.key)}
-                        />
-                        <span className="user-profile__perm-text">
-                          <span className="user-profile__perm-label">
-                            {p.label}
-                          </span>
-                          {p.subtitle ? (
-                            <span className="user-profile__perm-sub">
-                              {p.subtitle}
-                            </span>
-                          ) : null}
-                        </span>
-                      </label>
-                    );
-                  })}
+                  <span
+                    className="user-profile__spinner-ring"
+                    aria-hidden="true"
+                  />
                 </div>
-              ))}
-              {canAdmin ? (
-                <button
-                  type="button"
-                  className="user-profile__save-perms"
-                  data-testid="user-profile-save-permissions"
-                  onClick={() => void onSavePermissions()}
-                >
-                  {USER_PROFILE_SAVE_PERMISSIONS}
-                </button>
               ) : null}
-              <span hidden data-perm-keys={permKeys.join(",")} />
+
+              {!permLoading && permError != null ? (
+                <UserProfileFriendlyLoadError
+                  message={mapUserFacingError(permError)}
+                  subtitle={null}
+                  onRetry={onRetryPermissions}
+                  testId="user-profile-perms-friendly-error"
+                  retryTestId="user-profile-perms-retry"
+                />
+              ) : null}
+
+              {!permLoading && permError == null ? (
+                <>
+                  {!canAdmin ? (
+                    <p
+                      className="user-profile__perms-view-only"
+                      data-testid="user-profile-perms-view-only"
+                    >
+                      {USER_PROFILE_PERMS_VIEW_ONLY}
+                    </p>
+                  ) : null}
+                  {USER_PERMISSION_GROUPS.map((group) => (
+                    <div
+                      key={group.title}
+                      className="user-profile__perm-group"
+                      data-testid={`user-profile-perm-group-${group.title}`}
+                    >
+                      <h3 className="user-profile__perm-group-title">
+                        {group.title}
+                      </h3>
+                      {group.permissions.map((p) => {
+                        const checked = permDraft[p.key] ?? false;
+                        return (
+                          <label
+                            key={p.key}
+                            className="user-profile__perm-row"
+                            data-testid={`user-profile-perm-${p.key}`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              disabled={!canAdmin}
+                              onChange={() => togglePerm(p.key)}
+                            />
+                            <span className="user-profile__perm-text">
+                              <span className="user-profile__perm-label">
+                                {p.label}
+                              </span>
+                              {p.subtitle ? (
+                                <span className="user-profile__perm-sub">
+                                  {p.subtitle}
+                                </span>
+                              ) : null}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  ))}
+                  {canAdmin ? (
+                    <button
+                      type="button"
+                      className="user-profile__save-perms"
+                      data-testid="user-profile-save-permissions"
+                      onClick={() => void onSavePermissions()}
+                    >
+                      {USER_PROFILE_SAVE_PERMISSIONS}
+                    </button>
+                  ) : null}
+                  <span hidden data-perm-keys={permKeys.join(",")} />
+                </>
+              ) : null}
             </div>
           ) : null}
         </section>
@@ -966,5 +1031,41 @@ function MenuItem({
     >
       {children}
     </button>
+  );
+}
+
+/** HexaErrorCard → FriendlyLoadError — hexa_error_card.dart / friendly_load_error.dart */
+function UserProfileFriendlyLoadError({
+  message,
+  subtitle,
+  onRetry,
+  testId,
+  retryTestId,
+}: {
+  message: string;
+  subtitle: string | null;
+  onRetry: () => void;
+  testId: string;
+  retryTestId: string;
+}) {
+  return (
+    <div
+      className="user-profile__friendly-error"
+      role="alert"
+      data-testid={testId}
+    >
+      <p className="user-profile__friendly-error-msg">{message}</p>
+      {subtitle != null ? (
+        <p className="user-profile__friendly-error-sub">{subtitle}</p>
+      ) : null}
+      <button
+        type="button"
+        className="user-profile__retry"
+        data-testid={retryTestId}
+        onClick={onRetry}
+      >
+        {USER_PROFILE_RETRY}
+      </button>
+    </div>
   );
 }

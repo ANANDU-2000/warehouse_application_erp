@@ -1,7 +1,21 @@
 /**
- * loadStateErrorSubtitle — source-app load_state_error.dart (users list HexaErrorCard).
+ * loadStateErrorSubtitle — source-app load_state_error.dart (HexaErrorCard).
+ * userFacingError — auth_error_messages.dart friendlyApiError (permissions tab).
  */
 import { UsersApiError, UsersNetworkError } from "./usersApi";
+import {
+  USER_PROFILE_FACING_400,
+  USER_PROFILE_FACING_401_403,
+  USER_PROFILE_FACING_402,
+  USER_PROFILE_FACING_404,
+  USER_PROFILE_FACING_408,
+  USER_PROFILE_FACING_409,
+  USER_PROFILE_FACING_429,
+  USER_PROFILE_FACING_503,
+  USER_PROFILE_FACING_5XX,
+  USER_PROFILE_FACING_GENERIC,
+  USER_PROFILE_FACING_NETWORK,
+} from "./userProfileCopy";
 import {
   USERS_MGMT_RETRY_SUBTITLE,
   USERS_MGMT_SUBTITLE_400,
@@ -55,4 +69,48 @@ export function mapUsersLoadSubtitle(error: unknown): string {
   }
 
   return USERS_MGMT_RETRY_SUBTITLE;
+}
+
+/** Permissions tab FriendlyLoadError.message — userFacingError(e). */
+export function mapUserFacingError(error: unknown): string {
+  if (error instanceof UsersNetworkError) {
+    return USER_PROFILE_FACING_NETWORK;
+  }
+
+  if (error instanceof UsersApiError) {
+    switch (error.status) {
+      case 401:
+      case 403:
+        return USER_PROFILE_FACING_401_403;
+      case 402:
+        return USER_PROFILE_FACING_402;
+      case 404:
+        return USER_PROFILE_FACING_404;
+      case 408:
+        return USER_PROFILE_FACING_408;
+      case 429:
+        return USER_PROFILE_FACING_429;
+      case 409:
+        return USER_PROFILE_FACING_409;
+      case 400:
+      case 422: {
+        const detail = error.detail?.trim();
+        if (detail) {
+          return detail.length <= 420 ? detail : `${detail.slice(0, 417)}…`;
+        }
+        return USER_PROFILE_FACING_400;
+      }
+      case 503:
+        return USER_PROFILE_FACING_503;
+      default:
+        if (error.status >= 500) return USER_PROFILE_FACING_5XX;
+        break;
+    }
+    const detail = error.detail?.trim();
+    if (detail) {
+      return detail.length <= 420 ? detail : `${detail.slice(0, 417)}…`;
+    }
+  }
+
+  return USER_PROFILE_FACING_GENERIC;
 }

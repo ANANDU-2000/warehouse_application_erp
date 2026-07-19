@@ -41,8 +41,35 @@ export const USER_PROFILE_EMAIL_COPIED = "Email copied";
 export const USER_PROFILE_PERMISSIONS_SAVED = "Permissions saved";
 export const USER_PROFILE_NEW_PASSWORD_TITLE = "New password";
 export const USER_PROFILE_COPY_AND_CLOSE = "Copy & close";
+/** HexaErrorCard.fromError title — user_profile_page.dart */
 export const USER_PROFILE_LOAD_ERROR = "Could not load user";
 export const USER_PROFILE_NOT_FOUND = "User not found.";
-export const USER_PROFILE_LOADING = "Loading user…";
+/** friendly_load_error.dart kFriendlyLoadNetworkSubtitle */
+export const USER_PROFILE_RETRY_SUBTITLE = "Tap to retry.";
 export const USER_PROFILE_RETRY = "Retry";
+/** _PermissionsTab readOnly banner — user_profile_page.dart */
+export const USER_PROFILE_PERMS_VIEW_ONLY =
+  "View only — only owners and admins can edit permissions.";
+
+/** userFacingError / friendlyApiError — permissions FriendlyLoadError message */
+export const USER_PROFILE_FACING_401_403 =
+  "Session expired. Please sign in again.";
+export const USER_PROFILE_FACING_402 =
+  "Monthly AI usage limit reached. Ask your owner or try again next month.";
+export const USER_PROFILE_FACING_404 = "This item was not found.";
+export const USER_PROFILE_FACING_408 = "Request timed out. Please try again.";
+export const USER_PROFILE_FACING_429 =
+  "Too many requests. Wait a moment and try again.";
+export const USER_PROFILE_FACING_409 =
+  "Someone else updated this item. Please refresh and try again.";
+export const USER_PROFILE_FACING_400 =
+  "Please check your input and try again.";
+export const USER_PROFILE_FACING_503 =
+  "Server is starting up. Retrying automatically…";
+export const USER_PROFILE_FACING_5XX =
+  "Something went wrong on our side. Please try again.";
+export const USER_PROFILE_FACING_NETWORK =
+  "No connection. Changes will sync when online.";
+export const USER_PROFILE_FACING_GENERIC =
+  "Something went wrong. Please try again.";
 

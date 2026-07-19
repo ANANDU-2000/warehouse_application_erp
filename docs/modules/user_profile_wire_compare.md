@@ -16,10 +16,10 @@
 | 9 | Save permissions → `PATCH …/permissions` | Yes | `patchUserPermissions` | PASS |
 | 10 | Copy email clipboard | Yes | email \|\| login_email | PASS |
 | 11 | Activity feed/stock/purchases/ledger APIs | Yes | **Deferred** | N/A |
-| 12 | Full skeleton / FriendlyLoadError | Yes | Minimal loading/error — **STATES** | N/A |
+| 12 | Full skeleton / FriendlyLoadError | Spinner + HexaErrorCard | **STATES** — [`user_profile_states_compare.md`](user_profile_states_compare.md) | PASS |
 
 **Smoke:** `npm run test:user-profile-wire` (+ prior profile smokes); `npm run build` PASS.
 
 **Rollback:** Revert WIRE commit; restore BUTTONS stubs; remove wire compare + script; boards → ask before WIRE.
 
-**Next (ask first):** `/settings/users/:userId` STATES — ListSkeleton/FriendlyLoadError polish for profile load.
+**Next (ask first):** `/settings/users/:userId` STATES — done → [`user_profile_states_compare.md`](user_profile_states_compare.md). Ask before COMPARE.

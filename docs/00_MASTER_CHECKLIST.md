@@ -22,15 +22,15 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: staff WIRE-2 COMPLETE; Users backend Slice 1–14 PASS; Users list COMPARE PASS; profile **WIRE PASS** on `ops/dashboard-module` — ask before profile STATES.
+**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: staff WIRE-2 COMPLETE; Users backend Slice 1–14 PASS; Users list COMPARE PASS; profile **STATES PASS** on `ops/dashboard-module` — ask before profile COMPARE.
 
 ### Task board (Dashboard staff WIRE-2)
 
 | State | Step |
 |---|---|
-| ✅ Completed | Login/Splash/home/staff COMPARE · WIRE-2a–2f · Users backend **1–14** · Users list **COMPARE** · profile **SCAFFOLD→WIRE** |
-| 🟡 Current | Profile `/settings/users/:userId` **WIRE PASS** — ask before **STATES** |
-| ⬜ Pending | Profile STATES→COMPARE · Subagent 4 — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
+| ✅ Completed | Login/Splash/home/staff COMPARE · WIRE-2a–2f · Users backend **1–14** · Users list **COMPARE** · profile **SCAFFOLD→STATES** |
+| 🟡 Current | Profile `/settings/users/:userId` **STATES PASS** — ask before **COMPARE** |
+| ⬜ Pending | Profile COMPARE · Subagent 4 — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
 | ⏸ Deferred | Merge to `main`; full Dashboard Subagent 4 sign-off |
 
 ### Phase 1 module analysis queue (strict — one at a time)
@@ -39,7 +39,7 @@
 |---|---|---|---|
 | 1 | Login | ✅ UI COMPARE PASS | COMPARE [`login_compare.md`](modules/login_compare.md) · Splash [`splash_compare.md`](modules/splash_compare.md) |
 | 2 | Dashboard | 🟡 WIRE-2 DONE · Subagent 4 pending | [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) · [`staff_home_wire2f_compare.md`](modules/staff_home_wire2f_compare.md) |
-| 3 | Users & Roles | 🟡 Backend 1–14 PASS · list COMPARE · profile WIRE | [`user_profile_wire_compare.md`](modules/user_profile_wire_compare.md) · [`users_management_compare.md`](modules/users_management_compare.md) |
+| 3 | Users & Roles | 🟡 Backend 1–14 PASS · list COMPARE · profile STATES | [`user_profile_states_compare.md`](modules/user_profile_states_compare.md) · [`users_management_compare.md`](modules/users_management_compare.md) |
 | 4 | Products | ✅ Analyze+Review PASS | `docs/modules/products.md`, `docs/matrix/products_traceability.md`, branch `phase1/products-analysis` |
 | 5 | Categories | ✅ Analyze+Review PASS | `docs/modules/categories.md`, `docs/matrix/categories_traceability.md`, branch `phase1/categories-analysis` |
 | 6 | Units | ✅ Analyze+Review PASS | `docs/modules/units.md`, `docs/matrix/units_traceability.md`, branch `phase1/units-analysis` |
@@ -53,7 +53,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). Staff WIRE-2 **COMPLETE**. Users list **COMPARE PASS**. Profile **WIRE PASS**. Ask before STATES.
+**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). Staff WIRE-2 **COMPLETE**. Users list **COMPARE PASS**. Profile **STATES PASS**. Ask before COMPARE.
 
 ### Cursor operator setup (workspace)
 
@@ -111,7 +111,7 @@
 
 ## PHASE 4 — Frontend Migration (React + TypeScript) 🟡
 
-**Unlocked.** Phase 3 platform PASS. Login + Splash COMPARE PASS. Staff `/staff/home` WIRE-2 **COMPLETE**. Users backend Slice 1–14 **PASS**. Users list **COMPARE PASS**. Profile **WIRE PASS**. Next: ask profile STATES **or** Subagent 4 satellite.
+**Unlocked.** Phase 3 platform PASS. Login + Splash COMPARE PASS. Staff `/staff/home` WIRE-2 **COMPLETE**. Users backend Slice 1–14 **PASS**. Users list **COMPARE PASS**. Profile **STATES PASS**. Next: ask profile COMPARE **or** Subagent 4 satellite.
 
 | # | Task | Status |
 |---|---|---|
@@ -125,7 +125,7 @@
 | 4.8 | Accessibility | 🔒 |
 | 4.9 | Phase 4 sign-off (per module) | 🔒 |
 
-**4.2 / 4.5 note:** Staff WIRE-2a–2f COMPLETE (`ops/dashboard-module`). Profile WIRE PASS — [`user_profile_wire_compare.md`](modules/user_profile_wire_compare.md). Ask before STATES or one Subagent 4 satellite ([`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md)). Owner routes + Users list COMPARE PASS.
+**4.2 / 4.5 note:** Staff WIRE-2a–2f COMPLETE (`ops/dashboard-module`). Profile STATES PASS — [`user_profile_states_compare.md`](modules/user_profile_states_compare.md). Ask before COMPARE or one Subagent 4 satellite ([`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md)). Owner routes + Users list COMPARE PASS.
 
 ---
 
@@ -203,4 +203,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-19 — User profile WIRE PASS ([`user_profile_wire_compare.md`](modules/user_profile_wire_compare.md)); ask before STATES.*
+*Last updated: 2026-07-19 — User profile STATES PASS ([`user_profile_states_compare.md`](modules/user_profile_states_compare.md)); ask before COMPARE.*

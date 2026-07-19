@@ -50,7 +50,7 @@
 
 | Path | Blocker |
 |---|---|
-| `/settings/users` · `/settings/users/:userId` | List COMPARE PASS; profile **WIRE PASS** — STATES next |
+| `/settings/users` · `/settings/users/:userId` | List COMPARE PASS; profile **STATES PASS** — COMPARE next |
 
 ## Other known gaps (not full pages)
 
@@ -62,8 +62,8 @@
 
 ## Next (ask first)
 
-1. **User profile STATES** (`/settings/users/:userId` page loop step 6), or  
+1. **User profile COMPARE** (`/settings/users/:userId` page loop step 7), or  
 2. One **satellite** from the stub tables above (start page loop), or  
 3. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Profile WIRE done — see [`user_profile_wire_compare.md`](user_profile_wire_compare.md).)*
+*(Profile STATES done — see [`user_profile_states_compare.md`](user_profile_states_compare.md).)*

@@ -1,10 +1,15 @@
 /**
- * User profile — BUTTONS (Step 4).
+ * User profile — WIRE (Step 5).
  * Source: user_profile_page.dart AppBar/edit/more/permissions;
  * user_profile_header.dart Edit user + PopupMenu
- * Local CTAs only — no fetch (WIRE).
  */
-import { useMemo, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import {
@@ -14,6 +19,7 @@ import {
 import {
   USER_PROFILE_BACK_FALLBACK,
   USER_PROFILE_CANCEL,
+  USER_PROFILE_COPY_AND_CLOSE,
   USER_PROFILE_DELETE_BODY,
   USER_PROFILE_DELETE_TITLE,
   USER_PROFILE_EDIT_USER,
@@ -23,6 +29,8 @@ import {
   USER_PROFILE_FIELD_PHONE,
   USER_PROFILE_FIELD_ROLE,
   USER_PROFILE_LAST_ACTIVE_PREFIX,
+  USER_PROFILE_LOAD_ERROR,
+  USER_PROFILE_LOADING,
   USER_PROFILE_MORE_ACTIVATE,
   USER_PROFILE_MORE_BLOCK,
   USER_PROFILE_MORE_COPY_EMAIL,
@@ -31,7 +39,10 @@ import {
   USER_PROFILE_MORE_RESET,
   USER_PROFILE_MORE_UNBLOCK,
   USER_PROFILE_NAME_EMPTY,
+  USER_PROFILE_NEW_PASSWORD_TITLE,
+  USER_PROFILE_NOT_FOUND,
   USER_PROFILE_PERMISSIONS_SAVED,
+  USER_PROFILE_RETRY,
   USER_PROFILE_ROLE_ADMIN,
   USER_PROFILE_ROLE_MANAGER,
   USER_PROFILE_ROLE_STAFF,
@@ -52,6 +63,7 @@ import {
   USER_PROFILE_KPI_LABELS,
   USER_PROFILE_KPI_ORDER,
   type UserActivitySection,
+  type UserProfileKpiKey,
   type UserProfileTab,
 } from "./userProfileFields";
 import {
@@ -59,6 +71,17 @@ import {
   userLastActiveLabel,
   userStatusLabel,
 } from "./userLastActive";
+import {
+  deleteBusinessUser,
+  getBusinessUser,
+  getUserPermissions,
+  patchBusinessUser,
+  patchUserPermissions,
+  resetBusinessUserPassword,
+  UsersApiError,
+  UsersNetworkError,
+  type BusinessUserProfile,
+} from "./usersApi";
 import "./UserProfilePage.css";
 
 function popOrGo(
@@ -78,6 +101,30 @@ function popOrGo(
   navigate(fallback, { replace: true });
 }
 
+function actionErrorMessage(error: unknown): string {
+  if (error instanceof UsersApiError) return error.detail;
+  if (error instanceof UsersNetworkError) return error.message;
+  return "Something went wrong. Please try again.";
+}
+
+function kpiValue(
+  key: UserProfileKpiKey,
+  stats: BusinessUserProfile["stats"],
+): number {
+  switch (key) {
+    case "purchases":
+      return stats?.purchases_total ?? 0;
+    case "stock":
+      return stats?.stock_edits_total ?? 0;
+    case "items":
+      return stats?.items_created_total ?? 0;
+    case "scans":
+      return stats?.scans_total ?? 0;
+    default:
+      return 0;
+  }
+}
+
 type EditDraft = {
   fullName: string;
   email: string;
@@ -92,6 +139,11 @@ const EMPTY_EDIT: EditDraft = {
   role: "staff",
 };
 
+type ResetCred = {
+  email: string;
+  password: string;
+};
+
 export function UserProfilePage() {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
@@ -104,13 +156,13 @@ export function UserProfilePage() {
   const [editDraft, setEditDraft] = useState<EditDraft>(EMPTY_EDIT);
   const [moreOpen, setMoreOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [resetCred, setResetCred] = useState<ResetCred | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-
-  /** Until WIRE: treat as non-owner inactive unblocked for menu labels. */
-  const profileRole: string = "staff";
-  const isBlocked = false;
-  const isActive = false;
-  const profileEmail = "";
+  const [profile, setProfile] = useState<BusinessUserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<unknown | null>(null);
+  const [notFound, setNotFound] = useState(false);
+  const [retryTick, setRetryTick] = useState(0);
 
   const permKeys = useMemo(() => {
     const keys: string[] = [];
@@ -120,17 +172,86 @@ export function UserProfilePage() {
     return keys;
   }, []);
 
+  const canAdmin = sessionCanAdminUsers(session);
+  const businessId = session?.id;
+
+  const loadProfile = useCallback(async () => {
+    if (!businessId || !userId) {
+      setProfile(null);
+      setLoading(false);
+      setLoadError(null);
+      setNotFound(false);
+      return;
+    }
+
+    setLoading(true);
+    setLoadError(null);
+    setNotFound(false);
+
+    try {
+      const data = await getBusinessUser({ businessId, userId });
+      setProfile(data);
+
+      if (sessionCanAdminUsers(session)) {
+        try {
+          const perms = await getUserPermissions({ businessId, userId });
+          setPermDraft({ ...perms.permissions });
+        } catch {
+          setPermDraft({});
+        }
+      }
+    } catch (e) {
+      setProfile(null);
+      if (e instanceof UsersApiError && e.status === 404) {
+        setNotFound(true);
+      } else {
+        setLoadError(e);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [businessId, session, userId]);
+
+  useEffect(() => {
+    void loadProfile();
+  }, [loadProfile, retryTick]);
+
   if (!sessionCanManageUsers(session)) {
     return <Navigate to="/settings" replace />;
   }
 
-  const canAdmin = sessionCanAdminUsers(session);
-  const name = USER_PROFILE_NAME_EMPTY;
-  const roleLabel = displayUserRole(null);
-  const statusLabel = userStatusLabel({ blocked: false, active: false });
-  const lastActive = userLastActiveLabel(null, null);
-  const initial = "?";
+  const profileRole = profile?.role ?? "";
+  const isBlocked = profile?.is_blocked ?? false;
+  const isActiveComputed =
+    (profile?.is_active ?? false) && !isBlocked;
+  const profileEmail =
+    profile?.email?.trim() ||
+    profile?.login_email?.trim() ||
+    "";
+  const warehouse =
+    profile?.warehouse_name?.trim() ||
+    profile?.business_name?.trim() ||
+    "";
+  const phone = profile?.phone?.trim() ?? "";
+  const name = profile?.name?.trim() || USER_PROFILE_NAME_EMPTY;
+  const roleLabel = displayUserRole(profile?.role);
+  const statusLabel = userStatusLabel({
+    blocked: isBlocked,
+    active: isActiveComputed,
+  });
+  const lastActive = userLastActiveLabel(
+    profile?.last_active_at,
+    profile?.created_at,
+  );
+  const initial =
+    name !== USER_PROFILE_NAME_EMPTY
+      ? name.charAt(0).toUpperCase()
+      : "?";
   const showOwnerExtras = profileRole !== "owner";
+
+  function onRetry() {
+    setRetryTick((n) => n + 1);
+  }
 
   function togglePerm(key: string) {
     if (!canAdmin) return;
@@ -141,26 +262,66 @@ export function UserProfilePage() {
   }
 
   function openEdit() {
-    setEditDraft({ ...EMPTY_EDIT });
+    if (!profile) return;
+    setEditDraft({
+      fullName: profile.name?.trim() ?? "",
+      email: profile.email?.trim() ?? "",
+      phone: profile.phone?.trim() ?? "",
+      role: profile.role?.trim() || "staff",
+    });
     setEditOpen(true);
     setMoreOpen(false);
   }
 
-  function onSaveChanges() {
-    /* PATCH user — WIRE */
-    setEditOpen(false);
+  async function onSaveChanges() {
+    if (!businessId || !userId) return;
+    try {
+      await patchBusinessUser({
+        businessId,
+        userId,
+        fullName: editDraft.fullName,
+        email: editDraft.email,
+        phone: editDraft.phone,
+        role: editDraft.role,
+      });
+      setEditOpen(false);
+      await loadProfile();
+    } catch (e) {
+      setToast(actionErrorMessage(e));
+    }
   }
 
-  function onSavePermissions() {
-    /* PATCH permissions — WIRE */
-    setToast(USER_PROFILE_PERMISSIONS_SAVED);
+  async function onSavePermissions() {
+    if (!businessId || !userId || !canAdmin) return;
+    try {
+      await patchUserPermissions({
+        businessId,
+        userId,
+        permissions: permDraft,
+      });
+      setToast(USER_PROFILE_PERMISSIONS_SAVED);
+      const perms = await getUserPermissions({ businessId, userId });
+      setPermDraft({ ...perms.permissions });
+    } catch (e) {
+      setToast(actionErrorMessage(e));
+    }
   }
 
-  function onMoreAction(action: string) {
+  async function onMoreAction(action: string) {
     setMoreOpen(false);
+    if (!businessId || !userId) return;
+
     switch (action) {
       case "reset":
-        /* POST reset-password — WIRE */
+        try {
+          const out = await resetBusinessUserPassword({ businessId, userId });
+          setResetCred({
+            email: out.login_email?.trim() ?? profileEmail,
+            password: out.new_password,
+          });
+        } catch (e) {
+          setToast(actionErrorMessage(e));
+        }
         break;
       case "copy":
         if (!profileEmail) return;
@@ -170,8 +331,28 @@ export function UserProfilePage() {
         );
         break;
       case "block":
+        try {
+          await patchBusinessUser({
+            businessId,
+            userId,
+            isBlocked: !isBlocked,
+          });
+          await loadProfile();
+        } catch (e) {
+          setToast(actionErrorMessage(e));
+        }
+        break;
       case "toggle_active":
-        /* PATCH — WIRE */
+        try {
+          await patchBusinessUser({
+            businessId,
+            userId,
+            isActive: !isActiveComputed,
+          });
+          await loadProfile();
+        } catch (e) {
+          setToast(actionErrorMessage(e));
+        }
         break;
       case "delete":
         setDeleteOpen(true);
@@ -181,46 +362,62 @@ export function UserProfilePage() {
     }
   }
 
-  function onConfirmDelete() {
+  async function onConfirmDelete() {
+    if (!businessId || !userId) return;
     setDeleteOpen(false);
-    /* DELETE — WIRE; then popOrGo list */
+    try {
+      await deleteBusinessUser({ businessId, userId });
+      popOrGo(navigate, USER_PROFILE_BACK_FALLBACK);
+    } catch (e) {
+      setToast(actionErrorMessage(e));
+    }
   }
 
-  return (
-    <div
-      className="user-profile"
-      data-testid="user-profile-page"
-      data-user-id={userId ?? ""}
-    >
-      <header className="user-profile__appbar" data-slot="appBar">
-        <div
-          className="user-profile__appbar-leading"
-          data-slot="appBar.leading"
-        >
-          <button
-            type="button"
-            className="user-profile__icon-btn user-profile__icon-btn--active"
-            title={USER_PROFILE_TOOLTIP_BACK}
-            aria-label={USER_PROFILE_TOOLTIP_BACK}
-            data-testid="user-profile-back"
-            onClick={() => popOrGo(navigate, USER_PROFILE_BACK_FALLBACK)}
-          >
-            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-              <path
-                fill="currentColor"
-                d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
-              />
-            </svg>
-          </button>
-        </div>
-        <h1 className="user-profile__title">{USER_PROFILE_TITLE}</h1>
-        <div
-          className="user-profile__appbar-actions"
-          data-slot="appBar.actions"
-        />
-      </header>
+  function onCopyResetPassword() {
+    if (!resetCred) return;
+    void navigator.clipboard.writeText(resetCred.password).then(
+      () => setResetCred(null),
+      () => setResetCred(null),
+    );
+  }
 
-      <div className="user-profile__body">
+  let bodyContent: ReactNode;
+
+  if (loading) {
+    bodyContent = (
+      <p
+        className="user-profile__meta"
+        data-testid="user-profile-loading"
+      >
+        {USER_PROFILE_LOADING}
+      </p>
+    );
+  } else if (notFound) {
+    bodyContent = (
+      <p
+        className="user-profile__meta"
+        data-testid="user-profile-not-found"
+      >
+        {USER_PROFILE_NOT_FOUND}
+      </p>
+    );
+  } else if (loadError) {
+    bodyContent = (
+      <div data-testid="user-profile-load-error">
+        <p className="user-profile__meta">{USER_PROFILE_LOAD_ERROR}</p>
+        <button
+          type="button"
+          className="user-profile__edit-btn"
+          data-testid="user-profile-retry"
+          onClick={onRetry}
+        >
+          {USER_PROFILE_RETRY}
+        </button>
+      </div>
+    );
+  } else {
+    bodyContent = (
+      <>
         <section
           className="user-profile__header"
           data-slot="header"
@@ -253,6 +450,31 @@ export function UserProfilePage() {
               </div>
             </div>
           </div>
+          {warehouse ? (
+            <p
+              className="user-profile__meta"
+              data-testid="user-profile-warehouse"
+            >
+              {USER_PROFILE_WAREHOUSE_PREFIX}
+              {warehouse}
+            </p>
+          ) : null}
+          {profileEmail ? (
+            <p
+              className="user-profile__meta"
+              data-testid="user-profile-email"
+            >
+              {profileEmail}
+            </p>
+          ) : null}
+          {phone && phone !== USER_PROFILE_NAME_EMPTY ? (
+            <p
+              className="user-profile__meta"
+              data-testid="user-profile-phone"
+            >
+              {phone}
+            </p>
+          ) : null}
           <p
             className="user-profile__meta"
             data-testid="user-profile-last-active"
@@ -260,9 +482,6 @@ export function UserProfilePage() {
             {USER_PROFILE_LAST_ACTIVE_PREFIX}
             {lastActive}
           </p>
-          <span className="user-profile__warehouse-prefix" hidden>
-            {USER_PROFILE_WAREHOUSE_PREFIX}
-          </span>
           {canAdmin ? (
             <div
               className="user-profile__admin-row"
@@ -301,13 +520,13 @@ export function UserProfilePage() {
                   >
                     <MenuItem
                       testId="user-profile-more-reset"
-                      onClick={() => onMoreAction("reset")}
+                      onClick={() => void onMoreAction("reset")}
                     >
                       {USER_PROFILE_MORE_RESET}
                     </MenuItem>
                     <MenuItem
                       testId="user-profile-more-copy"
-                      onClick={() => onMoreAction("copy")}
+                      onClick={() => void onMoreAction("copy")}
                     >
                       {USER_PROFILE_MORE_COPY_EMAIL}
                     </MenuItem>
@@ -315,7 +534,7 @@ export function UserProfilePage() {
                       <>
                         <MenuItem
                           testId="user-profile-more-block"
-                          onClick={() => onMoreAction("block")}
+                          onClick={() => void onMoreAction("block")}
                         >
                           {isBlocked
                             ? USER_PROFILE_MORE_UNBLOCK
@@ -323,16 +542,16 @@ export function UserProfilePage() {
                         </MenuItem>
                         <MenuItem
                           testId="user-profile-more-active"
-                          onClick={() => onMoreAction("toggle_active")}
+                          onClick={() => void onMoreAction("toggle_active")}
                         >
-                          {isActive
+                          {isActiveComputed
                             ? USER_PROFILE_MORE_DEACTIVATE
                             : USER_PROFILE_MORE_ACTIVATE}
                         </MenuItem>
                         <MenuItem
                           testId="user-profile-more-delete"
                           danger
-                          onClick={() => onMoreAction("delete")}
+                          onClick={() => void onMoreAction("delete")}
                         >
                           {USER_PROFILE_MORE_DELETE}
                         </MenuItem>
@@ -415,7 +634,9 @@ export function UserProfilePage() {
                   <span className="user-profile__kpi-label">
                     {USER_PROFILE_KPI_LABELS[key]}
                   </span>
-                  <span className="user-profile__kpi-value">0</span>
+                  <span className="user-profile__kpi-value">
+                    {kpiValue(key, profile?.stats ?? null)}
+                  </span>
                 </div>
               ))}
             </div>
@@ -506,7 +727,7 @@ export function UserProfilePage() {
                   type="button"
                   className="user-profile__save-perms"
                   data-testid="user-profile-save-permissions"
-                  onClick={onSavePermissions}
+                  onClick={() => void onSavePermissions()}
                 >
                   {USER_PROFILE_SAVE_PERMISSIONS}
                 </button>
@@ -515,7 +736,45 @@ export function UserProfilePage() {
             </div>
           ) : null}
         </section>
-      </div>
+      </>
+    );
+  }
+
+  return (
+    <div
+      className="user-profile"
+      data-testid="user-profile-page"
+      data-user-id={userId ?? ""}
+    >
+      <header className="user-profile__appbar" data-slot="appBar">
+        <div
+          className="user-profile__appbar-leading"
+          data-slot="appBar.leading"
+        >
+          <button
+            type="button"
+            className="user-profile__icon-btn user-profile__icon-btn--active"
+            title={USER_PROFILE_TOOLTIP_BACK}
+            aria-label={USER_PROFILE_TOOLTIP_BACK}
+            data-testid="user-profile-back"
+            onClick={() => popOrGo(navigate, USER_PROFILE_BACK_FALLBACK)}
+          >
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+              />
+            </svg>
+          </button>
+        </div>
+        <h1 className="user-profile__title">{USER_PROFILE_TITLE}</h1>
+        <div
+          className="user-profile__appbar-actions"
+          data-slot="appBar.actions"
+        />
+      </header>
+
+      <div className="user-profile__body">{bodyContent}</div>
 
       {editOpen ? (
         <div
@@ -583,7 +842,7 @@ export function UserProfilePage() {
               type="button"
               className="user-profile__drawer-btn user-profile__drawer-btn--filled"
               data-testid="user-profile-save-changes"
-              onClick={onSaveChanges}
+              onClick={() => void onSaveChanges()}
             >
               {USER_PROFILE_SAVE_CHANGES}
             </button>
@@ -623,11 +882,49 @@ export function UserProfilePage() {
                 type="button"
                 className="user-profile__drawer-btn user-profile__drawer-btn--danger"
                 data-testid="user-profile-delete-confirm"
-                onClick={onConfirmDelete}
+                onClick={() => void onConfirmDelete()}
               >
                 {USER_PROFILE_MORE_DELETE}
               </button>
             </div>
+          </div>
+        </div>
+      ) : null}
+
+      {resetCred ? (
+        <div
+          className="user-profile__overlay"
+          data-testid="user-profile-reset-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-label={USER_PROFILE_NEW_PASSWORD_TITLE}
+        >
+          <button
+            type="button"
+            className="user-profile__overlay-scrim"
+            aria-label="Close"
+            onClick={() => setResetCred(null)}
+          />
+          <div className="user-profile__drawer user-profile__drawer--dialog">
+            <h2 className="user-profile__drawer-title">
+              {USER_PROFILE_NEW_PASSWORD_TITLE}
+            </h2>
+            {resetCred.email ? (
+              <p className="user-profile__dialog-body">
+                Email: {resetCred.email}
+              </p>
+            ) : null}
+            <p className="user-profile__dialog-body">
+              Password: {resetCred.password}
+            </p>
+            <button
+              type="button"
+              className="user-profile__drawer-btn user-profile__drawer-btn--filled"
+              data-testid="user-profile-reset-copy"
+              onClick={onCopyResetPassword}
+            >
+              {USER_PROFILE_COPY_AND_CLOSE}
+            </button>
           </div>
         </div>
       ) : null}

@@ -51,10 +51,12 @@ assert(page.includes("user-profile-edit-sheet"), "edit sheet");
 assert(page.includes("user-profile-save-changes"), "save changes");
 assert(page.includes("user-profile-save-permissions"), "save permissions");
 assert(page.includes("user-profile-delete-dialog"), "delete dialog");
-assert(page.includes("onSaveChanges"), "save stub");
-assert(page.includes("onMoreAction"), "more stub");
-assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("/v1/businesses"), "no API path");
+assert(page.includes("onSaveChanges"), "save handler");
+assert(page.includes("onMoreAction"), "more handler");
+assert(
+  page.includes("getBusinessUser") || page.includes("patchBusinessUser"),
+  "API wired via usersApi",
+);
 
 assert(
   pkg.includes("test:user-profile-buttons"),

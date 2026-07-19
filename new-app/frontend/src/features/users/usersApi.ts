@@ -36,6 +36,29 @@ export type UserBulkOut = {
   failed: string[];
 };
 
+export type BusinessUserProfile = BusinessUserListItem & {
+  login_email?: string | null;
+  purchases_7d?: number;
+  stock_updates_7d?: number;
+  business_name?: string | null;
+  stats?: {
+    stock_edits_total: number;
+    purchases_total: number;
+    scans_total: number;
+    items_created_total: number;
+  } | null;
+};
+
+export type PermissionsOut = {
+  role: string;
+  permissions: Record<string, boolean>;
+};
+
+export type ResetPasswordOut = {
+  new_password: string;
+  login_email?: string | null;
+};
+
 export class UsersApiError extends Error {
   readonly status: number;
   readonly detail: string;
@@ -206,4 +229,142 @@ export async function bulkBusinessUsers(opts: {
   }
 
   return (await res.json()) as UserBulkOut;
+}
+
+async function usersFetch(
+  url: string,
+  init: RequestInit,
+): Promise<Response> {
+  try {
+    return await fetch(url, init);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Failed to fetch";
+    throw new UsersNetworkError(msg);
+  }
+}
+
+/** GET …/users/:userId — getBusinessUser */
+export async function getBusinessUser(opts: {
+  businessId: string;
+  userId: string;
+  accessToken?: string;
+}): Promise<BusinessUserProfile> {
+  const url = `/v1/businesses/${encodeURIComponent(opts.businessId)}/users/${encodeURIComponent(opts.userId)}`;
+  const res = await usersFetch(url, {
+    method: "GET",
+    headers: { Authorization: authHeader(opts.accessToken) },
+  });
+  if (!res.ok) {
+    throw new UsersApiError(res.status, await readDetail(res));
+  }
+  return (await res.json()) as BusinessUserProfile;
+}
+
+/** PATCH …/users/:userId — patchBusinessUser */
+export async function patchBusinessUser(opts: {
+  businessId: string;
+  userId: string;
+  fullName?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  role?: string | null;
+  isActive?: boolean | null;
+  isBlocked?: boolean | null;
+  notes?: string | null;
+  accessToken?: string;
+}): Promise<BusinessUserProfile> {
+  const body: Record<string, unknown> = {};
+  if (opts.fullName != null) body.full_name = opts.fullName.trim();
+  if (opts.email != null) body.email = opts.email.trim().toLowerCase();
+  if (opts.phone != null) body.phone = opts.phone.trim();
+  if (opts.role != null) body.role = opts.role;
+  if (opts.isActive != null) body.is_active = opts.isActive;
+  if (opts.isBlocked != null) body.is_blocked = opts.isBlocked;
+  if (opts.notes != null) body.notes = opts.notes.trim();
+
+  const url = `/v1/businesses/${encodeURIComponent(opts.businessId)}/users/${encodeURIComponent(opts.userId)}`;
+  const res = await usersFetch(url, {
+    method: "PATCH",
+    headers: {
+      Authorization: authHeader(opts.accessToken),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    throw new UsersApiError(res.status, await readDetail(res));
+  }
+  return (await res.json()) as BusinessUserProfile;
+}
+
+/** DELETE …/users/:userId — deleteBusinessUser */
+export async function deleteBusinessUser(opts: {
+  businessId: string;
+  userId: string;
+  accessToken?: string;
+}): Promise<void> {
+  const url = `/v1/businesses/${encodeURIComponent(opts.businessId)}/users/${encodeURIComponent(opts.userId)}`;
+  const res = await usersFetch(url, {
+    method: "DELETE",
+    headers: { Authorization: authHeader(opts.accessToken) },
+  });
+  if (!res.ok) {
+    throw new UsersApiError(res.status, await readDetail(res));
+  }
+}
+
+/** POST …/users/:userId/reset-password */
+export async function resetBusinessUserPassword(opts: {
+  businessId: string;
+  userId: string;
+  accessToken?: string;
+}): Promise<ResetPasswordOut> {
+  const url = `/v1/businesses/${encodeURIComponent(opts.businessId)}/users/${encodeURIComponent(opts.userId)}/reset-password`;
+  const res = await usersFetch(url, {
+    method: "POST",
+    headers: { Authorization: authHeader(opts.accessToken) },
+  });
+  if (!res.ok) {
+    throw new UsersApiError(res.status, await readDetail(res));
+  }
+  return (await res.json()) as ResetPasswordOut;
+}
+
+/** GET …/users/:userId/permissions */
+export async function getUserPermissions(opts: {
+  businessId: string;
+  userId: string;
+  accessToken?: string;
+}): Promise<PermissionsOut> {
+  const url = `/v1/businesses/${encodeURIComponent(opts.businessId)}/users/${encodeURIComponent(opts.userId)}/permissions`;
+  const res = await usersFetch(url, {
+    method: "GET",
+    headers: { Authorization: authHeader(opts.accessToken) },
+  });
+  if (!res.ok) {
+    throw new UsersApiError(res.status, await readDetail(res));
+  }
+  return (await res.json()) as PermissionsOut;
+}
+
+/** PATCH …/users/:userId/permissions */
+export async function patchUserPermissions(opts: {
+  businessId: string;
+  userId: string;
+  permissions: Record<string, boolean>;
+  accessToken?: string;
+}): Promise<PermissionsOut> {
+  const url = `/v1/businesses/${encodeURIComponent(opts.businessId)}/users/${encodeURIComponent(opts.userId)}/permissions`;
+  const res = await usersFetch(url, {
+    method: "PATCH",
+    headers: {
+      Authorization: authHeader(opts.accessToken),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ permissions: opts.permissions }),
+  });
+  if (!res.ok) {
+    throw new UsersApiError(res.status, await readDetail(res));
+  }
+  return (await res.json()) as PermissionsOut;
 }

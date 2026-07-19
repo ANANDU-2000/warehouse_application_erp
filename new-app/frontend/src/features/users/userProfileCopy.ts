@@ -39,3 +39,10 @@ export const USER_PROFILE_DELETE_BODY =
 export const USER_PROFILE_CANCEL = "Cancel";
 export const USER_PROFILE_EMAIL_COPIED = "Email copied";
 export const USER_PROFILE_PERMISSIONS_SAVED = "Permissions saved";
+export const USER_PROFILE_NEW_PASSWORD_TITLE = "New password";
+export const USER_PROFILE_COPY_AND_CLOSE = "Copy & close";
+export const USER_PROFILE_LOAD_ERROR = "Could not load user";
+export const USER_PROFILE_NOT_FOUND = "User not found.";
+export const USER_PROFILE_LOADING = "Loading user…";
+export const USER_PROFILE_RETRY = "Retry";
+

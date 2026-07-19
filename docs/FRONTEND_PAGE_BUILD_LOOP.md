@@ -112,8 +112,8 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 2 LAYOUT | ✅ | brand AppBar/header/tabs — [`user_profile_layout_compare.md`](modules/user_profile_layout_compare.md) |
 | 3 FIELDS | ✅ | header + KPI/activity/perms catalogs — [`user_profile_fields_compare.md`](modules/user_profile_fields_compare.md) |
 | 4 BUTTONS | ✅ | back/Edit/More/Save stubs — [`user_profile_buttons_compare.md`](modules/user_profile_buttons_compare.md) |
-| 5 WIRE | ⬜ | Ask before next |
-| 6 STATES | ⬜ | |
+| 5 WIRE | ✅ | profile GET/PATCH/reset/delete/perms — [`user_profile_wire_compare.md`](modules/user_profile_wire_compare.md) |
+| 6 STATES | ⬜ | Ask before next |
 | 7 COMPARE | ⬜ | |
 
 ### Prompt template (copy per page)

@@ -14,7 +14,7 @@
 | State | Step |
 |---|---|
 | ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · COMPARE |
-| 🟡 Current | List COMPARE PASS — profile **BUTTONS PASS**; ask before WIRE |
+| 🟡 Current | List COMPARE PASS — profile **WIRE PASS**; ask before STATES |
 | ⬜ Pending (ask first) | Profile LAYOUT→COMPARE · Subagent 4 — [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md) |
 | ⏸ Deferred | Merge to `main`; desktop detail panel live; card overflow menus |
 
@@ -73,10 +73,10 @@ Docs/checklist + smoke script only: revert COMPARE commit. Application code unch
 
 ## 5. Next after Approve
 
-1. Ask before: **User profile WIRE**, **or**  
+1. Ask before: **User profile STATES**, **or**  
 2. One **Subagent 4 satellite** from [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md), **or**  
 3. Hold / merge review of `ops/dashboard-module` → `main`.
 
 **Do not merge to `main` unless asked.**
 
-*(Profile BUTTONS done — see [`user_profile_buttons_compare.md`](user_profile_buttons_compare.md).)*
+*(Profile WIRE done — see [`user_profile_wire_compare.md`](user_profile_wire_compare.md).)*

@@ -78,7 +78,8 @@
     "test:staff-search-fields": "node scripts/check-staff-search-fields.mjs",
     "test:staff-search-buttons": "node scripts/check-staff-search-buttons.mjs",
     "test:staff-search-wire": "node scripts/check-staff-search-wire.mjs",
-    "test:staff-search-states": "node scripts/check-staff-search-states.mjs"
+    "test:staff-search-states": "node scripts/check-staff-search-states.mjs",
+    "test:staff-search-compare": "node scripts/check-staff-search-compare.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

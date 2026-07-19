@@ -22,7 +22,7 @@
 | Path | Stub title |
 |---|---|
 | `/staff/settings` | Staff settings (**implement locked** — Settings backend) |
-| `/staff/search` | **STATES PASS** — [`staff_search_states_compare.md`](staff_search_states_compare.md); ask before COMPARE |
+| `/staff/search` | **COMPARE PASS** — [`staff_search_compare.md`](staff_search_compare.md); ask next stub |
 | `/staff/items` | Staff gallery |
 | `/staff/stock` | Staff stock |
 | `/staff/purchase-history` | Purchase history |
@@ -63,7 +63,7 @@
 
 ## Next (ask first)
 
-1. **`/staff/search` COMPARE** (STATES done), **or**  
+1. **Next unlockable Subagent 4 stub** (e.g. `/staff/items`, `/staff/stock`, … — not Settings), **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Notifications COMPARE done — [`notifications_compare.md`](notifications_compare.md). Staff search STATES — [`staff_search_states_compare.md`](staff_search_states_compare.md). `/staff/settings` skipped — Settings implement locked.)*
+*(Notifications COMPARE done — [`notifications_compare.md`](notifications_compare.md). Staff search COMPARE — [`staff_search_compare.md`](staff_search_compare.md). `/staff/settings` skipped — Settings implement locked.)*

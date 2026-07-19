@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Notifications COMPARE · Staff search SCAFFOLD→**STATES** |
-| 🟡 Current | Staff search **STATES PASS** — ask before COMPARE |
-| ⬜ Pending | COMPARE · other stubs |
+| ✅ Completed | Notifications COMPARE · Staff search SCAFFOLD→**COMPARE** |
+| 🟡 Current | Staff search **COMPARE PASS** — ask before next stub |
+| ⬜ Pending | Other Subagent 4 stubs |
 | ⏸ Deferred | `/staff/settings` · owner `/search`; desktop preview pane; TradeIntel fact-rich tile polish |
 
 ## Legacy vs New
@@ -33,4 +33,4 @@
 
 **Rollback:** Revert STATES commit; restore WIRE string error + ungated loading; remove load-subtitle helper + this compare + script; boards → ask before STATES.
 
-**Next (ask first):** `/staff/search` COMPARE — do not start until approved.
+**Next (ask first):** COMPARE done — [`staff_search_compare.md`](staff_search_compare.md). Ask before next Subagent 4 stub.

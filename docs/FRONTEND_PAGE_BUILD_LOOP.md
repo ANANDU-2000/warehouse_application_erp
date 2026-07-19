@@ -139,7 +139,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 4 BUTTONS | ✅ | Quick-filter push/go — [`staff_search_buttons_compare.md`](modules/staff_search_buttons_compare.md) |
 | 5 WIRE | ✅ | GET /search + rows + addRecent — [`staff_search_wire_compare.md`](modules/staff_search_wire_compare.md) |
 | 6 STATES | ✅ | FriendlyLoadError + reload/cold gates + TTL — [`staff_search_states_compare.md`](modules/staff_search_states_compare.md) |
-| 7 COMPARE | ⬜ | — |
+| 7 COMPARE | ✅ | in-scope PASS — [`staff_search_compare.md`](modules/staff_search_compare.md) |
 
 ### Prompt template (copy per page)
 

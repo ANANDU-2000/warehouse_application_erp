@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Notifications COMPARE · Staff search SCAFFOLD→**STATES** |
-| 🟡 Current | Staff search **STATES PASS** — ask before COMPARE |
-| ⬜ Pending | COMPARE · other stubs |
+| ✅ Completed | Notifications COMPARE · Staff search SCAFFOLD→**COMPARE** |
+| 🟡 Current | Staff search **COMPARE PASS** — ask before next stub |
+| ⬜ Pending | Other Subagent 4 stubs |
 | ⏸ Deferred | `/staff/settings` · owner `/search`; desktop preview pane; TradeIntel fact-rich tile polish |
 
 ## Legacy vs New
@@ -36,4 +36,4 @@
 
 **Rollback:** Revert WIRE commit; remove search repo/routes/controller + frontend api/wire UI; restore BUTTONS empty catalogs; boards → ask before WIRE.
 
-**Next (ask first):** `/staff/search` STATES — done → [`staff_search_states_compare.md`](staff_search_states_compare.md). Ask before COMPARE.
+**Next (ask first):** STATES → [`staff_search_states_compare.md`](staff_search_states_compare.md). COMPARE → [`staff_search_compare.md`](staff_search_compare.md). Ask before next stub.

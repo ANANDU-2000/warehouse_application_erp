@@ -415,3 +415,69 @@
   font-size: 18px;
   cursor: pointer;
 }
+
+/* STATES — ListSkeleton (list_skeleton.dart) */
+.users-mgmt__skeleton-wrap {
+  flex: 1;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.users-mgmt__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 16px 100px;
+  box-sizing: border-box;
+}
+
+.users-mgmt__skeleton-bar {
+  height: 84px;
+  border-radius: 12px;
+  background: #eff2f1;
+}
+
+/* STATES — FriendlyLoadError / HexaErrorCard */
+.users-mgmt__friendly-error {
+  margin: 24px auto;
+  padding: 24px 16px;
+  max-width: 400px;
+  width: calc(100% - 48px);
+  box-sizing: border-box;
+  text-align: center;
+  border: 1px solid var(--users-border);
+  border-radius: 16px;
+  background: var(--users-card);
+}
+
+.users-mgmt__friendly-error-msg {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--users-text);
+}
+
+.users-mgmt__friendly-error-sub {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--users-muted);
+  line-height: 1.4;
+}
+
+.users-mgmt__retry {
+  margin-top: 18px;
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  background: var(--users-brand);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 14px 18px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.users-mgmt__retry:hover {
+  filter: brightness(1.05);
+}

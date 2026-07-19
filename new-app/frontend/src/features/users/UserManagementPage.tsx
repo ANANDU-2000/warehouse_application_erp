@@ -1,7 +1,7 @@
 /**
- * Users list — WIRE (Step 5).
- * Source: business_users_provider + hexa_api list/create/bulk; user_management_page.dart
- * Full skeleton / FriendlyLoadError → STATES.
+ * Users list — STATES (Step 6).
+ * Source: user_management_page.dart async.when ListSkeleton / HexaErrorCard;
+ * load_state_error.dart · friendly_load_error.dart
  */
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -37,8 +37,8 @@ import {
   USERS_MGMT_FILTER_CLEAR,
   USERS_MGMT_FILTER_HEADING,
   USERS_MGMT_LOAD_ERROR,
-  USERS_MGMT_LOADING,
   USERS_MGMT_PASSWORD_HELPER,
+  USERS_MGMT_RETRY_LABEL,
   USERS_MGMT_ROLE_ADMIN_OWNER,
   USERS_MGMT_ROLE_MANAGER,
   USERS_MGMT_ROLE_STAFF,
@@ -70,6 +70,7 @@ import {
   UsersNetworkError,
   type BusinessUserListItem,
 } from "./usersApi";
+import { mapUsersLoadSubtitle } from "./usersLoadSubtitle";
 import { UserCompactCard } from "./UserCompactCard";
 import "./UserManagementPage.css";
 
@@ -166,7 +167,7 @@ export function UserManagementPage() {
 
   const [rows, setRows] = useState<BusinessUserListItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<unknown | null>(null);
   const [retryTick, setRetryTick] = useState(0);
   const [bulkBusy, setBulkBusy] = useState(false);
 
@@ -174,7 +175,7 @@ export function UserManagementPage() {
     if (!session?.id) {
       setRows([]);
       setLoading(false);
-      setLoadError("Not signed in");
+      setLoadError(new UsersApiError(401, "Not signed in"));
       return;
     }
     setLoading(true);
@@ -186,11 +187,7 @@ export function UserManagementPage() {
       });
       setRows(list);
     } catch (e) {
-      const msg =
-        e instanceof UsersApiError || e instanceof UsersNetworkError
-          ? e.message
-          : USERS_MGMT_LOAD_ERROR;
-      setLoadError(msg);
+      setLoadError(e);
       setRows([]);
     } finally {
       setLoading(false);
@@ -439,7 +436,6 @@ export function UserManagementPage() {
             label={USERS_MGMT_TOOLTIP_REFRESH}
             onClick={onRefresh}
             testId="users-mgmt-refresh"
-            disabled={loading}
           >
             <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
               <path
@@ -470,143 +466,144 @@ export function UserManagementPage() {
       </header>
 
       <div className="users-mgmt__body">
-        <div
-          className="users-mgmt__search-filter"
-          data-slot="searchFilter"
-          data-testid="users-mgmt-search-chrome"
-        >
-          <div className="users-mgmt__search-row">
-            <label className="users-mgmt__search-field">
-              <span className="users-mgmt__search-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="20" height="20">
-                  <path
-                    fill="currentColor"
-                    d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
-                  />
-                </svg>
-              </span>
-              <input
-                type="text"
-                className="users-mgmt__search-input"
-                placeholder={USERS_MGMT_SEARCH_HINT}
-                value={filter.search}
-                onChange={(e) => setSearch(e.target.value)}
-                data-testid="users-mgmt-search-input"
-                aria-label={USERS_MGMT_SEARCH_HINT}
-              />
-            </label>
-            <button
-              type="button"
-              className="users-mgmt__icon-btn users-mgmt__icon--filter"
-              title={USERS_MGMT_TOOLTIP_FILTER}
-              aria-label={USERS_MGMT_TOOLTIP_FILTER}
-              onClick={openFilterDrawer}
-              data-testid="users-mgmt-filter"
+        {loading ? (
+          <UsersListSkeleton />
+        ) : loadError != null ? (
+          <UsersFriendlyLoadError
+            message={USERS_MGMT_LOAD_ERROR}
+            subtitle={mapUsersLoadSubtitle(loadError)}
+            onRetry={() => setRetryTick((n) => n + 1)}
+          />
+        ) : (
+          <>
+            <div
+              className="users-mgmt__search-filter"
+              data-slot="searchFilter"
+              data-testid="users-mgmt-search-chrome"
             >
-              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                <path
-                  fill="currentColor"
-                  d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"
-                />
-              </svg>
-              {roleBadge > 0 ? (
-                <span
-                  className="users-mgmt__filter-badge"
-                  data-testid="users-mgmt-filter-badge"
-                >
-                  {roleBadge}
-                </span>
-              ) : null}
-            </button>
-          </div>
-        </div>
-
-        <div
-          className="users-mgmt__status-chips"
-          data-slot="statusChips"
-          data-testid="users-mgmt-chips-chrome"
-          role="tablist"
-          aria-label="User status filter"
-        >
-          {USER_LIST_PRIMARY_ORDER.map((key) => {
-            const selectedChip = filter.primary === key;
-            const count = countForPrimaryFilter(rows, key);
-            const label = USER_LIST_PRIMARY_LABELS[key];
-            return (
-              <button
-                key={key}
-                type="button"
-                role="tab"
-                aria-selected={selectedChip}
-                className={
-                  selectedChip
-                    ? "users-mgmt__chip users-mgmt__chip--selected"
-                    : "users-mgmt__chip"
-                }
-                data-testid={`users-mgmt-chip-${key}`}
-                onClick={() => setPrimary(key)}
-              >
-                {label} ({count})
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="users-mgmt__split">
-          <section
-            className="users-mgmt__list users-mgmt__list--live"
-            data-slot="list"
-            data-testid="users-mgmt-list-chrome"
-          >
-            {loading ? (
-              <p className="users-mgmt__status-msg" data-testid="users-mgmt-loading">
-                {USERS_MGMT_LOADING}
-              </p>
-            ) : loadError ? (
-              <div className="users-mgmt__status-msg" data-testid="users-mgmt-error">
-                <p>{USERS_MGMT_LOAD_ERROR}</p>
-                <p>{loadError}</p>
+              <div className="users-mgmt__search-row">
+                <label className="users-mgmt__search-field">
+                  <span className="users-mgmt__search-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                      <path
+                        fill="currentColor"
+                        d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    type="text"
+                    className="users-mgmt__search-input"
+                    placeholder={USERS_MGMT_SEARCH_HINT}
+                    value={filter.search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    data-testid="users-mgmt-search-input"
+                    aria-label={USERS_MGMT_SEARCH_HINT}
+                  />
+                </label>
                 <button
                   type="button"
-                  className="users-mgmt__drawer-btn users-mgmt__drawer-btn--filled"
-                  onClick={() => setRetryTick((n) => n + 1)}
+                  className="users-mgmt__icon-btn users-mgmt__icon--filter"
+                  title={USERS_MGMT_TOOLTIP_FILTER}
+                  aria-label={USERS_MGMT_TOOLTIP_FILTER}
+                  onClick={openFilterDrawer}
+                  data-testid="users-mgmt-filter"
                 >
-                  Retry
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                    <path
+                      fill="currentColor"
+                      d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"
+                    />
+                  </svg>
+                  {roleBadge > 0 ? (
+                    <span
+                      className="users-mgmt__filter-badge"
+                      data-testid="users-mgmt-filter-badge"
+                    >
+                      {roleBadge}
+                    </span>
+                  ) : null}
                 </button>
               </div>
-            ) : filtered.length === 0 ? (
-              <p className="users-mgmt__status-msg" data-testid="users-mgmt-empty">
-                {USERS_MGMT_EMPTY_FILTERS}
-              </p>
-            ) : (
-              filtered.map((u) => {
-                const id = u.id;
+            </div>
+
+            <div
+              className="users-mgmt__status-chips"
+              data-slot="statusChips"
+              data-testid="users-mgmt-chips-chrome"
+              role="tablist"
+              aria-label="User status filter"
+            >
+              {USER_LIST_PRIMARY_ORDER.map((key) => {
+                const selectedChip = filter.primary === key;
+                const count = countForPrimaryFilter(rows, key);
+                const label = USER_LIST_PRIMARY_LABELS[key];
                 return (
-                  <UserCompactCard
-                    key={id}
-                    user={u}
-                    selectMode={selectMode}
-                    selected={selected.has(id)}
-                    onToggleSelect={() => toggleSelected(id)}
-                    onTap={() => {
-                      if (selectMode) {
-                        toggleSelected(id);
-                      } else {
-                        navigate(`/settings/users/${encodeURIComponent(id)}`);
-                      }
-                    }}
-                  />
+                  <button
+                    key={key}
+                    type="button"
+                    role="tab"
+                    aria-selected={selectedChip}
+                    className={
+                      selectedChip
+                        ? "users-mgmt__chip users-mgmt__chip--selected"
+                        : "users-mgmt__chip"
+                    }
+                    data-testid={`users-mgmt-chip-${key}`}
+                    onClick={() => setPrimary(key)}
+                  >
+                    {label} ({count})
+                  </button>
                 );
-              })
-            )}
-          </section>
-          <aside
-            className="users-mgmt__detail"
-            data-slot="detailPanel"
-            data-testid="users-mgmt-detail-chrome"
-            aria-hidden="true"
-          />
-        </div>
+              })}
+            </div>
+
+            <div className="users-mgmt__split">
+              <section
+                className="users-mgmt__list users-mgmt__list--live"
+                data-slot="list"
+                data-testid="users-mgmt-list-chrome"
+              >
+                {filtered.length === 0 ? (
+                  <p
+                    className="users-mgmt__status-msg"
+                    data-testid="users-mgmt-empty"
+                  >
+                    {USERS_MGMT_EMPTY_FILTERS}
+                  </p>
+                ) : (
+                  filtered.map((u) => {
+                    const id = u.id;
+                    return (
+                      <UserCompactCard
+                        key={id}
+                        user={u}
+                        selectMode={selectMode}
+                        selected={selected.has(id)}
+                        onToggleSelect={() => toggleSelected(id)}
+                        onTap={() => {
+                          if (selectMode) {
+                            toggleSelected(id);
+                          } else {
+                            navigate(
+                              `/settings/users/${encodeURIComponent(id)}`,
+                            );
+                          }
+                        }}
+                      />
+                    );
+                  })
+                )}
+              </section>
+              <aside
+                className="users-mgmt__detail"
+                data-slot="detailPanel"
+                data-testid="users-mgmt-detail-chrome"
+                aria-hidden="true"
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {selectMode && canAdmin ? (
@@ -905,6 +902,54 @@ export function UserManagementPage() {
           </button>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+/** ListSkeleton — list_skeleton.dart defaults (6 × 84) + outer Padding.all(16) */
+function UsersListSkeleton() {
+  return (
+    <div
+      className="users-mgmt__skeleton-wrap"
+      data-testid="users-mgmt-skeleton"
+      aria-busy="true"
+      aria-label="Loading users"
+    >
+      <div className="users-mgmt__skeleton">
+        {Array.from({ length: 6 }, (_, i) => (
+          <div key={i} className="users-mgmt__skeleton-bar" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** HexaErrorCard → FriendlyLoadError */
+function UsersFriendlyLoadError({
+  message,
+  subtitle,
+  onRetry,
+}: {
+  message: string;
+  subtitle: string;
+  onRetry: () => void;
+}) {
+  return (
+    <div
+      className="users-mgmt__friendly-error"
+      role="alert"
+      data-testid="users-mgmt-friendly-error"
+    >
+      <p className="users-mgmt__friendly-error-msg">{message}</p>
+      <p className="users-mgmt__friendly-error-sub">{subtitle}</p>
+      <button
+        type="button"
+        className="users-mgmt__retry"
+        data-testid="users-mgmt-retry"
+        onClick={onRetry}
+      >
+        {USERS_MGMT_RETRY_LABEL}
+      </button>
     </div>
   );
 }

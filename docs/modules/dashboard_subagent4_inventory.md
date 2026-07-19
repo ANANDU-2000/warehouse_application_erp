@@ -50,7 +50,7 @@
 
 | Path | Blocker |
 |---|---|
-| `/settings/users` · `/settings/users/:userId` | List WIRE PASS; profile page body + STATES still pending |
+| `/settings/users` · `/settings/users/:userId` | List STATES PASS; COMPARE + profile page body still pending |
 
 ## Other known gaps (not full pages)
 
@@ -62,8 +62,8 @@
 
 ## Next (ask first)
 
-1. **Users `/settings/users` STATES** (page loop step 6), or  
+1. **Users `/settings/users` COMPARE** (page loop step 7), or  
 2. One **satellite** from the stub tables above (start page loop), or  
 3. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Users UI WIRE done — see [`users_management_wire_compare.md`](users_management_wire_compare.md).)*
+*(Users UI STATES done — see [`users_management_states_compare.md`](users_management_states_compare.md).)*

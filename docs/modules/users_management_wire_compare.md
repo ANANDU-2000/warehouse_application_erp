@@ -21,4 +21,4 @@
 
 **Rollback:** Revert WIRE commit; restore BUTTONS stubs; remove wire compare + script; boards → ask before WIRE.
 
-**Next (ask first):** `/settings/users` STATES — skeleton + FriendlyLoadError / Retry copy.
+**Next (ask first):** `/settings/users` STATES — done → [`users_management_states_compare.md`](users_management_states_compare.md). Ask before COMPARE.

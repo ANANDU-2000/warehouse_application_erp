@@ -12,10 +12,10 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 nest COMPLETE · Catalog SCAFFOLD | Catalog SCAFFOLD — [`catalog_scaffold_compare.md`](modules/catalog_scaffold_compare.md) |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 nest COMPLETE · Catalog LAYOUT | Catalog LAYOUT — [`catalog_layout_compare.md`](modules/catalog_layout_compare.md) |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list+profile COMPARE · Activity WIRE | Next: ask next Subagent 4 stub — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
-| 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | 🟡 Slice 1–7 · hub SCAFFOLD | Ask before LAYOUT — [`catalog_scaffold_compare.md`](modules/catalog_scaffold_compare.md) |
-| 5 | Categories | 1 | ✅ `categories.md` | 🟡 Slice 1–2 · hub UI started | Backend PASS — [`categories_backend_slice2.md`](modules/categories_backend_slice2.md) |
+| 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | 🟡 Slice 1–7 · hub LAYOUT | Ask before FIELDS — [`catalog_layout_compare.md`](modules/catalog_layout_compare.md) |
+| 5 | Categories | 1 | ✅ `categories.md` | 🟡 Slice 1–2 · hub UI LAYOUT | Backend PASS — [`categories_backend_slice2.md`](modules/categories_backend_slice2.md) |
 | 6 | Suppliers/Brokers | 12 | ✅ `suppliers.md` | ❌ | Blocked |
 | 7 | Purchase Orders | 6 | ✅ `purchase-orders.md` | ❌ | Blocked |
 | 8 | Goods Receipt (staff receive) | 2 | ✅ `goods-receipt.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard nest **COMPLETE**. Products **Slice 1–7 PASS**. Categories **Slice 1–2 PASS**. Catalog hub **SCAFFOLD PASS**. Next: ask before **Catalog LAYOUT**. Purchase / barcode / receive **UI blocked** until their backends (docs/06 Seq 7–8 / 11).
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard nest **COMPLETE**. Products **Slice 1–7 PASS**. Categories **Slice 1–2 PASS**. Catalog hub **LAYOUT PASS**. Next: ask before **Catalog FIELDS**. Purchase / barcode / receive **UI blocked** until their backends (docs/06 Seq 7–8 / 11).
 
 ---
 

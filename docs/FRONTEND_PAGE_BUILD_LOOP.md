@@ -218,7 +218,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | Step | Status | Evidence |
 |---|---|---|
 | 1 SCAFFOLD | ✅ | AppBar + empty slots + staff gate — [`catalog_scaffold_compare.md`](modules/catalog_scaffold_compare.md) |
-| 2 LAYOUT | ⬜ | — |
+| 2 LAYOUT | ✅ | Hexa tokens + search/card/FAB chrome — [`catalog_layout_compare.md`](modules/catalog_layout_compare.md) |
 | 3 FIELDS | ⬜ | — |
 | 4 BUTTONS | ⬜ | — |
 | 5 WIRE | ⬜ | — |

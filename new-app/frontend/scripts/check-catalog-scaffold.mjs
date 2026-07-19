@@ -52,7 +52,10 @@ assert(
   "empty sub",
 );
 
-assert(page.includes("SCAFFOLD"), "SCAFFOLD header");
+assert(
+  page.includes("SCAFFOLD") || page.includes("LAYOUT"),
+  "SCAFFOLD/LAYOUT header",
+);
 assert(page.includes('data-slot="appBar"'), "appBar");
 assert(page.includes('data-slot="search"'), "search");
 assert(page.includes('data-slot="suggestions"'), "suggestions");

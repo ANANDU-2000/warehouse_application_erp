@@ -117,6 +117,7 @@
     "test:staff-activity-compare": "node scripts/check-staff-activity-compare.mjs",
     "test:staff-deliveries-scaffold": "node scripts/check-staff-deliveries-scaffold.mjs",
     "test:catalog-scaffold": "node scripts/check-catalog-scaffold.mjs",
+    "test:catalog-layout": "node scripts/check-catalog-layout.mjs",
     "test:staff-deliveries-layout": "node scripts/check-staff-deliveries-layout.mjs",
     "test:staff-deliveries-fields": "node scripts/check-staff-deliveries-fields.mjs",
     "test:staff-deliveries-buttons": "node scripts/check-staff-deliveries-buttons.mjs",

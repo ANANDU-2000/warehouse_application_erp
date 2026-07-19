@@ -9,9 +9,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · **Catalog hub SCAFFOLD** |
-| 🟡 Current | See [`catalog_scaffold_compare.md`](catalog_scaffold_compare.md) |
-| ⬜ Pending | Catalog LAYOUT→COMPARE · trade-summary/insights · other catalog routes |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog SCAFFOLD · **LAYOUT** |
+| 🟡 Current | See [`catalog_layout_compare.md`](catalog_layout_compare.md) |
+| ⬜ Pending | Catalog FIELDS→COMPARE · trade-summary/insights · other catalog routes |
 | ⏸ Deferred | purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New

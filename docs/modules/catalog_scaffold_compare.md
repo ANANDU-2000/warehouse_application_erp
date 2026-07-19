@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · **Catalog hub SCAFFOLD** |
-| 🟡 Current | Catalog hub SCAFFOLD PASS — ask before **LAYOUT** |
-| ⬜ Pending | LAYOUT → FIELDS → BUTTONS → WIRE → STATES → COMPARE · other `/catalog/*` routes |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog SCAFFOLD · **LAYOUT** |
+| 🟡 Current | superseded — see [`catalog_layout_compare.md`](catalog_layout_compare.md) |
+| ⬜ Pending | FIELDS → COMPARE · other `/catalog/*` routes |
 | ⏸ Deferred | rename/delete dialogs · FAB sheet · fuzzy search · trade-summary · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -41,6 +41,4 @@ npm run build
 
 Revert SCAFFOLD commit; remove `features/catalog/*` + `scripts/check-catalog-scaffold.mjs` + package script; restore no `/catalog` route (or stub); boards → Categories Slice 2 current.
 
-## Next (ask first)
-
-**LAYOUT** for `/catalog` — do not start until approved.
+**Next (ask first):** LAYOUT — done → [`catalog_layout_compare.md`](catalog_layout_compare.md). Ask before FIELDS.

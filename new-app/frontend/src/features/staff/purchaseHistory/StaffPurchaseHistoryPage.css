@@ -1,5 +1,5 @@
 /**
- * Staff purchase history LAYOUT — Hexa operational chrome.
+ * Staff purchase history LAYOUT/FIELDS — Hexa operational chrome.
  * Source: staff_purchase_history_page.dart Scaffold brandBackground 0xFFF7F9F6;
  * AppBar foreground brandPrimary 0xFF0E4F46; search OutlineInputBorder radius 10 /
  * brandBorder 0xFFE2E8E6; FilterChip fontSize 11 · Wrap spacing/runSpacing 6;
@@ -87,6 +87,10 @@
   pointer-events: none;
 }
 
+.staff-ph-tabs--active {
+  pointer-events: auto;
+}
+
 .staff-ph-tab {
   flex: 0 0 auto;
   border: 0;
@@ -96,7 +100,7 @@
   font-size: 14px;
   font-weight: 500;
   color: var(--sph-muted);
-  cursor: default;
+  cursor: pointer;
   border-bottom: 2px solid transparent;
   white-space: nowrap;
 }
@@ -115,6 +119,7 @@
 }
 
 .staff-ph-search {
+  position: relative;
   padding: 8px var(--sph-gutter) 0;
 }
 
@@ -122,16 +127,24 @@
   pointer-events: none;
 }
 
+.staff-ph-search--active {
+  pointer-events: auto;
+}
+
 .staff-ph-search__input {
   width: 100%;
   box-sizing: border-box;
   min-height: 40px;
-  padding: 8px 12px;
+  padding: 8px 36px 8px 12px;
   border: 1px solid var(--sph-border);
   border-radius: 10px;
   background: var(--sph-surface);
   font: inherit;
   font-size: 14px;
+  color: var(--sph-fg);
+}
+
+.staff-ph-search__input--active {
   color: var(--sph-fg);
 }
 
@@ -142,6 +155,22 @@
 .staff-ph-search__input:disabled {
   color: var(--sph-hint);
   opacity: 1;
+}
+
+.staff-ph-search__clear {
+  position: absolute;
+  right: calc(var(--sph-gutter) + 4px);
+  top: 50%;
+  transform: translateY(-35%);
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sph-muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .staff-ph-chips {
@@ -155,6 +184,10 @@
   pointer-events: none;
 }
 
+.staff-ph-chips--active {
+  pointer-events: auto;
+}
+
 .staff-ph-chip {
   display: inline-flex;
   align-items: center;
@@ -162,10 +195,12 @@
   border-radius: 16px;
   border: 1px solid var(--sph-border);
   background: var(--sph-surface);
+  font: inherit;
   font-size: 11px;
   font-weight: 600;
   color: var(--sph-muted);
   line-height: 1.2;
+  cursor: pointer;
 }
 
 .staff-ph-chip--selected {

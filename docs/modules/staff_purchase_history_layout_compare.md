@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff stock COMPARE · Staff purchase-history SCAFFOLD · **LAYOUT** |
-| 🟡 Current | `/staff/purchase-history` **LAYOUT PASS** — ask before FIELDS |
-| ⬜ Pending | FIELDS → COMPARE · other Subagent 4 stubs |
+| ✅ Completed | Staff stock COMPARE · Staff purchase-history SCAFFOLD · LAYOUT · **FIELDS** |
+| 🟡 Current | `/staff/purchase-history` **FIELDS PASS** — ask before BUTTONS |
+| ⬜ Pending | BUTTONS → COMPARE · other Subagent 4 stubs |
 | ⏸ Deferred | Detail `:purchaseId` · trade-purchases API · Inform owner · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -38,4 +38,4 @@
 
 **Rollback:** Revert LAYOUT commit; restore SCAFFOLD page/CSS; remove layout script + this compare; boards → ask before LAYOUT.
 
-**Next (ask first):** FIELDS — do not start until approved.
+**Next (ask first):** FIELDS done — [`staff_purchase_history_fields_compare.md`](staff_purchase_history_fields_compare.md). Ask before BUTTONS.

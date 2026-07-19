@@ -43,10 +43,26 @@ assert(page.includes("staff-ph-chip--all"), "chip all mod");
 assert(page.includes("staff-ph-chip--pending"), "chip pending mod");
 assert(page.includes("staff-ph-chip--delivered"), "chip delivered mod");
 assert(page.includes("staff-ph-chip--critical"), "chip critical mod");
-assert(page.includes("staff-ph-tabs--inert"), "tabs inert class");
-assert(page.includes("staff-ph-search--inert"), "search inert class");
-assert(page.includes("readOnly"), "search inert");
-assert(page.includes("STAFF_PH_EMPTY_PERIOD"), "empty copy");
+assert(
+  page.includes("staff-ph-tabs--inert") ||
+    page.includes("staff-ph-tabs--active"),
+  "tabs class",
+);
+assert(
+  page.includes("staff-ph-search--inert") ||
+    page.includes("staff-ph-search--active"),
+  "search class",
+);
+assert(
+  page.includes("readOnly") ||
+    page.includes("staff-ph-search__input--active"),
+  "search field present (FIELDS may activate)",
+);
+assert(
+  page.includes("STAFF_PH_EMPTY_PERIOD") ||
+    page.includes("staffPhPurchasesEmptyTitle"),
+  "empty copy",
+);
 
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "page bg F7F9F6");
 assert(css.includes("#0e4f46") || css.includes("#0E4F46"), "brandPrimary");

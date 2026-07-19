@@ -18,6 +18,9 @@ export const STAFF_PH_TAB_LOW = "Low stock";
 export const STAFF_PH_SEARCH_HINT = "Search supplier, ID, items…";
 export const STAFF_PH_SEARCH_HINT_LOW = "Search low stock items…";
 
+/** `_onSearchChanged` Timer — staff_purchase_history_page.dart */
+export const STAFF_PH_DEBOUNCE_MS = 250;
+
 /** Purchase status FilterChips */
 export const STAFF_PH_STATUS_ALL = "All";
 export const STAFF_PH_STATUS_UNDELIVERED = "Undelivered";

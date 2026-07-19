@@ -1,15 +1,14 @@
 /**
- * Staff purchase history `/staff/purchase-history` — LAYOUT (Step 2).
- * Source: staff_purchase_history_page.dart Scaffold HexaColors.brandBackground;
- * AppBar brandPrimary; InputDecoration radius 10 / brandBorder;
- * FilterChip fontSize 11 · Wrap spacing 6; _DateHeader; StaffPurchaseHistoryRow.
- * Forbidden: debounce/search typing, chip/tab handlers, trade-purchases API.
+ * Staff purchase history `/staff/purchase-history` — FIELDS (Step 3).
+ * Source: staff_purchase_history_page.dart debounce 250ms · TabController ·
+ * FilterChips · `_filterPurchases` / `_filterLowStock` · `_emptyMessage`.
+ * Forbidden: row tap / Inform owner / RefreshIndicator / trade-purchases API.
  */
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   STAFF_PH_BACK_FALLBACK,
-  STAFF_PH_EMPTY_LOW,
-  STAFF_PH_EMPTY_PERIOD,
+  STAFF_PH_DEBOUNCE_MS,
   STAFF_PH_LOW_ALL,
   STAFF_PH_LOW_CRITICAL,
   STAFF_PH_SEARCH_HINT,
@@ -31,6 +30,14 @@ import {
   type StaffPhLowFilter,
   type StaffPhStatusFilter,
 } from "./staffPurchaseHistoryFilters";
+import {
+  filterStaffPhLowStock,
+  filterStaffPhPurchases,
+  staffPhLowEmptyTitle,
+  staffPhPurchasesEmptyTitle,
+  type StaffPhLowStockRow,
+  type StaffPhPurchaseRow,
+} from "./staffPurchaseHistoryLogic";
 import {
   STAFF_PH_TAB_ORDER,
   staffPhTabFromQuery,
@@ -81,10 +88,48 @@ function popOrGo(
 export function StaffPurchaseHistoryPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const tab = staffPhTabFromQuery(searchParams.get("tab"));
+  const [tab, setTab] = useState<StaffPhTab>(() =>
+    staffPhTabFromQuery(searchParams.get("tab")),
+  );
+  const [status, setStatus] = useState<StaffPhStatusFilter>(
+    STAFF_PH_DEFAULT_STATUS,
+  );
+  const [lowFilter, setLowFilter] = useState<StaffPhLowFilter>(
+    STAFF_PH_DEFAULT_LOW,
+  );
+  const [query, setQuery] = useState("");
+  const [debounced, setDebounced] = useState("");
+  /** WIRE fills these; FIELDS filters empty local catalogs. */
+  const [purchases] = useState<StaffPhPurchaseRow[]>([]);
+  const [lowRows] = useState<StaffPhLowStockRow[]>([]);
+
   const isLow = tab === "lowStock";
-  const status = STAFF_PH_DEFAULT_STATUS;
-  const lowFilter = STAFF_PH_DEFAULT_LOW;
+
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      setDebounced(query.trim().toLowerCase());
+    }, STAFF_PH_DEBOUNCE_MS);
+    return () => window.clearTimeout(t);
+  }, [query]);
+
+  const filteredPurchases = filterStaffPhPurchases(purchases, {
+    status,
+    query: debounced,
+  });
+  const filteredLow = filterStaffPhLowStock(lowRows, {
+    low: lowFilter,
+    query: debounced,
+  });
+
+  const emptyTitle = isLow
+    ? staffPhLowEmptyTitle({
+        itemCount: filteredLow.length,
+        query: debounced,
+      })
+    : staffPhPurchasesEmptyTitle({
+        itemCount: filteredPurchases.length,
+        query: debounced,
+      });
 
   return (
     <div className="staff-ph-page" data-page="staff-purchase-history">
@@ -102,7 +147,7 @@ export function StaffPurchaseHistoryPage() {
           <h1 className="staff-ph-appbar__title">{STAFF_PH_TITLE}</h1>
         </div>
         <div
-          className="staff-ph-tabs staff-ph-tabs--inert"
+          className="staff-ph-tabs staff-ph-tabs--active"
           data-slot="tabs"
           role="tablist"
           aria-label="Period"
@@ -118,8 +163,7 @@ export function StaffPurchaseHistoryPage() {
                   ? "staff-ph-tab staff-ph-tab--selected"
                   : "staff-ph-tab"
               }
-              disabled
-              tabIndex={-1}
+              onClick={() => setTab(key)}
             >
               {TAB_LABEL[key]}
             </button>
@@ -129,28 +173,38 @@ export function StaffPurchaseHistoryPage() {
 
       <main className="staff-ph-body" data-slot="body">
         <div
-          className="staff-ph-search staff-ph-search--inert"
+          className="staff-ph-search staff-ph-search--active"
           data-slot="search"
         >
           <input
-            className="staff-ph-search__input"
+            className="staff-ph-search__input staff-ph-search__input--active"
             type="search"
-            readOnly
-            disabled
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
             placeholder={isLow ? STAFF_PH_SEARCH_HINT_LOW : STAFF_PH_SEARCH_HINT}
             aria-label={isLow ? STAFF_PH_SEARCH_HINT_LOW : STAFF_PH_SEARCH_HINT}
-            value=""
           />
+          {query.trim().length > 0 ? (
+            <button
+              type="button"
+              className="staff-ph-search__clear"
+              aria-label="Clear"
+              onClick={() => setQuery("")}
+            >
+              ×
+            </button>
+          ) : null}
         </div>
 
         {!isLow ? (
           <div
-            className="staff-ph-chips staff-ph-chips--inert"
+            className="staff-ph-chips staff-ph-chips--active"
             data-slot="statusChips"
           >
             {STAFF_PH_STATUS_ORDER.map((key) => (
-              <span
+              <button
                 key={key}
+                type="button"
                 className={[
                   "staff-ph-chip",
                   STATUS_CHIP_MOD[key],
@@ -158,19 +212,21 @@ export function StaffPurchaseHistoryPage() {
                 ]
                   .filter(Boolean)
                   .join(" ")}
+                onClick={() => setStatus(key)}
               >
                 {STATUS_LABEL[key]}
-              </span>
+              </button>
             ))}
           </div>
         ) : (
           <div
-            className="staff-ph-chips staff-ph-chips--inert"
+            className="staff-ph-chips staff-ph-chips--active"
             data-slot="lowStockChips"
           >
             {STAFF_PH_LOW_ORDER.map((key) => (
-              <span
+              <button
                 key={key}
+                type="button"
                 className={[
                   "staff-ph-chip",
                   LOW_CHIP_MOD[key],
@@ -178,18 +234,21 @@ export function StaffPurchaseHistoryPage() {
                 ]
                   .filter(Boolean)
                   .join(" ")}
+                onClick={() => setLowFilter(key)}
               >
                 {LOW_LABEL[key]}
-              </span>
+              </button>
             ))}
           </div>
         )}
 
         <div className="staff-ph-results" data-slot="results">
-          <div className="staff-ph-results__empty" data-slot="empty">
-            {isLow ? STAFF_PH_EMPTY_LOW : STAFF_PH_EMPTY_PERIOD}
-          </div>
-          {/* Date headers + StaffPurchaseHistoryRow — FIELDS/WIRE */}
+          {emptyTitle ? (
+            <div className="staff-ph-results__empty" data-slot="empty">
+              {emptyTitle}
+            </div>
+          ) : null}
+          {/* Date headers + StaffPurchaseHistoryRow — BUTTONS/WIRE */}
           <div
             className="staff-ph-list"
             data-slot="list"

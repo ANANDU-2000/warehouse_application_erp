@@ -95,7 +95,8 @@
     "test:staff-stock-states": "node scripts/check-staff-stock-states.mjs",
     "test:staff-stock-compare": "node scripts/check-staff-stock-compare.mjs",
     "test:staff-purchase-history-scaffold": "node scripts/check-staff-purchase-history-scaffold.mjs",
-    "test:staff-purchase-history-layout": "node scripts/check-staff-purchase-history-layout.mjs"
+    "test:staff-purchase-history-layout": "node scripts/check-staff-purchase-history-layout.mjs",
+    "test:staff-purchase-history-fields": "node scripts/check-staff-purchase-history-fields.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

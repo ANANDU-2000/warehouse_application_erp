@@ -99,10 +99,17 @@ assert(page.includes('data-slot="statusChips"'), "statusChips");
 assert(page.includes('data-slot="lowStockChips"'), "lowStockChips");
 assert(page.includes('data-slot="results"'), "results");
 assert(page.includes('data-slot="empty"'), "empty");
-assert(page.includes("readOnly"), "search inert");
-assert(page.includes("disabled"), "tabs/search disabled");
+assert(
+  page.includes("readOnly") ||
+    page.includes("staff-ph-search__input--active"),
+  "search field present (FIELDS may activate)",
+);
 assert(page.includes("staffPhTabFromQuery"), "reads ?tab=");
-assert(page.includes("STAFF_PH_EMPTY_PERIOD"), "empty copy");
+assert(
+  page.includes("STAFF_PH_EMPTY_PERIOD") ||
+    page.includes("staffPhPurchasesEmptyTitle"),
+  "empty copy",
+);
 assert(page.includes("STAFF_PH_BACK_FALLBACK"), "back");
 assert(page.includes('data-deferred="purchase-rows"'), "rows deferred");
 assert(!page.includes("fetch("), "no fetch");

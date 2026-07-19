@@ -12,8 +12,8 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 DONE | Next: ask profile SCAFFOLD **or** Subagent 4 ([`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md)) |
-| 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 backend PASS · list UI COMPARE | Profile next — [`users_management_compare.md`](modules/users_management_compare.md) |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 DONE | Next: ask profile LAYOUT **or** Subagent 4 ([`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md)) |
+| 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list COMPARE · profile SCAFFOLD | LAYOUT next — [`user_profile_scaffold_compare.md`](modules/user_profile_scaffold_compare.md) |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
 | 6 | Suppliers/Brokers | 12 | ✅ `suppliers.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users backend **through bulk PASS**. Users list UI **COMPARE PASS**. Next: ask **profile SCAFFOLD** or one **Subagent 4 satellite**.
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users backend **through bulk PASS**. Users list **COMPARE PASS**. Profile **SCAFFOLD PASS**. Next: ask **profile LAYOUT** or one **Subagent 4 satellite**.
 
 ---
 
@@ -101,7 +101,7 @@ Backend (wire in later steps): `POST /v1/auth/login`, `POST /v1/auth/refresh`, `
 | `PATCH /v1/businesses/:businessId/users/:userId` | Backend Slice 4 **PASS** — [`users_roles_backend_patch_compare.md`](modules/users_roles_backend_patch_compare.md) |
 | `DELETE /v1/businesses/:businessId/users/:userId` | Backend Slice 5 **PASS** — [`users_roles_backend_delete_compare.md`](modules/users_roles_backend_delete_compare.md) |
 | `/settings/users` | Users list UI — **COMPARE PASS** — [`users_management_compare.md`](modules/users_management_compare.md) |
-| `/settings/users/:userId` | User profile stub route (page body deferred — ask before SCAFFOLD) |
+| `/settings/users/:userId` | User profile — **SCAFFOLD PASS** — [`user_profile_scaffold_compare.md`](modules/user_profile_scaffold_compare.md) |
 
 ### Seq 4 — Products/Catalog
 

@@ -104,6 +104,18 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 6 STATES | ✅ | ListSkeleton + HexaErrorCard — [`users_management_states_compare.md`](modules/users_management_states_compare.md) |
 | 7 COMPARE | ✅ | Master PASS — [`users_management_compare.md`](modules/users_management_compare.md) |
 
+### User profile (`/settings/users/:userId`)
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | empty slots + manage gate — [`user_profile_scaffold_compare.md`](modules/user_profile_scaffold_compare.md) |
+| 2 LAYOUT | ⬜ | Ask before next |
+| 3 FIELDS | ⬜ | |
+| 4 BUTTONS | ⬜ | |
+| 5 WIRE | ⬜ | |
+| 6 STATES | ⬜ | |
+| 7 COMPARE | ⬜ | |
+
 ### Prompt template (copy per page)
 
 ```

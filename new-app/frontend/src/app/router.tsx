@@ -8,6 +8,7 @@ import { HomeBreakdownListPage } from "../features/home/HomeBreakdownListPage";
 import { DashboardRouteStubPage } from "../features/home/DashboardRouteStubPage";
 import { StaffHomePage } from "../features/staff/StaffHomePage";
 import { UserManagementPage } from "../features/users/UserManagementPage";
+import { UserProfilePage } from "../features/users/UserProfilePage";
 
 /**
  * Splash + Login + owner /home + activity + breakdown-more SCAFFOLD + staff /staff/home + stubs.
@@ -88,10 +89,7 @@ export function AppRouter() {
           element={<DashboardRouteStubPage title="Settings" />}
         />
         <Route path="/settings/users" element={<UserManagementPage />} />
-        <Route
-          path="/settings/users/:userId"
-          element={<DashboardRouteStubPage title="User profile" />}
-        />
+        <Route path="/settings/users/:userId" element={<UserProfilePage />} />
         <Route
           path="/purchase"
           element={<DashboardRouteStubPage title="Purchases" />}

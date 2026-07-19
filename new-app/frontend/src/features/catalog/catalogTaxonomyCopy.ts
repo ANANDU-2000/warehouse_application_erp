@@ -36,6 +36,16 @@ export const TAXONOMY_ROW_ADD_SUB_TOOLTIP = "Add subcategory";
 export const TAXONOMY_PATH_CATALOG = "/catalog";
 export const TAXONOMY_PATH_NEW_CATEGORY = "/catalog/new-category";
 
+/** BUTTONS sample until WIRE — mirrors catalog hub sample id pattern */
+export const TAXONOMY_SAMPLE_CATEGORY_ID =
+  "00000000-0000-4000-8000-000000000001";
+export const TAXONOMY_SAMPLE_CATEGORY_NAME = "Rice";
+
 export function taxonomyCategoryPath(categoryId: string): string {
   return `/catalog/category/${encodeURIComponent(categoryId)}`;
+}
+
+/** Full-screen create stub until quick subcategory sheet is ported */
+export function taxonomyNewSubcategoryPath(categoryId: string): string {
+  return `/catalog/category/${encodeURIComponent(categoryId)}/new-subcategory`;
 }

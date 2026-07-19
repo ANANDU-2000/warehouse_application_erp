@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy SCAFFOLD→LAYOUT→**FIELDS** |
-| 🟡 Current | `/catalog/taxonomy` **FIELDS PASS** — ask before BUTTONS |
-| ⬜ Pending | BUTTONS → COMPARE · `/catalog/new-category` · category detail · item routes |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy SCAFFOLD→LAYOUT→FIELDS→**BUTTONS** |
+| 🟡 Current | superseded — see [`catalog_taxonomy_buttons_compare.md`](catalog_taxonomy_buttons_compare.md) |
+| ⬜ Pending | WIRE → COMPARE · `/catalog/new-category` · category detail · item routes |
 | ⏸ Deferred | quick taxonomy sheet · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -41,4 +41,4 @@ npm run build
 
 Revert FIELDS commit; restore LAYOUT inert search; remove `catalogTaxonomyFields.ts` + fields script + this compare; boards → ask before FIELDS.
 
-**Next (ask first):** BUTTONS — back / Full catalog / chips / FAB / empty primary / row add (local nav or stubs; no live API). Stop after FIELDS.
+**Next (ask first):** BUTTONS — done → [`catalog_taxonomy_buttons_compare.md`](catalog_taxonomy_buttons_compare.md). Ask before WIRE.

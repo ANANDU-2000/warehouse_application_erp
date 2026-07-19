@@ -232,7 +232,8 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 1 SCAFFOLD | ✅ | AppBar + explainer/chips/search/list/empty/FAB + staff allowed — [`catalog_taxonomy_scaffold_compare.md`](modules/catalog_taxonomy_scaffold_compare.md) |
 | 2 LAYOUT | ✅ | Hexa tokens + ActionChip/search/row/FAB chrome — [`catalog_taxonomy_layout_compare.md`](modules/catalog_taxonomy_layout_compare.md) |
 | 3 FIELDS | ✅ | Search contains (no debounce) + empty catalogs — [`catalog_taxonomy_fields_compare.md`](modules/catalog_taxonomy_fields_compare.md) |
-| 4–7 | ⬜ | Ask before BUTTONS |
+| 4 BUTTONS | ✅ | Back/full-catalog/chips/FAB/empty/row nav stubs — [`catalog_taxonomy_buttons_compare.md`](modules/catalog_taxonomy_buttons_compare.md) |
+| 5–7 | ⬜ | Ask before WIRE |
 
 ### Prompt template (copy per page)
 

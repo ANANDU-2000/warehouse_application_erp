@@ -98,21 +98,37 @@ assert(page.includes('data-slot="search"'), "search");
 assert(page.includes('data-slot="categoryList"'), "categoryList");
 assert(page.includes('data-slot="empty"'), "empty");
 assert(page.includes('data-slot="fab"'), "fab");
-assert(page.includes('data-deferred="back"'), "back deferred");
-assert(page.includes('data-deferred="full-catalog"'), "full-catalog deferred");
-assert(page.includes('data-role="owner-only"'), "owner-only full catalog");
-assert(page.includes('data-deferred="chip-category"'), "chip category deferred");
 assert(
-  page.includes('data-deferred="chip-subcategory"'),
-  "chip subcategory deferred",
+  page.includes('data-deferred="back"') || page.includes('data-action="back"'),
+  "back deferred or BUTTONS",
+);
+assert(
+  page.includes('data-deferred="full-catalog"') ||
+    page.includes('data-action="full-catalog"'),
+  "full-catalog deferred or BUTTONS",
+);
+assert(
+  page.includes('data-deferred="chip-category"') ||
+    page.includes('data-action="chip-category"'),
+  "chip category deferred or BUTTONS",
+);
+assert(
+  page.includes('data-deferred="chip-subcategory"') ||
+    page.includes('data-action="chip-subcategory"'),
+  "chip subcategory deferred or BUTTONS",
 );
 assert(
   page.includes('data-deferred="search-field"') ||
     page.includes('data-testid="taxonomy-search"'),
   "search deferred or FIELDS input",
 );
-assert(page.includes('data-deferred="quick-add"'), "fab deferred");
+assert(
+  page.includes('data-deferred="quick-add"') ||
+    page.includes('data-action="quick-add"'),
+  "fab deferred or BUTTONS",
+);
 assert(page.includes("isStaff"), "staff role awareness");
+assert(page.includes('data-role="owner-only"'), "owner-only full catalog");
 assert(
   page.includes("FIELDS") ||
     page.includes("BUTTONS") ||

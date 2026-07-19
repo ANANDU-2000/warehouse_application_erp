@@ -82,6 +82,10 @@ export function AppRouter() {
           element={<DashboardRouteStubPage title="New category" />}
         />
         <Route
+          path="/catalog/category/:categoryId/new-subcategory"
+          element={<DashboardRouteStubPage title="New subcategory" />}
+        />
+        <Route
           path="/catalog/category/:categoryId"
           element={<DashboardRouteStubPage title="Category detail" />}
         />

@@ -55,7 +55,7 @@ assert(page.includes("taxonomy-hub-page__row-name"), "row name");
 assert(page.includes("taxonomy-hub-page__empty-icon"), "empty icon");
 assert(page.includes("taxonomy-hub-page__fab"), "fab chrome");
 assert(page.includes("isStaff"), "staff role awareness");
-assert(!page.includes("Navigate"), "staff allowed — no Navigate");
+assert(!page.includes("<Navigate"), "staff allowed — no Navigate redirect");
 assert(!page.includes("fetch("), "no fetch");
 assert(
   page.includes("FIELDS") ||

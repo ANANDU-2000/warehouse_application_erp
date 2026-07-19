@@ -21,7 +21,7 @@
 
 | Path | Stub title |
 |---|---|
-| `/staff/settings` | Staff settings |
+| `/staff/settings` | Staff settings (**implement locked** — Settings backend) |
 | `/staff/search` | Staff search |
 | `/staff/items` | Staff gallery |
 | `/staff/stock` | Staff stock |

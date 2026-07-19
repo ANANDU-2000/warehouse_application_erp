@@ -1,11 +1,15 @@
 /**
- * Staff stock FIELDS helpers — stock_page.dart empty titles · status chips ·
- * stock_period_utils sort/search rank (client; WIRE fills rows).
+ * Staff stock FIELDS/BUTTONS helpers — stock_page empty titles · status chips ·
+ * stock_period_utils sort/search rank + op filters (client; WIRE fills rows).
  */
 import {
   STAFF_STOCK_EMPTY,
   STAFF_STOCK_EMPTY_FILTERED,
 } from "./staffStockCopy";
+import {
+  itemMatchesOpFilters,
+  type StaffStockOpFilters,
+} from "./staffStockFilters";
 import type { StaffStockStatus } from "./staffStockStatus";
 
 export type StaffStockRow = Record<string, unknown>;
@@ -77,11 +81,16 @@ export function stockNamePrefixRank(
 
 export function filterStaffStockRows(
   items: readonly StaffStockRow[],
-  args: { status: StaffStockStatus; query: string },
+  args: {
+    status: StaffStockStatus;
+    query: string;
+    op?: StaffStockOpFilters;
+  },
 ): StaffStockRow[] {
   const q = args.query.trim().toLowerCase();
   return items.filter((it) => {
     if (!itemMatchesStockStatus(it, args.status)) return false;
+    if (args.op && !itemMatchesOpFilters(it, args.op)) return false;
     if (q && !itemMatchesStockSearch(it, q)) return false;
     return true;
   });
@@ -96,11 +105,13 @@ export function staffStockListEmptyTitle(args: {
   status: StaffStockStatus;
   query: string;
   deliveryFilterActive?: boolean;
+  advancedFilterCount?: number;
 }): string | null {
   if (args.itemCount > 0) return null;
   const filtered =
     args.status !== "all" ||
     args.query.trim().length > 0 ||
-    Boolean(args.deliveryFilterActive);
+    Boolean(args.deliveryFilterActive) ||
+    (args.advancedFilterCount ?? 0) > 0;
   return filtered ? STAFF_STOCK_EMPTY_FILTERED : STAFF_STOCK_EMPTY;
 }

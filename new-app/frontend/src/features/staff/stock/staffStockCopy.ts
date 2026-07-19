@@ -37,3 +37,25 @@ export const STAFF_STOCK_DEBOUNCE_MS = 180;
 
 /** Bootstrap list query sort — stock_page `_bootstrapStockListQueryOnce` */
 export const STAFF_STOCK_DEFAULT_SORT = "recent";
+
+/** StockOperationalTopBar tooltips / menu */
+export const STAFF_STOCK_TOOLTIP_PERIOD = "Filter by period";
+export const STAFF_STOCK_TOOLTIP_FILTERS = "Filters";
+export const STAFF_STOCK_TOOLTIP_SEARCH = "Search";
+export const STAFF_STOCK_TOOLTIP_HIDE_SEARCH = "Hide search";
+export const STAFF_STOCK_MENU_SCAN = "Scan";
+
+/** Period sheet — stock_page `_StockPeriodSheet` */
+export const STAFF_STOCK_PERIOD_SHEET_TITLE = "Filter by period";
+
+/** Filter sheet — operational_stock_filter_sheet */
+export const STAFF_STOCK_FILTER_SHEET_TITLE = "Filters";
+export const STAFF_STOCK_FILTER_CLEAR = "Clear advanced";
+export const STAFF_STOCK_FILTER_APPLY = "Apply";
+export const STAFF_STOCK_FILTER_REORDER = "Reorder only";
+export const STAFF_STOCK_FILTER_PURCHASED = "Purchased in period";
+export const STAFF_STOCK_FILTER_MISSING_BARCODE = "Missing barcode";
+export const STAFF_STOCK_FILTER_MISSING_CODE = "Missing item code";
+
+/** Scan — stock_operational_top_bar push */
+export const STAFF_STOCK_SCAN_PATH = "/barcode/scan?return=stock";

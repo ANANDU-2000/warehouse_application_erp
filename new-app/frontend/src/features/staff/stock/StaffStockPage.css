@@ -80,6 +80,158 @@
   padding-right: 4px;
 }
 
+.staff-stock-appbar__icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--ss-fg);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  border-radius: 8px;
+  padding: 0;
+}
+
+.staff-stock-appbar__badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 8px;
+  background: var(--ss-brand);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 14px;
+  text-align: center;
+}
+
+.staff-stock-appbar__more-wrap {
+  position: relative;
+}
+
+.staff-stock-more-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 20;
+  min-width: 140px;
+  background: var(--ss-surface);
+  border: 1px solid var(--ss-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 12%);
+  padding: 4px 0;
+}
+
+.staff-stock-more-menu button {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ss-fg);
+  cursor: pointer;
+}
+
+.staff-stock-sheet {
+  border-bottom: 1px solid var(--ss-border);
+  background: var(--ss-surface);
+  padding: 12px var(--ss-gutter) 16px;
+  box-sizing: border-box;
+}
+
+.staff-stock-sheet__title {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.staff-stock-sheet__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.staff-stock-sheet__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 10px 4px;
+  cursor: pointer;
+  text-align: left;
+  border-bottom: 1px solid var(--ss-border);
+}
+
+.staff-stock-sheet__item--active {
+  background: color-mix(in srgb, var(--ss-brand) 8%, transparent);
+}
+
+.staff-stock-sheet__item-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ss-fg);
+}
+
+.staff-stock-sheet__item-sub {
+  font-size: 12px;
+  color: var(--ss-muted);
+}
+
+.staff-stock-sheet__switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 0;
+  color: var(--ss-fg);
+}
+
+.staff-stock-sheet__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.staff-stock-sheet__actions button {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--ss-border);
+  border-radius: 8px;
+  background: var(--ss-bg);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.staff-stock-sheet__dismiss {
+  margin-top: 8px;
+  width: 100%;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--ss-muted);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.staff-stock-sheet__deferred {
+  min-height: 0;
+}
+
 .staff-stock-appbar__action-slot {
   width: 40px;
   height: 40px;

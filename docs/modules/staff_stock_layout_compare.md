@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff items COMPARE · Staff stock SCAFFOLD · **LAYOUT** · FIELDS |
-| 🟡 Current | Staff stock **FIELDS PASS** — ask before BUTTONS |
-| ⬜ Pending | Staff stock BUTTONS → COMPARE · other Subagent 4 stubs |
+| ✅ Completed | Staff items COMPARE · Staff stock SCAFFOLD · **LAYOUT** · FIELDS · BUTTONS |
+| 🟡 Current | Staff stock **BUTTONS PASS** — ask before WIRE |
+| ⬜ Pending | Staff stock WIRE → COMPARE · other Subagent 4 stubs |
 | ⏸ Deferred | `/staff/settings` · `/settings`; owner `/stock`; listStock (WIRE) |
 
 ## Legacy vs New
@@ -36,4 +36,4 @@
 
 **Rollback:** Revert LAYOUT commit; restore SCAFFOLD page/CSS; remove layout script + this compare; boards → ask before LAYOUT.
 
-**Next (ask first):** FIELDS → [`staff_stock_fields_compare.md`](staff_stock_fields_compare.md). Ask before BUTTONS.
+**Next (ask first):** FIELDS → [`staff_stock_fields_compare.md`](staff_stock_fields_compare.md). BUTTONS → [`staff_stock_buttons_compare.md`](staff_stock_buttons_compare.md). Ask before WIRE.

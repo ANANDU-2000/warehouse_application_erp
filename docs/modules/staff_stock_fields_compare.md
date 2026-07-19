@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff items COMPARE · Staff stock SCAFFOLD · LAYOUT · **FIELDS** |
-| 🟡 Current | Staff stock **FIELDS PASS** — ask before BUTTONS |
-| ⬜ Pending | Staff stock BUTTONS → COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | `/staff/settings` · `/settings`; listStock (WIRE); AppBar period/filters/more (BUTTONS) |
+| ✅ Completed | Staff items COMPARE · Staff stock SCAFFOLD · LAYOUT · FIELDS · **BUTTONS** |
+| 🟡 Current | Staff stock **BUTTONS PASS** — ask before WIRE |
+| ⬜ Pending | Staff stock WIRE → COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | `/staff/settings` · `/settings`; listStock (WIRE); AppBar period/filters/more done |
 
 ## Legacy vs New
 
@@ -38,4 +38,4 @@
 
 **Rollback:** Revert FIELDS commit; restore LAYOUT inert search/chips/tabs; remove `staffStockLogic.ts` + this compare + fields script; boards → ask before FIELDS.
 
-**Next (ask first):** `/staff/stock` BUTTONS — do not start until approved.
+**Next (ask first):** BUTTONS → [`staff_stock_buttons_compare.md`](staff_stock_buttons_compare.md). Ask before WIRE.

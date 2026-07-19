@@ -1,19 +1,30 @@
 /**
- * Staff stock `/staff/stock` — FIELDS (Step 3).
- * Source: stock_page.dart search debounce 180ms · status chips · tab client state;
- * stock_period_utils prefix rank; HexaEmptyState titles.
- * Forbidden: AppBar action handlers (BUTTONS), stock list API (WIRE).
+ * Staff stock `/staff/stock` — BUTTONS (Step 4).
+ * Source: StockOperationalTopBar actions · `_StockPeriodSheet` ·
+ * showOperationalStockFilter toggles · Scan menu (staff).
+ * Forbidden: listStock / delivery counts / row actions API (WIRE).
  */
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import type { HomePeriod } from "../../home/homePeriod";
 import {
   STAFF_STOCK_ACTIVITY_EMPTY,
   STAFF_STOCK_BACK_HOME,
   STAFF_STOCK_DEBOUNCE_MS,
+  STAFF_STOCK_FILTER_APPLY,
+  STAFF_STOCK_FILTER_CLEAR,
+  STAFF_STOCK_FILTER_MISSING_BARCODE,
+  STAFF_STOCK_FILTER_MISSING_CODE,
+  STAFF_STOCK_FILTER_PURCHASED,
+  STAFF_STOCK_FILTER_REORDER,
+  STAFF_STOCK_FILTER_SHEET_TITLE,
   STAFF_STOCK_HDR_DIFF,
   STAFF_STOCK_HDR_ITEM,
   STAFF_STOCK_HDR_PHYS,
   STAFF_STOCK_HDR_SYS,
+  STAFF_STOCK_MENU_SCAN,
+  STAFF_STOCK_PERIOD_SHEET_TITLE,
+  STAFF_STOCK_SCAN_PATH,
   STAFF_STOCK_SEARCH_HINT,
   STAFF_STOCK_STATUS_ALL,
   STAFF_STOCK_STATUS_LOW,
@@ -21,12 +32,28 @@ import {
   STAFF_STOCK_TAB_ACTIVITY,
   STAFF_STOCK_TAB_STOCK,
   STAFF_STOCK_TITLE,
+  STAFF_STOCK_TOOLTIP_FILTERS,
+  STAFF_STOCK_TOOLTIP_HIDE_SEARCH,
+  STAFF_STOCK_TOOLTIP_PERIOD,
+  STAFF_STOCK_TOOLTIP_SEARCH,
 } from "./staffStockCopy";
+import {
+  countWarehouseActiveFilters,
+  STAFF_STOCK_OP_FILTERS_EMPTY,
+  type StaffStockOpFilters,
+} from "./staffStockFilters";
 import {
   filterStaffStockRows,
   staffStockListEmptyTitle,
   type StaffStockRow,
 } from "./staffStockLogic";
+import {
+  STAFF_STOCK_DEFAULT_PERIOD,
+  STAFF_STOCK_PERIOD_BADGE,
+  STAFF_STOCK_PERIOD_SHEET_LABELS,
+  STAFF_STOCK_PERIOD_SHEET_ORDER,
+  STAFF_STOCK_PERIOD_SHEET_SUB,
+} from "./staffStockPeriod";
 import {
   STAFF_STOCK_STATUS_ORDER,
   staffStockStatusFromQuery,
@@ -72,7 +99,17 @@ export function StaffStockPage() {
   );
   const [query, setQuery] = useState("");
   const [debounced, setDebounced] = useState("");
-  /** Local catalog — WIRE fills; FIELDS filters empty → empty titles. */
+  /** Flutter `_searchExpanded` default false. */
+  const [searchExpanded, setSearchExpanded] = useState(false);
+  const [period, setPeriod] = useState<HomePeriod>(STAFF_STOCK_DEFAULT_PERIOD);
+  const [periodOpen, setPeriodOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [op, setOp] = useState<StaffStockOpFilters>(STAFF_STOCK_OP_FILTERS_EMPTY);
+  const [draftOp, setDraftOp] = useState<StaffStockOpFilters>(
+    STAFF_STOCK_OP_FILTERS_EMPTY,
+  );
+  /** Local catalog — WIRE fills. */
   const [allItems] = useState<StaffStockRow[]>([]);
 
   useEffect(() => {
@@ -82,15 +119,47 @@ export function StaffStockPage() {
     return () => window.clearTimeout(t);
   }, [query]);
 
+  const filterCount = countWarehouseActiveFilters(status, op);
   const filtered = filterStaffStockRows(allItems, {
     status,
     query: debounced,
+    op,
   });
   const emptyTitle = staffStockListEmptyTitle({
     itemCount: filtered.length,
     status,
     query: debounced,
+    advancedFilterCount: filterCount,
   });
+
+  function openFilters(): void {
+    setDraftOp(op);
+    setFiltersOpen(true);
+    setMoreOpen(false);
+    setPeriodOpen(false);
+  }
+
+  function applyFilters(): void {
+    setOp(draftOp);
+    setFiltersOpen(false);
+  }
+
+  function clearAdvancedFilters(): void {
+    setDraftOp(STAFF_STOCK_OP_FILTERS_EMPTY);
+    setOp(STAFF_STOCK_OP_FILTERS_EMPTY);
+    setStatus("all");
+    setFiltersOpen(false);
+  }
+
+  function pickPeriod(p: HomePeriod): void {
+    setPeriod(p);
+    setPeriodOpen(false);
+  }
+
+  function openScan(): void {
+    setMoreOpen(false);
+    navigate(STAFF_STOCK_SCAN_PATH);
+  }
 
   return (
     <div className="staff-stock-page" data-page="staff-stock">
@@ -105,28 +174,93 @@ export function StaffStockPage() {
             ←
           </button>
           <h1 className="staff-stock-appbar__title">{STAFF_STOCK_TITLE}</h1>
-          <div
-            className="staff-stock-appbar__actions"
-            data-slot="actions"
-            aria-hidden="true"
-          >
-            {/* Period / Filters / Search toggle / More — BUTTONS */}
-            <span
-              className="staff-stock-appbar__action-slot"
-              data-deferred="period"
-            />
-            <span
-              className="staff-stock-appbar__action-slot"
-              data-deferred="filters"
-            />
-            <span
-              className="staff-stock-appbar__action-slot"
-              data-deferred="search-toggle"
-            />
-            <span
-              className="staff-stock-appbar__action-slot"
-              data-deferred="more"
-            />
+          <div className="staff-stock-appbar__actions" data-slot="actions">
+            <button
+              type="button"
+              className="staff-stock-appbar__icon-btn"
+              title={STAFF_STOCK_TOOLTIP_PERIOD}
+              aria-label={STAFF_STOCK_TOOLTIP_PERIOD}
+              data-action="period"
+              onClick={() => {
+                setPeriodOpen((v) => !v);
+                setFiltersOpen(false);
+                setMoreOpen(false);
+              }}
+            >
+              ◷
+              {period !== "allTime" ? (
+                <span className="staff-stock-appbar__badge">
+                  {STAFF_STOCK_PERIOD_BADGE[period]}
+                </span>
+              ) : null}
+            </button>
+            <button
+              type="button"
+              className="staff-stock-appbar__icon-btn"
+              title={STAFF_STOCK_TOOLTIP_FILTERS}
+              aria-label={STAFF_STOCK_TOOLTIP_FILTERS}
+              data-action="filters"
+              onClick={openFilters}
+            >
+              ☰
+              {filterCount > 0 ? (
+                <span className="staff-stock-appbar__badge">{filterCount}</span>
+              ) : null}
+            </button>
+            <button
+              type="button"
+              className="staff-stock-appbar__icon-btn"
+              title={
+                searchExpanded
+                  ? STAFF_STOCK_TOOLTIP_HIDE_SEARCH
+                  : STAFF_STOCK_TOOLTIP_SEARCH
+              }
+              aria-label={
+                searchExpanded
+                  ? STAFF_STOCK_TOOLTIP_HIDE_SEARCH
+                  : STAFF_STOCK_TOOLTIP_SEARCH
+              }
+              data-action="search-toggle"
+              onClick={() => {
+                setSearchExpanded((v) => !v);
+                setMoreOpen(false);
+              }}
+            >
+              {searchExpanded ? "×" : "⌕"}
+            </button>
+            <div className="staff-stock-appbar__more-wrap">
+              <button
+                type="button"
+                className="staff-stock-appbar__icon-btn"
+                title="More"
+                aria-label="More"
+                data-action="more"
+                onClick={() => {
+                  setMoreOpen((v) => !v);
+                  setPeriodOpen(false);
+                  setFiltersOpen(false);
+                }}
+              >
+                ⋮
+              </button>
+              {moreOpen ? (
+                <div
+                  className="staff-stock-more-menu"
+                  data-slot="moreMenu"
+                  role="menu"
+                >
+                  <button
+                    type="button"
+                    role="menuitem"
+                    data-action="scan"
+                    onClick={openScan}
+                  >
+                    {STAFF_STOCK_MENU_SCAN}
+                  </button>
+                  {/* Staff: no PDF/Excel/movement/add — stock_operational_top_bar */}
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
         <div
@@ -153,6 +287,123 @@ export function StaffStockPage() {
         </div>
       </header>
 
+      {periodOpen ? (
+        <div
+          className="staff-stock-sheet"
+          data-slot="periodSheet"
+          role="dialog"
+          aria-label={STAFF_STOCK_PERIOD_SHEET_TITLE}
+        >
+          <div className="staff-stock-sheet__title">
+            {STAFF_STOCK_PERIOD_SHEET_TITLE}
+          </div>
+          <ul className="staff-stock-sheet__list">
+            {STAFF_STOCK_PERIOD_SHEET_ORDER.map((key) => (
+              <li key={key}>
+                <button
+                  type="button"
+                  className={
+                    period === key
+                      ? "staff-stock-sheet__item staff-stock-sheet__item--active"
+                      : "staff-stock-sheet__item"
+                  }
+                  data-period={key}
+                  onClick={() => pickPeriod(key)}
+                >
+                  <span className="staff-stock-sheet__item-label">
+                    {STAFF_STOCK_PERIOD_SHEET_LABELS[key]}
+                  </span>
+                  <span className="staff-stock-sheet__item-sub">
+                    {STAFF_STOCK_PERIOD_SHEET_SUB[key]}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            className="staff-stock-sheet__dismiss"
+            onClick={() => setPeriodOpen(false)}
+          >
+            Close
+          </button>
+        </div>
+      ) : null}
+
+      {filtersOpen ? (
+        <div
+          className="staff-stock-sheet"
+          data-slot="filterSheet"
+          role="dialog"
+          aria-label={STAFF_STOCK_FILTER_SHEET_TITLE}
+        >
+          <div className="staff-stock-sheet__title">
+            {STAFF_STOCK_FILTER_SHEET_TITLE}
+          </div>
+          <label className="staff-stock-sheet__switch">
+            <input
+              type="checkbox"
+              checked={draftOp.reorderOnly}
+              onChange={(e) =>
+                setDraftOp((o) => ({ ...o, reorderOnly: e.target.checked }))
+              }
+            />
+            {STAFF_STOCK_FILTER_REORDER}
+          </label>
+          <label className="staff-stock-sheet__switch">
+            <input
+              type="checkbox"
+              checked={draftOp.purchasedInPeriodOnly}
+              onChange={(e) =>
+                setDraftOp((o) => ({
+                  ...o,
+                  purchasedInPeriodOnly: e.target.checked,
+                }))
+              }
+            />
+            {STAFF_STOCK_FILTER_PURCHASED}
+          </label>
+          <label className="staff-stock-sheet__switch">
+            <input
+              type="checkbox"
+              checked={draftOp.missingBarcodeOnly}
+              onChange={(e) =>
+                setDraftOp((o) => ({
+                  ...o,
+                  missingBarcodeOnly: e.target.checked,
+                }))
+              }
+            />
+            {STAFF_STOCK_FILTER_MISSING_BARCODE}
+          </label>
+          <label className="staff-stock-sheet__switch">
+            <input
+              type="checkbox"
+              checked={draftOp.missingItemCodeOnly}
+              onChange={(e) =>
+                setDraftOp((o) => ({
+                  ...o,
+                  missingItemCodeOnly: e.target.checked,
+                }))
+              }
+            />
+            {STAFF_STOCK_FILTER_MISSING_CODE}
+          </label>
+          <div
+            className="staff-stock-sheet__deferred"
+            data-deferred="subcategory-supplier-pickers"
+          />
+          <div className="staff-stock-sheet__actions">
+            <button type="button" onClick={clearAdvancedFilters}>
+              {STAFF_STOCK_FILTER_CLEAR}
+            </button>
+            <button type="button" onClick={applyFilters}>
+              {STAFF_STOCK_FILTER_APPLY}
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       <main className="staff-stock-body" data-slot="body">
         {tab === "stock" ? (
           <>
@@ -177,29 +428,33 @@ export function StaffStockPage() {
                 </button>
               ))}
             </div>
-            <div
-              className="staff-stock-search staff-stock-search--active"
-              data-slot="search"
-            >
-              <input
-                className="staff-stock-search__input staff-stock-search__input--active"
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={STAFF_STOCK_SEARCH_HINT}
-                aria-label={STAFF_STOCK_SEARCH_HINT}
-              />
-              {query.trim().length > 0 ? (
-                <button
-                  type="button"
-                  className="staff-stock-search__clear"
-                  aria-label="Clear"
-                  onClick={() => setQuery("")}
-                >
-                  ×
-                </button>
-              ) : null}
-            </div>
+            {searchExpanded ? (
+              <div
+                className="staff-stock-search staff-stock-search--active"
+                data-slot="search"
+              >
+                <input
+                  className="staff-stock-search__input staff-stock-search__input--active"
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={STAFF_STOCK_SEARCH_HINT}
+                  aria-label={STAFF_STOCK_SEARCH_HINT}
+                />
+                {query.trim().length > 0 ? (
+                  <button
+                    type="button"
+                    className="staff-stock-search__clear"
+                    aria-label="Clear"
+                    onClick={() => setQuery("")}
+                  >
+                    ×
+                  </button>
+                ) : null}
+              </div>
+            ) : (
+              <div data-slot="search" hidden />
+            )}
             <div
               className="staff-stock-delivery"
               data-slot="deliveryChips"

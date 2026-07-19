@@ -160,7 +160,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 1 SCAFFOLD | ✅ | AppBar + tabs + status/search/table/empty — [`staff_stock_scaffold_compare.md`](modules/staff_stock_scaffold_compare.md) |
 | 2 LAYOUT | ✅ | Hexa operational tokens + chip/table chrome — [`staff_stock_layout_compare.md`](modules/staff_stock_layout_compare.md) |
 | 3 FIELDS | ✅ | debounce 180ms + status/tabs + empty titles — [`staff_stock_fields_compare.md`](modules/staff_stock_fields_compare.md) |
-| 4 BUTTONS | ⬜ | — |
+| 4 BUTTONS | ✅ | period/filters/search-toggle/Scan — [`staff_stock_buttons_compare.md`](modules/staff_stock_buttons_compare.md) |
 | 5 WIRE | ⬜ | — |
 | 6 STATES | ⬜ | — |
 | 7 COMPARE | ⬜ | — |

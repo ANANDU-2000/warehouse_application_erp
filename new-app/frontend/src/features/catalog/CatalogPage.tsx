@@ -1,16 +1,14 @@
 /**
- * Catalog hub `/catalog` — LAYOUT (Step 2; SCAFFOLD slots retained).
- * Source: catalog_page.dart · HexaColors · DesktopPageShell max 900 ·
- * search Outline radius 12 · grid pad fromLTRB(16,8,16,100) · card radius 14 /
- * pad 12 · avatar primaryMid@20% · title w800 16 · FAB extended.
- * Forbidden: search input, handlers, API.
+ * Catalog hub `/catalog` — FIELDS (Step 3; SCAFFOLD/LAYOUT chrome retained).
+ * Source: catalog_page.dart search TextField + 150ms debounce + clear suffix;
+ * empty `No categories yet` / `No matches` client catalogs.
+ * Forbidden: AppBar/FAB navigation, rename/delete, API / fuzzy over live list.
  * Staff: blocked → `/staff/home`.
  */
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import {
-  CATALOG_EMPTY_SUB,
-  CATALOG_EMPTY_TITLE,
   CATALOG_FAB_LABEL,
   CATALOG_SEARCH_HINT,
   CATALOG_STAFF_REDIRECT,
@@ -19,7 +17,17 @@ import {
   CATALOG_TOOLTIP_SCAN,
   CATALOG_TOOLTIP_STOCK_LIST,
 } from "./catalogCopy";
+import {
+  CATALOG_SEARCH_DEBOUNCE_MS,
+  catalogDisplayLength,
+  catalogEmptyMode,
+  catalogEmptySub,
+  catalogEmptyTitle,
+} from "./catalogFields";
 import "./CatalogPage.css";
+
+/** Until WIRE — no catalog rows loaded. */
+const CLIENT_CATEGORY_COUNT = 0;
 
 export function CatalogPage() {
   const session = readPrimaryBusiness();
@@ -28,8 +36,33 @@ export function CatalogPage() {
     return <Navigate to={CATALOG_STAFF_REDIRECT} replace />;
   }
 
+  return <CatalogPageFields />;
+}
+
+function CatalogPageFields() {
+  const [searchDraft, setSearchDraft] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      setSearchQuery(searchDraft);
+    }, CATALOG_SEARCH_DEBOUNCE_MS);
+    return () => window.clearTimeout(t);
+  }, [searchDraft]);
+
+  const displayLen = catalogDisplayLength({
+    listLength: CLIENT_CATEGORY_COUNT,
+    searchQuery,
+  });
+  const emptyMode = catalogEmptyMode({
+    listLength: displayLen,
+    searchQuery,
+  });
+  const showEmpty = displayLen === 0;
+  const showClear = searchDraft.length > 0;
+
   return (
-    <div className="catalog-page" data-page="catalog-layout">
+    <div className="catalog-page" data-page="catalog-fields">
       <header className="catalog-page__appbar" data-slot="appBar">
         <div
           className="catalog-page__icon-btn"
@@ -68,40 +101,68 @@ export function CatalogPage() {
       </header>
 
       <div className="catalog-page__shell" data-slot="shell">
-        <div
-          className="catalog-page__search"
-          data-slot="search"
-          data-deferred="search-field"
-        >
+        <div className="catalog-page__search catalog-page__search--active" data-slot="search">
           <span className="catalog-page__search-icon" aria-hidden>
             ⌕
           </span>
-          <span className="catalog-page__search-hint">{CATALOG_SEARCH_HINT}</span>
+          <input
+            className="catalog-page__search-input"
+            type="search"
+            value={searchDraft}
+            onChange={(e) => setSearchDraft(e.target.value)}
+            placeholder={CATALOG_SEARCH_HINT}
+            aria-label={CATALOG_SEARCH_HINT}
+            data-testid="catalog-search"
+            autoComplete="off"
+          />
+          {showClear ? (
+            <button
+              type="button"
+              className="catalog-page__search-clear"
+              data-testid="catalog-search-clear"
+              aria-label="Clear search"
+              onClick={() => {
+                setSearchDraft("");
+                setSearchQuery("");
+              }}
+            >
+              ×
+            </button>
+          ) : null}
         </div>
 
         <div
           className="catalog-page__suggestions"
           data-slot="suggestions"
           data-deferred="suggestion-chips"
+          data-search-query={searchQuery.trim()}
         />
 
         <div className="catalog-page__grid" data-slot="categoryGrid">
-          <div
-            className="catalog-page__empty"
-            data-slot="empty"
-            data-deferred="category-cards"
-          >
-            <div className="catalog-page__empty-icon" aria-hidden>
-              📁
+          {showEmpty ? (
+            <div
+              className="catalog-page__empty"
+              data-slot="empty"
+              data-empty-mode={emptyMode}
+              data-testid="catalog-empty"
+            >
+              <div className="catalog-page__empty-icon" aria-hidden>
+                📁
+              </div>
+              <p className="catalog-page__empty-title">
+                {catalogEmptyTitle(emptyMode)}
+              </p>
+              <p className="catalog-page__empty-sub">
+                {catalogEmptySub(emptyMode)}
+              </p>
             </div>
-            <p className="catalog-page__empty-title">{CATALOG_EMPTY_TITLE}</p>
-            <p className="catalog-page__empty-sub">{CATALOG_EMPTY_SUB}</p>
-          </div>
+          ) : null}
 
-          {/* Inert card chrome sample — LAYOUT only; WIRE fills real cards */}
+          {/* Card chrome retained for LAYOUT parity until WIRE fills rows */}
           <div
             className="catalog-page__card"
             data-chrome="category-card"
+            data-deferred="category-cards"
             aria-hidden
           >
             <div className="catalog-page__avatar">A</div>

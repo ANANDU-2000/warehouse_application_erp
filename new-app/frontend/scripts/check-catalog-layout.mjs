@@ -26,21 +26,41 @@ const page = readFileSync(pagePath, "utf8");
 const css = readFileSync(cssPath, "utf8");
 const pkg = readFileSync(pkgPath, "utf8");
 
-assert(page.includes("LAYOUT"), "LAYOUT header");
+assert(
+  page.includes("LAYOUT") ||
+    page.includes("FIELDS") ||
+    page.includes("SCAFFOLD") ||
+    page.includes("BUTTONS") ||
+    page.includes("WIRE"),
+  "step header",
+);
 assert(page.includes('data-slot="appBar"'), "appBar");
 assert(page.includes('data-slot="search"'), "search");
 assert(page.includes('data-slot="categoryGrid"'), "grid");
 assert(page.includes('data-slot="fab"'), "fab");
 assert(page.includes("catalog-page__search-icon"), "search icon");
-assert(page.includes("catalog-page__search-hint"), "search hint");
+assert(
+  page.includes("catalog-page__search-hint") ||
+    page.includes("catalog-page__search-input"),
+  "search hint or FIELDS input",
+);
 assert(page.includes('data-chrome="category-card"'), "card chrome");
 assert(page.includes("catalog-page__avatar"), "avatar");
 assert(page.includes("catalog-page__fab-label"), "fab label");
 assert(page.includes('role === "staff"'), "staff gate");
 assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("onClick"), "no onClick");
-assert(!page.includes("<input"), "no input");
-assert(!page.includes("<button"), "no button");
+assert(
+  page.includes("FIELDS") || !page.includes("onClick"),
+  "no onClick until FIELDS",
+);
+assert(
+  page.includes("FIELDS") || !page.includes("<input"),
+  "no input until FIELDS",
+);
+assert(
+  page.includes("FIELDS") || !page.includes("<button"),
+  "no button until FIELDS",
+);
 
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "brand bg");
 assert(css.includes("#0e4f46") || css.includes("#0E4F46"), "brandPrimary");

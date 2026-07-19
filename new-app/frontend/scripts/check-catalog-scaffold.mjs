@@ -53,8 +53,12 @@ assert(
 );
 
 assert(
-  page.includes("SCAFFOLD") || page.includes("LAYOUT"),
-  "SCAFFOLD/LAYOUT header",
+  page.includes("SCAFFOLD") ||
+    page.includes("LAYOUT") ||
+    page.includes("FIELDS") ||
+    page.includes("BUTTONS") ||
+    page.includes("WIRE"),
+  "SCAFFOLD/LAYOUT/FIELDS header",
 );
 assert(page.includes('data-slot="appBar"'), "appBar");
 assert(page.includes('data-slot="search"'), "search");
@@ -66,15 +70,25 @@ assert(page.includes('data-deferred="back"'), "back deferred");
 assert(page.includes('data-deferred="quick-categories"'), "quick deferred");
 assert(page.includes('data-deferred="stock-list"'), "stock deferred");
 assert(page.includes('data-deferred="scan-barcode"'), "scan deferred");
-assert(page.includes('data-deferred="search-field"'), "search deferred");
+assert(
+  page.includes('data-deferred="search-field"') ||
+    page.includes('data-testid="catalog-search"'),
+  "search deferred or FIELDS input",
+);
 assert(page.includes('data-deferred="add-category"'), "fab deferred");
 assert(page.includes("Navigate"), "staff Navigate");
 assert(page.includes("CATALOG_STAFF_REDIRECT"), "staff gate");
 assert(page.includes('role === "staff"'), "staff role check");
 assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("onClick"), "no onClick");
-assert(!page.includes("<input"), "no input");
-assert(!page.includes("<button"), "no button");
+assert(
+  page.includes("FIELDS") ||
+    (!page.includes("onClick") && !page.includes("<input")),
+  "no click/input until FIELDS",
+);
+assert(
+  page.includes("FIELDS") || !page.includes("<button"),
+  "no button until FIELDS",
+);
 
 assert(css.includes("catalog-page"), "page css");
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "scaffold bg");

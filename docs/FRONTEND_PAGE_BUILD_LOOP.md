@@ -219,7 +219,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 |---|---|---|
 | 1 SCAFFOLD | ✅ | AppBar + empty slots + staff gate — [`catalog_scaffold_compare.md`](modules/catalog_scaffold_compare.md) |
 | 2 LAYOUT | ✅ | Hexa tokens + search/card/FAB chrome — [`catalog_layout_compare.md`](modules/catalog_layout_compare.md) |
-| 3 FIELDS | ⬜ | — |
+| 3 FIELDS | ✅ | Search + 150ms debounce + empty catalogs — [`catalog_fields_compare.md`](modules/catalog_fields_compare.md) |
 | 4 BUTTONS | ⬜ | — |
 | 5 WIRE | ⬜ | — |
 | 6 STATES | ⬜ | — |

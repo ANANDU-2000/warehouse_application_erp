@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog SCAFFOLD → **LAYOUT** |
-| 🟡 Current | Catalog hub LAYOUT PASS — ask before **FIELDS** |
-| ⬜ Pending | FIELDS → BUTTONS → WIRE → STATES → COMPARE · other `/catalog/*` |
-| ⏸ Deferred | rename/delete · FAB sheet · fuzzy search · API · purchase entry · barcode/print · receive · Settings · merge to `main` |
+| ✅ Completed | Catalog SCAFFOLD → LAYOUT · **FIELDS** |
+| 🟡 Current | superseded — see [`catalog_fields_compare.md`](catalog_fields_compare.md) |
+| ⬜ Pending | BUTTONS → COMPARE · other `/catalog/*` |
+| ⏸ Deferred | rename/delete · FAB sheet · API · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
 
@@ -46,6 +46,4 @@ npm run build
 
 Revert LAYOUT commit; restore SCAFFOLD page/CSS; remove layout script + this compare; boards → ask before LAYOUT.
 
-## Next (ask first)
-
-**FIELDS** for `/catalog` — do not start until approved.
+**Next (ask first):** FIELDS — done → [`catalog_fields_compare.md`](catalog_fields_compare.md). Ask before BUTTONS.

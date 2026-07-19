@@ -63,9 +63,9 @@
 
 ## Next (ask first)
 
-1. **Catalog FIELDS** — `/catalog` page loop step 3, **or**  
+1. **Catalog BUTTONS** — `/catalog` page loop step 4, **or**  
 2. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11).
 
 **Do not** invent purchase/barcode UI.
 
-*(Catalog LAYOUT — [`catalog_layout_compare.md`](catalog_layout_compare.md). Categories Slice 2 — [`categories_backend_slice2.md`](categories_backend_slice2.md).)*
+*(Catalog FIELDS — [`catalog_fields_compare.md`](catalog_fields_compare.md). Categories Slice 2 — [`categories_backend_slice2.md`](categories_backend_slice2.md).)*

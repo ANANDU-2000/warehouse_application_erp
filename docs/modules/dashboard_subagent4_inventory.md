@@ -50,7 +50,7 @@
 
 | Path | Blocker |
 |---|---|
-| `/settings/users` · `/settings/users/:userId` | List COMPARE PASS; profile **SCAFFOLD PASS** — LAYOUT next |
+| `/settings/users` · `/settings/users/:userId` | List COMPARE PASS; profile **LAYOUT PASS** — FIELDS next |
 
 ## Other known gaps (not full pages)
 
@@ -62,8 +62,8 @@
 
 ## Next (ask first)
 
-1. **User profile LAYOUT** (`/settings/users/:userId` page loop step 2), or  
+1. **User profile FIELDS** (`/settings/users/:userId` page loop step 3), or  
 2. One **satellite** from the stub tables above (start page loop), or  
 3. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Profile SCAFFOLD done — see [`user_profile_scaffold_compare.md`](user_profile_scaffold_compare.md).)*
+*(Profile LAYOUT done — see [`user_profile_layout_compare.md`](user_profile_layout_compare.md).)*

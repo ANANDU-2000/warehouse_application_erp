@@ -18,4 +18,4 @@
 
 **Rollback:** Revert SCAFFOLD commit; restore route → `DashboardRouteStubPage` title “User profile”; remove `UserProfilePage*` + copy + this compare + script; boards → ask before profile SCAFFOLD.
 
-**Next (ask first):** `/settings/users/:userId` LAYOUT — brand chrome for AppBar/header/tabs.
+**Next (ask first):** `/settings/users/:userId` LAYOUT — done → [`user_profile_layout_compare.md`](user_profile_layout_compare.md). Ask before FIELDS.

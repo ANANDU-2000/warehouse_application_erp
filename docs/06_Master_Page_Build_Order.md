@@ -12,9 +12,9 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 Subagent 4 nest COMPLETE · HOLD | Next: Products Seq 4 **backend** (ask first) — [`staff_deliveries_compare.md`](modules/staff_deliveries_compare.md) |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 nest COMPLETE · Products Slice 1 | Products Slice 1 — [`products_backend_slice1.md`](modules/products_backend_slice1.md) |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list+profile COMPARE · Activity WIRE | Next: ask next Subagent 4 stub — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
-| 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
+| 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | 🟡 Slice 1 GET catalog-items | Next: ask before Slice 2 — [`products_backend_slice1.md`](modules/products_backend_slice1.md) |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
 | 6 | Suppliers/Brokers | 12 | ✅ `suppliers.md` | ❌ | Blocked |
 | 7 | Purchase Orders | 6 | ✅ `purchase-orders.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users list+profile **COMPARE PASS**. Profile Activity **WIRE PASS**. Subagent 4: `/notifications` **COMPARE PASS**. Staff search **COMPARE PASS**. Staff items **COMPARE PASS**. Staff stock **COMPARE PASS**. Staff purchase-history **COMPARE PASS**. Staff low-stock **COMPARE PASS**. Staff activity **COMPARE PASS**. Staff deliveries **COMPARE PASS**. **Dashboard nest COMPLETE · HOLD.** Purchase / barcode / receive / catalog **UI blocked** until backends (docs/06 Seq 4 / 7–8 / 11). Next (ask first): **Products Seq 4 backend** on `ops/products-module`.
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard nest **COMPLETE**. Products **Slice 1 GET catalog-items PASS**. Next: ask before **Products Slice 2**. Purchase / barcode / receive **UI blocked** until their backends (docs/06 Seq 7–8 / 11).
 
 ---
 

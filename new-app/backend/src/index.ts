@@ -21,6 +21,7 @@ import { createHomeOverviewRepository } from "./repositories/homeOverview.reposi
 import { createStaffHomeRepository } from "./repositories/staffHome.repository";
 import { createHomeActivityRepository } from "./repositories/homeActivity.repository";
 import { createSearchRepository } from "./repositories/search.repository";
+import { createCatalogItemsRepository } from "./repositories/catalogItems.repository";
 import { logger } from "./logging/logger";
 
 async function main(): Promise<void> {
@@ -40,6 +41,7 @@ async function main(): Promise<void> {
         staffHome: createStaffHomeRepository(pool),
         homeActivity: createHomeActivityRepository(pool),
         search: createSearchRepository(pool),
+        catalogItems: createCatalogItemsRepository(pool),
       };
       logger.info("database.connected", {
         host: env.sql.host,

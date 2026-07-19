@@ -46,6 +46,19 @@ export function shouldRedactFinancials(role: string | null | undefined): boolean
   return (role ?? "").trim().toLowerCase() === "staff";
 }
 
+/** Null financial fields — Formula source: staff_view.py:redact_catalog_item_out_model */
+export function redactCatalogItemOutFields<T extends Record<string, unknown>>(
+  item: T,
+): T {
+  return {
+    ...item,
+    default_landing_cost: null,
+    default_selling_cost: null,
+    last_purchase_price: null,
+    last_selling_rate: null,
+  };
+}
+
 export function redactCatalogItemDict(
   item: Record<string, unknown>,
 ): Record<string, unknown> {

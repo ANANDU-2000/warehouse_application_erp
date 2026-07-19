@@ -26,6 +26,7 @@ import type { HomeOverviewRepository } from "./repositories/homeOverview.reposit
 import type { StaffHomeRepository } from "./repositories/staffHome.repository";
 import type { HomeActivityRepository } from "./repositories/homeActivity.repository";
 import type { SearchRepository } from "./repositories/search.repository";
+import type { CatalogItemsRepository } from "./repositories/catalogItems.repository";
 import type { ConnectionPool } from "mssql";
 import type { CreateUserDeps } from "./services/usersCreate.service";
 import type { PatchUserDeps } from "./services/usersPatch.service";
@@ -44,9 +45,11 @@ import {
   createTradePurchasesRoutes,
 } from "./routes/staffHome.routes";
 import { createSearchRoutes } from "./routes/search.routes";
+import { createCatalogItemsRoutes } from "./routes/catalogItems.routes";
 import { createStaffHomeController } from "./controllers/staffHome.controller";
 import { createHomeActivityController } from "./controllers/homeActivity.controller";
 import { createSearchController } from "./controllers/search.controller";
+import { createCatalogItemsController } from "./controllers/catalogItems.controller";
 
 export type AppDeps = {
   /** Injected for tests / when pool is ready. */
@@ -62,6 +65,8 @@ export type AppDeps = {
   homeActivity?: HomeActivityRepository;
   /** Unified search — search.py */
   search?: SearchRepository;
+  /** Products Slice 1 — catalog.py GET catalog-items */
+  catalogItems?: CatalogItemsRepository;
   /** Users & Roles — business user list */
   businessUsers?: BusinessUsersRepository;
   /** SQL pool for transactional user create. */
@@ -191,6 +196,13 @@ function unavailableSearchRepository(): SearchRepository {
   return { unifiedSearch: fail };
 }
 
+function unavailableCatalogItemsRepository(): CatalogItemsRepository {
+  const fail = async (): Promise<never> => {
+    throw new Error("Database pool not connected. Call connect() first.");
+  };
+  return { list: fail, getById: fail };
+}
+
 function unavailableBusinessUsersRepository(): BusinessUsersRepository {
   const fail = async (): Promise<never> => {
     throw new Error("Database pool not connected. Call connect() first.");
@@ -290,6 +302,16 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
   app.use(
     "/v1/businesses/:businessId/search",
     createSearchRoutes(createSearchController({ search }), app.authz),
+  );
+
+  const catalogItems =
+    deps.catalogItems ?? unavailableCatalogItemsRepository();
+  app.use(
+    "/v1/businesses/:businessId/catalog-items",
+    createCatalogItemsRoutes(
+      createCatalogItemsController({ catalogItems }),
+      app.authz,
+    ),
   );
 
   const businessUsers =

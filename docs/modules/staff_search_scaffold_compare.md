@@ -8,9 +8,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Notifications SCAFFOLD→COMPARE |
-| 🟡 Current | Staff search **SCAFFOLD** |
-| ⬜ Pending | Staff search LAYOUT → COMPARE · other Subagent 4 stubs |
+| ✅ Completed | Notifications SCAFFOLD→COMPARE · Staff search SCAFFOLD · **LAYOUT** |
+| 🟡 Current | Staff search **LAYOUT PASS** — ask before FIELDS |
+| ⬜ Pending | Staff search FIELDS → COMPARE · other Subagent 4 stubs |
 | ⏸ Deferred | `/staff/settings` · `/settings` (implement locked); owner `/search`; API `GET …/search` (WIRE) |
 
 ## Legacy vs New
@@ -32,4 +32,4 @@
 
 **Rollback:** Revert SCAFFOLD commit; restore route → `DashboardRouteStubPage` title “Staff search”; remove `features/staff/search/*` + this compare + script; boards → ask before staff search SCAFFOLD.
 
-**Next (ask first):** `/staff/search` LAYOUT — do not start until approved.
+**Next (ask first):** `/staff/search` LAYOUT — done → [`staff_search_layout_compare.md`](staff_search_layout_compare.md). Ask before FIELDS.

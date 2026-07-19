@@ -1,13 +1,15 @@
 /**
- * Staff search `/staff/search` — SCAFFOLD (Step 1).
+ * Staff search `/staff/search` — LAYOUT (Step 2).
  * Source: search_page.dart SearchPage(staffShellEmbedded: true)
- * Chrome: search → chips → results (no AppBar when embedded).
- * No typing/API (FIELDS/WIRE).
+ * Chrome + empty-query Quick filters shell — no typing/API (FIELDS/WIRE).
  */
 import {
   STAFF_SEARCH_BACK_FALLBACK,
+  STAFF_SEARCH_EMPTY_HELPER,
   STAFF_SEARCH_HINT,
+  STAFF_SEARCH_QUICK_FILTERS_TITLE,
 } from "./staffSearchCopy";
+import { STAFF_SEARCH_QUICK_FILTERS } from "./staffSearchQuickFilters";
 import {
   STAFF_SEARCH_DEFAULT_SECTION,
   STAFF_SEARCH_SECTION_LABELS,
@@ -82,7 +84,40 @@ export function StaffSearchPage() {
           data-slot="results"
           data-testid="staff-search-results-chrome"
           aria-label="Search results"
-        />
+        >
+          {/* Empty-query chrome — Flutter q.isEmpty (Recent deferred until FIELDS) */}
+          <div
+            className="staff-search-page__empty"
+            data-slot="empty"
+            data-testid="staff-search-empty-chrome"
+          >
+            <h2 className="staff-search-page__section-title">
+              {STAFF_SEARCH_QUICK_FILTERS_TITLE}
+            </h2>
+            <div
+              className="staff-search-page__quick-filters"
+              data-testid="staff-search-quick-filters"
+            >
+              {STAFF_SEARCH_QUICK_FILTERS.map((qf) => (
+                <button
+                  key={qf.id}
+                  type="button"
+                  className="staff-search-page__action-chip"
+                  data-testid={`staff-search-qf-${qf.id}`}
+                  data-path={qf.path}
+                  tabIndex={-1}
+                >
+                  <span
+                    className="staff-search-page__action-chip-icon"
+                    aria-hidden="true"
+                  />
+                  {qf.label}
+                </button>
+              ))}
+            </div>
+            <p className="staff-search-page__helper">{STAFF_SEARCH_EMPTY_HELPER}</p>
+          </div>
+        </section>
       </div>
     </div>
   );

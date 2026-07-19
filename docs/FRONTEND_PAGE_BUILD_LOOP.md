@@ -134,7 +134,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | Step | Status | Evidence |
 |---|---|---|
 | 1 SCAFFOLD | ✅ | search/filters/results (no AppBar) — [`staff_search_scaffold_compare.md`](modules/staff_search_scaffold_compare.md) |
-| 2 LAYOUT | ⬜ | — |
+| 2 LAYOUT | ✅ | ChoiceChip tokens + Quick filters empty chrome — [`staff_search_layout_compare.md`](modules/staff_search_layout_compare.md) |
 | 3 FIELDS | ⬜ | — |
 | 4 BUTTONS | ⬜ | — |
 | 5 WIRE | ⬜ | — |

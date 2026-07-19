@@ -22,7 +22,7 @@
 | Path | Stub title |
 |---|---|
 | `/staff/settings` | Staff settings (**implement locked** — Settings backend) |
-| `/staff/search` | **SCAFFOLD PASS** — [`staff_search_scaffold_compare.md`](staff_search_scaffold_compare.md); ask before LAYOUT |
+| `/staff/search` | **LAYOUT PASS** — [`staff_search_layout_compare.md`](staff_search_layout_compare.md); ask before FIELDS |
 | `/staff/items` | Staff gallery |
 | `/staff/stock` | Staff stock |
 | `/staff/purchase-history` | Purchase history |
@@ -63,7 +63,7 @@
 
 ## Next (ask first)
 
-1. **`/staff/search` LAYOUT** (SCAFFOLD done), **or**  
+1. **`/staff/search` FIELDS** (LAYOUT done), **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Notifications COMPARE done — [`notifications_compare.md`](notifications_compare.md). Staff search SCAFFOLD — [`staff_search_scaffold_compare.md`](staff_search_scaffold_compare.md). `/staff/settings` skipped — Settings implement locked.)*
+*(Notifications COMPARE done — [`notifications_compare.md`](notifications_compare.md). Staff search LAYOUT — [`staff_search_layout_compare.md`](staff_search_layout_compare.md). `/staff/settings` skipped — Settings implement locked.)*

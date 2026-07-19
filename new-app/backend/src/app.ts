@@ -183,6 +183,7 @@ function unavailableBusinessUsersRepository(): BusinessUsersRepository {
     insertActivityLog: fail,
     listCreatedItemsByUser: fail,
     listStockAdjustmentsByUser: fail,
+    listPurchasesByUser: fail,
   } as unknown as BusinessUsersRepository;
 }
 

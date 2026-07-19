@@ -62,6 +62,6 @@
 
 ## Next (ask first)
 
-1. **Users purchases / ledger / Users UI**, or  
+1. **Users ledger / Users UI**, or  
 2. One **satellite** from the stub tables above (start page loop), or  
 3. Hold / merge review of `ops/dashboard-module` → `main`.

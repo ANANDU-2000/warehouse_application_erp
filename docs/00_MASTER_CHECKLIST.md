@@ -22,7 +22,7 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: staff WIRE-2 COMPLETE; Users & Roles Backend Slice 1–10 (through stock-adjustments) PASS on `ops/dashboard-module` — ask before next.
+**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: staff WIRE-2 COMPLETE; Users & Roles Backend Slice 1–11 (through purchases) PASS on `ops/dashboard-module` — ask before next.
 
 ### Task board (Dashboard staff WIRE-2)
 

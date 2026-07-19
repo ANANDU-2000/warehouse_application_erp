@@ -13,10 +13,10 @@
 | 6 | Filter business_id + updated_by | Yes | Same | PASS |
 | 7 | LEFT JOIN catalog name; order updated_at DESC | Yes | Same | PASS |
 | 8 | Shape id/item_id/item_name/old_qty/new_qty/type/reason/updated_at | Yes | Same | PASS |
-| 9 | purchases / ledger / UI | Out of slice | Not added | N/A |
+| 9 | purchases / ledger / UI | Out of slice | See Slice 11 | N/A |
 
 **Smoke:** `npx vitest run tests/users/` (70 PASS); `tsc --noEmit` PASS.
 
 **Rollback:** Revert this commit; remove stock-adjustments route + service + repo method; restore boards to Slice 1–9.
 
-**Next (ask first):** purchases · ledger · Users UI · Subagent 4.
+**Next:** Slice 11 purchases — [`users_roles_backend_purchases_compare.md`](users_roles_backend_purchases_compare.md).

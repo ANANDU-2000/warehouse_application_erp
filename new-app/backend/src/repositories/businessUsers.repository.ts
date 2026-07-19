@@ -103,6 +103,18 @@ export type StockAdjustmentByUserRow = {
   updated_at: Date;
 };
 
+/** Row for user_purchases / UserPurchaseBrief (pre-normalize). */
+export type PurchaseByUserRow = {
+  id: string;
+  human_id: string | null;
+  purchase_date: Date | string | null;
+  created_at: Date | null;
+  status: string | null;
+  total_amount: number | null;
+  supplier_name: string | null;
+  item_count: number;
+};
+
 export class BusinessUsersRepository {
   constructor(private readonly client: SqlClient) {}
 
@@ -448,6 +460,50 @@ export class BusinessUsersRepository {
       adjustment_type: String(r.adjustment_type),
       reason: (r.reason as string | null) ?? null,
       updated_at: r.updated_at as Date,
+    }));
+  }
+
+  /**
+   * user_purchases — trade_purchases by user with line count + supplier name.
+   * Source: users.py:user_purchases
+   */
+  async listPurchasesByUser(
+    businessId: string,
+    userId: string,
+    limit: number,
+  ): Promise<PurchaseByUserRow[]> {
+    const rows = await queryMany<Record<string, unknown>>(
+      this.client,
+      `SELECT TOP (@limit)
+         tp.[id], tp.[human_id], tp.[purchase_date], tp.[created_at],
+         tp.[status], tp.[total_amount],
+         s.[name] AS [supplier_name],
+         (SELECT COUNT(*)
+          FROM [trade_purchase_lines] tpl
+          WHERE tpl.[trade_purchase_id] = tp.[id]) AS [item_count]
+       FROM [trade_purchases] tp
+       LEFT JOIN [suppliers] s ON s.[id] = tp.[supplier_id]
+       WHERE tp.[business_id] = @businessId
+         AND tp.[user_id] = @userId
+       ORDER BY tp.[created_at] DESC`,
+      [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: userId },
+        { name: "limit", type: sql.Int, value: limit },
+      ],
+    );
+    return rows.map((r) => ({
+      id: String(r.id),
+      human_id: (r.human_id as string | null) ?? null,
+      purchase_date: (r.purchase_date as Date | string | null) ?? null,
+      created_at: (r.created_at as Date | null) ?? null,
+      status: (r.status as string | null) ?? null,
+      total_amount:
+        r.total_amount == null || r.total_amount === ""
+          ? null
+          : Number(r.total_amount),
+      supplier_name: (r.supplier_name as string | null) ?? null,
+      item_count: Number(r.item_count ?? 0),
     }));
   }
 }

@@ -36,3 +36,8 @@ export function parseLimitQuery(
 export function parseUsersListLimit50to200(raw: unknown): number {
   return parseLimitQuery(raw, { default: 50, min: 1, max: 200 });
 }
+
+/** purchases: Query(50, ge=1, le=100) */
+export function parseUsersListLimit50to100(raw: unknown): number {
+  return parseLimitQuery(raw, { default: 50, min: 1, max: 100 });
+}

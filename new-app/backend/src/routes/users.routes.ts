@@ -79,6 +79,14 @@ export function createUsersRoutes(
   );
 
   r.get(
+    "/:userId/purchases",
+    authz.requireAuth,
+    authz.requireMembership,
+    createRequireRole("owner", "admin", "manager", "super_admin"),
+    (req, res, next) => void controller.purchases(req, res, next),
+  );
+
+  r.get(
     "/:userId",
     authz.requireAuth,
     authz.requireMembership,

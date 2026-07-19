@@ -1,10 +1,10 @@
 # Module: Users & Roles
 
 **Queue:** 3 of 15  
-**Status:** Backend Slice 1–10 — through stock-adjustments PASS (2026-07-18) · UI blocked  
-**Scope:** Analysis + users admin APIs + created-items + stock-adjustments; purchases/ledger / UI not started  
+**Status:** Backend Slice 1–11 — through purchases PASS (2026-07-19) · UI blocked  
+**Scope:** Analysis + users admin APIs + satellites through purchases; ledger / UI not started  
 **Source of truth:** `source-app/`  
-**Compare:** `docs/modules/users_roles_backend_*_compare.md` (incl. stock_adjustments) 
+**Compare:** `docs/modules/users_roles_backend_*_compare.md` (incl. purchases) 
 
 ## Definition
 

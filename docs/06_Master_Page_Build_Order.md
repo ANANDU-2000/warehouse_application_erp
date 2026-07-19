@@ -12,8 +12,8 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 DONE | Next: ask Users purchases/ledger/UI **or** Subagent 4 ([`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md)) |
-| 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 through stock-adjustments PASS | purchases/ledger/UI blocked — [`users_roles_backend_stock_adjustments_compare.md`](modules/users_roles_backend_stock_adjustments_compare.md) |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 DONE | Next: ask Users ledger/UI **or** Subagent 4 ([`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md)) |
+| 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 through purchases PASS | ledger/UI blocked — [`users_roles_backend_purchases_compare.md`](modules/users_roles_backend_purchases_compare.md) |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
 | 6 | Suppliers/Brokers | 12 | ✅ `suppliers.md` | ❌ | Blocked |

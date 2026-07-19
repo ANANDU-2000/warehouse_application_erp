@@ -71,6 +71,14 @@ export function createUsersRoutes(
   );
 
   r.get(
+    "/:userId/stock-adjustments",
+    authz.requireAuth,
+    authz.requireMembership,
+    createRequireRole("owner", "manager", "super_admin"),
+    (req, res, next) => void controller.stockAdjustments(req, res, next),
+  );
+
+  r.get(
     "/:userId",
     authz.requireAuth,
     authz.requireMembership,

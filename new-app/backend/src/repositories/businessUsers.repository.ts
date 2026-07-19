@@ -91,6 +91,18 @@ export type CreatedItemRow = {
   updated_at: Date | null;
 };
 
+/** Row for user_stock_adjustments / StockAdjustmentOut. */
+export type StockAdjustmentByUserRow = {
+  id: string;
+  item_id: string;
+  item_name: string | null;
+  old_qty: number;
+  new_qty: number;
+  adjustment_type: string;
+  reason: string | null;
+  updated_at: Date;
+};
+
 export class BusinessUsersRepository {
   constructor(private readonly client: SqlClient) {}
 
@@ -399,6 +411,43 @@ export class BusinessUsersRepository {
           ? null
           : Number(r.reorder_level),
       updated_at: (r.updated_at as Date | null) ?? null,
+    }));
+  }
+
+  /**
+   * user_stock_adjustments — logs by updated_by.
+   * Source: users.py:user_stock_adjustments
+   */
+  async listStockAdjustmentsByUser(
+    businessId: string,
+    userId: string,
+    limit: number,
+  ): Promise<StockAdjustmentByUserRow[]> {
+    const rows = await queryMany<Record<string, unknown>>(
+      this.client,
+      `SELECT TOP (@limit)
+         a.[id], a.[item_id], ci.[name] AS [item_name],
+         a.[old_qty], a.[new_qty], a.[adjustment_type], a.[reason], a.[updated_at]
+       FROM [stock_adjustment_log] a
+       LEFT JOIN [catalog_items] ci ON ci.[id] = a.[item_id]
+       WHERE a.[business_id] = @businessId
+         AND a.[updated_by] = @userId
+       ORDER BY a.[updated_at] DESC`,
+      [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: userId },
+        { name: "limit", type: sql.Int, value: limit },
+      ],
+    );
+    return rows.map((r) => ({
+      id: String(r.id),
+      item_id: String(r.item_id),
+      item_name: (r.item_name as string | null) ?? null,
+      old_qty: Number(r.old_qty),
+      new_qty: Number(r.new_qty),
+      adjustment_type: String(r.adjustment_type),
+      reason: (r.reason as string | null) ?? null,
+      updated_at: r.updated_at as Date,
     }));
   }
 }

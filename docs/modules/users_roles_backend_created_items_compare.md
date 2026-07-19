@@ -13,10 +13,10 @@
 | 6 | Order created_at DESC + TOP limit | Yes | Same | PASS |
 | 7 | `barcode` ← `item_code`; category name; reorder_level | Yes | Same | PASS |
 | 8 | `updated_at` ← last_stock_updated_at OR created_at | Yes | COALESCE | PASS |
-| 9 | stock-adjustments / UI | Out of slice | Not added | N/A |
+| 9 | stock-adjustments / UI | Out of slice | See Slice 10 | N/A |
 
 **Smoke:** `npx vitest run tests/users/` (63 PASS); `tsc --noEmit` PASS.
 
 **Rollback:** Revert this commit; remove created-items route + service + repo method; restore boards to Slice 1–8.
 
-**Next (ask first):** stock-adjustments · purchases · ledger · Users UI · Subagent 4.
+**Next:** Slice 10 stock-adjustments — [`users_roles_backend_stock_adjustments_compare.md`](users_roles_backend_stock_adjustments_compare.md).

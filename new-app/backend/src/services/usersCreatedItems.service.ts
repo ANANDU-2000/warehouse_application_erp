@@ -3,8 +3,8 @@
  * Source: source-app/backend/app/routers/users.py:user_created_items
  *         schemas/users.py:CreatedItemOut
  */
-import { HttpError } from "../errors/httpError";
 import type { BusinessUsersRepository } from "../repositories/businessUsers.repository";
+import { parseUsersListLimit50to200 } from "./usersQueryParams";
 
 export type CreatedItemOut = {
   id: string;
@@ -15,24 +15,8 @@ export type CreatedItemOut = {
   updated_at: string | null;
 };
 
-/**
- * Parse FastAPI Query(limit=50, ge=1, le=200).
- * Missing / empty → 50. Invalid → 422.
- */
-export function parseCreatedItemsLimit(raw: unknown): number {
-  if (raw === undefined || raw === null || raw === "") {
-    return 50;
-  }
-  const s = Array.isArray(raw) ? String(raw[0]) : String(raw);
-  if (!/^\d+$/.test(s)) {
-    throw new HttpError(422, "limit must be an integer between 1 and 200");
-  }
-  const n = Number(s);
-  if (!Number.isInteger(n) || n < 1 || n > 200) {
-    throw new HttpError(422, "limit must be an integer between 1 and 200");
-  }
-  return n;
-}
+/** @deprecated use parseUsersListLimit50to200 — kept as alias for callers. */
+export const parseCreatedItemsLimit = parseUsersListLimit50to200;
 
 function isoOrNull(d: Date | null | undefined): string | null {
   if (d == null) return null;

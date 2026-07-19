@@ -44,6 +44,10 @@ import {
   parseCreatedItemsLimit,
 } from "../services/usersCreatedItems.service";
 import {
+  listStockAdjustmentsForBusiness,
+  parseStockAdjustmentsLimit,
+} from "../services/usersStockAdjustments.service";
+import {
   userCreateInSchema,
   userPatchInSchema,
   permissionsPatchInSchema,
@@ -438,6 +442,44 @@ export function createUsersController(deps: UsersControllerDeps) {
           throw e;
         }
         const out = await listCreatedItemsForBusiness(
+          deps.businessUsers,
+          businessId,
+          userId,
+          limit,
+        );
+        res.json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async stockAdjustments(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> {
+      try {
+        const businessId = req.params.businessId;
+        const userId = req.params.userId;
+        if (typeof businessId !== "string" || !businessId) {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        if (typeof userId !== "string" || !userId) {
+          sendDetail(res, 400, "userId required");
+          return;
+        }
+        let limit: number;
+        try {
+          limit = parseStockAdjustmentsLimit(req.query.limit);
+        } catch (e) {
+          if (e instanceof HttpError) {
+            sendDetail(res, e.status, e.detail);
+            return;
+          }
+          throw e;
+        }
+        const out = await listStockAdjustmentsForBusiness(
           deps.businessUsers,
           businessId,
           userId,

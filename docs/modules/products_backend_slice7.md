@@ -9,9 +9,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Slice 1–6 · **Slice 7 bulk-archive + bulk-reorder** |
-| 🟡 Current | Products backend Slice 7 PASS — ask before catalog UI or remaining catalog reads (insights/defaults/lines) |
-| ⬜ Pending | catalog UI · supplier-purchase-defaults · insights · duplicate-clusters · categories APIs |
+| ✅ Completed | Slice 1–6 · **Slice 7 bulk-archive + bulk-reorder** · Categories Slice 1 |
+| 🟡 Current | See [`categories_backend_slice1.md`](categories_backend_slice1.md) |
+| ⬜ Pending | catalog UI · remaining reads |
 | ⏸ Deferred | purchase entry · barcode/print UI · receive · Settings · merge to `main` |
 
 ## Legacy vs New

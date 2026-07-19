@@ -63,6 +63,14 @@ import {
   createCatalogItemVariantsRoutes,
   createCatalogVariantsRoutes,
 } from "./routes/catalogVariants.routes";
+import type { ItemCategoriesRepository } from "./repositories/itemCategories.repository";
+import { createItemCategoriesRepository } from "./repositories/itemCategories.repository";
+import { createItemCategoriesService } from "./services/itemCategories.service";
+import {
+  createItemCategoriesController,
+  createItemCategoriesRoutes,
+  createCategoryTypesIndexRoutes,
+} from "./controllers/itemCategories.controller";
 
 export type AppDeps = {
   /** Injected for tests / when pool is ready. */
@@ -96,6 +104,14 @@ export type AppDeps = {
   catalogVariantsRepoForClient?: (
     client: import("./repositories/sql").SqlClient,
   ) => CatalogVariantsRepository;
+  /** Categories Slice 1 — item-categories */
+  itemCategories?: ItemCategoriesRepository;
+  itemCategoriesRunInTransaction?: <T>(
+    fn: (tx: import("./repositories/sql").SqlClient) => Promise<T>,
+  ) => Promise<T>;
+  itemCategoriesRepoForClient?: (
+    client: import("./repositories/sql").SqlClient,
+  ) => ItemCategoriesRepository;
   /** Users & Roles — business user list */
   businessUsers?: BusinessUsersRepository;
   /** SQL pool for transactional user create. */
@@ -278,6 +294,20 @@ function unavailableCatalogVariantsRepository(): CatalogVariantsRepository {
   };
 }
 
+function unavailableItemCategoriesRepository(): ItemCategoriesRepository {
+  const fail = async (): Promise<never> => {
+    throw new Error("Database pool not connected. Call connect() first.");
+  };
+  return {
+    list: fail,
+    getById: fail,
+    findDupCategoryId: fail,
+    insertCategory: fail,
+    insertType: fail,
+    listTypesIndex: fail,
+  };
+}
+
 function unavailableBusinessUsersRepository(): BusinessUsersRepository {
   const fail = async (): Promise<never> => {
     throw new Error("Database pool not connected. Call connect() first.");
@@ -426,6 +456,29 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
   app.use(
     "/v1/businesses/:businessId/catalog-variants",
     createCatalogVariantsRoutes(catalogVariantsCtrl, app.authz),
+  );
+
+  const itemCategoriesRepo =
+    deps.itemCategories ??
+    (deps.pool
+      ? createItemCategoriesRepository(deps.pool)
+      : unavailableItemCategoriesRepository());
+  const itemCategoriesSvc = createItemCategoriesService({
+    categories: itemCategoriesRepo,
+    pool: deps.pool,
+    runInTransaction: deps.itemCategoriesRunInTransaction,
+    repoForClient: deps.itemCategoriesRepoForClient,
+  });
+  const itemCategoriesCtrl = createItemCategoriesController({
+    categories: itemCategoriesSvc,
+  });
+  app.use(
+    "/v1/businesses/:businessId/item-categories",
+    createItemCategoriesRoutes(itemCategoriesCtrl, app.authz),
+  );
+  app.use(
+    "/v1/businesses/:businessId/category-types-index",
+    createCategoryTypesIndexRoutes(itemCategoriesCtrl, app.authz),
   );
 
   const businessUsers =

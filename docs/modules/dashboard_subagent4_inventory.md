@@ -63,11 +63,10 @@
 
 ## Next (ask first)
 
-1. **Catalog UI** — docs/06 Seq 4 pages (ask first), **or**  
-2. Remaining catalog read APIs (insights/defaults), **or**  
-3. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11), **or**  
-4. Hold / merge review of `ops/products-module` → `main`.
+1. **Categories Slice 2** — PATCH/DELETE category + nested category-types (ask first), **or**  
+2. **Catalog UI SCAFFOLD** — `/catalog` page loop step 1, **or**  
+3. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11).
 
 **Do not** invent purchase/barcode UI.
 
-*(Staff deliveries COMPARE — [`staff_deliveries_compare.md`](staff_deliveries_compare.md). Products Slice 7 — [`products_backend_slice7.md`](products_backend_slice7.md). `/staff/settings` skipped — Settings implement locked.)*
+*(Products Slice 7 — [`products_backend_slice7.md`](products_backend_slice7.md). Categories Slice 1 — [`categories_backend_slice1.md`](categories_backend_slice1.md).)*

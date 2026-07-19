@@ -22,15 +22,15 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: Dashboard nest COMPLETE. **Products Seq 4 backend Slice 7** on `ops/products-module` — ask before catalog UI.
+**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: Dashboard nest COMPLETE. **Categories Slice 1** on `ops/products-module` — ask before Slice 2 or catalog UI.
 
 ### Task board (Dashboard staff WIRE-2)
 
 | State | Step |
 |---|---|
-| ✅ Completed | Login/Splash/home/staff COMPARE · WIRE-2a–2f · Users COMPARE · Notifications COMPARE · Staff search/items/stock/purchase-history/low-stock/activity/deliveries **COMPARE** · **Products Slice 1–7** (core catalog APIs + variants + bulk) |
-| 🟡 Current | Products backend **Slice 7 PASS** — ask before catalog UI or remaining reads |
-| ⬜ Pending | Catalog UI · remaining catalog reads · Seq 7–8 / 11 purchase/receive/barcode — [`products_backend_slice7.md`](modules/products_backend_slice7.md) |
+| ✅ Completed | Login/Splash/home/staff COMPARE · WIRE-2a–2f · Users COMPARE · Notifications COMPARE · Staff nest **COMPARE** · **Products Slice 1–7** · **Categories Slice 1** (item-categories + types-index) |
+| 🟡 Current | Categories **Slice 1 PASS** — ask before Slice 2 (types CRUD) or catalog UI SCAFFOLD |
+| ⬜ Pending | Categories Slice 2 · catalog UI · Seq 7–8 / 11 purchase/receive/barcode — [`categories_backend_slice1.md`](modules/categories_backend_slice1.md) |
 | ⏸ Deferred | `/staff/settings` · `/settings`; owner `/stock`; purchase entry (**backend blocked**); barcode/print (**blocked**); receive body (**blocked**); merge to `main` |
 
 ### Phase 1 module analysis queue (strict — one at a time)
@@ -38,10 +38,10 @@
 | # | Module | Status | Evidence |
 |---|---|---|---|
 | 1 | Login | ✅ UI COMPARE PASS | COMPARE [`login_compare.md`](modules/login_compare.md) · Splash [`splash_compare.md`](modules/splash_compare.md) |
-| 2 | Dashboard | 🟡 nest COMPLETE · Products Slice 7 | [`products_backend_slice7.md`](modules/products_backend_slice7.md) · [`staff_deliveries_compare.md`](modules/staff_deliveries_compare.md) |
+| 2 | Dashboard | 🟡 nest COMPLETE · Categories Slice 1 | [`categories_backend_slice1.md`](modules/categories_backend_slice1.md) · [`products_backend_slice7.md`](modules/products_backend_slice7.md) |
 | 3 | Users & Roles | 🟡 Backend 1–14 · list+profile COMPARE · Activity WIRE | [`user_profile_activity_wire_compare.md`](modules/user_profile_activity_wire_compare.md) · [`user_profile_compare.md`](modules/user_profile_compare.md) |
 | 4 | Products | 🟡 Backend Slice 1–7 | [`products_backend_slice7.md`](modules/products_backend_slice7.md) · `docs/modules/products.md` |
-| 5 | Categories | ✅ Analyze+Review PASS | `docs/modules/categories.md`, `docs/matrix/categories_traceability.md`, branch `phase1/categories-analysis` |
+| 5 | Categories | 🟡 Backend Slice 1 list/get/create + types-index | [`categories_backend_slice1.md`](modules/categories_backend_slice1.md) · `docs/modules/categories.md` |
 | 6 | Units | ✅ Analyze+Review PASS | `docs/modules/units.md`, `docs/matrix/units_traceability.md`, branch `phase1/units-analysis` |
 | 7 | Suppliers | ✅ Analyze+Review PASS | `docs/modules/suppliers.md`, `docs/matrix/suppliers_traceability.md`, branch `phase1/suppliers-analysis` |
 | 8 | Customers | ✅ Analyze+Review PASS | `docs/modules/customers.md`, `docs/matrix/customers_traceability.md` — **absent in source**; branch `phase1/customers-analysis` |

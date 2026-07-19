@@ -32,7 +32,9 @@ const css = readFileSync(cssPath, "utf8");
 const pkg = readFileSync(pkgPath, "utf8");
 
 assert(
-  page.includes("LAYOUT") || page.includes("SCAFFOLD"),
+  page.includes("LAYOUT") ||
+    page.includes("SCAFFOLD") ||
+    page.includes("FIELDS"),
   "step header",
 );
 assert(page.includes('data-slot="appBar"'), "appBar");

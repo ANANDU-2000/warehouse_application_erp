@@ -72,14 +72,36 @@ assert(
   "load failed",
 );
 
-assert(page.includes("SCAFFOLD") || page.includes("LAYOUT"), "SCAFFOLD+ header");
+assert(
+  page.includes("SCAFFOLD") ||
+    page.includes("LAYOUT") ||
+    page.includes("FIELDS"),
+  "SCAFFOLD+ header",
+);
 assert(page.includes('data-slot="appBar"'), "appBar");
 assert(page.includes('data-slot="section"'), "sections");
-assert(page.includes('data-section={sec.key}'), "section key binding");
-assert(page.includes('key: "dispatched"') || page.includes('"dispatched"'), "dispatched section");
-assert(page.includes('key: "arrived"') || page.includes('"arrived"'), "arrived section");
 assert(
-  page.includes('key: "pendingVerify"') || page.includes('"pendingVerify"'),
+  page.includes('data-section={sec.key}') ||
+    page.includes("data-section={key}") ||
+    page.includes("STAFF_DEL_SECTION_ORDER"),
+  "section key binding",
+);
+assert(
+  page.includes('"dispatched"') ||
+    page.includes("dispatched") ||
+    page.includes("STAFF_DEL_SECTION_ORDER"),
+  "dispatched section",
+);
+assert(
+  page.includes('"arrived"') ||
+    page.includes("arrived") ||
+    page.includes("STAFF_DEL_SECTION_ORDER"),
+  "arrived section",
+);
+assert(
+  page.includes('"pendingVerify"') ||
+    page.includes("pendingVerify") ||
+    page.includes("STAFF_DEL_SECTION_ORDER"),
   "pending section",
 );
 assert(page.includes('data-slot="emptyAll"'), "empty all");

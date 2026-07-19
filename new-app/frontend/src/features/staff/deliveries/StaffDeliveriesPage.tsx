@@ -1,11 +1,10 @@
 /**
- * Staff deliveries `/staff/deliveries` — LAYOUT (Step 2).
- * Source: staff_pending_deliveries_page.dart · HexaColors.brandBackground /
- * brandPrimary / brandBorder; ListView padding 16/8/16/88; section gap 16;
- * Card radius 12 pad 14; CircleAvatar r18 · brandPrimary @10%;
- * Arrived highlight Color(0xFFE65100) when count > 0 (WIRE).
- * Forbidden: back/scan/row handlers, API, FIELDS.
+ * Staff deliveries `/staff/deliveries` — FIELDS (Step 3).
+ * Source: staff_pending_deliveries_page.dart — **no** search/filter inputs;
+ * client title/count/empty gates only (`staffDelAppBarTitle` / section counts).
+ * Deferred: back/scan/row → BUTTONS; trade-purchases → WIRE.
  */
+import { useState } from "react";
 import {
   STAFF_DEL_BACK_FALLBACK,
   STAFF_DEL_EMPTY_ALL,
@@ -13,54 +12,45 @@ import {
   STAFF_DEL_EMPTY_DISPATCHED,
   STAFF_DEL_EMPTY_PENDING_VERIFY,
   STAFF_DEL_SCAN_TOOLTIP,
-  STAFF_DEL_SECTION_ARRIVED,
-  STAFF_DEL_SECTION_DISPATCHED,
-  STAFF_DEL_SECTION_PENDING_VERIFY,
   STAFF_DEL_SUPPLIER_FALLBACK,
-  STAFF_DEL_TITLE,
 } from "./staffDeliveriesCopy";
+import {
+  STAFF_DEL_EMPTY_COUNTS,
+  STAFF_DEL_SECTION_ORDER,
+  STAFF_DEL_SECTION_TITLE,
+  staffDelAppBarTitle,
+  staffDelSectionHeading,
+  staffDelSectionTitleHot,
+  staffDelShowEmptyAll,
+  staffDelTotal,
+  type StaffDelSectionCounts,
+  type StaffDelSectionKey,
+} from "./staffDeliveriesFields";
 import "./StaffDeliveriesPage.css";
 
-type SectionKey = "dispatched" | "arrived" | "pendingVerify";
+const SECTION_EMPTY: Record<StaffDelSectionKey, string> = {
+  dispatched: STAFF_DEL_EMPTY_DISPATCHED,
+  arrived: STAFF_DEL_EMPTY_ARRIVED,
+  pendingVerify: STAFF_DEL_EMPTY_PENDING_VERIFY,
+};
 
-const SECTIONS: Array<{
-  key: SectionKey;
-  title: string;
-  empty: string;
-  highlight?: boolean;
-}> = [
-  {
-    key: "dispatched",
-    title: STAFF_DEL_SECTION_DISPATCHED,
-    empty: STAFF_DEL_EMPTY_DISPATCHED,
-  },
-  {
-    key: "arrived",
-    title: STAFF_DEL_SECTION_ARRIVED,
-    empty: STAFF_DEL_EMPTY_ARRIVED,
-    highlight: true,
-  },
-  {
-    key: "pendingVerify",
-    title: STAFF_DEL_SECTION_PENDING_VERIFY,
-    empty: STAFF_DEL_EMPTY_PENDING_VERIFY,
-  },
-];
+const SECTION_HIGHLIGHT: Partial<Record<StaffDelSectionKey, boolean>> = {
+  arrived: true,
+};
 
 export function StaffDeliveriesPage() {
-  /* LAYOUT: count title when WIRE; highlight orange only if count > 0 */
-  const title = STAFF_DEL_TITLE;
-  const sectionCounts: Record<SectionKey, number> = {
-    dispatched: 0,
-    arrived: 0,
-    pendingVerify: 0,
-  };
+  /* FIELDS: client section counts (empty catalog); WIRE replaces values */
+  const [sectionCounts] = useState<StaffDelSectionCounts>(STAFF_DEL_EMPTY_COUNTS);
+  const total = staffDelTotal(sectionCounts);
+  const title = staffDelAppBarTitle(total);
+  const showEmptyAll = staffDelShowEmptyAll(total);
 
   return (
     <div
       className="staff-del-page"
       data-page="staff-deliveries"
-      data-step="layout"
+      data-step="fields"
+      data-total={total}
       data-back-fallback={STAFF_DEL_BACK_FALLBACK}
     >
       <header className="staff-del-appbar" data-slot="appBar">
@@ -74,7 +64,9 @@ export function StaffDeliveriesPage() {
         >
           ←
         </button>
-        <h1 className="staff-del-appbar__title">{title}</h1>
+        <h1 className="staff-del-appbar__title" data-slot="title">
+          {title}
+        </h1>
         <button
           type="button"
           className="staff-del-appbar__scan"
@@ -89,19 +81,20 @@ export function StaffDeliveriesPage() {
       </header>
 
       <main className="staff-del-body" data-slot="body">
-        {SECTIONS.map((sec) => {
-          const count = sectionCounts[sec.key];
-          const titleHot = Boolean(sec.highlight && count > 0);
+        {STAFF_DEL_SECTION_ORDER.map((key) => {
+          const count = sectionCounts[key];
+          const highlight = Boolean(SECTION_HIGHLIGHT[key]);
+          const titleHot = staffDelSectionTitleHot(highlight, count);
           return (
             <section
-              key={sec.key}
+              key={key}
               className={
-                sec.highlight
+                highlight
                   ? "staff-del-section staff-del-section--highlight"
                   : "staff-del-section"
               }
               data-slot="section"
-              data-section={sec.key}
+              data-section={key}
               data-count={count}
               data-title-hot={titleHot ? "true" : "false"}
             >
@@ -113,20 +106,22 @@ export function StaffDeliveriesPage() {
                 }
                 data-slot="sectionTitle"
               >
-                {sec.title} ({count})
+                {staffDelSectionHeading(STAFF_DEL_SECTION_TITLE[key], count)}
               </h2>
-              <div
-                className="staff-del-section__empty"
-                data-slot="sectionEmpty"
-              >
-                {sec.empty}
-              </div>
+              {count === 0 ? (
+                <div
+                  className="staff-del-section__empty"
+                  data-slot="sectionEmpty"
+                >
+                  {SECTION_EMPTY[key]}
+                </div>
+              ) : null}
               <ul
                 className="staff-del-list"
                 data-slot="list"
                 data-deferred="delivery-rows"
-                aria-hidden="true"
-                hidden
+                aria-hidden={count === 0 ? "true" : undefined}
+                hidden={count === 0}
               >
                 <li
                   className="staff-del-row"
@@ -153,9 +148,11 @@ export function StaffDeliveriesPage() {
           );
         })}
 
-        <div className="staff-del-empty-all" data-slot="emptyAll">
-          <p className="staff-del-empty-all__text">{STAFF_DEL_EMPTY_ALL}</p>
-        </div>
+        {showEmptyAll ? (
+          <div className="staff-del-empty-all" data-slot="emptyAll">
+            <p className="staff-del-empty-all__text">{STAFF_DEL_EMPTY_ALL}</p>
+          </div>
+        ) : null}
       </main>
     </div>
   );

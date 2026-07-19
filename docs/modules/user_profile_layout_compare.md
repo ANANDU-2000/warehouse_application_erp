@@ -23,4 +23,4 @@
 
 **Rollback:** Revert LAYOUT commit; restore SCAFFOLD page/CSS; remove this compare + script; boards → ask before LAYOUT.
 
-**Next (ask first):** `/settings/users/:userId` FIELDS — header text fields / tab content placeholders from profile data shape (still no API).
+**Next (ask first):** `/settings/users/:userId` FIELDS — done → [`user_profile_fields_compare.md`](user_profile_fields_compare.md). Ask before BUTTONS.

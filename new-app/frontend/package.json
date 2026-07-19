@@ -59,7 +59,8 @@
     "test:users-management-states": "node scripts/check-users-management-states.mjs",
     "test:users-management-compare": "node scripts/check-users-management-compare.mjs",
     "test:user-profile-scaffold": "node scripts/check-user-profile-scaffold.mjs",
-    "test:user-profile-layout": "node scripts/check-user-profile-layout.mjs"
+    "test:user-profile-layout": "node scripts/check-user-profile-layout.mjs",
+    "test:user-profile-fields": "node scripts/check-user-profile-fields.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

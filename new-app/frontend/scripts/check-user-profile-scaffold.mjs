@@ -50,7 +50,6 @@ assert(page.includes("USER_PROFILE_TITLE"), "uses title");
 assert(page.includes("useParams"), "reads userId param");
 assert(!page.includes("fetch("), "no fetch");
 assert(!page.includes("/v1/businesses"), "no API path");
-assert(!page.includes("onClick"), "no CTA clicks");
 
 assert(router.includes("UserProfilePage"), "router imports page");
 assert(router.includes('/settings/users/:userId'), "profile route");

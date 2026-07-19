@@ -82,6 +82,12 @@
   border-radius: 50%;
   flex-shrink: 0;
   background: rgba(14, 79, 70, 0.15);
+  color: var(--profile-brand);
+  font-size: 22px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .user-profile__header-main {
@@ -92,13 +98,12 @@
   gap: 6px;
 }
 
-.user-profile__name-bar {
-  display: block;
-  height: 22px;
-  width: 60%;
-  max-width: 220px;
-  border-radius: 6px;
-  background: rgba(15, 23, 42, 0.12);
+.user-profile__name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--profile-text);
 }
 
 .user-profile__pills {
@@ -115,25 +120,22 @@
   background: rgba(14, 79, 70, 0.08);
 }
 
-.user-profile__meta-bar {
-  display: block;
-  margin-top: 10px;
-  height: 12px;
-  width: 70%;
-  max-width: 280px;
-  border-radius: 4px;
-  background: rgba(92, 101, 120, 0.2);
+.user-profile__pill--live {
+  height: auto;
+  width: auto;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--profile-brand);
 }
 
-.user-profile__meta-bar--short {
-  margin-top: 4px;
-  width: 45%;
-}
-
-.user-profile__meta-bar--tiny {
-  margin-top: 4px;
-  height: 10px;
-  width: 35%;
+.user-profile__meta {
+  margin: 10px 0 0;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--profile-muted);
 }
 
 .user-profile__admin-row {
@@ -184,13 +186,16 @@
 }
 
 .user-profile__tab-slot {
+  font: inherit;
   font-size: 13px;
   font-weight: 600;
   color: var(--profile-muted);
   padding: 12px 0;
   white-space: nowrap;
-  pointer-events: none;
+  border: none;
   border-bottom: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
 }
 
 .user-profile__tab-slot--selected {
@@ -203,4 +208,119 @@
   flex: 1;
   min-height: 120px;
   background: var(--profile-surface);
+  padding: 8px 12px 24px;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+/* FIELDS — Overview KPI */
+.user-profile__kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (min-width: 900px) {
+  .user-profile__kpi-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.user-profile__kpi-card {
+  border: 1px solid var(--profile-border);
+  border-radius: 12px;
+  background: var(--profile-surface);
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.user-profile__kpi-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--profile-muted);
+}
+
+.user-profile__kpi-value {
+  display: block;
+  margin-top: 6px;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--profile-text);
+}
+
+/* FIELDS — Activity chips */
+.user-profile__activity-chips {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 0;
+}
+
+.user-profile__activity-chip {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--profile-border);
+  background: var(--profile-surface);
+  color: var(--profile-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.user-profile__activity-chip--selected {
+  border-color: var(--profile-brand);
+  color: var(--profile-brand);
+  background: rgba(14, 79, 70, 0.08);
+}
+
+.user-profile__activity-panel {
+  min-height: 80px;
+  border-top: 1px solid var(--profile-border);
+}
+
+/* FIELDS — Permissions */
+.user-profile__perm-group {
+  margin-bottom: 12px;
+}
+
+.user-profile__perm-group-title {
+  margin: 8px 4px 4px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--profile-text);
+}
+
+.user-profile__perm-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 4px;
+  cursor: pointer;
+}
+
+.user-profile__perm-row input:disabled {
+  cursor: not-allowed;
+}
+
+.user-profile__perm-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-profile__perm-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--profile-text);
+}
+
+.user-profile__perm-sub {
+  font-size: 12px;
+  color: var(--profile-muted);
 }

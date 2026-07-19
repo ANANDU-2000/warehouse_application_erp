@@ -110,8 +110,8 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 |---|---|---|
 | 1 SCAFFOLD | ✅ | empty slots + manage gate — [`user_profile_scaffold_compare.md`](modules/user_profile_scaffold_compare.md) |
 | 2 LAYOUT | ✅ | brand AppBar/header/tabs — [`user_profile_layout_compare.md`](modules/user_profile_layout_compare.md) |
-| 3 FIELDS | ⬜ | Ask before next |
-| 4 BUTTONS | ⬜ | |
+| 3 FIELDS | ✅ | header + KPI/activity/perms catalogs — [`user_profile_fields_compare.md`](modules/user_profile_fields_compare.md) |
+| 4 BUTTONS | ⬜ | Ask before next |
 | 5 WIRE | ⬜ | |
 | 6 STATES | ⬜ | |
 | 7 COMPARE | ⬜ | |

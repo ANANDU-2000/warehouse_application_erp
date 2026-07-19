@@ -53,7 +53,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). Staff WIRE-2 **COMPLETE**. Users APIs through created-items **PASS**. Ask before stock-adjustments / purchases / ledger / Users UI or Subagent 4. Users UI still blocked until enough users APIs.
+**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). Staff WIRE-2 **COMPLETE**. Users APIs through stock-adjustments **PASS**. Ask before purchases / ledger / Users UI or Subagent 4. Users UI still blocked until enough users APIs.
 
 ### Cursor operator setup (workspace)
 
@@ -111,7 +111,7 @@
 
 ## PHASE 4 — Frontend Migration (React + TypeScript) 🟡
 
-**Unlocked.** Phase 3 platform PASS. Login + Splash COMPARE PASS. Staff `/staff/home` WIRE-2 **COMPLETE**. Users & Roles Backend Slice 1–9 (through created-items) **PASS**. Next: ask stock-adjustments / purchases / ledger / Users UI **or** Subagent 4 satellite.
+**Unlocked.** Phase 3 platform PASS. Login + Splash COMPARE PASS. Staff `/staff/home` WIRE-2 **COMPLETE**. Users & Roles Backend Slice 1–10 (through stock-adjustments) **PASS**. Next: ask purchases / ledger / Users UI **or** Subagent 4 satellite.
 
 | # | Task | Status |
 |---|---|---|
@@ -125,7 +125,7 @@
 | 4.8 | Accessibility | 🔒 |
 | 4.9 | Phase 4 sign-off (per module) | 🔒 |
 
-**4.2 / 4.5 note:** Staff WIRE-2a–2f COMPLETE (`ops/dashboard-module`). Users through created-items PASS — compare MDs. Ask before stock-adjustments / purchases / ledger / Users UI or one Subagent 4 satellite ([`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md)). Users UI blocked. Owner routes + Splash COMPARE PASS.
+**4.2 / 4.5 note:** Staff WIRE-2a–2f COMPLETE (`ops/dashboard-module`). Users through stock-adjustments PASS — compare MDs. Ask before purchases / ledger / Users UI or one Subagent 4 satellite ([`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md)). Users UI blocked. Owner routes + Splash COMPARE PASS.
 
 ---
 

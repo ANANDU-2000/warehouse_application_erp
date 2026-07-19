@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users **through created-items PASS**. Next: ask **stock-adjustments / purchases / ledger / Users UI** or one **Subagent 4 satellite**. Users UI blocked until enough users APIs.
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users **through stock-adjustments PASS**. Next: ask **purchases / ledger / Users UI** or one **Subagent 4 satellite**. Users UI blocked until enough users APIs.
 
 ---
 

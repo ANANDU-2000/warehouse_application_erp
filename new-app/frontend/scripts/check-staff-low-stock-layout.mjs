@@ -40,13 +40,29 @@ assert(page.includes('data-slot="empty"'), "empty");
 assert(page.includes('data-slot="tree"'), "tree");
 assert(page.includes('data-slot="categoryCard"'), "category card");
 assert(page.includes('data-slot="compactRow"'), "compact row");
-assert(page.includes("staff-ls-tabs--inert"), "tabs inert");
-assert(page.includes("staff-ls-search--inert"), "search inert");
+assert(
+  page.includes("staff-ls-tabs--inert") ||
+    page.includes("staff-ls-tabs--active"),
+  "tabs class",
+);
+assert(
+  page.includes("staff-ls-search--inert") ||
+    page.includes("staff-ls-search--active"),
+  "search class",
+);
 assert(page.includes("staff-ls-export--inert"), "export inert");
-assert(page.includes("readOnly"), "search readOnly");
+assert(
+  page.includes("readOnly") ||
+    page.includes("staff-ls-search__input--active"),
+  "search field present (FIELDS may activate)",
+);
 assert(page.includes("staff-ls-row__bar--out"), "bar out");
 assert(page.includes("staff-ls-status--out"), "status out");
-assert(page.includes("staff-ls-status--low"), "status low");
+assert(
+  page.includes("staff-ls-status--low") ||
+    css.includes("staff-ls-status--low"),
+  "status low",
+);
 assert(page.includes('data-deferred="inform-owner"'), "inform deferred");
 assert(page.includes('data-deferred="category-tree"'), "tree deferred");
 assert(!page.includes("fetch("), "no fetch");

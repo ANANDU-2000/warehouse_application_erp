@@ -113,6 +113,10 @@
   pointer-events: none;
 }
 
+.staff-ls-search--active {
+  pointer-events: auto;
+}
+
 .staff-ls-search__input {
   flex: 1;
   box-sizing: border-box;
@@ -125,8 +129,24 @@
   color: var(--sls-fg);
 }
 
+.staff-ls-search__input--active {
+  pointer-events: auto;
+}
+
 .staff-ls-search__input::placeholder {
   color: var(--sls-hint);
+}
+
+.staff-ls-search__clear {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sls-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .staff-ls-filter-btn {
@@ -136,8 +156,28 @@
   border-radius: 10px;
   background: var(--sls-surface);
   color: var(--sls-muted);
-  cursor: not-allowed;
-  opacity: 0.7;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.staff-ls-filter-btn--active {
+  background: rgba(14, 79, 70, 0.12);
+  color: var(--sls-brand);
+  border-color: transparent;
+}
+
+.staff-ls-subchip-row {
+  padding: 0 var(--sls-gutter) 4px;
+}
+
+.staff-ls-subchip {
+  border: 1px solid var(--sls-border);
+  border-radius: 16px;
+  background: var(--sls-surface);
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--sls-fg);
+  cursor: pointer;
 }
 
 .staff-ls-attention {
@@ -161,6 +201,10 @@
   pointer-events: none;
 }
 
+.staff-ls-tabs--active {
+  pointer-events: auto;
+}
+
 .staff-ls-tab {
   flex: 0 0 auto;
   border: 0;
@@ -170,7 +214,7 @@
   font-weight: 600;
   background: var(--sls-tab);
   color: var(--sls-tab-fg);
-  cursor: default;
+  cursor: pointer;
 }
 
 .staff-ls-tab--selected {
@@ -364,4 +408,113 @@
   color: #ffffff;
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+/* Filter sheet — _showFiltersSheet */
+.staff-ls-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.staff-ls-sheet__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(15, 23, 42, 0.35);
+  cursor: pointer;
+}
+
+.staff-ls-sheet__panel {
+  position: relative;
+  z-index: 1;
+  width: min(480px, 100%);
+  max-height: 55dvh;
+  overflow: auto;
+  box-sizing: border-box;
+  background: var(--sls-surface);
+  border-radius: 16px 16px 0 0;
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.staff-ls-sheet__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--sls-fg);
+}
+
+.staff-ls-sheet__sub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--sls-muted);
+}
+
+.staff-ls-sheet__label {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--sls-muted);
+}
+
+.staff-ls-sheet__scopes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.staff-ls-scope {
+  border: 1px solid var(--sls-border);
+  border-radius: 16px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--sls-tab);
+  color: var(--sls-tab-fg);
+  cursor: pointer;
+}
+
+.staff-ls-scope--selected {
+  background: var(--sls-tab-selected);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.staff-ls-sheet__select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--sls-border);
+  border-radius: 10px;
+  background: var(--sls-surface);
+  font-size: 14px;
+}
+
+.staff-ls-sheet__apply {
+  margin-top: 8px;
+  border: 0;
+  border-radius: 10px;
+  min-height: 48px;
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--sls-tab-selected);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.staff-ls-sheet__clear {
+  border: 0;
+  background: transparent;
+  color: var(--sls-brand);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px;
+  cursor: pointer;
 }

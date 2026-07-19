@@ -85,15 +85,27 @@ assert(page.includes('data-slot="search"'), "search");
 assert(page.includes('data-slot="tabs"'), "tabs");
 assert(page.includes('data-slot="attention"'), "attention");
 assert(page.includes('data-slot="empty"'), "empty");
-assert(page.includes("readOnly"), "search readOnly");
+assert(
+  page.includes("readOnly") ||
+    page.includes("staff-ls-search__input--active"),
+  "search field present (FIELDS may activate)",
+);
 assert(page.includes("staffLsTabFromFilter"), "reads ?filter=");
-assert(page.includes("STAFF_LS_EMPTY"), "empty copy");
+assert(
+  page.includes("STAFF_LS_EMPTY") || page.includes("staffLsEmptyTitle"),
+  "empty copy",
+);
 assert(page.includes("STAFF_LS_BACK_FALLBACK"), "back");
 assert(page.includes('data-deferred="category-tree"'), "tree deferred");
 assert(page.includes('data-deferred="inform-owner"'), "inform deferred");
 assert(page.includes('data-deferred="pdf-export"'), "pdf deferred");
 assert(page.includes('data-deferred="csv-export"'), "csv deferred");
-assert(page.includes('data-deferred="filter-sheet"'), "filter deferred");
+assert(
+  page.includes('data-deferred="filter-sheet"') ||
+    page.includes('data-slot="filterSheet"') ||
+    page.includes("openFilters"),
+  "filter control present (FIELDS may activate sheet)",
+);
 assert(!page.includes("fetch("), "no fetch");
 
 assert(router.includes("StaffLowStockPage"), "router import");

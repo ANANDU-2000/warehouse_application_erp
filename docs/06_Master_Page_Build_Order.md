@@ -12,7 +12,7 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 · Staff low-stock LAYOUT | Next: ask before FIELDS — [`staff_low_stock_layout_compare.md`](modules/staff_low_stock_layout_compare.md) |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 · Staff low-stock FIELDS | Next: ask before BUTTONS — [`staff_low_stock_fields_compare.md`](modules/staff_low_stock_fields_compare.md) |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list+profile COMPARE · Activity WIRE | Next: ask next Subagent 4 stub — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users list+profile **COMPARE PASS**. Profile Activity **WIRE PASS**. Subagent 4: `/notifications` **COMPARE PASS**. Staff search **COMPARE PASS**. Staff items **COMPARE PASS**. Staff stock **COMPARE PASS**. Staff purchase-history **COMPARE PASS**. Staff low-stock **LAYOUT PASS**. Next: ask before **FIELDS**.
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users list+profile **COMPARE PASS**. Profile Activity **WIRE PASS**. Subagent 4: `/notifications` **COMPARE PASS**. Staff search **COMPARE PASS**. Staff items **COMPARE PASS**. Staff stock **COMPARE PASS**. Staff purchase-history **COMPARE PASS**. Staff low-stock **FIELDS PASS**. Next: ask before **BUTTONS**.
 
 ---
 
@@ -182,7 +182,7 @@ Primarily via `/catalog/taxonomy`, `/catalog/new-category`, `/catalog/category/:
 | `/stock/fast-moving` | |
 | `/stock/slow-moving` | |
 | `/staff/stock` | Staff shell — **COMPARE PASS** — [`staff_stock_compare.md`](modules/staff_stock_compare.md) |
-| `/staff/low-stock` | Staff shell — **LAYOUT PASS** — [`staff_low_stock_layout_compare.md`](modules/staff_low_stock_layout_compare.md) |
+| `/staff/low-stock` | Staff shell — **FIELDS PASS** — [`staff_low_stock_fields_compare.md`](modules/staff_low_stock_fields_compare.md) |
 | `/staff/items` | Staff gallery — **COMPARE PASS** — [`staff_items_compare.md`](modules/staff_items_compare.md) |
 
 ### Seq 10 — Stock Movement

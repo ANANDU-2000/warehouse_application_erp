@@ -11,8 +11,27 @@ export const STAFF_LS_BACK_FALLBACK = "/staff/home";
 /** Autocomplete field hint */
 export const STAFF_LS_SEARCH_HINT = "Search item, subcategory, supplier…";
 
+/** Debounce — low_stock_dashboard_page.dart fieldViewBuilder Timer */
+export const STAFF_LS_DEBOUNCE_MS = 200;
+
 /** Filter sheet IconButton tooltip */
 export const STAFF_LS_FILTER_TOOLTIP = "Search & filter";
+
+/** Filter sheet — _showFiltersSheet */
+export const STAFF_LS_FILTER_SHEET_TITLE = "Filters";
+export const STAFF_LS_FILTER_SHEET_SUB =
+  "Search scope and subcategory.";
+export const STAFF_LS_FILTER_SEARCH_IN = "Search in";
+export const STAFF_LS_FILTER_SUBCATEGORY = "Subcategory";
+export const STAFF_LS_FILTER_ALL_SUBS = "All subcategories";
+export const STAFF_LS_FILTER_APPLY = "Apply filters";
+export const STAFF_LS_FILTER_CLEAR = "Clear filters";
+
+export const STAFF_LS_SCOPE_ALL = "All fields";
+export const STAFF_LS_SCOPE_CATEGORY = "Category";
+export const STAFF_LS_SCOPE_SUBCATEGORY = "Subcategory";
+export const STAFF_LS_SCOPE_ITEM = "Item name";
+export const STAFF_LS_SCOPE_SUPPLIER = "Supplier";
 
 /** Attention strip under search — count is WIRE */
 export const STAFF_LS_ATTENTION_SUFFIX = "need attention · Period follows Home";
@@ -37,6 +56,8 @@ export const STAFF_LS_TAB_DELIVERY_FULL = "Pending delivery";
 
 /** HexaEmptyState — low_stock_category_tree.dart */
 export const STAFF_LS_EMPTY = "No low-stock items here";
+export const STAFF_LS_EMPTY_SUB = "No items in this subcategory.";
+export const STAFF_LS_EMPTY_SEARCH = "No low-stock items here";
 
 /** AppBar actions tooltips */
 export const STAFF_LS_PDF_TOOLTIP = "Download PDF";

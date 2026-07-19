@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff purchase-history COMPARE · Staff low-stock SCAFFOLD → **LAYOUT** |
-| 🟡 Current | `/staff/low-stock` **LAYOUT PASS** — ask before FIELDS |
-| ⬜ Pending | FIELDS → COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | filter sheet · Inform API · PDF/CSV · owner `/stock/low-stock` · purchase entry · barcode/print · Settings · merge to `main` |
+| ✅ Completed | Staff purchase-history COMPARE · Staff low-stock SCAFFOLD → **FIELDS** |
+| 🟡 Current | `/staff/low-stock` **FIELDS PASS** — ask before BUTTONS |
+| ⬜ Pending | BUTTONS → COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | Inform/PDF/CSV/row handlers · operations API · owner `/stock/low-stock` · purchase entry · barcode/print · Settings · merge to `main` |
 
 ## Legacy vs New
 
@@ -42,4 +42,4 @@
 
 **Rollback:** Revert LAYOUT commit; restore SCAFFOLD page/CSS; remove layout script + this compare; boards → ask before LAYOUT.
 
-**Next (ask first):** FIELDS — do not start until approved.
+**Next (ask first):** FIELDS done — [`staff_low_stock_fields_compare.md`](staff_low_stock_fields_compare.md). Ask before BUTTONS.

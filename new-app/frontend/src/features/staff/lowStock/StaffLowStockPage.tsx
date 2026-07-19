@@ -1,15 +1,22 @@
 /**
- * Staff low stock `/staff/low-stock` — LAYOUT (Step 2).
- * Source: low_stock_dashboard_page.dart · low_stock_compact_item_row.dart ·
- * low_stock_category_tree.dart · HexaColors.
- * Forbidden: typing, filter sheet, API, Inform handlers, PDF/CSV export.
+ * Staff low stock `/staff/low-stock` — FIELDS (Step 3).
+ * Source: low_stock_dashboard_page.dart debounce 200ms · TabController ·
+ * filter sheet scopes · filterLowStockGrouped.
+ * Forbidden: Inform/PDF/CSV/row handlers (BUTTONS) · operations API (WIRE).
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   STAFF_LS_BACK_FALLBACK,
   STAFF_LS_CSV_TOOLTIP,
-  STAFF_LS_EMPTY,
+  STAFF_LS_DEBOUNCE_MS,
+  STAFF_LS_FILTER_ALL_SUBS,
+  STAFF_LS_FILTER_APPLY,
+  STAFF_LS_FILTER_CLEAR,
+  STAFF_LS_FILTER_SEARCH_IN,
+  STAFF_LS_FILTER_SHEET_SUB,
+  STAFF_LS_FILTER_SHEET_TITLE,
+  STAFF_LS_FILTER_SUBCATEGORY,
   STAFF_LS_FILTER_TOOLTIP,
   STAFF_LS_INFORM,
   STAFF_LS_PDF_TOOLTIP,
@@ -22,6 +29,21 @@ import {
   STAFF_LS_TITLE,
   staffLsAttentionLine,
 } from "./staffLowStockCopy";
+import {
+  STAFF_LS_DEFAULT_SCOPE,
+  STAFF_LS_SCOPE_ORDER,
+  type StaffLsSearchScope,
+} from "./staffLowStockFilters";
+import {
+  countFilteredItems,
+  countLowStockForTab,
+  filterLowStockGrouped,
+  lowStockSubcategoryOptions,
+  staffLsEmptyTitle,
+  staffLsFiltersActive,
+  STAFF_LS_SCOPE_LABEL,
+  type StaffLsGrouped,
+} from "./staffLowStockLogic";
 import {
   STAFF_LS_TAB_ORDER,
   staffLsTabFromFilter,
@@ -37,6 +59,9 @@ const TAB_LABEL: Record<StaffLsTab, string> = {
   pendingDelivery: STAFF_LS_TAB_DELIVERY,
 };
 
+/** FIELDS: empty catalog until WIRE — client filters still apply. */
+const EMPTY_GROUPED: StaffLsGrouped = {};
+
 function popOrGo(
   navigate: ReturnType<typeof useNavigate>,
   fallback: string,
@@ -51,18 +76,78 @@ function popOrGo(
 export function StaffLowStockPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [tab] = useState<StaffLsTab>(() =>
+  const [tab, setTab] = useState<StaffLsTab>(() =>
     staffLsTabFromFilter(searchParams.get("filter")),
   );
+  const [query, setQuery] = useState("");
+  const [debounced, setDebounced] = useState("");
+  const [searchScope, setSearchScope] = useState<StaffLsSearchScope>(
+    STAFF_LS_DEFAULT_SCOPE,
+  );
+  const [subcategoryFilter, setSubcategoryFilter] = useState<string | null>(
+    null,
+  );
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [draftScope, setDraftScope] = useState<StaffLsSearchScope>(
+    STAFF_LS_DEFAULT_SCOPE,
+  );
+  const [draftSub, setDraftSub] = useState<string | null>(null);
 
-  /** LAYOUT: counts still deferred — chrome shows (0). */
+  const grouped = EMPTY_GROUPED;
+
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      setDebounced(query.trim().toLowerCase());
+    }, STAFF_LS_DEBOUNCE_MS);
+    return () => window.clearTimeout(t);
+  }, [query]);
+
+  const filtered = filterLowStockGrouped({
+    grouped,
+    tab,
+    searchQuery: debounced,
+    searchScope,
+    subcategoryFilter,
+  });
+  const itemCount = countFilteredItems(filtered);
+  const emptyTitle = staffLsEmptyTitle({
+    itemCount,
+    query: debounced,
+    subcategoryFilter,
+  });
+  const filtersActive = staffLsFiltersActive({
+    searchScope,
+    subcategoryFilter,
+  });
+  const subOptions = lowStockSubcategoryOptions(grouped);
+
   const counts: Record<StaffLsTab, number> = {
-    allLow: 0,
-    outOfStock: 0,
-    purchasedInPeriod: 0,
-    pendingOrder: 0,
-    pendingDelivery: 0,
+    allLow: countLowStockForTab(grouped, "allLow"),
+    outOfStock: countLowStockForTab(grouped, "outOfStock"),
+    purchasedInPeriod: countLowStockForTab(grouped, "purchasedInPeriod"),
+    pendingOrder: countLowStockForTab(grouped, "pendingOrder"),
+    pendingDelivery: countLowStockForTab(grouped, "pendingDelivery"),
   };
+
+  function openFilters(): void {
+    setDraftScope(searchScope);
+    setDraftSub(subcategoryFilter);
+    setFiltersOpen(true);
+  }
+
+  function applyFilters(): void {
+    setSearchScope(draftScope);
+    setSubcategoryFilter(draftSub);
+    setFiltersOpen(false);
+  }
+
+  function clearFilters(): void {
+    setSearchScope(STAFF_LS_DEFAULT_SCOPE);
+    setSubcategoryFilter(null);
+    setDraftScope(STAFF_LS_DEFAULT_SCOPE);
+    setDraftSub(null);
+    setFiltersOpen(false);
+  }
 
   return (
     <div className="staff-ls-page" data-page="staff-low-stock">
@@ -109,31 +194,55 @@ export function StaffLowStockPage() {
 
         <div className="staff-ls-appbar__bottom" data-slot="appBarBottom">
           <div
-            className="staff-ls-search-row staff-ls-search--inert"
+            className="staff-ls-search-row staff-ls-search--active"
             data-slot="search"
           >
             <input
-              className="staff-ls-search__input"
+              className="staff-ls-search__input staff-ls-search__input--active"
               type="search"
-              readOnly
-              tabIndex={-1}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder={STAFF_LS_SEARCH_HINT}
               aria-label={STAFF_LS_SEARCH_HINT}
-              value=""
             />
+            {query.trim().length > 0 ? (
+              <button
+                type="button"
+                className="staff-ls-search__clear"
+                aria-label="Clear"
+                onClick={() => setQuery("")}
+              >
+                ×
+              </button>
+            ) : null}
             <button
               type="button"
-              className="staff-ls-filter-btn"
+              className={
+                filtersActive
+                  ? "staff-ls-filter-btn staff-ls-filter-btn--active"
+                  : "staff-ls-filter-btn"
+              }
               title={STAFF_LS_FILTER_TOOLTIP}
               aria-label={STAFF_LS_FILTER_TOOLTIP}
               data-slot="filterButton"
-              data-deferred="filter-sheet"
-              tabIndex={-1}
-              disabled
+              data-testid="staff-ls-filter"
+              onClick={openFilters}
             >
               ⚙
             </button>
           </div>
+
+          {subcategoryFilter && subcategoryFilter.trim() ? (
+            <div className="staff-ls-subchip-row" data-slot="subcategoryChip">
+              <button
+                type="button"
+                className="staff-ls-subchip"
+                onClick={() => setSubcategoryFilter(null)}
+              >
+                {subcategoryFilter} ×
+              </button>
+            </div>
+          ) : null}
 
           <p
             className="staff-ls-attention"
@@ -144,7 +253,7 @@ export function StaffLowStockPage() {
           </p>
 
           <div
-            className="staff-ls-tabs staff-ls-tabs--inert"
+            className="staff-ls-tabs staff-ls-tabs--active"
             data-slot="tabs"
             role="tablist"
             aria-label="Low stock filters"
@@ -155,12 +264,12 @@ export function StaffLowStockPage() {
                 type="button"
                 role="tab"
                 aria-selected={tab === key}
-                tabIndex={-1}
                 className={
                   tab === key
                     ? "staff-ls-tab staff-ls-tab--selected"
                     : "staff-ls-tab"
                 }
+                onClick={() => setTab(key)}
               >
                 {TAB_LABEL[key]} ({counts[key]})
               </button>
@@ -171,11 +280,12 @@ export function StaffLowStockPage() {
 
       <main className="staff-ls-body" data-slot="body">
         <div className="staff-ls-results" data-slot="results">
-          <div className="staff-ls-results__empty" data-slot="empty">
-            {STAFF_LS_EMPTY}
-          </div>
+          {emptyTitle ? (
+            <div className="staff-ls-results__empty" data-slot="empty">
+              {emptyTitle}
+            </div>
+          ) : null}
 
-          {/* LAYOUT sample chrome — not wired; FIELDS/WIRE fill real tree */}
           <div
             className="staff-ls-tree staff-ls-tree--layout"
             data-slot="tree"
@@ -263,6 +373,87 @@ export function StaffLowStockPage() {
           </div>
         </div>
       </main>
+
+      {filtersOpen ? (
+        <div
+          className="staff-ls-sheet"
+          data-slot="filterSheet"
+          role="dialog"
+          aria-label={STAFF_LS_FILTER_SHEET_TITLE}
+        >
+          <div className="staff-ls-sheet__panel">
+            <h2 className="staff-ls-sheet__title">
+              {STAFF_LS_FILTER_SHEET_TITLE}
+            </h2>
+            <p className="staff-ls-sheet__sub">{STAFF_LS_FILTER_SHEET_SUB}</p>
+            <p className="staff-ls-sheet__label">{STAFF_LS_FILTER_SEARCH_IN}</p>
+            <div className="staff-ls-sheet__scopes" data-slot="searchScopes">
+              {STAFF_LS_SCOPE_ORDER.map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={
+                    draftScope === key
+                      ? "staff-ls-scope staff-ls-scope--selected"
+                      : "staff-ls-scope"
+                  }
+                  onClick={() => setDraftScope(key)}
+                >
+                  {STAFF_LS_SCOPE_LABEL[key]}
+                </button>
+              ))}
+            </div>
+            {subOptions.length > 1 ? (
+              <>
+                <p className="staff-ls-sheet__label">
+                  {STAFF_LS_FILTER_SUBCATEGORY}
+                </p>
+                <select
+                  className="staff-ls-sheet__select"
+                  value={draftSub ?? ""}
+                  onChange={(e) =>
+                    setDraftSub(e.target.value === "" ? null : e.target.value)
+                  }
+                  aria-label={STAFF_LS_FILTER_SUBCATEGORY}
+                >
+                  <option value="">{STAFF_LS_FILTER_ALL_SUBS}</option>
+                  {subOptions.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </>
+            ) : null}
+            <button
+              type="button"
+              className="staff-ls-sheet__apply"
+              data-testid="staff-ls-filter-apply"
+              onClick={applyFilters}
+            >
+              {STAFF_LS_FILTER_APPLY}
+            </button>
+            {filtersActive ||
+            draftScope !== STAFF_LS_DEFAULT_SCOPE ||
+            draftSub ? (
+              <button
+                type="button"
+                className="staff-ls-sheet__clear"
+                data-testid="staff-ls-filter-clear"
+                onClick={clearFilters}
+              >
+                {STAFF_LS_FILTER_CLEAR}
+              </button>
+            ) : null}
+          </div>
+          <button
+            type="button"
+            className="staff-ls-sheet__backdrop"
+            aria-label="Close"
+            onClick={() => setFiltersOpen(false)}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

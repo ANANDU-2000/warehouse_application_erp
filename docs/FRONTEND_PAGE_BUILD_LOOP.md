@@ -211,7 +211,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 4 BUTTONS | ✅ | back + scan + row→receive stubs — [`staff_deliveries_buttons_compare.md`](modules/staff_deliveries_buttons_compare.md) |
 | 5 WIRE | ✅ | trade-purchases + groupStaffDeliverySections — [`staff_deliveries_wire_compare.md`](modules/staff_deliveries_wire_compare.md) |
 | 6 STATES | ✅ | ListSkeleton 6 + FriendlyLoadError — [`staff_deliveries_states_compare.md`](modules/staff_deliveries_states_compare.md) |
-| 7 COMPARE | ⬜ | — |
+| 7 COMPARE | ✅ | Aggregator SCAFFOLD→STATES — [`staff_deliveries_compare.md`](modules/staff_deliveries_compare.md) |
 
 ### Prompt template (copy per page)
 

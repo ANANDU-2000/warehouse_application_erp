@@ -28,7 +28,7 @@
 | `/staff/purchase-history` | **COMPARE PASS** — [`staff_purchase_history_compare.md`](staff_purchase_history_compare.md); ask before next stub |
 | `/staff/activity` | **COMPARE PASS** — [`staff_activity_compare.md`](staff_activity_compare.md) |
 | `/staff/low-stock` | **COMPARE PASS** — [`staff_low_stock_compare.md`](staff_low_stock_compare.md) |
-| `/staff/deliveries` | **STATES PASS** — [`staff_deliveries_states_compare.md`](staff_deliveries_states_compare.md); ask before COMPARE |
+| `/staff/deliveries` | **COMPARE PASS** — [`staff_deliveries_compare.md`](staff_deliveries_compare.md); ask before next stub / hold |
 | `/staff/receive` · `/staff/receive/:purchaseId` | Receive shipment (**backend blocked**) |
 | `/staff/scan` | Staff scan (**barcode-related — blocked**) |
 
@@ -63,8 +63,8 @@
 
 ## Next (ask first)
 
-1. **`/staff/deliveries` COMPARE** (STATES done — aggregator SCAFFOLD→STATES), **or**  
-2. Hold — purchase entry / barcode / receive **bodies** need **backend modules** first (docs/06), **or**  
+1. Hold — purchase entry / barcode / receive **bodies** need **backend modules** first (docs/06 Seq 7–8 / 11), **or**  
+2. Next unlocked stub from inventory (e.g. `/catalog/item/:id` if Catalog approved), **or**  
 3. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Notifications COMPARE — [`notifications_compare.md`](notifications_compare.md). Staff search COMPARE — [`staff_search_compare.md`](staff_search_compare.md). Staff items COMPARE — [`staff_items_compare.md`](staff_items_compare.md). Staff stock COMPARE — [`staff_stock_compare.md`](staff_stock_compare.md). Staff purchase-history COMPARE — [`staff_purchase_history_compare.md`](staff_purchase_history_compare.md). Staff low-stock COMPARE — [`staff_low_stock_compare.md`](staff_low_stock_compare.md). Staff activity COMPARE — [`staff_activity_compare.md`](staff_activity_compare.md). Staff deliveries STATES — [`staff_deliveries_states_compare.md`](staff_deliveries_states_compare.md). `/staff/settings` skipped — Settings implement locked.)*
+*(Notifications COMPARE — [`notifications_compare.md`](notifications_compare.md). Staff search COMPARE — [`staff_search_compare.md`](staff_search_compare.md). Staff items COMPARE — [`staff_items_compare.md`](staff_items_compare.md). Staff stock COMPARE — [`staff_stock_compare.md`](staff_stock_compare.md). Staff purchase-history COMPARE — [`staff_purchase_history_compare.md`](staff_purchase_history_compare.md). Staff low-stock COMPARE — [`staff_low_stock_compare.md`](staff_low_stock_compare.md). Staff activity COMPARE — [`staff_activity_compare.md`](staff_activity_compare.md). Staff deliveries COMPARE — [`staff_deliveries_compare.md`](staff_deliveries_compare.md). `/staff/settings` skipped — Settings implement locked.)*

@@ -120,7 +120,8 @@
     "test:staff-deliveries-fields": "node scripts/check-staff-deliveries-fields.mjs",
     "test:staff-deliveries-buttons": "node scripts/check-staff-deliveries-buttons.mjs",
     "test:staff-deliveries-wire": "node scripts/check-staff-deliveries-wire.mjs",
-    "test:staff-deliveries-states": "node scripts/check-staff-deliveries-states.mjs"
+    "test:staff-deliveries-states": "node scripts/check-staff-deliveries-states.mjs",
+    "test:staff-deliveries-compare": "node scripts/check-staff-deliveries-compare.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

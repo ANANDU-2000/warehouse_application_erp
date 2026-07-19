@@ -8,9 +8,9 @@
 | State | Step |
 |---|---|
 | ✅ Completed | Staff activity COMPARE · Staff deliveries SCAFFOLD → **STATES** |
-| 🟡 Current | `/staff/deliveries` **STATES PASS** — ask before COMPARE |
-| ⬜ Pending | COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | receive **body** · barcode **body** · purchase entry · Settings · keepAlive 2m client cache · merge to `main` |
+| 🟡 Current | superseded — see [`staff_deliveries_compare.md`](staff_deliveries_compare.md) |
+| ⬜ Pending | Next Subagent 4 stub / hold |
+| ⏸ Deferred | receive **body** · barcode **body** · purchase entry · Settings · keepAlive 2m · merge to `main` |
 
 ## Legacy vs New
 
@@ -31,4 +31,4 @@
 
 **Rollback:** Revert STATES commit; restore WIRE text Loading… / plain Retry; remove `staffDeliveriesLoadSubtitle.ts` + this compare + states script; boards → ask before STATES.
 
-**Next (ask first):** COMPARE — do not start until approved.
+**Next (ask first):** superseded — see [`staff_deliveries_compare.md`](staff_deliveries_compare.md).

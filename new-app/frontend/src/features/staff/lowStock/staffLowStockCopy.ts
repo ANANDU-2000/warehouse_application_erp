@@ -82,17 +82,37 @@ export function staffLsOwnerNotified(name: string): string {
   return `Owner notified about ${name}`;
 }
 
-/** WIRE load / error — FriendlyLoadError pattern (STATES may refine) */
-export const STAFF_LS_LOADING = "Loading…";
-export const STAFF_LS_LOAD_FAILED = "Could not load low stock items";
+/** STATES — low_stock_dashboard_page.dart AsyncValue.when + load_state_error */
+export const STAFF_LS_LOAD_FAILED = "Could not load low stock";
 export const STAFF_LS_RETRY = "Retry";
-export const STAFF_LS_RETRY_SUBTITLE = "Check your connection and try again.";
-export const STAFF_LS_SESSION_EXPIRED = "Session expired — sign in again";
-export const STAFF_LS_FRIENDLY_NETWORK = "Network error";
-export const STAFF_LS_FRIENDLY_GENERIC = "Something went wrong. Please try again.";
-export const STAFF_LS_FRIENDLY_401 = "Not authenticated";
-export const STAFF_LS_FRIENDLY_404 = "Not found";
-export const STAFF_LS_FRIENDLY_5XX = "Server error — please try again";
+export const STAFF_LS_REFRESH = "Refresh";
+export const STAFF_LS_RETRY_SUBTITLE = "Tap to retry.";
+export const STAFF_LS_SLOW_LOAD = "Taking longer than usual";
+/** _scheduleLoadSlowTimer — 10s */
+export const STAFF_LS_LOAD_SLOW_MS = 10_000;
+
+/** load_state_error.dart status subtitles */
+export const STAFF_LS_SUBTITLE_400 =
+  "Invalid request. Please check your input.";
+export const STAFF_LS_SUBTITLE_401 =
+  "Session expired. Please log in again.";
+export const STAFF_LS_SUBTITLE_402 =
+  "Monthly AI usage limit reached. Contact your owner or try again next month.";
+export const STAFF_LS_SUBTITLE_403 =
+  "You don't have permission for this.";
+export const STAFF_LS_SUBTITLE_404 = "Not found.";
+export const STAFF_LS_SUBTITLE_408 =
+  "Request timed out. Please try again.";
+export const STAFF_LS_SUBTITLE_409 =
+  "That conflicts with existing data. Try again.";
+export const STAFF_LS_SUBTITLE_429 =
+  "Too many requests. Wait a moment and try again.";
+export const STAFF_LS_SUBTITLE_503 =
+  "Server is starting up — wait about 30 seconds, then tap Retry.";
+export const STAFF_LS_SUBTITLE_5XX =
+  "Server error. Please try again shortly.";
+export const STAFF_LS_SUBTITLE_NO_CONNECTION =
+  "No connection. Check your network and try again.";
 
 /** Staff receive — _receive(staffMode) */
 export const STAFF_LS_RECEIVE_PATH = "/staff/receive";

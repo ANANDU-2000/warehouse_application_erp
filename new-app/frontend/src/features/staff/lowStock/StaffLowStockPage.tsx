@@ -1,10 +1,11 @@
 /**
- * Staff low stock `/staff/low-stock` — WIRE (Step 5).
- * Source: lowStockOperationsPageProvider / groupLowStockOperationItems /
- * _notifyOwner → notifyOwnerStockItem · _receive / export empty snack.
+ * Staff low stock `/staff/low-stock` — STATES (Step 6).
+ * Source: low_stock_dashboard_page.dart AsyncValue.when —
+ * CircularProgressIndicator + 10s slow hint · FriendlyLoadError ·
+ * RefreshIndicator · AppBar bottom/actions only on data.
  * Deferred: PDF/CSV bytes · + Stock / reorder sheets · summary endpoint.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type TouchEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { readPrimaryBusiness } from "../../../shared/auth/sessionStore";
 import {
@@ -29,16 +30,18 @@ import {
   STAFF_LS_INFORM,
   STAFF_LS_INFORM_OWNER,
   STAFF_LS_ITEM_PROFILE,
-  STAFF_LS_LOADING,
+  STAFF_LS_LOAD_SLOW_MS,
   STAFF_LS_MORE,
   STAFF_LS_OWNER_INFORMED,
   STAFF_LS_PDF_TOOLTIP,
   STAFF_LS_PLUS_STOCK,
   STAFF_LS_RECEIVE,
+  STAFF_LS_REFRESH,
   STAFF_LS_RETRY,
   STAFF_LS_SEARCH_HINT,
   STAFF_LS_SENT,
   STAFF_LS_SET_REORDER,
+  STAFF_LS_SLOW_LOAD,
   STAFF_LS_TAB_ALL,
   STAFF_LS_TAB_BOUGHT,
   STAFF_LS_TAB_DELIVERY,
@@ -143,6 +146,8 @@ export function StaffLowStockPage() {
   const [loadError, setLoadError] = useState<unknown | null>(null);
   const [retryTick, setRetryTick] = useState(0);
   const [notifyingId, setNotifyingId] = useState<string | null>(null);
+  const [loadTimedOut, setLoadTimedOut] = useState(false);
+  const pullStartY = useRef<number | null>(null);
 
   useEffect(() => {
     const t = window.setTimeout(() => {
@@ -156,6 +161,19 @@ export function StaffLowStockPage() {
     const t = window.setTimeout(() => setToast(null), 3200);
     return () => window.clearTimeout(t);
   }, [toast]);
+
+  /** Flutter _scheduleLoadSlowTimer — 10s while still loading */
+  useEffect(() => {
+    if (!loading) {
+      setLoadTimedOut(false);
+      return;
+    }
+    setLoadTimedOut(false);
+    const t = window.setTimeout(() => {
+      setLoadTimedOut(true);
+    }, STAFF_LS_LOAD_SLOW_MS);
+    return () => window.clearTimeout(t);
+  }, [loading, retryTick]);
 
   useEffect(() => {
     if (!businessId) {
@@ -175,6 +193,7 @@ export function StaffLowStockPage() {
       .then((res) => {
         if (cancelled) return;
         setGrouped(groupLowStockOperationItems(res.items));
+        setLoadError(null);
         setLoading(false);
       })
       .catch((e: unknown) => {
@@ -188,6 +207,11 @@ export function StaffLowStockPage() {
     };
   }, [businessId, retryTick]);
 
+  /** Flutter AppBar bottom + export only when data (not loading/error). */
+  const showDataChrome = !loading && loadError == null;
+  const showInitialLoading = loading;
+  const showError = !loading && loadError != null;
+
   const filtered = filterLowStockGrouped({
     grouped,
     tab,
@@ -197,13 +221,13 @@ export function StaffLowStockPage() {
   });
   const itemCount = countFilteredItems(filtered);
   const emptyTitle =
-    loading || loadError
-      ? null
-      : staffLsEmptyTitle({
+    showDataChrome
+      ? staffLsEmptyTitle({
           itemCount,
           query: debounced,
           subcategoryFilter,
-        });
+        })
+      : null;
   const filtersActive = staffLsFiltersActive({
     searchScope,
     subcategoryFilter,
@@ -222,6 +246,18 @@ export function StaffLowStockPage() {
 
   function retryLoad(): void {
     setRetryTick((n) => n + 1);
+  }
+
+  function onPullTouchStart(e: TouchEvent): void {
+    pullStartY.current = e.touches[0]?.clientY ?? null;
+  }
+
+  function onPullTouchEnd(e: TouchEvent): void {
+    const start = pullStartY.current;
+    pullStartY.current = null;
+    if (start == null || !showDataChrome) return;
+    const end = e.changedTouches[0]?.clientY ?? start;
+    if (end - start > 70) retryLoad();
   }
 
   function openFilters(): void {
@@ -377,7 +413,14 @@ export function StaffLowStockPage() {
   }
 
   return (
-    <div className="staff-ls-page" data-page="staff-low-stock">
+    <div
+      className="staff-ls-page"
+      data-page="staff-low-stock"
+      data-loading={loading ? "true" : "false"}
+      data-load-error={loadError != null ? "true" : "false"}
+      data-show-data={showDataChrome ? "true" : "false"}
+      data-load-slow={loadTimedOut ? "true" : "false"}
+    >
       <header className="staff-ls-appbar" data-slot="appBar">
         <div className="staff-ls-appbar__row">
           <button
@@ -390,32 +433,37 @@ export function StaffLowStockPage() {
             ←
           </button>
           <h1 className="staff-ls-appbar__title">{STAFF_LS_TITLE}</h1>
-          <div className="staff-ls-appbar__actions" data-slot="exportActions">
-            <button
-              type="button"
-              className="staff-ls-appbar__action staff-ls-appbar__action--active"
-              title={STAFF_LS_PDF_TOOLTIP}
-              aria-label={STAFF_LS_PDF_TOOLTIP}
-              data-action="export-pdf"
-              data-deferred="pdf-bytes"
-              onClick={onExportPdf}
-            >
-              PDF
-            </button>
-            <button
-              type="button"
-              className="staff-ls-appbar__action staff-ls-appbar__action--active"
-              title={STAFF_LS_CSV_TOOLTIP}
-              aria-label={STAFF_LS_CSV_TOOLTIP}
-              data-action="export-csv"
-              data-deferred="csv-bytes"
-              onClick={onExportCsv}
-            >
-              CSV
-            </button>
-          </div>
+          {showDataChrome ? (
+            <div className="staff-ls-appbar__actions" data-slot="exportActions">
+              <button
+                type="button"
+                className="staff-ls-appbar__action staff-ls-appbar__action--active"
+                title={STAFF_LS_PDF_TOOLTIP}
+                aria-label={STAFF_LS_PDF_TOOLTIP}
+                data-action="export-pdf"
+                data-deferred="pdf-bytes"
+                onClick={onExportPdf}
+              >
+                PDF
+              </button>
+              <button
+                type="button"
+                className="staff-ls-appbar__action staff-ls-appbar__action--active"
+                title={STAFF_LS_CSV_TOOLTIP}
+                aria-label={STAFF_LS_CSV_TOOLTIP}
+                data-action="export-csv"
+                data-deferred="csv-bytes"
+                onClick={onExportCsv}
+              >
+                CSV
+              </button>
+            </div>
+          ) : (
+            <div className="staff-ls-appbar__actions" aria-hidden="true" />
+          )}
         </div>
 
+        {showDataChrome ? (
         <div className="staff-ls-appbar__bottom" data-slot="appBarBottom">
           <div
             className="staff-ls-search-row staff-ls-search--active"
@@ -496,34 +544,61 @@ export function StaffLowStockPage() {
             ))}
           </div>
         </div>
+        ) : null}
       </header>
 
       <main className="staff-ls-body" data-slot="body">
-        <div className="staff-ls-results" data-slot="results">
-          {loading ? (
+        <div
+          className="staff-ls-results"
+          data-slot="results"
+          onTouchStart={onPullTouchStart}
+          onTouchEnd={onPullTouchEnd}
+        >
+          {showInitialLoading ? (
             <div
               className="staff-ls-results__loading"
               data-slot="loading"
               data-testid="staff-ls-loading"
               aria-busy="true"
+              aria-label="CircularProgressIndicator"
             >
-              {STAFF_LS_LOADING}
+              {loadTimedOut ? (
+                <div className="staff-ls-slow" data-slot="loadSlow">
+                  <p className="staff-ls-slow__title">{STAFF_LS_SLOW_LOAD}</p>
+                  <button
+                    type="button"
+                    className="staff-ls-slow__refresh"
+                    data-action="refresh-slow"
+                    onClick={retryLoad}
+                  >
+                    {STAFF_LS_REFRESH}
+                  </button>
+                </div>
+              ) : null}
+              <div className="staff-ls-spinner" aria-hidden="true" />
             </div>
           ) : null}
 
-          {loadError && !loading ? (
+          {showError ? (
             <div
-              className="staff-ls-results__error"
+              className="staff-ls-friendly-error"
               data-slot="error"
               data-testid="staff-ls-error"
               role="alert"
             >
-              <p className="staff-ls-results__error-title">{errorTitle}</p>
-              <p className="staff-ls-results__error-sub">{errorSubtitle}</p>
+              <div
+                className="staff-ls-friendly-error__icon"
+                aria-hidden="true"
+              >
+                !
+              </div>
+              <p className="staff-ls-friendly-error__title">{errorTitle}</p>
+              <p className="staff-ls-friendly-error__sub">{errorSubtitle}</p>
               <button
                 type="button"
-                className="staff-ls-results__retry"
+                className="staff-ls-friendly-error__retry"
                 data-action="retry"
+                data-testid="staff-ls-retry"
                 onClick={retryLoad}
               >
                 {STAFF_LS_RETRY}
@@ -531,13 +606,13 @@ export function StaffLowStockPage() {
             </div>
           ) : null}
 
-          {!loading && !loadError && emptyTitle ? (
+          {showDataChrome && emptyTitle ? (
             <div className="staff-ls-results__empty" data-slot="empty">
               {emptyTitle}
             </div>
           ) : null}
 
-          {!loading && !loadError && itemCount > 0 ? (
+          {showDataChrome && itemCount > 0 ? (
             <div className="staff-ls-tree" data-slot="tree">
               {Object.entries(filtered).map(([cat, subMap]) => {
                 const catItems = Object.values(subMap).flat();
@@ -568,14 +643,17 @@ export function StaffLowStockPage() {
                 );
               })}
             </div>
-          ) : (
-            <div
-              className="staff-ls-tree staff-ls-tree--layout"
-              data-slot="tree"
-              data-deferred="category-tree"
-              aria-hidden="true"
-              hidden
-            >
+          ) : null}
+
+          {/* LAYOUT chrome sample — kept for static smoke; hidden */}
+          {!showDataChrome && !showInitialLoading && !showError ? null : null}
+          <div
+            className="staff-ls-tree staff-ls-tree--layout"
+            data-slot="tree"
+            data-deferred="category-tree"
+            aria-hidden="true"
+            hidden
+          >
               <div className="staff-ls-category" data-slot="categoryCard">
                 <div className="staff-ls-category__header">
                   <span className="staff-ls-category__title">Category</span>
@@ -643,7 +721,6 @@ export function StaffLowStockPage() {
                 </div>
               </div>
             </div>
-          )}
         </div>
       </main>
 

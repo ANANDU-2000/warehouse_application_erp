@@ -36,7 +36,7 @@
 
 | Path | Stub title |
 |---|---|
-| `/notifications` | **SCAFFOLD PASS** — [`notifications_scaffold_compare.md`](notifications_scaffold_compare.md); LAYOUT next |
+| `/notifications` | **LAYOUT PASS** — [`notifications_layout_compare.md`](notifications_layout_compare.md); FIELDS next |
 | `/barcode/scan` | Barcode scan |
 | `/barcode/bulk-print` | Bulk print labels |
 | `/catalog/item/:itemId` | Catalog item |
@@ -63,7 +63,7 @@
 
 ## Next (ask first)
 
-1. **`/notifications` LAYOUT** (page loop step 2), **or**  
+1. **`/notifications` FIELDS** (page loop step 3), **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Notifications SCAFFOLD done — see [`notifications_scaffold_compare.md`](notifications_scaffold_compare.md). `/staff/settings` skipped — Settings implement locked.)*
+*(Notifications LAYOUT done — see [`notifications_layout_compare.md`](notifications_layout_compare.md). `/staff/settings` skipped — Settings implement locked.)*

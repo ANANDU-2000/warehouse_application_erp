@@ -1,6 +1,7 @@
 /**
- * Notifications `/notifications` — SCAFFOLD (Step 1).
- * Source: notifications_page.dart chrome regions (no API / no list rows).
+ * Notifications `/notifications` — LAYOUT (Step 2).
+ * Source: notifications_page.dart AppBar/search/_FilterChip;
+ * notification_alert_card.dart row chrome; HexaColors (no API / no live rows).
  */
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import {
@@ -44,7 +45,7 @@ export function NotificationsPage() {
             title="Back"
             aria-label="Back"
             data-testid="notifications-back"
-            disabled
+            tabIndex={-1}
           >
             <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
               <path
@@ -63,7 +64,7 @@ export function NotificationsPage() {
             type="button"
             className="notifications-page__text-btn"
             data-testid="notifications-mark-all-read"
-            disabled
+            tabIndex={-1}
             aria-hidden="true"
           >
             {NOTIFICATIONS_MARK_ALL_READ}
@@ -74,7 +75,7 @@ export function NotificationsPage() {
             title={NOTIFICATIONS_CLEAR_TOOLTIP}
             aria-label={NOTIFICATIONS_CLEAR_TOOLTIP}
             data-testid="notifications-clear"
-            disabled
+            tabIndex={-1}
           >
             <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
               <path
@@ -92,14 +93,22 @@ export function NotificationsPage() {
           data-slot="search"
           data-testid="notifications-search-chrome"
         >
+          <span className="notifications-page__search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path
+                fill="currentColor"
+                d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+              />
+            </svg>
+          </span>
           <input
             className="notifications-page__search-input"
             type="search"
             placeholder={NOTIFICATIONS_SEARCH_HINT}
             aria-label={NOTIFICATIONS_SEARCH_HINT}
             data-testid="notifications-search"
-            disabled
             readOnly
+            tabIndex={-1}
           />
         </div>
 
@@ -122,7 +131,7 @@ export function NotificationsPage() {
                   : "notifications-page__chip"
               }
               data-testid={`notifications-filter-${f}`}
-              disabled
+              tabIndex={-1}
             >
               {NOTIFICATIONS_FILTER_LABELS[f]}
             </button>
@@ -134,7 +143,25 @@ export function NotificationsPage() {
           data-slot="list"
           data-testid="notifications-list-chrome"
           aria-label="Notifications list"
-        />
+        >
+          {/* Inert alert-card shells — notification_alert_card.dart shape; no copy/API */}
+          {[0, 1].map((i) => (
+            <div
+              key={i}
+              className="notifications-page__card-chrome"
+              data-testid="notifications-card-chrome"
+              aria-hidden="true"
+            >
+              <span className="notifications-page__card-priority" />
+              <span className="notifications-page__card-icon" />
+              <div className="notifications-page__card-lines">
+                <span className="notifications-page__card-bar notifications-page__card-bar--title" />
+                <span className="notifications-page__card-bar notifications-page__card-bar--sub" />
+                <span className="notifications-page__card-bar notifications-page__card-bar--time" />
+              </div>
+            </div>
+          ))}
+        </section>
       </div>
     </div>
   );

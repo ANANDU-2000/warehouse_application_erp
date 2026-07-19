@@ -1,13 +1,19 @@
 /**
- * Notifications SCAFFOLD chrome — brand tokens; no list rows / API.
+ * Notifications LAYOUT — Hexa brand chrome (no live fields/API).
+ * Tokens: HexaColors brandBackground / brandPrimary / brandAccent (primaryMid) /
+ * inputBorderGrey / inputHint / textSecondary / brandCard.
  */
 .notifications-page {
   --notif-brand: #0e4f46;
+  --notif-accent: #159a8a;
   --notif-bg: #f7f9f6;
   --notif-text: #0f172a;
   --notif-muted: #5c6578;
-  --notif-border: #e5e7eb;
+  --notif-border: #e2e8e6;
+  --notif-input-border: #e5e7eb;
+  --notif-hint: #9ca3af;
   --notif-surface: #ffffff;
+  --notif-chip-idle: #eff2f1;
 
   min-height: 100dvh;
   display: flex;
@@ -46,7 +52,7 @@
   color: var(--notif-muted);
   font-family: inherit;
   cursor: default;
-  opacity: 0.55;
+  pointer-events: none;
   padding: 0;
   border-radius: 8px;
 }
@@ -61,6 +67,7 @@
   font-weight: 700;
   padding: 0 8px;
   white-space: nowrap;
+  opacity: 0.45;
 }
 
 .notifications-page__title {
@@ -70,6 +77,7 @@
   font-weight: 800;
   line-height: 1.2;
   color: var(--notif-text);
+  letter-spacing: -0.01em;
 }
 
 .notifications-page__body {
@@ -80,21 +88,37 @@
 }
 
 .notifications-page__search {
+  position: relative;
   padding: 4px 16px 0;
   box-sizing: border-box;
+}
+
+.notifications-page__search-icon {
+  position: absolute;
+  left: 28px;
+  top: 50%;
+  transform: translateY(-40%);
+  color: var(--notif-hint);
+  pointer-events: none;
+  display: inline-flex;
 }
 
 .notifications-page__search-input {
   width: 100%;
   box-sizing: border-box;
   min-height: 40px;
-  padding: 8px 12px;
-  border: 1px solid var(--notif-border);
+  padding: 8px 12px 8px 40px;
+  border: 1px solid var(--notif-input-border);
   border-radius: 12px;
   font: inherit;
   font-size: 14px;
   background: var(--notif-surface);
-  color: var(--notif-muted);
+  color: var(--notif-text);
+  pointer-events: none;
+}
+
+.notifications-page__search-input::placeholder {
+  color: var(--notif-hint);
 }
 
 .notifications-page__filters {
@@ -106,30 +130,90 @@
   box-sizing: border-box;
 }
 
+/* _FilterChip — selected HexaColors.primaryMid (#159A8A) + white label */
 .notifications-page__chip {
   font: inherit;
   font-size: 13px;
-  font-weight: 600;
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--notif-border);
-  background: var(--notif-surface);
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: none;
+  background: var(--notif-chip-idle);
   color: var(--notif-muted);
   cursor: default;
+  pointer-events: none;
   white-space: nowrap;
-  opacity: 0.7;
 }
 
 .notifications-page__chip--selected {
-  border-color: var(--notif-brand);
-  color: var(--notif-brand);
-  background: rgba(14, 79, 70, 0.08);
-  opacity: 1;
+  background: var(--notif-accent);
+  color: #ffffff;
 }
 
 .notifications-page__list {
   flex: 1;
   min-height: 120px;
+  padding: 8px 16px 24px;
+  box-sizing: border-box;
+  background: var(--notif-bg);
+  overflow: auto;
+}
+
+/* notification_alert_card.dart inert shells */
+.notifications-page__card-chrome {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  margin-bottom: 8px;
+  min-height: 72px;
+  border-radius: 12px;
   background: var(--notif-surface);
-  border-top: 1px solid var(--notif-border);
+  border: 1px solid var(--notif-border);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.notifications-page__card-priority {
+  width: 4px;
+  flex-shrink: 0;
+  background: var(--notif-accent);
+}
+
+.notifications-page__card-icon {
+  width: 22px;
+  height: 22px;
+  margin: 12px 0 0 8px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: rgba(21, 154, 138, 0.15);
+}
+
+.notifications-page__card-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 12px 12px 0;
+  box-sizing: border-box;
+}
+
+.notifications-page__card-bar {
+  display: block;
+  border-radius: 4px;
+  background: #eff2f1;
+}
+
+.notifications-page__card-bar--title {
+  height: 14px;
+  width: 55%;
+}
+
+.notifications-page__card-bar--sub {
+  height: 12px;
+  width: 78%;
+}
+
+.notifications-page__card-bar--time {
+  height: 10px;
+  width: 28%;
 }

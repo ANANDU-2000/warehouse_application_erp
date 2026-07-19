@@ -122,8 +122,8 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | Step | Status | Evidence |
 |---|---|---|
 | 1 SCAFFOLD | ✅ | appBar/search/filters/list slots — [`notifications_scaffold_compare.md`](modules/notifications_scaffold_compare.md) |
-| 2 LAYOUT | ⬜ | Ask before next |
-| 3 FIELDS | ⬜ | |
+| 2 LAYOUT | ✅ | Hexa chips/search/card chrome — [`notifications_layout_compare.md`](modules/notifications_layout_compare.md) |
+| 3 FIELDS | ⬜ | Ask before next |
 | 4 BUTTONS | ⬜ | |
 | 5 WIRE | ⬜ | |
 | 6 STATES | ⬜ | |

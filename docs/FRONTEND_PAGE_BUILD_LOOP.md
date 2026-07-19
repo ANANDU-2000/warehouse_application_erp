@@ -189,6 +189,18 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 6 STATES | ✅ | spinner + 10s slow + FriendlyLoadError + pull — [`staff_low_stock_states_compare.md`](modules/staff_low_stock_states_compare.md) |
 | 7 COMPARE | ✅ | Aggregator SCAFFOLD→STATES — [`staff_low_stock_compare.md`](modules/staff_low_stock_compare.md) |
 
+### Staff activity (`/staff/activity`) — Subagent 4
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | AppBar + period chips + empty — [`staff_activity_scaffold_compare.md`](modules/staff_activity_scaffold_compare.md) |
+| 2 LAYOUT | ⬜ | — |
+| 3 FIELDS | ⬜ | — |
+| 4 BUTTONS | ⬜ | — |
+| 5 WIRE | ⬜ | — |
+| 6 STATES | ⬜ | — |
+| 7 COMPARE | ⬜ | — |
+
 ### Prompt template (copy per page)
 
 ```

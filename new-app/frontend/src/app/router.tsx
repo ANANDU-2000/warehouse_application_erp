@@ -15,11 +15,12 @@ import { StaffItemGalleryPage } from "../features/staff/items/StaffItemGalleryPa
 import { StaffStockPage } from "../features/staff/stock/StaffStockPage";
 import { StaffPurchaseHistoryPage } from "../features/staff/purchaseHistory/StaffPurchaseHistoryPage";
 import { StaffLowStockPage } from "../features/staff/lowStock/StaffLowStockPage";
+import { StaffActivityPage } from "../features/staff/activity/StaffActivityPage";
 
 /**
  * Splash + Login + owner /home + activity + breakdown-more + staff /staff/home +
  * users + notifications + staff search + staff items + staff stock +
- * staff purchase-history + staff low-stock SCAFFOLD + stubs.
+ * staff purchase-history + staff low-stock COMPARE + staff activity SCAFFOLD + stubs.
  * Source: docs/05_Navigation_Map.md; dashboard.md
  */
 export function AppRouter() {
@@ -56,10 +57,7 @@ export function AppRouter() {
           element={<DashboardRouteStubPage title="Purchase order detail" />}
         />
         <Route path="/staff/low-stock" element={<StaffLowStockPage />} />
-        <Route
-          path="/staff/activity"
-          element={<DashboardRouteStubPage title="Staff activity" />}
-        />
+        <Route path="/staff/activity" element={<StaffActivityPage />} />
         <Route
           path="/staff/deliveries"
           element={<DashboardRouteStubPage title="Staff deliveries" />}

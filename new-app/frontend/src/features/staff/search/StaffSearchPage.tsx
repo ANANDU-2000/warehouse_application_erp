@@ -1,22 +1,27 @@
 /**
- * Staff search `/staff/search` — WIRE (Step 5).
- * Source: search_page.dart + hexa_api.unifiedSearch
+ * Staff search `/staff/search` — STATES (Step 6).
+ * Source: search_page.dart loading/error FriendlyLoadError / _SearchLoadingFallback
  */
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { readPrimaryBusiness } from "../../../shared/auth/sessionStore";
 import {
   STAFF_SEARCH_BACK_FALLBACK,
+  STAFF_SEARCH_CACHE_MAX,
+  STAFF_SEARCH_CACHE_TTL_MS,
   STAFF_SEARCH_DEBOUNCE_MS,
   STAFF_SEARCH_EMPTY_HELPER,
   STAFF_SEARCH_FAILED,
   STAFF_SEARCH_FUZZY_CATALOG_STAFF,
   STAFF_SEARCH_FUZZY_ITEM_HINT,
   STAFF_SEARCH_HINT,
+  STAFF_SEARCH_LOADING_FALLBACK_MS,
+  STAFF_SEARCH_LOADING_SLOW,
   STAFF_SEARCH_NO_MATCH_GLOBAL,
   STAFF_SEARCH_QUICK_FILTERS_TITLE,
   STAFF_SEARCH_RECENT_CLEAR,
   STAFF_SEARCH_RECENT_TITLE,
+  STAFF_SEARCH_RETRY,
   STAFF_SEARCH_SECTION_EMPTY_BILLS,
   STAFF_SEARCH_SECTION_EMPTY_ITEMS,
   STAFF_SEARCH_SECTION_TITLE_BILLS,
@@ -25,10 +30,9 @@ import {
 } from "./staffSearchCopy";
 import {
   fetchUnifiedSearch,
-  StaffSearchApiError,
-  StaffSearchNetworkError,
   type UnifiedSearchResponse,
 } from "./staffSearchApi";
+import { mapStaffSearchLoadSubtitle } from "./staffSearchLoadSubtitle";
 import {
   STAFF_SEARCH_QUICK_FILTERS,
   type StaffSearchNavMode,
@@ -45,6 +49,8 @@ import {
   type StaffSearchSection,
 } from "./staffSearchSections";
 import "./StaffSearchPage.css";
+
+type CacheEntry = { at: number; data: UnifiedSearchResponse };
 
 function parseSectionParam(raw: string | null): StaffSearchSection | null {
   if (raw === "items" || raw === "types" || raw === "bills") return raw;
@@ -113,9 +119,14 @@ export function StaffSearchPage() {
   );
   const [data, setData] = useState<UnifiedSearchResponse>(emptyData);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<unknown>(null);
+  const [retryTick, setRetryTick] = useState(0);
+  const [slowFallback, setSlowFallback] = useState(false);
   const recordedKey = useRef<string | null>(null);
-  const cacheRef = useRef<Map<string, UnifiedSearchResponse>>(new Map());
+  const cacheRef = useRef<Map<string, CacheEntry>>(new Map());
+  const cachedSnapshot = useRef<UnifiedSearchResponse | null>(null);
+  const resultsRef = useRef<HTMLElement | null>(null);
+  const pullStartY = useRef<number | null>(null);
 
   useEffect(() => {
     const fromUrl = parseSectionParam(searchParams.get("section"));
@@ -134,30 +145,43 @@ export function StaffSearchPage() {
     if (!debounced || !businessId) {
       setData(emptyData());
       setLoading(false);
-      setError(null);
+      setLoadError(null);
+      setSlowFallback(false);
+      cachedSnapshot.current = null;
       return;
     }
-    const cacheKey = `${businessId}|${debounced}`;
+    const cacheKey = `${businessId}|${debounced.toLowerCase()}`;
     const hit = cacheRef.current.get(cacheKey);
-    if (hit) {
-      setData(hit);
+    const now = Date.now();
+    if (hit && now - hit.at < STAFF_SEARCH_CACHE_TTL_MS) {
+      setData(hit.data);
+      cachedSnapshot.current = hit.data;
       setLoading(false);
-      setError(null);
+      setLoadError(null);
+      setSlowFallback(false);
       return;
     }
+
     let cancelled = false;
     setLoading(true);
-    setError(null);
+    setLoadError(null);
+    setSlowFallback(false);
+    const slowTimer = window.setTimeout(() => {
+      if (!cancelled) setSlowFallback(true);
+    }, STAFF_SEARCH_LOADING_FALLBACK_MS);
+
     void fetchUnifiedSearch(businessId, debounced)
       .then((res) => {
         if (cancelled) return;
-        cacheRef.current.set(cacheKey, res);
-        while (cacheRef.current.size > 40) {
+        cacheRef.current.set(cacheKey, { at: Date.now(), data: res });
+        while (cacheRef.current.size > STAFF_SEARCH_CACHE_MAX) {
           const first = cacheRef.current.keys().next().value;
           if (first) cacheRef.current.delete(first);
         }
         setData(res);
+        cachedSnapshot.current = res;
         setLoading(false);
+        setSlowFallback(false);
         const keyNorm = debounced.trim().toLowerCase();
         if (keyNorm.length >= 2 && recordedKey.current !== keyNorm) {
           recordedKey.current = keyNorm;
@@ -167,19 +191,14 @@ export function StaffSearchPage() {
       .catch((err: unknown) => {
         if (cancelled) return;
         setLoading(false);
-        if (
-          err instanceof StaffSearchApiError ||
-          err instanceof StaffSearchNetworkError
-        ) {
-          setError(STAFF_SEARCH_FAILED);
-        } else {
-          setError(STAFF_SEARCH_FAILED);
-        }
+        setSlowFallback(false);
+        setLoadError(err);
       });
     return () => {
       cancelled = true;
+      window.clearTimeout(slowTimer);
     };
-  }, [debounced, businessId]);
+  }, [debounced, businessId, retryTick]);
 
   const qEmpty = debounced.length === 0;
   const items = data.catalog_items;
@@ -190,6 +209,10 @@ export function StaffSearchPage() {
     data.catalog_subcategories.length > 0 ||
     data.suppliers.length > 0 ||
     data.brokers.length > 0;
+  /** Flutter searchReloading = loading && cached snapshot */
+  const searchReloading = loading && cachedSnapshot.current != null;
+  const coldLoading = loading && !searchReloading;
+  const showResults = !loading && loadError == null;
 
   function applyQuery(raw: string) {
     setQuery(raw);
@@ -203,6 +226,13 @@ export function StaffSearchPage() {
 
   function onClearRecents() {
     setRecents(clearRecentSearchQueries());
+  }
+
+  function retrySearch() {
+    if (businessId && debounced) {
+      cacheRef.current.delete(`${businessId}|${debounced.toLowerCase()}`);
+    }
+    setRetryTick((t) => t + 1);
   }
 
   return (
@@ -286,6 +316,24 @@ export function StaffSearchPage() {
           data-slot="results"
           data-testid="staff-search-results-chrome"
           aria-label="Search results"
+          ref={resultsRef}
+          onTouchStart={(e) => {
+            const el = resultsRef.current;
+            if (!el || el.scrollTop > 0) {
+              pullStartY.current = null;
+              return;
+            }
+            pullStartY.current = e.touches[0]?.clientY ?? null;
+          }}
+          onTouchEnd={(e) => {
+            const start = pullStartY.current;
+            pullStartY.current = null;
+            if (start == null || qEmpty) return;
+            const endY = e.changedTouches[0]?.clientY ?? start;
+            if (endY - start > 64 && !loading) {
+              retrySearch();
+            }
+          }}
         >
           {qEmpty ? (
             <div
@@ -364,10 +412,12 @@ export function StaffSearchPage() {
               data-slot="query-results"
               data-testid="staff-search-query-results"
             >
-              {loading ? (
+              {searchReloading ? (
                 <div
                   className="staff-search-page__progress"
                   data-testid="staff-search-loading"
+                  role="progressbar"
+                  aria-label="Updating results"
                 >
                   <div className="staff-search-page__progress-bar" />
                   <p className="staff-search-page__updating">
@@ -375,15 +425,75 @@ export function StaffSearchPage() {
                   </p>
                 </div>
               ) : null}
-              {error ? (
-                <p
-                  className="staff-search-page__error"
+
+              {coldLoading ? (
+                <div
+                  className="staff-search-page__cold-load"
+                  data-testid="staff-search-loading"
+                >
+                  {!slowFallback ? (
+                    <div
+                      className="staff-search-page__spinner"
+                      role="progressbar"
+                      aria-label="Loading"
+                    />
+                  ) : (
+                    <div data-testid="staff-search-loading-fallback">
+                      <p className="staff-search-page__slow-msg">
+                        {STAFF_SEARCH_LOADING_SLOW}
+                      </p>
+                      <div className="staff-search-page__recents-wrap">
+                        {recents.slice(0, 8).map((r) => (
+                          <button
+                            key={r}
+                            type="button"
+                            className="staff-search-page__recent-chip"
+                            data-testid="staff-search-slow-recent"
+                            onClick={() => applyQuery(r)}
+                          >
+                            {r}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : null}
+
+              {loadError != null && !loading ? (
+                <div
+                  className="staff-search-page__friendly-error"
                   data-testid="staff-search-error"
                 >
-                  {error}
-                </p>
+                  <span
+                    className="staff-search-page__friendly-error-icon"
+                    aria-hidden="true"
+                  >
+                    <svg viewBox="0 0 24 24" width="32" height="32">
+                      <path
+                        fill="currentColor"
+                        d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4s1.79-4 4-4h.71C7.37 7.69 9.48 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3s-1.34 3-3 3z"
+                      />
+                    </svg>
+                  </span>
+                  <p className="staff-search-page__friendly-error-title">
+                    {STAFF_SEARCH_FAILED}
+                  </p>
+                  <p className="staff-search-page__friendly-error-sub">
+                    {mapStaffSearchLoadSubtitle(loadError)}
+                  </p>
+                  <button
+                    type="button"
+                    className="staff-search-page__retry-btn"
+                    data-testid="staff-search-retry"
+                    onClick={retrySearch}
+                  >
+                    {STAFF_SEARCH_RETRY}
+                  </button>
+                </div>
               ) : null}
-              {!loading && !error && data.fuzzy_catalog_used ? (
+
+              {showResults && data.fuzzy_catalog_used ? (
                 <p
                   className="staff-search-page__fuzzy"
                   data-testid="staff-search-fuzzy-banner"
@@ -391,7 +501,7 @@ export function StaffSearchPage() {
                   {STAFF_SEARCH_FUZZY_CATALOG_STAFF}
                 </p>
               ) : null}
-              {!loading && !error && !hasAny ? (
+              {showResults && !hasAny ? (
                 <p
                   className="staff-search-page__no-match"
                   data-testid="staff-search-no-match-global"
@@ -399,7 +509,7 @@ export function StaffSearchPage() {
                   {STAFF_SEARCH_NO_MATCH_GLOBAL}
                 </p>
               ) : null}
-              {!loading && !error && section === "items" ? (
+              {showResults && section === "items" ? (
                 <div data-testid="staff-search-section-block-items">
                   <h2 className="staff-search-page__result-title">
                     {STAFF_SEARCH_SECTION_TITLE_ITEMS}
@@ -447,7 +557,7 @@ export function StaffSearchPage() {
                 </div>
               ) : null}
               {/* Staff types list block gated in Flutter (!staffShellEmbedded) — N/A */}
-              {!loading && !error && section === "bills" ? (
+              {showResults && section === "bills" ? (
                 <div data-testid="staff-search-section-block-bills">
                   <h2 className="staff-search-page__result-title">
                     {STAFF_SEARCH_SECTION_TITLE_BILLS}

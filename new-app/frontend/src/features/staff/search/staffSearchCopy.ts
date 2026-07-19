@@ -57,3 +57,37 @@ export const STAFF_SEARCH_FUZZY_ITEM_HINT =
 
 export const STAFF_SEARCH_FAILED = "Search failed";
 export const STAFF_SEARCH_UPDATING = "Updating results…";
+export const STAFF_SEARCH_RETRY = "Retry";
+/** friendly_load_error.dart kFriendlyLoadNetworkSubtitle */
+export const STAFF_SEARCH_RETRY_SUBTITLE = "Tap to retry.";
+/** _SearchLoadingFallback after 2s */
+export const STAFF_SEARCH_LOADING_SLOW =
+  "Search is taking longer than expected. You can keep navigating or try a recent item.";
+
+/** load_state_error.dart status subtitles (shared map with notifications) */
+export const STAFF_SEARCH_SUBTITLE_400 =
+  "Invalid request. Please check your input.";
+export const STAFF_SEARCH_SUBTITLE_401 =
+  "Session expired. Please log in again.";
+export const STAFF_SEARCH_SUBTITLE_402 =
+  "Monthly AI usage limit reached. Contact your owner or try again next month.";
+export const STAFF_SEARCH_SUBTITLE_403 =
+  "You don't have permission for this.";
+export const STAFF_SEARCH_SUBTITLE_404 = "Not found.";
+export const STAFF_SEARCH_SUBTITLE_408 =
+  "Request timed out. Please try again.";
+export const STAFF_SEARCH_SUBTITLE_409 =
+  "That conflicts with existing data. Try again.";
+export const STAFF_SEARCH_SUBTITLE_429 =
+  "Too many requests. Wait a moment and try again.";
+export const STAFF_SEARCH_SUBTITLE_503 =
+  "Server is starting up — wait about 30 seconds, then tap Retry.";
+export const STAFF_SEARCH_SUBTITLE_5XX =
+  "Server error. Please try again shortly.";
+export const STAFF_SEARCH_SUBTITLE_NO_CONNECTION =
+  "No connection. Check your network and try again.";
+
+/** Flutter _unifiedSearchTtl */
+export const STAFF_SEARCH_CACHE_TTL_MS = 12_000;
+export const STAFF_SEARCH_CACHE_MAX = 40;
+export const STAFF_SEARCH_LOADING_FALLBACK_MS = 2_000;

@@ -92,6 +92,18 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 6 STATES | ✅ | skeleton / FriendlyLoadError — [`staff_home_states_compare.md`](modules/staff_home_states_compare.md) |
 | 7 COMPARE | ✅ | in-scope PASS — [`staff_home_compare.md`](modules/staff_home_compare.md) |
 
+### Users & Roles (`/settings/users`)
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | empty chrome slots + manage gate — [`users_management_scaffold_compare.md`](modules/users_management_scaffold_compare.md) |
+| 2 LAYOUT | ⬜ | Ask before next |
+| 3 FIELDS | ⬜ | |
+| 4 BUTTONS | ⬜ | |
+| 5 WIRE | ⬜ | |
+| 6 STATES | ⬜ | |
+| 7 COMPARE | ⬜ | |
+
 ### Prompt template (copy per page)
 
 ```

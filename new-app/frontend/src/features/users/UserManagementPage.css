@@ -1,0 +1,73 @@
+/**
+ * Users list SCAFFOLD — empty slot shell only.
+ * LAYOUT owns chrome parity; this step is structure.
+ */
+.users-mgmt {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.users-mgmt__appbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 3.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.users-mgmt__appbar-leading,
+.users-mgmt__appbar-actions {
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+}
+
+.users-mgmt__title {
+  flex: 1;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.users-mgmt__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.users-mgmt__search-filter,
+.users-mgmt__status-chips,
+.users-mgmt__list,
+.users-mgmt__detail,
+.users-mgmt__bulk {
+  min-height: 2.5rem;
+}
+
+.users-mgmt__split {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.users-mgmt__list {
+  flex: 4;
+  min-width: 0;
+}
+
+.users-mgmt__detail {
+  flex: 5;
+  min-width: 0;
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .users-mgmt__detail {
+    display: block;
+  }
+}
+
+.users-mgmt__bulk {
+  min-height: 3rem;
+}

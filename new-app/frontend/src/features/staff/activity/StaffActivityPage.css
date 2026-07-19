@@ -242,3 +242,37 @@
   font-size: 10px;
   color: var(--sa-variant);
 }
+
+/* WIRE — basic loading/error (ListSkeleton / HexaErrorCard → STATES) */
+.staff-act-loading {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--sa-muted);
+  font-size: 14px;
+}
+
+.staff-act-error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 0;
+}
+
+.staff-act-error__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--sa-fg);
+}
+
+.staff-act-error__retry {
+  border: 1px solid var(--sa-border);
+  background: var(--sa-surface);
+  color: var(--sa-brand);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}

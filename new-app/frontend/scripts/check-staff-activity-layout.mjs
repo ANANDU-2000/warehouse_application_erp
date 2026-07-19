@@ -32,21 +32,49 @@ const page = readFileSync(pagePath, "utf8");
 const css = readFileSync(cssPath, "utf8");
 const pkg = readFileSync(pkgPath, "utf8");
 
-assert(page.includes("LAYOUT") || page.includes("FIELDS") || page.includes("SCAFFOLD"), "step header");
+assert(
+  page.includes("LAYOUT") ||
+    page.includes("FIELDS") ||
+    page.includes("BUTTONS") ||
+    page.includes("WIRE") ||
+    page.includes("SCAFFOLD"),
+  "step header",
+);
 assert(page.includes('data-slot="appBar"'), "appBar");
 assert(page.includes('data-slot="periods"'), "periods");
 assert(page.includes('data-slot="empty"'), "empty");
 assert(page.includes('data-slot="emptyIcon"'), "empty icon");
 assert(page.includes("staff-act-periods--inert") || page.includes("staff-act-periods--active"), "periods class");
-assert(page.includes('data-kind="history"'), "history row");
-assert(page.includes('data-kind="purchase"'), "purchase row");
-assert(page.includes("staff-act-row__avatar--history"), "history avatar");
-assert(page.includes("staff-act-row__avatar--purchase"), "purchase avatar");
+assert(
+  page.includes('data-kind="history"') ||
+    page.includes("staff-act-row__avatar--history") ||
+    css.includes("staff-act-row__avatar--history"),
+  "history row chrome",
+);
+assert(
+  page.includes('data-kind="purchase"') ||
+    page.includes("staff-act-row__avatar--purchase") ||
+    css.includes("staff-act-row__avatar--purchase"),
+  "purchase row chrome",
+);
+assert(
+  page.includes("staff-act-row__avatar--history") ||
+    css.includes("staff-act-row__avatar--history"),
+  "history avatar",
+);
+assert(
+  page.includes("staff-act-row__avatar--purchase") ||
+    css.includes("staff-act-row__avatar--purchase"),
+  "purchase avatar",
+);
 assert(
   page.includes("disabled") || page.includes("setPeriod") || page.includes("data-action=\"select-period\""),
   "period control present (FIELDS may activate)",
 );
-assert(!page.includes("fetch("), "no fetch");
+assert(
+  page.includes("fetchStaffActivityLog") || !page.includes("fetch("),
+  "no raw fetch unless WIRE",
+);
 
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "page bg");
 assert(css.includes("#0e4f46") || css.includes("#0E4F46"), "brandPrimary");

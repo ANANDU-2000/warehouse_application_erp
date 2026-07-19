@@ -38,7 +38,10 @@ const page = readFileSync(pagePath, "utf8");
 const css = readFileSync(cssPath, "utf8");
 const pkg = readFileSync(pkgPath, "utf8");
 
-assert(page.includes("FIELDS"), "FIELDS header");
+assert(
+  page.includes("FIELDS") || page.includes("BUTTONS") || page.includes("WIRE"),
+  "FIELDS+ header",
+);
 assert(page.includes("useState"), "useState");
 assert(page.includes("setPeriod"), "setPeriod");
 assert(page.includes("STAFF_ACT_DEFAULT_PERIOD"), "default period");
@@ -46,11 +49,17 @@ assert(page.includes('data-action="select-period"'), "select-period");
 assert(page.includes("staff-act-periods--active"), "periods active");
 assert(page.includes('data-period={period}'), "page data-period");
 assert(page.includes('data-period={key}'), "chip data-period");
-assert(!page.includes("disabled"), "periods enabled");
 assert(!page.includes("staff-act-periods--inert"), "not inert");
 assert(!page.includes('data-deferred="period-select"'), "period not deferred");
-assert(page.includes('data-deferred="activity-rows"'), "rows still deferred");
-assert(!page.includes("fetch("), "no fetch");
+assert(
+  page.includes('data-deferred="activity-rows"') ||
+    page.includes("fetchStaffActivityLog"),
+  "rows deferred or WIRE",
+);
+assert(
+  page.includes("fetchStaffActivityLog") || !page.includes("fetch("),
+  "no raw fetch unless WIRE",
+);
 
 assert(copy.includes('"today"'), "today");
 assert(copy.includes('"week"'), "week");

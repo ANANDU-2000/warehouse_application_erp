@@ -197,7 +197,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 2 LAYOUT | ✅ | Hexa tokens + avatar/row chrome — [`staff_activity_layout_compare.md`](modules/staff_activity_layout_compare.md) |
 | 3 FIELDS | ✅ | period Today/Week/Month select — [`staff_activity_fields_compare.md`](modules/staff_activity_fields_compare.md) |
 | 4 BUTTONS | ✅ | back + display-only rows — [`staff_activity_buttons_compare.md`](modules/staff_activity_buttons_compare.md) |
-| 5 WIRE | ⬜ | — |
+| 5 WIRE | ✅ | activity-log by period + labels — [`staff_activity_wire_compare.md`](modules/staff_activity_wire_compare.md) |
 | 6 STATES | ⬜ | — |
 | 7 COMPARE | ⬜ | — |
 

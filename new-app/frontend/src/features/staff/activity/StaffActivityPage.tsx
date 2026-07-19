@@ -1,16 +1,29 @@
 /**
- * Staff activity `/staff/activity` — BUTTONS (Step 4).
- * Source: staff_activity_page.dart — AppBar back popOrGo; ListTile has **no** onTap
- * (display-only rows). Period chips already FIELDS.
- * Deferred: listActivityLog → WIRE; ListSkeleton / HexaErrorCard → STATES.
+ * Staff activity `/staff/activity` — WIRE (Step 5).
+ * Source: staff_activity_page.dart — listActivityLog(period);
+ * `_staffActivityLabel` / `_timeAgo` / ListTile display-only (no onTap).
+ * Deferred: ListSkeleton / HexaErrorCard polish → STATES.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { readPrimaryBusiness } from "../../../shared/auth/sessionStore";
+import {
+  fetchStaffActivityLog,
+  type StaffActLogRow,
+} from "./staffActivityApi";
+import {
+  staffActLabel,
+  staffActParseWhen,
+  staffActRowKind,
+  staffActTimeAgo,
+  staffActWhenStamp,
+} from "./staffActivityFormat";
 import {
   STAFF_ACT_BACK_FALLBACK,
   STAFF_ACT_DEFAULT_PERIOD,
   STAFF_ACT_EMPTY,
   STAFF_ACT_EMPTY_SUB,
+  STAFF_ACT_LOAD_FAILED,
   STAFF_ACT_PERIOD_LABEL,
   STAFF_ACT_PERIOD_ORDER,
   STAFF_ACT_TITLE,
@@ -29,19 +42,90 @@ function popOrGo(
   navigate(fallback);
 }
 
+type RowView = {
+  key: string;
+  actionRaw: string;
+  action: string;
+  item: string;
+  kind: "purchase" | "history";
+  ago: string;
+  whenStamp: string;
+};
+
+function mapRows(rows: StaffActLogRow[], now = new Date()): RowView[] {
+  return rows.map((r, i) => {
+    const actionRaw = String(r.action_type ?? "");
+    const itemName = r.item_name != null ? String(r.item_name) : "";
+    const when = staffActParseWhen(r.created_at, now);
+    return {
+      key: String(r.id ?? `${actionRaw}-${r.created_at ?? i}`),
+      actionRaw,
+      action: staffActLabel(actionRaw),
+      item: itemName.trim(),
+      kind: staffActRowKind(actionRaw),
+      ago: staffActTimeAgo(when, now),
+      whenStamp: staffActWhenStamp(when),
+    };
+  });
+}
+
 export function StaffActivityPage() {
   const navigate = useNavigate();
+  const session = readPrimaryBusiness();
+  const businessId = session?.id ?? "";
   const [period, setPeriod] = useState<StaffActPeriod>(STAFF_ACT_DEFAULT_PERIOD);
+  const [rows, setRows] = useState<RowView[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<unknown | null>(null);
+  const [retryTick, setRetryTick] = useState(0);
+
+  useEffect(() => {
+    if (!businessId) {
+      setLoading(false);
+      setRows([]);
+      setLoadError("Not signed in");
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    setLoadError(null);
+    void fetchStaffActivityLog(businessId, period)
+      .then((data) => {
+        if (cancelled) return;
+        setRows(mapRows(data));
+        setLoadError(null);
+        setLoading(false);
+      })
+      .catch((e: unknown) => {
+        if (cancelled) return;
+        setRows([]);
+        setLoadError(e);
+        setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [businessId, period, retryTick]);
 
   function onBack(): void {
     popOrGo(navigate, STAFF_ACT_BACK_FALLBACK);
   }
+
+  function retryLoad(): void {
+    setRetryTick((n) => n + 1);
+  }
+
+  const showLoading = loading;
+  const showError = !loading && loadError != null;
+  const showEmpty = !loading && loadError == null && rows.length === 0;
+  const showList = !loading && loadError == null && rows.length > 0;
 
   return (
     <div
       className="staff-act-page"
       data-page="staff-activity"
       data-period={period}
+      data-step="wire"
     >
       <header className="staff-act-appbar" data-slot="appBar">
         <button
@@ -85,64 +169,72 @@ export function StaffActivityPage() {
         </div>
 
         <div className="staff-act-results" data-slot="results">
-          <div className="staff-act-empty" data-slot="empty">
-            <div
-              className="staff-act-empty__icon"
-              data-slot="emptyIcon"
-              aria-hidden="true"
-            />
-            <p className="staff-act-empty__title">{STAFF_ACT_EMPTY}</p>
-            <p className="staff-act-empty__sub">{STAFF_ACT_EMPTY_SUB}</p>
-          </div>
+          {showLoading ? (
+            <div className="staff-act-loading" data-slot="loading" role="status">
+              Loading…
+            </div>
+          ) : null}
 
-          {/* Flutter ListTile: no onTap — display-only until WIRE fills rows */}
-          <ul
-            className="staff-act-list"
-            data-slot="list"
-            data-deferred="activity-rows"
-            data-interactive="false"
-            aria-hidden="true"
-            hidden
-          >
-            <li
-              className="staff-act-row"
-              data-slot="row"
-              data-kind="history"
-              data-interactive="false"
-            >
-              <span
-                className="staff-act-row__avatar staff-act-row__avatar--history"
+          {showError ? (
+            <div className="staff-act-error" data-slot="error" role="alert">
+              <p className="staff-act-error__title">{STAFF_ACT_LOAD_FAILED}</p>
+              <button
+                type="button"
+                className="staff-act-error__retry"
+                data-action="retry"
+                onClick={retryLoad}
+              >
+                Retry
+              </button>
+            </div>
+          ) : null}
+
+          {showEmpty ? (
+            <div className="staff-act-empty" data-slot="empty">
+              <div
+                className="staff-act-empty__icon"
+                data-slot="emptyIcon"
                 aria-hidden="true"
               />
-              <div className="staff-act-row__body">
-                <div className="staff-act-row__title">Signed in</div>
-                <div className="staff-act-row__sub" />
-              </div>
-              <div className="staff-act-row__meta">
-                <span className="staff-act-row__ago">just now</span>
-                <span className="staff-act-row__when">Jan 1 00:00</span>
-              </div>
-            </li>
-            <li
-              className="staff-act-row"
-              data-slot="row"
-              data-kind="purchase"
+              <p className="staff-act-empty__title">{STAFF_ACT_EMPTY}</p>
+              <p className="staff-act-empty__sub">{STAFF_ACT_EMPTY_SUB}</p>
+            </div>
+          ) : null}
+
+          {showList ? (
+            <ul
+              className="staff-act-list"
+              data-slot="list"
               data-interactive="false"
             >
-              <span
-                className="staff-act-row__avatar staff-act-row__avatar--purchase"
-                aria-hidden="true"
-              />
-              <div className="staff-act-row__body">
-                <div className="staff-act-row__title">Purchase saved</div>
-                <div className="staff-act-row__sub">Item</div>
-              </div>
-              <div className="staff-act-row__meta">
-                <span className="staff-act-row__ago">1h ago</span>
-                <span className="staff-act-row__when">Jan 1 00:00</span>
-              </div>
-            </li>
-          </ul>
+              {rows.map((row) => (
+                <li
+                  key={row.key}
+                  className="staff-act-row"
+                  data-slot="row"
+                  data-kind={row.kind}
+                  data-interactive="false"
+                >
+                  <span
+                    className={
+                      row.kind === "purchase"
+                        ? "staff-act-row__avatar staff-act-row__avatar--purchase"
+                        : "staff-act-row__avatar staff-act-row__avatar--history"
+                    }
+                    aria-hidden="true"
+                  />
+                  <div className="staff-act-row__body">
+                    <div className="staff-act-row__title">{row.action}</div>
+                    <div className="staff-act-row__sub">{row.item}</div>
+                  </div>
+                  <div className="staff-act-row__meta">
+                    <span className="staff-act-row__ago">{row.ago}</span>
+                    <span className="staff-act-row__when">{row.whenStamp}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </div>
       </main>
     </div>

@@ -26,15 +26,25 @@ assert(existsSync(pagePath), "page exists");
 const page = readFileSync(pagePath, "utf8");
 const pkg = readFileSync(pkgPath, "utf8");
 
-assert(page.includes("BUTTONS"), "BUTTONS header");
+assert(
+  page.includes("BUTTONS") || page.includes("WIRE"),
+  "BUTTONS+ header",
+);
 assert(page.includes("onBack"), "onBack");
 assert(page.includes('data-action="back"'), "back action");
 assert(page.includes("STAFF_ACT_BACK_FALLBACK"), "back fallback");
 assert(page.includes('data-action="select-period"'), "period action");
 assert(page.includes('data-interactive="false"'), "rows not interactive");
 assert(!page.includes("onClick={() => navigate(") || page.includes("onBack"), "no row navigate");
-assert(!page.includes("fetch("), "no fetch");
-assert(page.includes('data-deferred="activity-rows"'), "rows deferred WIRE");
+assert(
+  page.includes("fetchStaffActivityLog") || !page.includes("fetch("),
+  "no raw fetch unless WIRE",
+);
+assert(
+  page.includes('data-deferred="activity-rows"') ||
+    page.includes("fetchStaffActivityLog"),
+  "rows deferred or WIRE",
+);
 
 assert(pkg.includes("test:staff-activity-buttons"), "package script");
 

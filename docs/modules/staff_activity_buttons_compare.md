@@ -8,9 +8,9 @@
 | State | Step |
 |---|---|
 | ✅ Completed | Staff low-stock COMPARE · Staff activity SCAFFOLD → **BUTTONS** |
-| 🟡 Current | `/staff/activity` **BUTTONS PASS** — ask before WIRE |
-| ⬜ Pending | WIRE → COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | listActivityLog API · ListSkeleton / HexaErrorCard · purchase entry · barcode/print · receive · Settings · merge to `main` |
+| 🟡 Current | superseded — see [`staff_activity_wire_compare.md`](staff_activity_wire_compare.md) |
+| ⬜ Pending | STATES → COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | ListSkeleton / HexaErrorCard · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
 

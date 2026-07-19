@@ -1,9 +1,9 @@
 /**
- * Staff item gallery `/staff/items` — WIRE (Step 5).
- * Source: staffGalleryStockProvider + listStock; expand/menus from BUTTONS.
- * Deferred: QuickStockActionSheet; FriendlyLoadError polish (STATES).
+ * Staff item gallery `/staff/items` — STATES (Step 6).
+ * Source: staff_item_gallery_page.dart AsyncValue loading/error FriendlyLoadError;
+ * staffGalleryStockProvider keepAlive 3m.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type TouchEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { readPrimaryBusiness } from "../../../shared/auth/sessionStore";
 import { formatStockQtyNumber } from "../staffPendingDeliveries";
@@ -14,6 +14,7 @@ import {
 } from "./staffItemGalleryApi";
 import {
   STAFF_GALLERY_BACK_FALLBACK,
+  STAFF_GALLERY_CACHE_TTL_MS,
   STAFF_GALLERY_DEBOUNCE_MS,
   STAFF_GALLERY_DEFAULT_ITEM_NAME,
   STAFF_GALLERY_DEFAULT_UNIT,
@@ -25,6 +26,7 @@ import {
   STAFF_GALLERY_MENU_STOCK,
   STAFF_GALLERY_NO_BARCODE,
   STAFF_GALLERY_NO_CODE,
+  STAFF_GALLERY_RETRY,
   STAFF_GALLERY_SUB_TAB_ALL,
   STAFF_GALLERY_SUGGESTIONS_MAX,
   STAFF_GALLERY_TITLE,
@@ -35,6 +37,7 @@ import {
   type StaffGalleryFilter,
   staffGalleryFilterFromQuery,
 } from "./staffItemGalleryFilters";
+import { mapStaffGalleryLoadSubtitle } from "./staffItemGalleryLoadSubtitle";
 import {
   coerceToDouble,
   filterGalleryItems,
@@ -47,6 +50,9 @@ import {
   type StaffGalleryItem,
 } from "./staffItemGalleryLogic";
 import "./StaffItemGalleryPage.css";
+
+type CacheEntry = { at: number; rows: StaffGalleryItem[] };
+const galleryCache = new Map<string, CacheEntry>();
 
 /** Flutter navigation_ext.popOrGo — pop when stack allows, else go fallback. */
 function popOrGo(
@@ -94,7 +100,7 @@ export function StaffItemGalleryPage() {
   const [debounced, setDebounced] = useState("");
   const [allItems, setAllItems] = useState<StaffGalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<unknown | null>(null);
   const [retryTick, setRetryTick] = useState(0);
   const [suggestOpen, setSuggestOpen] = useState(false);
   const [expandedCats, setExpandedCats] = useState<Set<string>>(() => new Set());
@@ -102,6 +108,7 @@ export function StaffItemGalleryPage() {
     {},
   );
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const pullStartY = useRef<number | null>(null);
 
   useEffect(() => {
     const t = window.setTimeout(() => {
@@ -126,11 +133,25 @@ export function StaffItemGalleryPage() {
       return;
     }
     let cancelled = false;
+
+    const cached = galleryCache.get(businessId);
+    if (
+      retryTick === 0 &&
+      cached &&
+      Date.now() - cached.at < STAFF_GALLERY_CACHE_TTL_MS
+    ) {
+      setAllItems(cached.rows);
+      setLoading(false);
+      setLoadError(null);
+      return;
+    }
+
     setLoading(true);
     setLoadError(null);
     void fetchAllGalleryStock(businessId)
       .then((rows) => {
         if (cancelled) return;
+        galleryCache.set(businessId, { at: Date.now(), rows });
         setAllItems(rows);
         setLoading(false);
       })
@@ -138,19 +159,21 @@ export function StaffItemGalleryPage() {
         if (cancelled) return;
         setAllItems([]);
         setLoading(false);
-        if (
+        setLoadError(
           err instanceof StaffGalleryApiError ||
-          err instanceof StaffGalleryNetworkError
-        ) {
-          setLoadError(err.message || STAFF_GALLERY_LOAD_FAILED);
-        } else {
-          setLoadError(STAFF_GALLERY_LOAD_FAILED);
-        }
+            err instanceof StaffGalleryNetworkError
+            ? err
+            : err,
+        );
       });
     return () => {
       cancelled = true;
     };
   }, [businessId, retryTick]);
+
+  /** Flutter AsyncValue.when — loading/error replace body; data shows chrome */
+  const showData = !loading && loadError == null;
+  const errorSubtitle = mapStaffGalleryLoadSubtitle(loadError);
 
   const q = debounced.toLowerCase();
   const filtered = filterGalleryItems(allItems, filter, q);
@@ -196,7 +219,20 @@ export function StaffItemGalleryPage() {
   }
 
   function retryLoad() {
+    if (businessId) galleryCache.delete(businessId);
     setRetryTick((n) => n + 1);
+  }
+
+  function onPullTouchStart(e: TouchEvent) {
+    pullStartY.current = e.touches[0]?.clientY ?? null;
+  }
+
+  function onPullTouchEnd(e: TouchEvent) {
+    const start = pullStartY.current;
+    pullStartY.current = null;
+    if (start == null) return;
+    const end = e.changedTouches[0]?.clientY ?? start;
+    if (end - start > 70) retryLoad();
   }
 
   return (
@@ -207,7 +243,8 @@ export function StaffItemGalleryPage() {
       data-filter={filter}
       data-debounced={debounced}
       data-loading={loading ? "true" : "false"}
-      data-load-error={loadError ? "true" : "false"}
+      data-load-error={loadError != null ? "true" : "false"}
+      data-show-data={showData ? "true" : "false"}
     >
       <header className="staff-gallery-page__appbar" data-slot="appBar">
         <div
@@ -238,6 +275,50 @@ export function StaffItemGalleryPage() {
       </header>
 
       <div className="staff-gallery-page__body" data-slot="body">
+        {loading ? (
+          <div
+            className="staff-gallery-page__loading"
+            data-slot="loading"
+            data-testid="staff-gallery-loading"
+            role="status"
+            aria-label="Loading"
+          >
+            <span className="staff-gallery-page__spinner" />
+          </div>
+        ) : loadError != null ? (
+          <div
+            className="staff-gallery-page__friendly-error"
+            data-slot="error"
+            data-testid="staff-gallery-error"
+          >
+            <span
+              className="staff-gallery-page__friendly-error-icon"
+              aria-hidden="true"
+            >
+              <svg viewBox="0 0 24 24" width="32" height="32">
+                <path
+                  fill="currentColor"
+                  d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4s1.79-4 4-4h.71C7.37 7.69 9.5 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3s-1.34 3-3 3z"
+                />
+              </svg>
+            </span>
+            <p className="staff-gallery-page__friendly-error-title">
+              {STAFF_GALLERY_LOAD_FAILED}
+            </p>
+            <p className="staff-gallery-page__friendly-error-sub">
+              {errorSubtitle}
+            </p>
+            <button
+              type="button"
+              className="staff-gallery-page__retry-btn"
+              data-testid="staff-gallery-retry"
+              onClick={retryLoad}
+            >
+              {STAFF_GALLERY_RETRY}
+            </button>
+          </div>
+        ) : (
+          <>
         <div className="staff-gallery-page__search" data-slot="search">
           <label className="staff-gallery-page__search-field staff-gallery-page__search-field--active">
             <span className="staff-gallery-page__search-icon" aria-hidden="true">
@@ -327,47 +408,22 @@ export function StaffItemGalleryPage() {
           {summary}
         </p>
 
-        <div className="staff-gallery-page__results" data-slot="results">
-          {loading ? (
-            <div
-              className="staff-gallery-page__loading"
-              data-slot="loading"
-              data-testid="staff-gallery-loading"
-              role="status"
-              aria-label="Loading"
-            >
-              <span className="staff-gallery-page__spinner" />
-            </div>
-          ) : loadError != null ? (
-            <div
-              className="staff-gallery-page__error"
-              data-slot="error"
-              data-testid="staff-gallery-error"
-            >
-              <p className="staff-gallery-page__error-title">
-                {STAFF_GALLERY_LOAD_FAILED}
-              </p>
-              <p className="staff-gallery-page__error-detail">{loadError}</p>
-              <button
-                type="button"
-                className="staff-gallery-page__retry"
-                data-testid="staff-gallery-retry"
-                onClick={retryLoad}
+        <div
+          className="staff-gallery-page__results"
+          data-slot="results"
+          onTouchStart={onPullTouchStart}
+          onTouchEnd={onPullTouchEnd}
+        >
+          <div className="staff-gallery-page__list" data-slot="list">
+            {filtered.length === 0 ? (
+              <p
+                className="staff-gallery-page__empty"
+                data-slot="empty"
+                data-testid="staff-gallery-empty"
               >
-                Retry
-              </button>
-            </div>
-          ) : (
-            <div className="staff-gallery-page__list" data-slot="list">
-              {filtered.length === 0 ? (
-                <p
-                  className="staff-gallery-page__empty"
-                  data-slot="empty"
-                  data-testid="staff-gallery-empty"
-                >
-                  {STAFF_GALLERY_EMPTY}
-                </p>
-              ) : (
+                {STAFF_GALLERY_EMPTY}
+              </p>
+            ) : (
               cats.map((cat) => {
                 const subMap = grouped.get(cat)!;
                 const expanded = expandedCats.has(cat);
@@ -608,9 +664,10 @@ export function StaffItemGalleryPage() {
                 );
               })
             )}
-            </div>
-          )}
+          </div>
         </div>
+          </>
+        )}
       </div>
     </div>
   );

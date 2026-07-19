@@ -41,3 +41,30 @@ export function parseUsersListLimit50to200(raw: unknown): number {
 export function parseUsersListLimit50to100(raw: unknown): number {
   return parseLimitQuery(raw, { default: 50, min: 1, max: 100 });
 }
+
+/** ledger: Query(80, ge=1, le=200) */
+export function parseLedgerLimit(raw: unknown): number {
+  return parseLimitQuery(raw, { default: 80, min: 1, max: 200 });
+}
+
+/**
+ * FastAPI Query(False) bool for grouped.
+ * Missing/empty → false. Invalid → 422.
+ */
+export function parseGroupedQuery(raw: unknown): boolean {
+  if (Array.isArray(raw)) {
+    return parseGroupedQuery(raw[0]);
+  }
+  if (raw === undefined || raw === null || raw === "") return false;
+  if (typeof raw === "boolean") return raw;
+  if (typeof raw === "number") {
+    if (raw === 1) return true;
+    if (raw === 0) return false;
+  }
+  if (typeof raw === "string") {
+    const t = raw.trim().toLowerCase();
+    if (t === "true" || t === "1") return true;
+    if (t === "false" || t === "0") return false;
+  }
+  throw new HttpError(422, "grouped must be a boolean");
+}

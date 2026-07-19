@@ -14,10 +14,10 @@
 | 7 | item_count = COUNT trade_purchase_lines | Yes | Subquery | PASS |
 | 8 | purchase_date date → UTC midnight; else created_at | Yes | `normalizePurchaseDate` | PASS |
 | 9 | Shape id/human_id/purchase_date/status/total_amount/supplier_name/item_count | Yes | Same | PASS |
-| 10 | ledger / UI | Out of slice | Not added | N/A |
+| 10 | ledger / UI | Out of slice | See Slice 12 | N/A |
 
 **Smoke:** `npx vitest run tests/users/` (80 PASS); `tsc --noEmit` PASS.
 
 **Rollback:** Revert this commit; remove purchases route + service + repo method; restore boards to Slice 1–10.
 
-**Next (ask first):** ledger · Users UI · Subagent 4.
+**Next:** Slice 12 ledger — [`users_roles_backend_ledger_compare.md`](users_roles_backend_ledger_compare.md).

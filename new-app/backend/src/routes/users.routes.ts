@@ -87,6 +87,14 @@ export function createUsersRoutes(
   );
 
   r.get(
+    "/:userId/ledger",
+    authz.requireAuth,
+    authz.requireMembership,
+    createRequireRole("owner", "admin", "manager", "super_admin"),
+    (req, res, next) => void controller.ledger(req, res, next),
+  );
+
+  r.get(
     "/:userId",
     authz.requireAuth,
     authz.requireMembership,

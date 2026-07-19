@@ -52,6 +52,11 @@ import {
   parsePurchasesLimit,
 } from "../services/usersPurchases.service";
 import {
+  getLedgerForBusiness,
+  parseGroupedQuery,
+  parseLedgerLimit,
+} from "../services/usersLedger.service";
+import {
   userCreateInSchema,
   userPatchInSchema,
   permissionsPatchInSchema,
@@ -74,6 +79,8 @@ export type UsersControllerDeps = {
   runDeleteInTransaction?: DeleteUserDeps["runInTransaction"];
   /** Test seam for reset-password. */
   runResetInTransaction?: ResetPasswordDeps["runInTransaction"];
+  /** Test seam for ledger grouped buckets (UTC now). */
+  ledgerNow?: Date;
 };
 
 export function createUsersController(deps: UsersControllerDeps) {
@@ -526,6 +533,50 @@ export function createUsersController(deps: UsersControllerDeps) {
           businessId,
           userId,
           limit,
+        );
+        res.json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async ledger(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> {
+      try {
+        const businessId = req.params.businessId;
+        const userId = req.params.userId;
+        if (typeof businessId !== "string" || !businessId) {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        if (typeof userId !== "string" || !userId) {
+          sendDetail(res, 400, "userId required");
+          return;
+        }
+        let limit: number;
+        let grouped: boolean;
+        try {
+          limit = parseLedgerLimit(req.query.limit);
+          grouped = parseGroupedQuery(req.query.grouped);
+        } catch (e) {
+          if (e instanceof HttpError) {
+            sendDetail(res, e.status, e.detail);
+            return;
+          }
+          throw e;
+        }
+        const out = await getLedgerForBusiness(
+          deps.businessUsers,
+          businessId,
+          userId,
+          {
+            limit,
+            grouped,
+            now: deps.ledgerNow,
+          },
         );
         res.json(out);
       } catch (e) {

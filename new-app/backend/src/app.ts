@@ -68,6 +68,8 @@ export type AppDeps = {
   runDeleteInTransaction?: DeleteUserDeps["runInTransaction"];
   /** Test seam for POST …/users/:userId/reset-password. */
   runResetInTransaction?: ResetPasswordDeps["runInTransaction"];
+  /** Test seam for ledger grouped UTC now. */
+  ledgerNow?: Date;
 };
 
 /** Fail-closed users repo when SQL pool is not wired. */
@@ -184,6 +186,7 @@ function unavailableBusinessUsersRepository(): BusinessUsersRepository {
     listCreatedItemsByUser: fail,
     listStockAdjustmentsByUser: fail,
     listPurchasesByUser: fail,
+    listActivityLogByUser: fail,
   } as unknown as BusinessUsersRepository;
 }
 
@@ -275,6 +278,7 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
         runPatchInTransaction: deps.runPatchInTransaction,
         runDeleteInTransaction: deps.runDeleteInTransaction,
         runResetInTransaction: deps.runResetInTransaction,
+        ledgerNow: deps.ledgerNow,
       }),
       app.authz,
     ),

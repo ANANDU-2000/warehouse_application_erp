@@ -115,6 +115,14 @@ export type PurchaseByUserRow = {
   item_count: number;
 };
 
+/** Row for user_ledger activity half. */
+export type ActivityLogByUserRow = {
+  created_at: Date;
+  action_type: string;
+  item_name: string | null;
+  details: string | null;
+};
+
 export class BusinessUsersRepository {
   constructor(private readonly client: SqlClient) {}
 
@@ -504,6 +512,42 @@ export class BusinessUsersRepository {
           : Number(r.total_amount),
       supplier_name: (r.supplier_name as string | null) ?? null,
       item_count: Number(r.item_count ?? 0),
+    }));
+  }
+
+  /**
+   * user_ledger activity half — staff_activity_log by user.
+   * Source: users.py:user_ledger
+   */
+  async listActivityLogByUser(
+    businessId: string,
+    userId: string,
+    limit: number,
+  ): Promise<ActivityLogByUserRow[]> {
+    const rows = await queryMany<Record<string, unknown>>(
+      this.client,
+      `SELECT TOP (@limit)
+         [created_at], [action_type], [item_name], [details]
+       FROM [staff_activity_log]
+       WHERE [business_id] = @businessId
+         AND [user_id] = @userId
+       ORDER BY [created_at] DESC`,
+      [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: userId },
+        { name: "limit", type: sql.Int, value: limit },
+      ],
+    );
+    return rows.map((r) => ({
+      created_at: r.created_at as Date,
+      action_type: String(r.action_type),
+      item_name: (r.item_name as string | null) ?? null,
+      details:
+        r.details == null
+          ? null
+          : typeof r.details === "string"
+            ? r.details
+            : JSON.stringify(r.details),
     }));
   }
 }

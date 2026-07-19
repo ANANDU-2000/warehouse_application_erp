@@ -79,7 +79,7 @@ assert(page.includes("chip--active"), "chips interactive");
 assert(page.includes("search-input--active"), "search interactive");
 assert(!page.includes("fetch("), "no fetch");
 assert(!page.includes("/v1/businesses"), "no API path");
-assert(!page.includes("popOrGo"), "back deferred BUTTONS");
+/* BUTTONS owns popOrGo */
 
 assert(
   pkg.includes("test:notifications-fields"),

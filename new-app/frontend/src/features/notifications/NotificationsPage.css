@@ -51,10 +51,15 @@
   background: transparent;
   color: var(--notif-muted);
   font-family: inherit;
-  cursor: default;
-  pointer-events: none;
+  cursor: pointer;
+  pointer-events: auto;
   padding: 0;
   border-radius: 8px;
+}
+
+.notifications-page__icon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
 .notifications-page__icon-btn {
@@ -67,7 +72,7 @@
   font-weight: 700;
   padding: 0 8px;
   white-space: nowrap;
-  opacity: 0.45;
+  color: var(--notif-brand);
 }
 
 .notifications-page__title {
@@ -259,6 +264,71 @@
 .notifications-page__empty-btn[aria-disabled="true"] {
   pointer-events: none;
   opacity: 0.85;
+}
+
+/* Clear confirm — AlertDialog */
+.notifications-page__dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.notifications-page__dialog {
+  width: min(100%, 400px);
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--notif-surface);
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.18);
+  box-sizing: border-box;
+}
+
+.notifications-page__dialog-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--notif-text);
+}
+
+.notifications-page__dialog-body {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--notif-muted);
+}
+
+.notifications-page__dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.notifications-page__dialog-cancel,
+.notifications-page__dialog-confirm {
+  min-height: 40px;
+  border-radius: 8px;
+  padding: 0 14px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.notifications-page__dialog-cancel {
+  border: none;
+  background: transparent;
+  color: var(--notif-text);
+}
+
+.notifications-page__dialog-confirm {
+  border: none;
+  background: var(--notif-brand);
+  color: #ffffff;
 }
 
 /* notification_alert_card.dart inert shells (LAYOUT; unused while empty) */

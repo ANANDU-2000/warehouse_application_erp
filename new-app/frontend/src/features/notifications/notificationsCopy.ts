@@ -1,13 +1,23 @@
 /**
- * Notifications page copy — SCAFFOLD / LAYOUT / FIELDS labels.
- * Source: notifications_page.dart AppBar / search / filter chips / HexaEmptyState
+ * Notifications page copy — SCAFFOLD / LAYOUT / FIELDS / BUTTONS labels.
+ * Source: notifications_page.dart AppBar / search / filter chips / HexaEmptyState / clear dialog
  */
 export const NOTIFICATIONS_TITLE = "Notifications";
 /** Flutter popOrGo('/home') — staff uses history back when possible */
 export const NOTIFICATIONS_BACK_FALLBACK = "/home";
+/** Empty CTA — notifications_page.dart context.push */
+export const NOTIFICATIONS_CTA_PATH_STAFF = "/staff/receive";
+export const NOTIFICATIONS_CTA_PATH_OWNER = "/purchase/new";
 export const NOTIFICATIONS_SEARCH_HINT = "Search alerts…";
 export const NOTIFICATIONS_MARK_ALL_READ = "Mark all read";
 export const NOTIFICATIONS_CLEAR_TOOLTIP = "Clear server notifications";
+
+/** Clear confirm — _clearServerNotifications AlertDialog */
+export const NOTIFICATIONS_CLEAR_DIALOG_TITLE = "Clear server notifications?";
+export const NOTIFICATIONS_CLEAR_DIALOG_BODY =
+  "Stock alerts generated from live warehouse data will still appear until the stock issue is fixed.";
+export const NOTIFICATIONS_CLEAR_DIALOG_CANCEL = "Cancel";
+export const NOTIFICATIONS_CLEAR_DIALOG_CONFIRM = "Clear";
 
 export const NOTIFICATIONS_FILTER_ALL = "All";
 export const NOTIFICATIONS_FILTER_CRITICAL = "Critical";

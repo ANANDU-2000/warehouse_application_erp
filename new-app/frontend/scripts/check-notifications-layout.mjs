@@ -44,7 +44,7 @@ assert(
 );
 assert(!page.includes("fetch("), "no fetch");
 assert(!page.includes("/v1/businesses"), "no API path");
-assert(!page.includes("popOrGo"), "back deferred BUTTONS");
+/* BUTTONS owns popOrGo */
 
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "brand background");
 assert(css.includes("#0e4f46") || css.includes("#0E4F46"), "brand primary");

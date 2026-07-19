@@ -1,14 +1,21 @@
 /**
- * Notifications `/notifications` — FIELDS (Step 3).
- * Source: notifications_page.dart search/filter/showing/empty catalogs;
- * no API list rows (WIRE); back/clear/mark-all CTAs deferred BUTTONS.
+ * Notifications `/notifications` — BUTTONS (Step 4).
+ * Source: notifications_page.dart AppBar back/mark-all/clear + empty CTAs;
+ * mark-all / clear API deferred WIRE; list rows deferred WIRE.
  */
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import {
   NOTIFICATIONS_BACK_FALLBACK,
+  NOTIFICATIONS_CLEAR_DIALOG_BODY,
+  NOTIFICATIONS_CLEAR_DIALOG_CANCEL,
+  NOTIFICATIONS_CLEAR_DIALOG_CONFIRM,
+  NOTIFICATIONS_CLEAR_DIALOG_TITLE,
   NOTIFICATIONS_CLEAR_TOOLTIP,
   NOTIFICATIONS_CTA_NEW_PURCHASE,
+  NOTIFICATIONS_CTA_PATH_OWNER,
+  NOTIFICATIONS_CTA_PATH_STAFF,
   NOTIFICATIONS_CTA_RECEIVE,
   NOTIFICATIONS_EMPTY_SUB_FILTER_HIDDEN,
   NOTIFICATIONS_EMPTY_SUB_SEARCH,
@@ -31,7 +38,34 @@ import {
 } from "./notificationsFilters";
 import "./NotificationsPage.css";
 
+/** Flutter navigation_ext.popOrGo — pop when stack allows, else go fallback. */
+function popOrGo(
+  navigate: ReturnType<typeof useNavigate>,
+  fallback: string,
+): void {
+  const idx =
+    typeof window !== "undefined" &&
+    window.history.state &&
+    typeof (window.history.state as { idx?: unknown }).idx === "number"
+      ? (window.history.state as { idx: number }).idx
+      : 0;
+  if (idx > 0) {
+    navigate(-1);
+    return;
+  }
+  navigate(fallback, { replace: true });
+}
+
+type LocalNotification = {
+  title: string;
+  subtitle: string;
+  isRead: boolean;
+  /** Server-backed id — clear/mark-all WIRE */
+  serverNotificationId?: string | null;
+};
+
 export function NotificationsPage() {
+  const navigate = useNavigate();
   const session = readPrimaryBusiness();
   /** sessionIsStaff — post_auth_route.dart (primary role === staff) */
   const staff = (session?.role ?? "").toLowerCase() === "staff";
@@ -41,8 +75,11 @@ export function NotificationsPage() {
 
   const [filter, setFilter] = useState<NotificationCategoryFilter>("all");
   const [search, setSearch] = useState("");
+  const [clearOpen, setClearOpen] = useState(false);
   /** Local feed until WIRE — empty matches cold empty HexaEmptyState. */
-  const items = useMemo(() => [] as { title: string; subtitle: string }[], []);
+  const items = useMemo(() => [] as LocalNotification[], []);
+  /** Server list until WIRE — empty disables clear (Flutter valueOrNull?.isEmpty). */
+  const serverItems = useMemo(() => [] as { id: string }[], []);
 
   const q = search.trim().toLowerCase();
   const filtered = items;
@@ -56,6 +93,8 @@ export function NotificationsPage() {
     items.length > 0 && filtered.length === 0 && q.length === 0;
   const showShowing = filter !== "all" || q.length > 0;
   const showEmptyState = visible.length === 0;
+  const hasUnread = items.some((n) => !n.isRead);
+  const clearDisabled = serverItems.length === 0;
 
   const emptyTitle =
     q.length > 0
@@ -67,6 +106,17 @@ export function NotificationsPage() {
       : filterEmptyButHasItems
         ? NOTIFICATIONS_EMPTY_SUB_FILTER_HIDDEN
         : NOTIFICATIONS_EMPTY_SUBTITLE[filter];
+
+  /** Mark-all — live server + local read sets deferred WIRE */
+  function markAllRead(): void {
+    /* WIRE: POST mark-all-read + warehouse/purchase dismiss */
+  }
+
+  /** Clear confirm — live clear-all deferred WIRE */
+  function confirmClearServer(): void {
+    setClearOpen(false);
+    /* WIRE: DELETE/clear all server notifications */
+  }
 
   return (
     <div
@@ -85,7 +135,7 @@ export function NotificationsPage() {
             title="Back"
             aria-label="Back"
             data-testid="notifications-back"
-            tabIndex={-1}
+            onClick={() => popOrGo(navigate, NOTIFICATIONS_BACK_FALLBACK)}
           >
             <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
               <path
@@ -100,22 +150,27 @@ export function NotificationsPage() {
           className="notifications-page__appbar-actions"
           data-slot="appBar.actions"
         >
-          <button
-            type="button"
-            className="notifications-page__text-btn"
-            data-testid="notifications-mark-all-read"
-            tabIndex={-1}
-            aria-hidden="true"
-          >
-            {NOTIFICATIONS_MARK_ALL_READ}
-          </button>
+          {hasUnread ? (
+            <button
+              type="button"
+              className="notifications-page__text-btn"
+              data-testid="notifications-mark-all-read"
+              onClick={markAllRead}
+            >
+              {NOTIFICATIONS_MARK_ALL_READ}
+            </button>
+          ) : null}
           <button
             type="button"
             className="notifications-page__icon-btn"
             title={NOTIFICATIONS_CLEAR_TOOLTIP}
             aria-label={NOTIFICATIONS_CLEAR_TOOLTIP}
             data-testid="notifications-clear"
-            tabIndex={-1}
+            disabled={clearDisabled}
+            onClick={() => {
+              if (clearDisabled) return;
+              setClearOpen(true);
+            }}
           >
             <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
               <path
@@ -247,8 +302,13 @@ export function NotificationsPage() {
                     type="button"
                     className="notifications-page__empty-btn notifications-page__empty-btn--filled"
                     data-testid="notifications-empty-cta"
-                    tabIndex={-1}
-                    aria-disabled="true"
+                    onClick={() =>
+                      navigate(
+                        staff
+                          ? NOTIFICATIONS_CTA_PATH_STAFF
+                          : NOTIFICATIONS_CTA_PATH_OWNER,
+                      )
+                    }
                   >
                     {staff
                       ? NOTIFICATIONS_CTA_RECEIVE
@@ -260,6 +320,54 @@ export function NotificationsPage() {
           ) : null}
         </section>
       </div>
+
+      {clearOpen ? (
+        <div
+          className="notifications-page__dialog-backdrop"
+          data-testid="notifications-clear-dialog"
+          onClick={() => setClearOpen(false)}
+        >
+          <div
+            className="notifications-page__dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="notifications-clear-title"
+            aria-describedby="notifications-clear-body"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2
+              id="notifications-clear-title"
+              className="notifications-page__dialog-title"
+            >
+              {NOTIFICATIONS_CLEAR_DIALOG_TITLE}
+            </h2>
+            <p
+              id="notifications-clear-body"
+              className="notifications-page__dialog-body"
+            >
+              {NOTIFICATIONS_CLEAR_DIALOG_BODY}
+            </p>
+            <div className="notifications-page__dialog-actions">
+              <button
+                type="button"
+                className="notifications-page__dialog-cancel"
+                data-testid="notifications-clear-cancel"
+                onClick={() => setClearOpen(false)}
+              >
+                {NOTIFICATIONS_CLEAR_DIALOG_CANCEL}
+              </button>
+              <button
+                type="button"
+                className="notifications-page__dialog-confirm"
+                data-testid="notifications-clear-confirm"
+                onClick={confirmClearServer}
+              >
+                {NOTIFICATIONS_CLEAR_DIALOG_CONFIRM}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

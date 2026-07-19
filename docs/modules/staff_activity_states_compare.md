@@ -8,8 +8,8 @@
 | State | Step |
 |---|---|
 | ✅ Completed | Staff low-stock COMPARE · Staff activity SCAFFOLD → **STATES** |
-| 🟡 Current | `/staff/activity` **STATES PASS** — ask before COMPARE |
-| ⬜ Pending | COMPARE · other Subagent 4 stubs |
+| 🟡 Current | superseded — see [`staff_activity_compare.md`](staff_activity_compare.md) |
+| ⬜ Pending | Next Subagent 4 stub |
 | ⏸ Deferred | purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New

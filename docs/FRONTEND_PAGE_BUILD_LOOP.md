@@ -199,7 +199,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 4 BUTTONS | ✅ | back + display-only rows — [`staff_activity_buttons_compare.md`](modules/staff_activity_buttons_compare.md) |
 | 5 WIRE | ✅ | activity-log by period + labels — [`staff_activity_wire_compare.md`](modules/staff_activity_wire_compare.md) |
 | 6 STATES | ✅ | ListSkeleton 10 + HexaErrorCard map — [`staff_activity_states_compare.md`](modules/staff_activity_states_compare.md) |
-| 7 COMPARE | ⬜ | — |
+| 7 COMPARE | ✅ | Aggregator SCAFFOLD→STATES — [`staff_activity_compare.md`](modules/staff_activity_compare.md) |
 
 ### Prompt template (copy per page)
 

@@ -1,10 +1,10 @@
 # Module: Users & Roles
 
 **Queue:** 3 of 15  
-**Status:** Backend Slice 1–12 — through ledger PASS (2026-07-19) · UI blocked  
-**Scope:** Analysis + users admin APIs + satellites through ledger; Users UI / bulk/active-sessions not started  
+**Status:** Backend Slice 1–13 — through active-sessions PASS (2026-07-19) · UI blocked  
+**Scope:** Analysis + users admin APIs + satellites + active-sessions; bulk / Users UI not started  
 **Source of truth:** `source-app/`  
-**Compare:** `docs/modules/users_roles_backend_*_compare.md` (incl. ledger)
+**Compare:** `docs/modules/users_roles_backend_*_compare.md` (incl. active_sessions)
 
 ## Definition
 

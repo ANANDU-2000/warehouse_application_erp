@@ -30,6 +30,14 @@ export function createUsersRoutes(
     (req, res, next) => void controller.create(req, res, next),
   );
 
+  r.get(
+    "/active-sessions",
+    authz.requireAuth,
+    authz.requireMembership,
+    createRequireRole("owner", "manager", "super_admin"),
+    (req, res, next) => void controller.activeSessions(req, res, next),
+  );
+
   r.post(
     "/:userId/reset-password",
     authz.requireAuth,

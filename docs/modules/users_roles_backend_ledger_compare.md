@@ -15,10 +15,10 @@
 | 8 | Merge sort by at desc; trim to limit | Yes | `buildLedgerEntries` | PASS |
 | 9 | Flat → array; grouped → today/yesterday/this_week | Yes | Same | PASS |
 | 10 | Older than week_start dropped when grouped | Yes | Same | PASS |
-| 11 | Users UI / bulk | Out of slice | Not added | N/A |
+| 11 | Users UI / bulk / active-sessions | Out of slice | See Slice 13 | N/A |
 
 **Smoke:** `npx vitest run tests/users/` (89 PASS); `tsc --noEmit` PASS.
 
 **Rollback:** Revert this commit; remove ledger route + service + activity list method; restore boards to Slice 1–11.
 
-**Next (ask first):** Users UI · bulk/active-sessions · Subagent 4.
+**Next:** Slice 13 active-sessions — [`users_roles_backend_active_sessions_compare.md`](users_roles_backend_active_sessions_compare.md).

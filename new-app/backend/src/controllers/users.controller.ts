@@ -56,6 +56,7 @@ import {
   parseGroupedQuery,
   parseLedgerLimit,
 } from "../services/usersLedger.service";
+import { listActiveSessionsForBusiness } from "../services/usersActiveSessions.service";
 import {
   userCreateInSchema,
   userPatchInSchema,
@@ -81,6 +82,8 @@ export type UsersControllerDeps = {
   runResetInTransaction?: ResetPasswordDeps["runInTransaction"];
   /** Test seam for ledger grouped buckets (UTC now). */
   ledgerNow?: Date;
+  /** Test seam for active-sessions cutoff (UTC now). */
+  activeSessionsNow?: Date;
 };
 
 export function createUsersController(deps: UsersControllerDeps) {
@@ -108,6 +111,29 @@ export function createUsersController(deps: UsersControllerDeps) {
           deps.businesses,
           businessId,
           includeInactive,
+        );
+        res.json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async activeSessions(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> {
+      try {
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string" || !businessId) {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        const out = await listActiveSessionsForBusiness(
+          deps.businessUsers,
+          deps.businesses,
+          businessId,
+          deps.activeSessionsNow ?? new Date(),
         );
         res.json(out);
       } catch (e) {

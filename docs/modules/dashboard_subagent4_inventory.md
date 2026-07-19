@@ -62,6 +62,6 @@
 
 ## Next (ask first)
 
-1. **Users UI** (or remaining bulk/active-sessions APIs first), or  
+1. **Users POST bulk** (or Users UI), or  
 2. One **satellite** from the stub tables above (start page loop), or  
 3. Hold / merge review of `ops/dashboard-module` → `main`.

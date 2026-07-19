@@ -158,6 +158,37 @@ export class BusinessUsersRepository {
   }
 
   /**
+   * active_sessions — members active in last 5 minutes.
+   * Source: users.py:active_sessions
+   */
+  async listActiveSessions(
+    businessId: string,
+    cutoff: Date,
+  ): Promise<BusinessUserMemberRow[]> {
+    const rows = await queryMany<Record<string, unknown>>(
+      this.client,
+      `SELECT ${LIST_COLUMNS}
+       FROM [users] u
+       INNER JOIN [memberships] m ON m.[user_id] = u.[id]
+       WHERE m.[business_id] = @businessId
+         AND u.[deleted_at] IS NULL
+         AND u.[is_active] = 1
+         AND u.[last_active_at] IS NOT NULL
+         AND u.[last_active_at] >= @cutoff
+       ORDER BY u.[name]`,
+      [
+        {
+          name: "businessId",
+          type: sql.UniqueIdentifier,
+          value: businessId,
+        },
+        { name: "cutoff", type: sql.DateTimeOffset, value: cutoff },
+      ],
+    );
+    return rows.map(mapMemberRow);
+  }
+
+  /**
    * _load_user_membership — biz + user id + deleted_at IS NULL (no is_active filter).
    */
   async findMemberByUserId(

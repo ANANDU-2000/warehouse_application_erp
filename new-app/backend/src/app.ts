@@ -70,6 +70,8 @@ export type AppDeps = {
   runResetInTransaction?: ResetPasswordDeps["runInTransaction"];
   /** Test seam for ledger grouped UTC now. */
   ledgerNow?: Date;
+  /** Test seam for active-sessions UTC now. */
+  activeSessionsNow?: Date;
 };
 
 /** Fail-closed users repo when SQL pool is not wired. */
@@ -187,6 +189,7 @@ function unavailableBusinessUsersRepository(): BusinessUsersRepository {
     listStockAdjustmentsByUser: fail,
     listPurchasesByUser: fail,
     listActivityLogByUser: fail,
+    listActiveSessions: fail,
   } as unknown as BusinessUsersRepository;
 }
 
@@ -279,6 +282,7 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
         runDeleteInTransaction: deps.runDeleteInTransaction,
         runResetInTransaction: deps.runResetInTransaction,
         ledgerNow: deps.ledgerNow,
+        activeSessionsNow: deps.activeSessionsNow,
       }),
       app.authz,
     ),

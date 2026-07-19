@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · **taxonomy SCAFFOLD** |
-| 🟡 Current | `/catalog/taxonomy` **SCAFFOLD PASS** — ask before LAYOUT |
-| ⬜ Pending | LAYOUT → COMPARE · `/catalog/new-category` · category detail · item routes |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy SCAFFOLD → **LAYOUT** |
+| 🟡 Current | superseded — see [`catalog_taxonomy_layout_compare.md`](catalog_taxonomy_layout_compare.md) |
+| ⬜ Pending | FIELDS → COMPARE · `/catalog/new-category` · category detail · item routes |
 | ⏸ Deferred | quick taxonomy sheet · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -43,4 +43,4 @@ npm run build
 
 Revert SCAFFOLD commit; remove `CatalogTaxonomyHubPage*` + `catalogTaxonomyCopy.ts` + `scripts/check-catalog-taxonomy-scaffold.mjs` + package script; restore `DashboardRouteStubPage title="Categories"` on `/catalog/taxonomy`; boards → Catalog hub COMPARE current.
 
-**Next (ask first):** LAYOUT — Hexa chrome for explainer/chips/search/list/FAB. Stop after SCAFFOLD.
+**Next (ask first):** LAYOUT — done → [`catalog_taxonomy_layout_compare.md`](catalog_taxonomy_layout_compare.md). Ask before FIELDS.

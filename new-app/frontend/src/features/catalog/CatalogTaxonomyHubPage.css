@@ -1,53 +1,273 @@
 /**
- * Catalog taxonomy hub SCAFFOLD chrome — HexaOp scaffold bg parity.
- * Formula source: catalog_taxonomy_hub_page.dart Scaffold body.
+ * Catalog taxonomy hub LAYOUT — Hexa tokens.
+ * Formula source: catalog_taxonomy_hub_page.dart · HexaOp.pageGutter 16 ·
+ * HexaColors brandBackground #F7F9F6 · brandPrimary #0E4F46 · primaryMid #159A8A ·
+ * brandBorder #E2E8E6 · inputBorderGrey #E5E7EB · inputHint #9CA3AF ·
+ * textOnLightSurface #0F172A · textSecondary #5C6578 ·
+ * explainer 13 muted · ActionChip spacing 8 · search Outline radius 12 ·
+ * ListTile title w800 · subtitle 12 · avatar primaryContainer ≈ primaryMid@20% ·
+ * FAB circular (not extended) · empty icon 48.
+ * Forbidden: handlers, API, real inputs.
  */
+
 .taxonomy-hub-page {
   --tax-bg: #f7f9f6;
-  min-height: 100%;
-  background: var(--tax-bg);
+  --tax-fg: #0f172a;
+  --tax-brand: #0e4f46;
+  --tax-accent: #159a8a;
+  --tax-muted: #5c6578;
+  --tax-border: #e2e8e6;
+  --tax-input-border: #e5e7eb;
+  --tax-hint: #9ca3af;
+  --tax-surface: #ffffff;
+  --tax-gutter: 16px;
+  --tax-toolbar: 56px;
+
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+  background: var(--tax-bg);
+  color: var(--tax-fg);
 }
 
 .taxonomy-hub-page__appbar {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  min-height: var(--tax-toolbar);
+  padding: 0 var(--tax-gutter);
+  box-sizing: border-box;
+  background: transparent;
 }
 
 .taxonomy-hub-page__title {
   flex: 1;
   margin: 0;
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--tax-brand);
+  letter-spacing: -0.01em;
+}
+
+.taxonomy-hub-page__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+  color: var(--tax-brand);
+  font-size: 20px;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
 }
 
 .taxonomy-hub-page__body {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  flex: 1;
   min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding-bottom: 88px;
 }
 
-.taxonomy-hub-page__slot {
-  padding: 8px 16px;
+.taxonomy-hub-page__explainer {
+  margin: 0;
+  padding: 8px var(--tax-gutter) 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--tax-muted);
 }
 
-.taxonomy-hub-page__slot[data-slot="categoryList"],
-.taxonomy-hub-page__slot[data-slot="empty"] {
+.taxonomy-hub-page__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px var(--tax-gutter) 8px;
+  box-sizing: border-box;
+}
+
+.taxonomy-hub-page__action-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--tax-border);
+  background: var(--tax-surface);
+  color: var(--tax-brand);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  pointer-events: none;
+  user-select: none;
+}
+
+.taxonomy-hub-page__action-chip-icon {
+  font-size: 18px;
+  line-height: 1;
+  color: var(--tax-accent);
+}
+
+.taxonomy-hub-page__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 var(--tax-gutter);
+  min-height: 40px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  border: 1px solid var(--tax-input-border);
+  border-radius: 12px;
+  background: var(--tax-surface);
+  pointer-events: none;
+}
+
+.taxonomy-hub-page__search-icon {
+  color: var(--tax-hint);
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.taxonomy-hub-page__search-hint {
+  color: var(--tax-hint);
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.taxonomy-hub-page__list {
   flex: 1;
+  margin-top: 8px;
+  padding: 4px var(--tax-gutter) 24px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
-.taxonomy-hub-page__fab-slot {
-  position: sticky;
+.taxonomy-hub-page__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--tax-border);
+  pointer-events: none;
+}
+
+.taxonomy-hub-page__avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(21, 154, 138, 0.2);
+  color: var(--tax-accent);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.taxonomy-hub-page__row-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.taxonomy-hub-page__row-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--tax-fg);
+}
+
+.taxonomy-hub-page__row-meta {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--tax-muted);
+}
+
+.taxonomy-hub-page__row-add {
+  flex-shrink: 0;
+  min-width: 40px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tax-brand);
+  font-size: 22px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.taxonomy-hub-page__empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  padding: 24px var(--tax-gutter);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.taxonomy-hub-page__empty-icon {
+  font-size: 48px;
+  line-height: 1;
+  color: var(--tax-muted);
+  margin-bottom: 4px;
+}
+
+.taxonomy-hub-page__empty-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--tax-fg);
+}
+
+.taxonomy-hub-page__empty-sub {
+  margin: 0;
+  font-size: 14px;
+  color: var(--tax-muted);
+  max-width: 280px;
+}
+
+.taxonomy-hub-page__empty-primary {
+  margin-top: 8px;
+  padding: 8px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--tax-border);
+  background: var(--tax-surface);
+  color: var(--tax-brand);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.taxonomy-hub-page__fab {
+  position: fixed;
+  right: var(--tax-gutter);
   bottom: 16px;
-  align-self: flex-end;
-  margin: 0 16px 16px;
-  padding: 12px 16px;
-  border-radius: 28px;
-  background: rgba(0, 0, 0, 0.04);
-  font-size: 0.875rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tax-accent);
+  color: #ffffff;
+  font-size: 28px;
+  line-height: 1;
+  box-shadow: 0 4px 12px rgba(14, 79, 70, 0.28);
+  pointer-events: none;
+  user-select: none;
+  z-index: 2;
 }

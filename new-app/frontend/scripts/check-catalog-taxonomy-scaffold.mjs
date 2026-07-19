@@ -81,7 +81,16 @@ assert(
 );
 assert(copy.includes('TAXONOMY_PATH_CATALOG = "/catalog"'), "path catalog");
 
-assert(page.includes("SCAFFOLD"), "SCAFFOLD header");
+assert(
+  page.includes("SCAFFOLD") ||
+    page.includes("LAYOUT") ||
+    page.includes("FIELDS") ||
+    page.includes("BUTTONS") ||
+    page.includes("WIRE") ||
+    page.includes("STATES") ||
+    page.includes("COMPARE"),
+  "SCAFFOLD…STATES header",
+);
 assert(page.includes('data-slot="appBar"'), "appBar");
 assert(page.includes('data-slot="explainer"'), "explainer slot");
 assert(page.includes('data-slot="chips"'), "chips");

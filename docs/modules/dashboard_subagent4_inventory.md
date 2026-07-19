@@ -63,10 +63,10 @@
 
 ## Next (ask first)
 
-1. **`/catalog/taxonomy` LAYOUT** — page loop step 2, **or**  
+1. **`/catalog/taxonomy` FIELDS** — page loop step 3, **or**  
 2. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11), **or**  
 3. Hold / merge review of `ops/products-module` → `main`.
 
 **Do not** invent purchase/barcode UI.
 
-*(Taxonomy SCAFFOLD — [`catalog_taxonomy_scaffold_compare.md`](catalog_taxonomy_scaffold_compare.md).)*
+*(Taxonomy LAYOUT — [`catalog_taxonomy_layout_compare.md`](catalog_taxonomy_layout_compare.md).)*

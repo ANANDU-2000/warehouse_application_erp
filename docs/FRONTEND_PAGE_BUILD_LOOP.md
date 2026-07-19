@@ -230,7 +230,8 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | Step | Status | Evidence |
 |---|---|---|
 | 1 SCAFFOLD | ✅ | AppBar + explainer/chips/search/list/empty/FAB + staff allowed — [`catalog_taxonomy_scaffold_compare.md`](modules/catalog_taxonomy_scaffold_compare.md) |
-| 2–7 | ⬜ | Ask before LAYOUT |
+| 2 LAYOUT | ✅ | Hexa tokens + ActionChip/search/row/FAB chrome — [`catalog_taxonomy_layout_compare.md`](modules/catalog_taxonomy_layout_compare.md) |
+| 3–7 | ⬜ | Ask before FIELDS |
 
 ### Prompt template (copy per page)
 

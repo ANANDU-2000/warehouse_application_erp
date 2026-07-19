@@ -153,6 +153,18 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 6 STATES | ✅ | FriendlyLoadError + body gates + 3m cache — [`staff_items_states_compare.md`](modules/staff_items_states_compare.md) |
 | 7 COMPARE | ✅ | in-scope PASS — [`staff_items_compare.md`](modules/staff_items_compare.md) |
 
+### Staff stock (`/staff/stock`) — Subagent 4
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | AppBar + tabs + status/search/table/empty — [`staff_stock_scaffold_compare.md`](modules/staff_stock_scaffold_compare.md) |
+| 2 LAYOUT | ⬜ | — |
+| 3 FIELDS | ⬜ | — |
+| 4 BUTTONS | ⬜ | — |
+| 5 WIRE | ⬜ | — |
+| 6 STATES | ⬜ | — |
+| 7 COMPARE | ⬜ | — |
+
 ### Prompt template (copy per page)
 
 ```

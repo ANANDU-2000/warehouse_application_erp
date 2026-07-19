@@ -1,0 +1,178 @@
+/**
+ * Staff stock `/staff/stock` — SCAFFOLD chrome only.
+ * Source: stock_page.dart Scaffold background 0xFFF5F3EE; StockOperationalTopBar.
+ */
+
+.staff-stock-page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f3ee;
+  color: #1a1a1a;
+}
+
+.staff-stock-appbar {
+  display: flex;
+  flex-direction: column;
+  background: #f5f3ee;
+  border-bottom: 1px solid #e5e2db;
+}
+
+.staff-stock-appbar__row {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 4px;
+  gap: 0;
+}
+
+.staff-stock-appbar__back {
+  border: 0;
+  background: transparent;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: inherit;
+}
+
+.staff-stock-appbar__title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.staff-stock-appbar__actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 40px;
+  padding-right: 4px;
+}
+
+.staff-stock-appbar__action-slot {
+  width: 40px;
+  height: 40px;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.staff-stock-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 8px;
+  overflow-x: auto;
+}
+
+.staff-stock-tab {
+  border: 0;
+  background: transparent;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.staff-stock-tab--active {
+  font-weight: 800;
+  color: #1a1a1a;
+  box-shadow: inset 0 -2px 0 #1a1a1a;
+}
+
+.staff-stock-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.staff-stock-status-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 12px 2px;
+}
+
+.staff-stock-chip {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #d6d3cd;
+  background: #fff;
+  color: #475569;
+  pointer-events: none;
+}
+
+.staff-stock-chip--active {
+  border-color: #0f766e;
+  color: #0f766e;
+  font-weight: 800;
+}
+
+.staff-stock-search {
+  padding: 4px 12px 8px;
+}
+
+.staff-stock-search__input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #d6d3cd;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.staff-stock-delivery {
+  min-height: 0;
+  padding: 0 12px;
+}
+
+.staff-stock-table-header {
+  display: flex;
+  margin: 0 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 2px 2px 0 0;
+  background: #f8fafc;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  color: #475569;
+}
+
+.staff-stock-table-header__item {
+  flex: 1;
+  padding: 6px 8px;
+}
+
+.staff-stock-table-header__metric {
+  width: 56px;
+  text-align: center;
+  padding: 6px 4px;
+  border-left: 1px solid #e2e8f0;
+}
+
+.staff-stock-results {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.staff-stock-activity {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  color: #94a3b8;
+  font-size: 14px;
+}

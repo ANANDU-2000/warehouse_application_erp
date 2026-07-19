@@ -73,6 +73,36 @@ export const permissionsPatchInSchema = z.object({
 
 export type PermissionsPatchInBody = z.infer<typeof permissionsPatchInSchema>;
 
+/**
+ * Mirrors UserBulkIn — user_ids min 1 / max 100; role admin|manager|staff only.
+ * UUID shape matches Python uuid.UUID / SQL UniqueIdentifier (not Zod RFC-only uuid()).
+ * Source: source-app/backend/app/schemas/users.py:UserBulkIn
+ */
+const uuidLike = z
+  .string()
+  .regex(
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+  );
+
+export const userBulkInSchema = z.object({
+  user_ids: z.array(uuidLike).min(1).max(100),
+  action: z.enum([
+    "activate",
+    "deactivate",
+    "block",
+    "unblock",
+    "delete",
+    "set_role",
+  ]),
+  role: z
+    .string()
+    .regex(/^(admin|manager|staff)$/)
+    .optional()
+    .nullable(),
+});
+
+export type UserBulkIn = z.infer<typeof userBulkInSchema>;
+
 /** Digits-only phone — users.py:_phone_digits */
 export function phoneDigits(phone: string): string {
   return (phone || "").replace(/\D/g, "");

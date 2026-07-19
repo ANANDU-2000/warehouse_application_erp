@@ -62,6 +62,8 @@
 
 ## Next (ask first)
 
-1. **Users POST bulk** (or Users UI), or  
+1. **Users UI**, or  
 2. One **satellite** from the stub tables above (start page loop), or  
 3. Hold / merge review of `ops/dashboard-module` → `main`.
+
+*(Users POST bulk is done — see [`users_roles_backend_bulk_compare.md`](users_roles_backend_bulk_compare.md).)*

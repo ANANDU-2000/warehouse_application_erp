@@ -30,6 +30,14 @@ export function createUsersRoutes(
     (req, res, next) => void controller.create(req, res, next),
   );
 
+  r.post(
+    "/bulk",
+    authz.requireAuth,
+    authz.requireMembership,
+    createRequireRole("owner", "admin", "super_admin"),
+    (req, res, next) => void controller.bulk(req, res, next),
+  );
+
   r.get(
     "/active-sessions",
     authz.requireAuth,

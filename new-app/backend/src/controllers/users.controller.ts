@@ -58,9 +58,15 @@ import {
 } from "../services/usersLedger.service";
 import { listActiveSessionsForBusiness } from "../services/usersActiveSessions.service";
 import {
+  bulkActorFromUser,
+  bulkUsersForBusiness,
+  type BulkUserDeps,
+} from "../services/usersBulk.service";
+import {
   userCreateInSchema,
   userPatchInSchema,
   permissionsPatchInSchema,
+  userBulkInSchema,
 } from "../validation/users.schemas";
 import {
   SchemaValidationError,
@@ -80,6 +86,8 @@ export type UsersControllerDeps = {
   runDeleteInTransaction?: DeleteUserDeps["runInTransaction"];
   /** Test seam for reset-password. */
   runResetInTransaction?: ResetPasswordDeps["runInTransaction"];
+  /** Test seam for POST …/users/bulk. */
+  runBulkInTransaction?: BulkUserDeps["runInTransaction"];
   /** Test seam for ledger grouped buckets (UTC now). */
   ledgerNow?: Date;
   /** Test seam for active-sessions cutoff (UTC now). */
@@ -111,6 +119,54 @@ export function createUsersController(deps: UsersControllerDeps) {
           deps.businesses,
           businessId,
           includeInactive,
+        );
+        res.json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async bulk(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ): Promise<void> {
+      try {
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string" || !businessId) {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        const user = req.user;
+        const membership = req.membership;
+        if (!user || !membership) {
+          sendDetail(res, 401, "Not authenticated");
+          return;
+        }
+
+        let body;
+        try {
+          body = validateWithSchema(userBulkInSchema, req.body ?? {});
+        } catch (e) {
+          if (e instanceof SchemaValidationError) {
+            sendDetail(res, 422, e.detail);
+            return;
+          }
+          throw e;
+        }
+
+        const out = await bulkUsersForBusiness(
+          {
+            pool: deps.pool,
+            businessUsers: deps.businessUsers,
+            runInTransaction: deps.runBulkInTransaction,
+          },
+          {
+            businessId,
+            body,
+            actorMembershipRole: membership.role,
+            actor: bulkActorFromUser(user),
+          },
         );
         res.json(out);
       } catch (e) {

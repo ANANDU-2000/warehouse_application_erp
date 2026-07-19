@@ -12,7 +12,7 @@
 | 5 | Filters: last_active_at not null ≥ cutoff, is_active, deleted_at null | Yes | Same | PASS |
 | 6 | Response `UserListOut` via `_user_row` enrichment | Yes | `buildUserListOut` | PASS |
 | 7 | Stable `ORDER BY name` | Unspecified in FastAPI | Added for determinism | PASS* |
-| 8 | bulk / UI | Out of slice | Not added | N/A |
+| 8 | bulk / UI | Out of slice | See Slice 14 bulk | N/A |
 
 \*Documented intentional stable sort (matches list_users).
 
@@ -20,4 +20,4 @@
 
 **Rollback:** Revert this commit; remove active-sessions route + service + repo method; restore boards to Slice 1–12.
 
-**Next (ask first):** POST bulk · Users UI · Subagent 4.
+**Next (ask first):** Users UI · Subagent 4.

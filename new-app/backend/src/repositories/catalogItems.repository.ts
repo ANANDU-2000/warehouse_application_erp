@@ -163,6 +163,21 @@ export type CatalogItemsRepository = {
   listVariantIds(businessId: string, itemId: string): Promise<string[]>;
   countArchivedEntryLinesForVariants(variantIds: string[]): Promise<number>;
   deleteItem(businessId: string, itemId: string): Promise<void>;
+  /** Resolve type → category for business, or null if missing. */
+  findTypeInBusiness(
+    businessId: string,
+    typeId: string,
+  ): Promise<{ typeId: string; categoryId: string } | null>;
+  assertUniqueBarcode(
+    businessId: string,
+    barcode: string,
+    excludeId?: string,
+  ): Promise<void>;
+  assertUniqueItemCode(
+    businessId: string,
+    itemCode: string,
+    excludeId?: string,
+  ): Promise<void>;
 };
 
 const ITEM_SELECT = `
@@ -1118,6 +1133,72 @@ export function createCatalogItemsRepository(
           { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
         ],
       );
+    },
+
+    async findTypeInBusiness(businessId, typeId) {
+      const row = await queryOne<Record<string, unknown>>(
+        db,
+        `SELECT ct.[id] AS [type_id], ct.[category_id]
+         FROM category_types ct
+         INNER JOIN item_categories ic ON ic.[id] = ct.[category_id]
+         WHERE ct.[id] = @typeId AND ic.[business_id] = @businessId`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "typeId", type: sql.UniqueIdentifier, value: typeId },
+        ],
+      );
+      if (!row) return null;
+      return {
+        typeId: String(row.type_id),
+        categoryId: String(row.category_id),
+      };
+    },
+
+    async assertUniqueBarcode(businessId, barcode, excludeId) {
+      const params: SqlParam[] = [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "barcode", type: sql.NVarChar(64), value: barcode },
+      ];
+      let sqlText = `SELECT TOP 1 [id] FROM catalog_items
+        WHERE [business_id] = @businessId AND [barcode] = @barcode
+          AND [deleted_at] IS NULL`;
+      if (excludeId) {
+        sqlText += ` AND [id] <> @excludeId`;
+        params.push({
+          name: "excludeId",
+          type: sql.UniqueIdentifier,
+          value: excludeId,
+        });
+      }
+      const row = await queryOne<Record<string, unknown>>(db, sqlText, params);
+      if (row) {
+        const { HttpError } = await import("../errors/httpError");
+        throw new HttpError(409, "Barcode already exists");
+      }
+    },
+
+    async assertUniqueItemCode(businessId, itemCode, excludeId) {
+      const params: SqlParam[] = [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "itemCode", type: sql.NVarChar(64), value: itemCode },
+      ];
+      let sqlText = `SELECT TOP 1 [id] FROM catalog_items
+        WHERE [business_id] = @businessId
+          AND UPPER([item_code]) = @itemCode
+          AND [deleted_at] IS NULL`;
+      if (excludeId) {
+        sqlText += ` AND [id] <> @excludeId`;
+        params.push({
+          name: "excludeId",
+          type: sql.UniqueIdentifier,
+          value: excludeId,
+        });
+      }
+      const row = await queryOne<Record<string, unknown>>(db, sqlText, params);
+      if (row) {
+        const { HttpError } = await import("../errors/httpError");
+        throw new HttpError(409, "Item code already exists");
+      }
     },
   };
 }

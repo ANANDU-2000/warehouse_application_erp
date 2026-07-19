@@ -13,12 +13,16 @@ import type {
 import { createCatalogItemsRepository } from "../repositories/catalogItems.repository";
 import type { SqlClient } from "../repositories/sql";
 import {
+  catalogBatchCreateSchema,
   catalogItemCreateSchema,
+  catalogItemFromScanSchema,
   catalogItemUpdateSchema,
   coerceBoxItemsPerBox,
   dedupePreserveOrder,
   normalizePackageType,
+  type CatalogBatchCreateIn,
   type CatalogItemCreateIn,
+  type CatalogItemFromScanIn,
   type CatalogItemUpdateIn,
 } from "../validation/catalogItems.schemas";
 import { validateWithSchema } from "../validation/validate";
@@ -442,6 +446,266 @@ export function createCatalogItemsWriteService(deps: CatalogItemsWriteDeps) {
           );
         }
         await repo.deleteItem(businessId, itemId);
+      });
+    },
+
+    /**
+     * Formula source: catalog.py:batch_create_catalog_items
+     * Skips invalid/dup lines; does not apply canonical unit profile (legacy).
+     */
+    async batchCreate(
+      businessId: string,
+      body: unknown,
+    ): Promise<{ created: number; skipped: number; items: CatalogItemOut[] }> {
+      const data = validateWithSchema(
+        catalogBatchCreateSchema,
+        body,
+        "Invalid catalog batch",
+      ) as CatalogBatchCreateIn;
+
+      return runTx(async (tx) => {
+        const repo = repoOn(deps, tx);
+        const createdIds: string[] = [];
+        let skipped = 0;
+
+        for (const line of data.items) {
+          const resolved = await repo.findTypeInBusiness(
+            businessId,
+            line.type_id,
+          );
+          if (!resolved) {
+            skipped += 1;
+            continue;
+          }
+          const { typeId, categoryId } = resolved;
+          try {
+            await repo.verifyTypeInCategory(businessId, categoryId, typeId);
+          } catch {
+            skipped += 1;
+            continue;
+          }
+          const dupId = await repo.findDupItemId(
+            businessId,
+            categoryId,
+            typeId,
+            line.name,
+          );
+          if (dupId) {
+            skipped += 1;
+            continue;
+          }
+
+          const u = line.default_unit;
+          const dkg = u === "bag" ? (line.default_kg_per_bag ?? null) : null;
+          const dbox =
+            u === "box"
+              ? coerceBoxItemsPerBox(line.default_items_per_box ?? null)
+              : null;
+          const dwt = u === "tin" ? (line.default_weight_per_tin ?? null) : null;
+          const supplierIds = dedupePreserveOrder(line.default_supplier_ids);
+          try {
+            await repo.assertSupplierIdsInBusiness(businessId, supplierIds);
+            await repo.assertBrokerIdsInBusiness(businessId, []);
+          } catch {
+            skipped += 1;
+            continue;
+          }
+
+          const id = randomUUID();
+          const publicToken = randomUUID().replace(/-/g, "");
+          const packageType = normalizePackageType(line.package_type ?? null);
+          await repo.insertItem({
+            id,
+            businessId,
+            categoryId,
+            typeId,
+            name: line.name,
+            defaultUnit: u,
+            defaultKgPerBag: dkg,
+            defaultItemsPerBox: dbox,
+            defaultWeightPerTin: dwt,
+            defaultPurchaseUnit: u,
+            defaultSaleUnit: null,
+            hsnCode: null,
+            itemCode: null,
+            barcode: null,
+            publicToken,
+            taxPercent: null,
+            defaultLandingCost: null,
+            defaultSellingCost: null,
+            packageType,
+            sellingUnit: null,
+            stockUnit: null,
+            displayUnit: null,
+            packageSize: null,
+            packageMeasurement: null,
+            validationStatus: null,
+          });
+
+          const draft: CatalogItemUnitFields & { name: string } = {
+            name: line.name,
+            package_type: packageType,
+            selling_unit: null,
+            stock_unit: null,
+            display_unit: null,
+            package_size: null,
+            package_measurement: null,
+            conversion_factor: null,
+            unit_confidence: null,
+            validation_status: null,
+            smart_classification: null,
+            default_kg_per_bag: dkg,
+          };
+          const catName = await repo.getCategoryName(businessId, categoryId);
+          const ur = resolveForCatalogItem(draft, {
+            itemName: line.name,
+            categoryName: catName,
+            brandDetected: brandGuess(line.name),
+          });
+          mergeUnitResolutionIntoCatalogRow(draft, ur);
+          await repo.updateSmartFields(id, {
+            normalizedName:
+              line.name.trim().toUpperCase().slice(0, 512) || null,
+            sellingUnit: draft.selling_unit ?? null,
+            stockUnit: draft.stock_unit ?? null,
+            displayUnit: draft.display_unit ?? null,
+            packageType: draft.package_type ?? null,
+            packageSize: draft.package_size ?? null,
+            packageMeasurement: draft.package_measurement ?? null,
+            conversionFactor: draft.conversion_factor ?? null,
+            unitConfidence: draft.unit_confidence ?? null,
+            smartClassification: draft.smart_classification ?? null,
+            defaultKgPerBag: draft.default_kg_per_bag ?? null,
+            validationStatus: draft.validation_status ?? null,
+          });
+          await repo.replaceDefaultSuppliers(businessId, id, supplierIds);
+          await repo.replaceDefaultBrokers(businessId, id, []);
+          await repo.seedSupplierItemDefaults(businessId, id, supplierIds);
+          createdIds.push(id);
+        }
+
+        const items: CatalogItemOut[] = [];
+        for (const id of createdIds) {
+          const row = await repo.getById(businessId, id);
+          if (row) items.push(toCatalogItemOut(row));
+        }
+        return { created: items.length, skipped, items };
+      });
+    },
+
+    /**
+     * Formula source: catalog.py:create_catalog_item_from_scan
+     * No auto ITM, no suppliers; brand_detected=False.
+     */
+    async createFromScan(
+      businessId: string,
+      body: unknown,
+    ): Promise<CatalogItemOut> {
+      const data = validateWithSchema(
+        catalogItemFromScanSchema,
+        body,
+        "Invalid from-scan catalog item",
+      ) as CatalogItemFromScanIn;
+
+      return runTx(async (tx) => {
+        const repo = repoOn(deps, tx);
+        const resolved = await repo.findTypeInBusiness(
+          businessId,
+          data.type_id,
+        );
+        if (!resolved) {
+          throw new HttpError(400, "type_id not found in this business");
+        }
+        const { typeId, categoryId } = resolved;
+        await repo.assertUniqueBarcode(businessId, data.barcode);
+        await repo.assertUniqueItemCode(businessId, data.item_code);
+        const dupId = await repo.findDupItemId(
+          businessId,
+          categoryId,
+          typeId,
+          data.name,
+        );
+        if (dupId) {
+          throw new HttpError(
+            409,
+            "An item with this name already exists for this subcategory",
+          );
+        }
+
+        const u = data.default_unit;
+        const dkg = u === "bag" ? (data.default_kg_per_bag ?? null) : null;
+        const id = randomUUID();
+        const publicToken = randomUUID().replace(/-/g, "");
+        await repo.insertItem({
+          id,
+          businessId,
+          categoryId,
+          typeId,
+          name: data.name,
+          defaultUnit: u,
+          defaultKgPerBag: dkg,
+          defaultItemsPerBox: null,
+          defaultWeightPerTin: null,
+          defaultPurchaseUnit: null,
+          defaultSaleUnit: null,
+          hsnCode: null,
+          itemCode: data.item_code,
+          barcode: data.barcode,
+          publicToken,
+          taxPercent: null,
+          defaultLandingCost: null,
+          defaultSellingCost: null,
+          packageType: null,
+          sellingUnit: null,
+          stockUnit: null,
+          displayUnit: null,
+          packageSize: null,
+          packageMeasurement: null,
+          validationStatus: null,
+        });
+
+        const draft: CatalogItemUnitFields & {
+          name: string;
+          default_kg_per_bag: number | null;
+        } = {
+          name: data.name,
+          default_kg_per_bag: dkg,
+          package_type: null,
+          selling_unit: null,
+          stock_unit: null,
+          display_unit: null,
+          package_size: null,
+          package_measurement: null,
+          conversion_factor: null,
+          unit_confidence: null,
+          validation_status: null,
+          smart_classification: null,
+        };
+        const catName = await repo.getCategoryName(businessId, categoryId);
+        const ur = resolveForCatalogItem(draft, {
+          itemName: data.name,
+          categoryName: catName,
+          brandDetected: false,
+        });
+        mergeUnitResolutionIntoCatalogRow(draft, ur);
+        await repo.updateSmartFields(id, {
+          normalizedName: data.name.trim().toUpperCase().slice(0, 512) || null,
+          sellingUnit: draft.selling_unit ?? null,
+          stockUnit: draft.stock_unit ?? null,
+          displayUnit: draft.display_unit ?? null,
+          packageType: draft.package_type ?? null,
+          packageSize: draft.package_size ?? null,
+          packageMeasurement: draft.package_measurement ?? null,
+          conversionFactor: draft.conversion_factor ?? null,
+          unitConfidence: draft.unit_confidence ?? null,
+          smartClassification: draft.smart_classification ?? null,
+          defaultKgPerBag: draft.default_kg_per_bag ?? null,
+          validationStatus: draft.validation_status ?? null,
+        });
+
+        const row = await repo.getById(businessId, id);
+        if (!row) throw new HttpError(500, "Created item not found");
+        return toCatalogItemOut(row);
       });
     },
   };

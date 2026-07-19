@@ -137,6 +137,42 @@ export function createCatalogItemsController(deps: CatalogItemsControllerDeps) {
         next(e);
       }
     },
+
+    async batchCreate(req: Request, res: Response, next: NextFunction) {
+      try {
+        if (!deps.write) {
+          sendDetail(res, 503, "Catalog writes unavailable");
+          return;
+        }
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string") {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        const out = await deps.write.batchCreate(businessId, req.body);
+        res.json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async createFromScan(req: Request, res: Response, next: NextFunction) {
+      try {
+        if (!deps.write) {
+          sendDetail(res, 503, "Catalog writes unavailable");
+          return;
+        }
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string") {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        const out = await deps.write.createFromScan(businessId, req.body);
+        res.status(201).json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
   };
 }
 

@@ -230,6 +230,9 @@ function unavailableCatalogItemsRepository(): CatalogItemsRepository {
     listVariantIds: fail,
     countArchivedEntryLinesForVariants: fail,
     deleteItem: fail,
+    findTypeInBusiness: fail,
+    assertUniqueBarcode: fail,
+    assertUniqueItemCode: fail,
   };
 }
 

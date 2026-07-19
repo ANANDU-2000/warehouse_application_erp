@@ -145,3 +145,98 @@ export function coerceBoxItemsPerBox(v: number | null | undefined): number {
   if (v == null || !Number.isFinite(v) || v <= 0) return 1;
   return v;
 }
+
+/** Formula source: catalog.py:_normalize_item_code */
+export function normalizeItemCode(raw: string): string {
+  return raw.trim().toUpperCase().replace(/\s+/g, "");
+}
+
+/** Formula source: catalog.py:_normalize_barcode */
+export function normalizeBarcode(raw: string): string {
+  return raw.trim();
+}
+
+const ITEM_CODE_SLUG_RE = /^[A-Z0-9_-]+$/;
+
+/** Formula source: catalog.py CatalogBatchItemIn */
+export const catalogBatchItemSchema = z
+  .object({
+    name: z.string().min(1).max(512).transform(collapseName),
+    type_id: z.string().uuid(),
+    default_unit: UNIT,
+    default_kg_per_bag: z.number().gt(0).nullable().optional(),
+    default_items_per_box: z.number().gt(0).nullable().optional(),
+    default_weight_per_tin: z.number().gt(0).nullable().optional(),
+    default_supplier_ids: z.array(z.string().uuid()).min(1),
+    package_type: z.string().max(32).nullable().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.name) {
+      ctx.addIssue({
+        code: "custom",
+        message: "name must not be empty or whitespace",
+        path: ["name"],
+      });
+    }
+    if (data.default_unit === "bag" && data.default_kg_per_bag == null) {
+      ctx.addIssue({
+        code: "custom",
+        message: "default_kg_per_bag is required when default_unit is bag",
+        path: ["default_kg_per_bag"],
+      });
+    } else if (
+      data.default_unit === "box" &&
+      data.default_items_per_box == null
+    ) {
+      data.default_items_per_box = 1;
+    }
+  });
+
+export const catalogBatchCreateSchema = z.object({
+  items: z.array(catalogBatchItemSchema).min(1).max(80),
+});
+
+export type CatalogBatchCreateIn = z.infer<typeof catalogBatchCreateSchema>;
+
+/** Formula source: catalog.py CatalogItemFromScanIn */
+export const catalogItemFromScanSchema = z
+  .object({
+    barcode: z.string().min(1).max(64),
+    item_code: z.string().min(1).max(64),
+    name: z.string().min(1).max(512).transform(collapseName),
+    type_id: z.string().uuid(),
+    default_unit: UNIT,
+    default_kg_per_bag: z.number().gt(0).nullable().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const code = normalizeItemCode(data.item_code);
+    if (!ITEM_CODE_SLUG_RE.test(code)) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Item code: use A-Z, 0-9, hyphen, underscore only",
+        path: ["item_code"],
+      });
+    } else {
+      data.item_code = code;
+    }
+    const bc = normalizeBarcode(data.barcode);
+    if (!bc) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Barcode is required",
+        path: ["barcode"],
+      });
+    } else {
+      data.barcode = bc;
+    }
+    if (data.default_unit === "bag" && data.default_kg_per_bag == null) {
+      ctx.addIssue({
+        code: "custom",
+        message: "default_kg_per_bag is required when default_unit is bag",
+        path: ["default_kg_per_bag"],
+      });
+    }
+  });
+
+export type CatalogItemFromScanIn = z.infer<typeof catalogItemFromScanSchema>;
+

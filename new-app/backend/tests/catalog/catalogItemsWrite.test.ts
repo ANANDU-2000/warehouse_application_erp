@@ -147,6 +147,9 @@ function baseRepo(
     listVariantIds: async () => [],
     countArchivedEntryLinesForVariants: async () => 0,
     deleteItem: async () => undefined,
+    findTypeInBusiness: async () => ({ typeId: TYPE_ID, categoryId: CAT_ID }),
+    assertUniqueBarcode: async () => undefined,
+    assertUniqueItemCode: async () => undefined,
     ...overrides,
   };
 }

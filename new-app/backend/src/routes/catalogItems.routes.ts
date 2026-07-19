@@ -1,6 +1,7 @@
 /**
- * Catalog items routes — GET/POST/PATCH/DELETE
+ * Catalog items routes — GET/POST/PATCH/DELETE + batch + from-scan
  * Source: catalog.py
+ * Static paths (batch, from-scan) MUST register before /:itemId.
  */
 import { Router } from "express";
 import type { AuthzMiddleware } from "../middleware/authz";
@@ -22,6 +23,18 @@ export function createCatalogItemsRoutes(
     authz.requireAuth,
     authz.requireMembership,
     (req, res, next) => void catalog.create(req, res, next),
+  );
+  r.post(
+    "/batch",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void catalog.batchCreate(req, res, next),
+  );
+  r.post(
+    "/from-scan",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void catalog.createFromScan(req, res, next),
   );
   r.get(
     "/:itemId",

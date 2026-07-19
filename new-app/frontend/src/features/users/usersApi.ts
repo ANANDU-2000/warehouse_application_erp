@@ -368,3 +368,152 @@ export async function patchUserPermissions(opts: {
   }
   return (await res.json()) as PermissionsOut;
 }
+
+export type UserActivityLogRow = {
+  id: string;
+  user_name?: string | null;
+  action_type: string;
+  item_id?: string | null;
+  item_name?: string | null;
+  details?: Record<string, unknown> | null;
+  created_at: string;
+};
+
+export type UserStockAdjustmentRow = {
+  id: string;
+  item_id: string;
+  item_name: string | null;
+  old_qty: number;
+  new_qty: number;
+  adjustment_type: string;
+  reason: string | null;
+  updated_at: string;
+};
+
+export type UserPurchaseBriefRow = {
+  id: string;
+  human_id: string | null;
+  purchase_date: string | null;
+  status: string | null;
+  total_amount: number | null;
+  supplier_name: string | null;
+  item_count: number | null;
+};
+
+export type UserCreatedItemRow = {
+  id: string;
+  name: string | null;
+  barcode: string | null;
+  category: string | null;
+  reorder_level: number | null;
+  updated_at: string | null;
+};
+
+export type UserLedgerEntryRow = {
+  kind: string;
+  at: string;
+  title: string;
+  subtitle: string | null;
+  details: Record<string, unknown> | null;
+};
+
+export type UserLedgerGrouped = {
+  today: UserLedgerEntryRow[];
+  yesterday: UserLedgerEntryRow[];
+  this_week: UserLedgerEntryRow[];
+};
+
+async function usersGetJsonList<T>(
+  url: string,
+  accessToken?: string,
+): Promise<T[]> {
+  const res = await usersFetch(url, {
+    method: "GET",
+    headers: { Authorization: authHeader(accessToken) },
+  });
+  if (!res.ok) {
+    throw new UsersApiError(res.status, await readDetail(res));
+  }
+  const data: unknown = await res.json();
+  return Array.isArray(data) ? (data as T[]) : [];
+}
+
+/** GET …/activity-log?user_id=&days=30 — listUserActivity */
+export async function listUserActivity(opts: {
+  businessId: string;
+  userId: string;
+  days?: number;
+  perPage?: number;
+  accessToken?: string;
+}): Promise<UserActivityLogRow[]> {
+  const q = new URLSearchParams({
+    user_id: opts.userId,
+    days: String(opts.days ?? 30),
+    per_page: String(opts.perPage ?? 100),
+  });
+  const url = `/v1/businesses/${encodeURIComponent(opts.businessId)}/activity-log?${q}`;
+  return usersGetJsonList<UserActivityLogRow>(url, opts.accessToken);
+}
+
+/** GET …/users/:userId/stock-adjustments */
+export async function listUserStockAdjustments(opts: {
+  businessId: string;
+  userId: string;
+  limit?: number;
+  accessToken?: string;
+}): Promise<UserStockAdjustmentRow[]> {
+  const q = new URLSearchParams({ limit: String(opts.limit ?? 50) });
+  const url = `/v1/businesses/${encodeURIComponent(opts.businessId)}/users/${encodeURIComponent(opts.userId)}/stock-adjustments?${q}`;
+  return usersGetJsonList<UserStockAdjustmentRow>(url, opts.accessToken);
+}
+
+/** GET …/users/:userId/purchases */
+export async function listUserPurchases(opts: {
+  businessId: string;
+  userId: string;
+  limit?: number;
+  accessToken?: string;
+}): Promise<UserPurchaseBriefRow[]> {
+  const q = new URLSearchParams({ limit: String(opts.limit ?? 50) });
+  const url = `/v1/businesses/${encodeURIComponent(opts.businessId)}/users/${encodeURIComponent(opts.userId)}/purchases?${q}`;
+  return usersGetJsonList<UserPurchaseBriefRow>(url, opts.accessToken);
+}
+
+/** GET …/users/:userId/created-items */
+export async function listUserCreatedItems(opts: {
+  businessId: string;
+  userId: string;
+  limit?: number;
+  accessToken?: string;
+}): Promise<UserCreatedItemRow[]> {
+  const q = new URLSearchParams({ limit: String(opts.limit ?? 50) });
+  const url = `/v1/businesses/${encodeURIComponent(opts.businessId)}/users/${encodeURIComponent(opts.userId)}/created-items?${q}`;
+  return usersGetJsonList<UserCreatedItemRow>(url, opts.accessToken);
+}
+
+/** GET …/users/:userId/ledger?grouped=true */
+export async function listUserLedgerGrouped(opts: {
+  businessId: string;
+  userId: string;
+  limit?: number;
+  accessToken?: string;
+}): Promise<UserLedgerGrouped> {
+  const q = new URLSearchParams({
+    limit: String(opts.limit ?? 80),
+    grouped: "true",
+  });
+  const url = `/v1/businesses/${encodeURIComponent(opts.businessId)}/users/${encodeURIComponent(opts.userId)}/ledger?${q}`;
+  const res = await usersFetch(url, {
+    method: "GET",
+    headers: { Authorization: authHeader(opts.accessToken) },
+  });
+  if (!res.ok) {
+    throw new UsersApiError(res.status, await readDetail(res));
+  }
+  const data = (await res.json()) as Partial<UserLedgerGrouped>;
+  return {
+    today: Array.isArray(data.today) ? data.today : [],
+    yesterday: Array.isArray(data.yesterday) ? data.yesterday : [],
+    this_week: Array.isArray(data.this_week) ? data.this_week : [],
+  };
+}

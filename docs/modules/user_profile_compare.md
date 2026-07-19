@@ -13,10 +13,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
-| 🟡 Current | Profile COMPARE PASS — ask before Subagent 4 satellite **or** activity WIRE |
-| ⬜ Pending (ask first) | Subagent 4 — [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md) · optional activity satellites |
-| ⏸ Deferred | Merge to `main`; activity feed/stock/purchases/ledger APIs |
+| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · COMPARE · **Activity WIRE** |
+| 🟡 Current | Activity WIRE PASS — ask before Subagent 4 |
+| ⬜ Pending (ask first) | Subagent 4 — [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md) |
+| ⏸ Deferred | Merge to `main` |
 
 ---
 
@@ -45,8 +45,8 @@
 
 | Item | Why deferred |
 |---|---|
-| Activity tab feed / stock / purchases / items / ledger APIs | Separate WIRE satellite after profile loop |
-| Activity load STATES (spinner/error per section) | Blocked on activity WIRE |
+| Activity tab feed / stock / purchases / items / ledger APIs | **Activity WIRE PASS** — [`user_profile_activity_wire_compare.md`](user_profile_activity_wire_compare.md) |
+| Activity load STATES (spinner/error per section) | Included in Activity WIRE |
 | Pull-to-refresh `RefreshIndicator` | AppBar back + retry covers invalidate |
 | Edit sheet Notes field | Flutter edit sheet has name/email/phone/role only |
 | List page / Settings module | Separate routes |
@@ -74,7 +74,8 @@ Docs/checklist + smoke script (+ Notes card if bundled): revert COMPARE commit. 
 ## 5. Next after Approve
 
 1. Ask before: one **Subagent 4 satellite** from [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md), **or**  
-2. Optional: **Activity tab WIRE** (created-items / stock-adjustments / purchases / ledger), **or**  
-3. Hold / merge review of `ops/dashboard-module` → `main`.
+2. Hold / merge review of `ops/dashboard-module` → `main`.
 
 **Do not merge to `main` unless asked.**
+
+*(Activity WIRE done — see [`user_profile_activity_wire_compare.md`](user_profile_activity_wire_compare.md).)*

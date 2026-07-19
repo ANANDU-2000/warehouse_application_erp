@@ -391,6 +391,61 @@
 .user-profile__activity-panel {
   min-height: 80px;
   border-top: 1px solid var(--profile-border);
+  padding-top: 8px;
+}
+
+.user-profile__activity-empty {
+  margin: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--profile-muted);
+}
+
+.user-profile__activity-timeline {
+  padding: 4px 12px 16px;
+}
+
+.user-profile__activity-day-label {
+  margin: 8px 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--profile-text);
+}
+
+.user-profile__activity-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-left: 4px;
+  margin-bottom: 10px;
+}
+
+.user-profile__activity-dot {
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--profile-brand);
+}
+
+.user-profile__activity-row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.user-profile__activity-row-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--profile-text);
+}
+
+.user-profile__activity-row-item,
+.user-profile__activity-row-time {
+  font-size: 13px;
+  color: var(--profile-muted);
 }
 
 /* FIELDS — Permissions */

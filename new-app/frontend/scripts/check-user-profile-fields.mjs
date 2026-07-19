@@ -16,14 +16,17 @@ function assert(cond, msg) {
 const fieldsPath = join(root, "src/features/users/userProfileFields.ts");
 const copyPath = join(root, "src/features/users/userProfileCopy.ts");
 const pagePath = join(root, "src/features/users/UserProfilePage.tsx");
+const activityPath = join(root, "src/features/users/UserActivityPanel.tsx");
 const pkgPath = join(root, "package.json");
 
 assert(existsSync(fieldsPath), "userProfileFields.ts");
 assert(existsSync(pagePath), "page exists");
+assert(existsSync(activityPath), "UserActivityPanel exists");
 
 const fields = readFileSync(fieldsPath, "utf8");
 const copy = readFileSync(copyPath, "utf8");
 const page = readFileSync(pagePath, "utf8");
+const activity = readFileSync(activityPath, "utf8");
 const pkg = readFileSync(pkgPath, "utf8");
 
 assert(fields.includes('"Purchases"'), "KPI Purchases");
@@ -44,7 +47,11 @@ assert(copy.includes('USER_PROFILE_LAST_ACTIVE_PREFIX = "Last active: "'), "last
 assert(copy.includes('USER_PROFILE_WAREHOUSE_PREFIX = "Warehouse: "'), "warehouse prefix");
 
 assert(page.includes("USER_PROFILE_KPI_ORDER"), "uses KPI order");
-assert(page.includes("USER_ACTIVITY_SECTION_ORDER"), "uses activity order");
+assert(
+  page.includes("UserActivityPanel") || activity.includes("USER_ACTIVITY_SECTION_ORDER"),
+  "uses activity order",
+);
+assert(activity.includes("USER_ACTIVITY_SECTION_ORDER"), "activity panel order");
 assert(page.includes("USER_PERMISSION_GROUPS"), "uses permission groups");
 assert(page.includes("setTab"), "tab local state");
 assert(page.includes("setActivitySection"), "activity section state");

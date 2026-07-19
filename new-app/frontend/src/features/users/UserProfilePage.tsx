@@ -58,8 +58,6 @@ import {
   USER_PROFILE_WAREHOUSE_PREFIX,
 } from "./userProfileCopy";
 import {
-  USER_ACTIVITY_SECTION_LABELS,
-  USER_ACTIVITY_SECTION_ORDER,
   USER_PERMISSION_GROUPS,
   USER_PROFILE_KPI_LABELS,
   USER_PROFILE_KPI_ORDER,
@@ -67,6 +65,7 @@ import {
   type UserProfileKpiKey,
   type UserProfileTab,
 } from "./userProfileFields";
+import { UserActivityPanel } from "./UserActivityPanel";
 import {
   displayUserRole,
   userLastActiveLabel,
@@ -688,41 +687,13 @@ export function UserProfilePage() {
             </div>
           ) : null}
 
-          {tab === "activity" ? (
-            <div data-testid="user-profile-activity">
-              <div
-                className="user-profile__activity-chips"
-                data-testid="user-profile-activity-chips"
-                role="tablist"
-                aria-label="Activity section"
-              >
-                {USER_ACTIVITY_SECTION_ORDER.map((sec) => {
-                  const selected = activitySection === sec;
-                  return (
-                    <button
-                      key={sec}
-                      type="button"
-                      role="tab"
-                      aria-selected={selected}
-                      className={
-                        selected
-                          ? "user-profile__activity-chip user-profile__activity-chip--selected"
-                          : "user-profile__activity-chip"
-                      }
-                      data-testid={`user-profile-activity-${sec}`}
-                      onClick={() => setActivitySection(sec)}
-                    >
-                      {USER_ACTIVITY_SECTION_LABELS[sec]}
-                    </button>
-                  );
-                })}
-              </div>
-              <div
-                className="user-profile__activity-panel"
-                data-testid="user-profile-activity-panel"
-                aria-hidden="true"
-              />
-            </div>
+          {tab === "activity" && businessId && userId ? (
+            <UserActivityPanel
+              businessId={businessId}
+              userId={userId}
+              section={activitySection}
+              onSectionChange={setActivitySection}
+            />
           ) : null}
 
           {tab === "permissions" ? (

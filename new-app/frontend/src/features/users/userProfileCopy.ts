@@ -75,3 +75,14 @@ export const USER_PROFILE_FACING_NETWORK =
 export const USER_PROFILE_FACING_GENERIC =
   "Something went wrong. Please try again.";
 
+/** Activity empty — user_activity_tab.dart / user_activity_timeline.dart */
+export const USER_PROFILE_ACTIVITY_EMPTY_FEED =
+  "No activity in the last 30 days.";
+export const USER_PROFILE_ACTIVITY_EMPTY_STOCK = "No stock activity yet.";
+export const USER_PROFILE_ACTIVITY_EMPTY_PURCHASES =
+  "No purchase activity yet.";
+export const USER_PROFILE_ACTIVITY_EMPTY_ITEMS = "No items created yet.";
+export const USER_PROFILE_ACTIVITY_EMPTY_LEDGER = "No ledger activity yet.";
+/** FriendlyLoadError default message — non-feed sections */
+export const USER_PROFILE_ACTIVITY_LOAD_DEFAULT = "Unable to load data";
+

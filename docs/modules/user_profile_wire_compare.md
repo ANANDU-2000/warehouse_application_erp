@@ -15,7 +15,7 @@
 | 8 | Delete → `DELETE` then pop list | Yes | `deleteBusinessUser` + popOrGo | PASS |
 | 9 | Save permissions → `PATCH …/permissions` | Yes | `patchUserPermissions` | PASS |
 | 10 | Copy email clipboard | Yes | email \|\| login_email | PASS |
-| 11 | Activity feed/stock/purchases/ledger APIs | Yes | **Deferred** | N/A |
+| 11 | Activity feed/stock/purchases/ledger APIs | Yes | **Activity WIRE** — [`user_profile_activity_wire_compare.md`](user_profile_activity_wire_compare.md) | PASS |
 | 12 | Full skeleton / FriendlyLoadError | Spinner + HexaErrorCard | **STATES** — [`user_profile_states_compare.md`](user_profile_states_compare.md) | PASS |
 
 **Smoke:** `npm run test:user-profile-wire` (+ prior profile smokes); `npm run build` PASS.

@@ -115,6 +115,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 5 WIRE | ✅ | profile GET/PATCH/reset/delete/perms — [`user_profile_wire_compare.md`](modules/user_profile_wire_compare.md) |
 | 6 STATES | ✅ | spinner + HexaErrorCard/FriendlyLoadError — [`user_profile_states_compare.md`](modules/user_profile_states_compare.md) |
 | 7 COMPARE | ✅ | Master PASS — [`user_profile_compare.md`](modules/user_profile_compare.md) |
+| — Activity WIRE | ✅ | feed/stock/purchases/items/ledger — [`user_profile_activity_wire_compare.md`](modules/user_profile_activity_wire_compare.md) |
 
 ### Prompt template (copy per page)
 

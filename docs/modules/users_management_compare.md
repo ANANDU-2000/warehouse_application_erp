@@ -14,8 +14,8 @@
 | State | Step |
 |---|---|
 | ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · COMPARE |
-| 🟡 Current | List COMPARE PASS — profile **COMPARE PASS**; ask before Subagent 4 |
-| ⬜ Pending (ask first) | Subagent 4 — [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md) · optional activity WIRE |
+| 🟡 Current | List COMPARE PASS — profile COMPARE + **Activity WIRE PASS**; ask before Subagent 4 |
+| ⬜ Pending (ask first) | Subagent 4 — [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md) |
 | ⏸ Deferred | Merge to `main`; desktop detail panel live; card overflow menus |
 
 ---
@@ -45,7 +45,7 @@
 
 | Item | Why deferred |
 |---|---|
-| Profile page tabs / permissions / ledger | Profile COMPARE PASS — activity APIs still deferred |
+| Profile page tabs / permissions / ledger | Profile COMPARE + Activity WIRE PASS |
 | Card overflow: reset password / block / copy credentials / delete | Use bulk or profile later |
 | Desktop `UserManagementDetailPanel` live content | Split chrome present; body deferred |
 | Pull-to-refresh `RefreshIndicator` | AppBar refresh covers invalidate |

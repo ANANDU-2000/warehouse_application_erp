@@ -234,31 +234,92 @@
   color: var(--sph-muted);
 }
 
-/* _DateHeader — WIRE-ready */
-.staff-ph-results__error {
+/* ListSkeleton — purchases 10×88 · low 8×72 */
+.staff-ph-skeleton {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px var(--sph-gutter) 24px;
+  box-sizing: border-box;
+}
+
+.staff-ph-skeleton__row {
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    #ebe8e2 0%,
+    #f5f3ee 40%,
+    #ebe8e2 80%
+  );
+  background-size: 200% 100%;
+  animation: staff-ph-skeleton-shine 1.2s ease-in-out infinite;
+}
+
+@keyframes staff-ph-skeleton-shine {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* FriendlyLoadError — friendly_load_error.dart */
+.staff-ph-friendly-error {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 24px 16px;
-  color: var(--sph-muted);
-  font-size: 14px;
-  font-weight: 600;
+  justify-content: center;
   text-align: center;
+  max-width: 400px;
+  margin: auto;
+  padding: 22px 20px 20px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  background: rgba(239, 242, 241, 0.65);
+  border: 1px solid rgba(215, 231, 227, 0.5);
+  gap: 10px;
 }
 
-.staff-ph-results__error-detail {
-  font-size: 12px;
-  font-weight: 500;
+.staff-ph-friendly-error__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(216, 236, 232, 0.55);
+  color: var(--sph-brand);
+  font-size: 28px;
+  line-height: 1;
 }
 
-.staff-ph-results__error button {
-  margin-top: 4px;
-  padding: 8px 16px;
-  border: 1px solid var(--sph-border);
-  border-radius: 8px;
-  background: var(--sph-surface);
+.staff-ph-friendly-error__title {
+  margin: 0;
+  font-size: 16px;
   font-weight: 700;
+  color: var(--sph-fg);
+}
+
+.staff-ph-friendly-error__sub {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--sph-muted);
+}
+
+.staff-ph-friendly-error__retry {
+  margin-top: 4px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  background: var(--sph-brand);
+  color: #ffffff;
   cursor: pointer;
 }
 

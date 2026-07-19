@@ -98,7 +98,8 @@
     "test:staff-purchase-history-layout": "node scripts/check-staff-purchase-history-layout.mjs",
     "test:staff-purchase-history-fields": "node scripts/check-staff-purchase-history-fields.mjs",
     "test:staff-purchase-history-buttons": "node scripts/check-staff-purchase-history-buttons.mjs",
-    "test:staff-purchase-history-wire": "node scripts/check-staff-purchase-history-wire.mjs"
+    "test:staff-purchase-history-wire": "node scripts/check-staff-purchase-history-wire.mjs",
+    "test:staff-purchase-history-states": "node scripts/check-staff-purchase-history-states.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

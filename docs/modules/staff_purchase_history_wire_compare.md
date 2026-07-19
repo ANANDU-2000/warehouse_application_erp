@@ -10,7 +10,7 @@
 | ✅ Completed | Staff stock COMPARE · Staff purchase-history SCAFFOLD → **WIRE** |
 | 🟡 Current | `/staff/purchase-history` **WIRE PASS** — ask before STATES |
 | ⬜ Pending | STATES → COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | FriendlyLoadError map · RefreshIndicator · full pack · delivery badge · staff amount redact · Settings · merge to `main` |
+| ⏸ Deferred | full pack · delivery badge · staff amount redact · Settings · merge to `main` |
 
 ## Legacy vs New
 
@@ -36,4 +36,4 @@
 
 **Rollback:** Revert WIRE commit; restore BUTTONS empty catalogs; roll back homeActivity SELECT extras if needed; remove api/period modules + this compare + script; boards → ask before WIRE.
 
-**Next (ask first):** STATES — do not start until approved.
+**Next (ask first):** STATES done — see [`staff_purchase_history_states_compare.md`](staff_purchase_history_states_compare.md). Ask before COMPARE.

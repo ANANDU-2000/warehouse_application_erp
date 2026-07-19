@@ -62,7 +62,11 @@ assert(page.includes("fetchStaffPhLowStock"), "page low");
 assert(page.includes('data-slot="loading"'), "loading");
 assert(page.includes('data-slot="error"'), "error");
 assert(page.includes("retryLoad"), "retry");
-assert(page.includes("STAFF_PH_LOAD_FAILED"), "load failed copy");
+assert(
+  page.includes("STAFF_PH_LOAD_FAILED") ||
+    page.includes("mapStaffPhLoadTitle"),
+  "load failed copy",
+);
 assert(page.includes("lowRows.length"), "low tab count");
 
 assert(repo.includes("items_count"), "items_count");

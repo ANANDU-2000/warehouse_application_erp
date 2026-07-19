@@ -174,7 +174,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 3 FIELDS | ✅ | debounce 250ms + status/low chips + empty titles — [`staff_purchase_history_fields_compare.md`](modules/staff_purchase_history_fields_compare.md) |
 | 4 BUTTONS | ✅ | row tap + Inform owner + date grouping — [`staff_purchase_history_buttons_compare.md`](modules/staff_purchase_history_buttons_compare.md) |
 | 5 WIRE | ✅ | trade-purchases + low listStock — [`staff_purchase_history_wire_compare.md`](modules/staff_purchase_history_wire_compare.md) |
-| 6 STATES | ⬜ | — |
+| 6 STATES | ✅ | ListSkeleton + FriendlyLoadError + 2m cache — [`staff_purchase_history_states_compare.md`](modules/staff_purchase_history_states_compare.md) |
 | 7 COMPARE | ⬜ | — |
 
 ### Prompt template (copy per page)

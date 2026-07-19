@@ -1,10 +1,10 @@
 /**
- * Staff purchase history `/staff/purchase-history` — WIRE (Step 5).
- * Source: staffTradePurchasesHistoryProvider · staffLowStockAlertsProvider ·
- * hexa_api.listTradePurchases / listStock(status=low).
- * Deferred: RefreshIndicator / FriendlyLoadError map (STATES) · full pack · delivery badge.
+ * Staff purchase history `/staff/purchase-history` — STATES (Step 6).
+ * Source: staff_purchase_history_page.dart ListSkeleton / FriendlyLoadError /
+ * RefreshIndicator; staffTradePurchasesHistoryProvider keepAlive 2m.
+ * Deferred: full pack · delivery badge · detail body · staff ₹ redact.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type TouchEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { readPrimaryBusiness } from "../../../shared/auth/sessionStore";
 import {
@@ -15,17 +15,19 @@ import {
 } from "./staffPurchaseHistoryApi";
 import {
   STAFF_PH_BACK_FALLBACK,
+  STAFF_PH_CACHE_TTL_MS,
   STAFF_PH_DEBOUNCE_MS,
   STAFF_PH_INFORM_OWNER,
-  STAFF_PH_LOAD_FAILED,
-  STAFF_PH_LOADING,
   STAFF_PH_LOW_ALL,
   STAFF_PH_LOW_CRITICAL,
-  STAFF_PH_LOW_LOAD_FAILED,
   STAFF_PH_LOW_STOCK_PATH,
   STAFF_PH_RETRY,
   STAFF_PH_SEARCH_HINT,
   STAFF_PH_SEARCH_HINT_LOW,
+  STAFF_PH_SKELETON_LOW_HEIGHT_PX,
+  STAFF_PH_SKELETON_LOW_ROWS,
+  STAFF_PH_SKELETON_PURCHASE_HEIGHT_PX,
+  STAFF_PH_SKELETON_PURCHASE_ROWS,
   STAFF_PH_STATUS_ALL,
   STAFF_PH_STATUS_DELIVERED,
   STAFF_PH_STATUS_UNDELIVERED,
@@ -65,7 +67,14 @@ import {
   type StaffPhLowStockRow,
   type StaffPhPurchaseRow,
 } from "./staffPurchaseHistoryLogic";
-import { staffPhTabToPeriod } from "./staffPurchaseHistoryPeriod";
+import {
+  mapStaffPhLoadSubtitle,
+  mapStaffPhLoadTitle,
+} from "./staffPurchaseHistoryLoadSubtitle";
+import {
+  staffPhTabToPeriod,
+  type StaffPhPeriod,
+} from "./staffPurchaseHistoryPeriod";
 import {
   STAFF_PH_TAB_ORDER,
   staffPhTabFromQuery,
@@ -102,6 +111,21 @@ const LOW_CHIP_MOD: Record<StaffPhLowFilter, string> = {
   critical: "staff-ph-chip--critical",
 };
 
+type PhPurchasesCache = { at: number; rows: StaffPhPurchaseRow[] };
+type PhLowCache = { at: number; rows: StaffPhLowStockRow[] };
+
+/** Flutter keepAlive 2m — keyed by business + period / low. */
+const purchasesCache = new Map<string, PhPurchasesCache>();
+const lowStockCache = new Map<string, PhLowCache>();
+
+function purchasesCacheKey(businessId: string, period: StaffPhPeriod): string {
+  return `${businessId}|${period}`;
+}
+
+function lowCacheKey(businessId: string): string {
+  return businessId;
+}
+
 function popOrGo(
   navigate: ReturnType<typeof useNavigate>,
   fallback: string,
@@ -132,8 +156,10 @@ export function StaffPurchaseHistoryPage() {
   const [purchases, setPurchases] = useState<StaffPhPurchaseRow[]>([]);
   const [lowRows, setLowRows] = useState<StaffPhLowStockRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<unknown | null>(null);
   const [retryTick, setRetryTick] = useState(0);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const pullStartY = useRef<number | null>(null);
 
   const isLow = tab === "lowStock";
   const period = staffPhTabToPeriod(tab);
@@ -146,21 +172,63 @@ export function StaffPurchaseHistoryPage() {
   }, [query]);
 
   useEffect(() => {
+    setHasLoadedOnce(false);
+    setLoadError(null);
+    setLoading(true);
+  }, [tab, period, isLow, retryTick]);
+
+  useEffect(() => {
     if (!businessId) {
       setLoading(false);
       setLoadError("Not signed in");
       setPurchases([]);
       setLowRows([]);
+      setHasLoadedOnce(true);
       return;
     }
     let cancelled = false;
+
+    /** Serve keepAlive cache when not an explicit retry. */
+    if (retryTick === 0) {
+      const lowCached = lowStockCache.get(lowCacheKey(businessId));
+      if (lowCached && Date.now() - lowCached.at < STAFF_PH_CACHE_TTL_MS) {
+        setLowRows(lowCached.rows);
+      }
+      if (!isLow && period) {
+        const pCached = purchasesCache.get(
+          purchasesCacheKey(businessId, period),
+        );
+        if (pCached && Date.now() - pCached.at < STAFF_PH_CACHE_TTL_MS) {
+          setPurchases(pCached.rows);
+          setLoading(false);
+          setLoadError(null);
+          setHasLoadedOnce(true);
+          return;
+        }
+      } else if (isLow) {
+        const lowHit = lowStockCache.get(lowCacheKey(businessId));
+        if (lowHit && Date.now() - lowHit.at < STAFF_PH_CACHE_TTL_MS) {
+          setLowRows(lowHit.rows);
+          setLoading(false);
+          setLoadError(null);
+          setHasLoadedOnce(true);
+          return;
+        }
+      }
+    }
+
     setLoading(true);
     setLoadError(null);
 
-    /** Flutter: low alerts keepAlive independent of purchase period fetch. */
     const lowP = fetchStaffPhLowStock(businessId).then(
       (rows) => {
-        if (!cancelled) setLowRows(rows);
+        if (!cancelled) {
+          setLowRows(rows);
+          lowStockCache.set(lowCacheKey(businessId), {
+            at: Date.now(),
+            rows,
+          });
+        }
         return null as unknown;
       },
       (err: unknown) => err,
@@ -169,7 +237,15 @@ export function StaffPurchaseHistoryPage() {
     const purchaseP = !isLow
       ? fetchStaffPhPurchases(businessId, period ?? "allTime").then(
           (rows) => {
-            if (!cancelled) setPurchases(rows);
+            if (!cancelled) {
+              setPurchases(rows);
+              if (period) {
+                purchasesCache.set(purchasesCacheKey(businessId, period), {
+                  at: Date.now(),
+                  rows,
+                });
+              }
+            }
             return null as unknown;
           },
           (err: unknown) => err,
@@ -183,23 +259,24 @@ export function StaffPurchaseHistoryPage() {
       if (cancelled) return;
       if (isLow && lowErr != null) {
         setLowRows([]);
-        if (lowErr instanceof StaffPhNetworkError) {
-          setLoadError(lowErr.message);
-        } else if (lowErr instanceof StaffPhApiError) {
-          setLoadError(lowErr.detail);
-        } else {
-          setLoadError(STAFF_PH_LOW_LOAD_FAILED);
-        }
+        setLoadError(
+          lowErr instanceof StaffPhNetworkError ||
+            lowErr instanceof StaffPhApiError
+            ? lowErr
+            : lowErr,
+        );
       } else if (!isLow && purchaseErr != null) {
         setPurchases([]);
-        if (purchaseErr instanceof StaffPhNetworkError) {
-          setLoadError(purchaseErr.message);
-        } else if (purchaseErr instanceof StaffPhApiError) {
-          setLoadError(purchaseErr.detail);
-        } else {
-          setLoadError(STAFF_PH_LOAD_FAILED);
-        }
+        setLoadError(
+          purchaseErr instanceof StaffPhNetworkError ||
+            purchaseErr instanceof StaffPhApiError
+            ? purchaseErr
+            : purchaseErr,
+        );
+      } else {
+        setLoadError(null);
       }
+      setHasLoadedOnce(true);
       setLoading(false);
     });
 
@@ -218,8 +295,24 @@ export function StaffPurchaseHistoryPage() {
   });
   const grouped = buildGroupedPurchaseHistory(filteredPurchases);
 
+  /** Flutter: Expanded only — AppBar/search/chips stay; list area skeleton/error. */
+  const showInitialSkeleton =
+    loading &&
+    loadError == null &&
+    (isLow ? lowRows.length === 0 : purchases.length === 0);
+  const showError =
+    loadError != null &&
+    (isLow ? lowRows.length === 0 : purchases.length === 0);
+  const showListData =
+    !showInitialSkeleton &&
+    !showError &&
+    (hasLoadedOnce ||
+      (isLow ? lowRows.length > 0 : purchases.length > 0));
+  const errorTitle = mapStaffPhLoadTitle(loadError, { isLow });
+  const errorSubtitle = mapStaffPhLoadSubtitle(loadError);
+
   const emptyTitle =
-    !loading && !loadError
+    showListData && !loading && !loadError
       ? isLow
         ? staffPhLowEmptyTitle({
             itemCount: filteredLow.length,
@@ -242,8 +335,36 @@ export function StaffPurchaseHistoryPage() {
   }
 
   function retryLoad(): void {
+    if (businessId) {
+      lowStockCache.delete(lowCacheKey(businessId));
+      if (period) {
+        purchasesCache.delete(purchasesCacheKey(businessId, period));
+      }
+    }
     setRetryTick((n) => n + 1);
   }
+
+  /** RefreshIndicator — purchases list only (Flutter). */
+  function onPullTouchStart(e: TouchEvent): void {
+    if (isLow) return;
+    pullStartY.current = e.touches[0]?.clientY ?? null;
+  }
+
+  function onPullTouchEnd(e: TouchEvent): void {
+    if (isLow) return;
+    const start = pullStartY.current;
+    pullStartY.current = null;
+    if (start == null) return;
+    const end = e.changedTouches[0]?.clientY ?? start;
+    if (end - start > 72) retryLoad();
+  }
+
+  const skeletonRows = isLow
+    ? STAFF_PH_SKELETON_LOW_ROWS
+    : STAFF_PH_SKELETON_PURCHASE_ROWS;
+  const skeletonHeight = isLow
+    ? STAFF_PH_SKELETON_LOW_HEIGHT_PX
+    : STAFF_PH_SKELETON_PURCHASE_HEIGHT_PX;
 
   return (
     <div className="staff-ph-page" data-page="staff-purchase-history">
@@ -358,30 +479,66 @@ export function StaffPurchaseHistoryPage() {
           </div>
         )}
 
-        <div className="staff-ph-results" data-slot="results">
-          {loading ? (
-            <div className="staff-ph-results__empty" data-slot="loading">
-              {STAFF_PH_LOADING}
+        <div
+          className="staff-ph-results"
+          data-slot="results"
+          onTouchStart={onPullTouchStart}
+          onTouchEnd={onPullTouchEnd}
+        >
+          {showInitialSkeleton ? (
+            <div
+              className="staff-ph-skeleton"
+              data-slot="loading"
+              data-testid="staff-ph-loading"
+              aria-label="ListSkeleton"
+            >
+              {Array.from({ length: skeletonRows }, (_, i) => (
+                <div
+                  key={i}
+                  className="staff-ph-skeleton__row"
+                  style={{ height: skeletonHeight }}
+                />
+              ))}
             </div>
           ) : null}
-          {loadError && !loading ? (
-            <div className="staff-ph-results__error" data-slot="error">
-              <div>
-                {isLow ? STAFF_PH_LOW_LOAD_FAILED : STAFF_PH_LOAD_FAILED}
+
+          {showError ? (
+            <div
+              className="staff-ph-friendly-error"
+              data-slot="error"
+              data-testid="staff-ph-error"
+              role="alert"
+            >
+              <div
+                className="staff-ph-friendly-error__icon"
+                aria-hidden="true"
+              >
+                !
               </div>
-              <div className="staff-ph-results__error-detail">{loadError}</div>
-              <button type="button" onClick={retryLoad}>
+              <p className="staff-ph-friendly-error__title">{errorTitle}</p>
+              <p className="staff-ph-friendly-error__sub">{errorSubtitle}</p>
+              <button
+                type="button"
+                className="staff-ph-friendly-error__retry"
+                data-testid="staff-ph-retry"
+                onClick={retryLoad}
+              >
                 {STAFF_PH_RETRY}
               </button>
             </div>
           ) : null}
+
           {emptyTitle ? (
             <div className="staff-ph-results__empty" data-slot="empty">
               {emptyTitle}
             </div>
           ) : null}
 
-          {!loading && !loadError && !isLow && filteredPurchases.length > 0 ? (
+          {showListData &&
+          !loading &&
+          !loadError &&
+          !isLow &&
+          filteredPurchases.length > 0 ? (
             <div className="staff-ph-list" data-slot="list">
               {grouped.map((entry, i) => {
                 if (entry.kind === "header") {
@@ -416,7 +573,6 @@ export function StaffPurchaseHistoryPage() {
                       <div className="staff-ph-row__headline">{headline}</div>
                     ) : null}
                     <div className="staff-ph-row__meta">
-                      {/* pack summary — full accumulator deferred WIRE */}
                       <span data-deferred="pack-summary" />
                       {humanId ? <span>{humanId}</span> : null}
                       {broker ? (
@@ -432,7 +588,6 @@ export function StaffPurchaseHistoryPage() {
                       >
                         {purchaseStatusLabel(row)}
                       </span>
-                      {/* PurchaseDeliveryBadge — WIRE */}
                       <span data-deferred="delivery-badge" />
                     </div>
                   </button>
@@ -441,7 +596,11 @@ export function StaffPurchaseHistoryPage() {
             </div>
           ) : null}
 
-          {!loading && !loadError && isLow && filteredLow.length > 0 ? (
+          {showListData &&
+          !loading &&
+          !loadError &&
+          isLow &&
+          filteredLow.length > 0 ? (
             <div className="staff-ph-list" data-slot="list">
               {filteredLow.map((item, i) => {
                 const critical = lowStockIsCritical(item);
@@ -495,8 +654,7 @@ export function StaffPurchaseHistoryPage() {
             </div>
           ) : null}
 
-          {/* Empty catalog still reserves list slot */}
-          {emptyTitle && !loading && !loadError ? (
+          {emptyTitle && showListData ? (
             <div
               className="staff-ph-list"
               data-slot="list"

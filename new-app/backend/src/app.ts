@@ -303,7 +303,16 @@ function unavailableItemCategoriesRepository(): ItemCategoriesRepository {
     getById: fail,
     findDupCategoryId: fail,
     insertCategory: fail,
+    updateCategoryName: fail,
+    countCatalogItemsByCategory: fail,
+    deleteCategory: fail,
     insertType: fail,
+    listTypes: fail,
+    getTypeById: fail,
+    findDupTypeId: fail,
+    updateTypeName: fail,
+    countCatalogItemsByType: fail,
+    deleteType: fail,
     listTypesIndex: fail,
   };
 }

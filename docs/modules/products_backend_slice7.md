@@ -9,8 +9,8 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Slice 1–6 · **Slice 7 bulk-archive + bulk-reorder** · Categories Slice 1 |
-| 🟡 Current | See [`categories_backend_slice1.md`](categories_backend_slice1.md) |
+| ✅ Completed | Slice 1–6 · **Slice 7 bulk-archive + bulk-reorder** · Categories Slice 1–2 |
+| 🟡 Current | See [`categories_backend_slice2.md`](categories_backend_slice2.md) |
 | ⬜ Pending | catalog UI · remaining reads |
 | ⏸ Deferred | purchase entry · barcode/print UI · receive · Settings · merge to `main` |
 

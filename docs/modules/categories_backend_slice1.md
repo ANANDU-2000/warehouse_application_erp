@@ -9,9 +9,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · **Categories Slice 1** |
-| 🟡 Current | Categories Slice 1 PASS — ask before Slice 2 (PATCH/DELETE category + category-types CRUD) or catalog UI SCAFFOLD |
-| ⬜ Pending | category PATCH/DELETE · nested category-types · trade-summary/insights · catalog UI |
+| ✅ Completed | Products Slice 1–7 · **Categories Slice 1** · Slice 2 |
+| 🟡 Current | See [`categories_backend_slice2.md`](categories_backend_slice2.md) |
+| ⬜ Pending | trade-summary/insights · catalog UI |
+| ⏸ Deferred | purchase entry · barcode/print · receive · Settings · merge to `main` |
 | ⏸ Deferred | purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New

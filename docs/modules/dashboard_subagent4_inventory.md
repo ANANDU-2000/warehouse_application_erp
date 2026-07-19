@@ -63,10 +63,10 @@
 
 ## Next (ask first)
 
-1. **Categories Slice 2** — PATCH/DELETE category + nested category-types (ask first), **or**  
-2. **Catalog UI SCAFFOLD** — `/catalog` page loop step 1, **or**  
+1. **Catalog UI SCAFFOLD** — `/catalog` page loop step 1, **or**  
+2. Categories trade-summary / insights APIs, **or**  
 3. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11).
 
 **Do not** invent purchase/barcode UI.
 
-*(Products Slice 7 — [`products_backend_slice7.md`](products_backend_slice7.md). Categories Slice 1 — [`categories_backend_slice1.md`](categories_backend_slice1.md).)*
+*(Categories Slice 2 — [`categories_backend_slice2.md`](categories_backend_slice2.md). Products Slice 7 — [`products_backend_slice7.md`](products_backend_slice7.md).)*

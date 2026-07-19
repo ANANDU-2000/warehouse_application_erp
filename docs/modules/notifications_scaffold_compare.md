@@ -9,9 +9,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · **STATES** |
-| 🟡 Current | STATES PASS — ask before **COMPARE** |
-| ⬜ Pending | COMPARE · other Subagent 4 stubs |
+| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
+| 🟡 Current | COMPARE PASS — ask before next Subagent 4 stub |
+| ⬜ Pending | Other Subagent 4 stubs |
 | ⏸ Deferred | Settings hub; purchase-due; STATES polish |
 
 ## Legacy vs New

@@ -8,9 +8,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff stock COMPARE · Staff purchase-history **SCAFFOLD** |
-| 🟡 Current | `/staff/purchase-history` **SCAFFOLD PASS** — ask before LAYOUT |
-| ⬜ Pending | LAYOUT → COMPARE · other Subagent 4 stubs |
+| ✅ Completed | Staff stock COMPARE · Staff purchase-history SCAFFOLD · **LAYOUT** |
+| 🟡 Current | `/staff/purchase-history` **LAYOUT PASS** — ask before FIELDS |
+| ⬜ Pending | FIELDS → COMPARE · other Subagent 4 stubs |
 | ⏸ Deferred | `/staff/purchase-history/:purchaseId` detail page · trade-purchases API · Inform owner · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -39,4 +39,4 @@
 
 **Rollback:** Revert SCAFFOLD commit; restore list route → `DashboardRouteStubPage` title “Purchase history”; remove `features/staff/purchaseHistory/*` + this compare + script; boards → ask before purchase-history SCAFFOLD.
 
-**Next (ask first):** LAYOUT — do not start until approved.
+**Next (ask first):** LAYOUT done — [`staff_purchase_history_layout_compare.md`](staff_purchase_history_layout_compare.md). Ask before FIELDS.

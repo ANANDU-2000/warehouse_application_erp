@@ -1,7 +1,9 @@
 /**
- * Staff purchase history `/staff/purchase-history` — SCAFFOLD (Step 1).
- * Source: staff_purchase_history_page.dart StaffPurchaseHistoryPage.
- * Forbidden: debounce/search typing, chip/tab handlers, trade-purchases API, detail nav.
+ * Staff purchase history `/staff/purchase-history` — LAYOUT (Step 2).
+ * Source: staff_purchase_history_page.dart Scaffold HexaColors.brandBackground;
+ * AppBar brandPrimary; InputDecoration radius 10 / brandBorder;
+ * FilterChip fontSize 11 · Wrap spacing 6; _DateHeader; StaffPurchaseHistoryRow.
+ * Forbidden: debounce/search typing, chip/tab handlers, trade-purchases API.
  */
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
@@ -49,9 +51,20 @@ const STATUS_LABEL: Record<StaffPhStatusFilter, string> = {
   delivered: STAFF_PH_STATUS_DELIVERED,
 };
 
+const STATUS_CHIP_MOD: Record<StaffPhStatusFilter, string> = {
+  all: "staff-ph-chip--all",
+  pending: "staff-ph-chip--pending",
+  delivered: "staff-ph-chip--delivered",
+};
+
 const LOW_LABEL: Record<StaffPhLowFilter, string> = {
   all: STAFF_PH_LOW_ALL,
   critical: STAFF_PH_LOW_CRITICAL,
+};
+
+const LOW_CHIP_MOD: Record<StaffPhLowFilter, string> = {
+  all: "staff-ph-chip--low-all",
+  critical: "staff-ph-chip--critical",
 };
 
 function popOrGo(
@@ -89,7 +102,7 @@ export function StaffPurchaseHistoryPage() {
           <h1 className="staff-ph-appbar__title">{STAFF_PH_TITLE}</h1>
         </div>
         <div
-          className="staff-ph-tabs"
+          className="staff-ph-tabs staff-ph-tabs--inert"
           data-slot="tabs"
           role="tablist"
           aria-label="Period"
@@ -115,7 +128,10 @@ export function StaffPurchaseHistoryPage() {
       </header>
 
       <main className="staff-ph-body" data-slot="body">
-        <div className="staff-ph-search" data-slot="search">
+        <div
+          className="staff-ph-search staff-ph-search--inert"
+          data-slot="search"
+        >
           <input
             className="staff-ph-search__input"
             type="search"
@@ -128,30 +144,40 @@ export function StaffPurchaseHistoryPage() {
         </div>
 
         {!isLow ? (
-          <div className="staff-ph-chips" data-slot="statusChips">
+          <div
+            className="staff-ph-chips staff-ph-chips--inert"
+            data-slot="statusChips"
+          >
             {STAFF_PH_STATUS_ORDER.map((key) => (
               <span
                 key={key}
-                className={
-                  status === key
-                    ? "staff-ph-chip staff-ph-chip--selected"
-                    : "staff-ph-chip"
-                }
+                className={[
+                  "staff-ph-chip",
+                  STATUS_CHIP_MOD[key],
+                  status === key ? "staff-ph-chip--selected" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
               >
                 {STATUS_LABEL[key]}
               </span>
             ))}
           </div>
         ) : (
-          <div className="staff-ph-chips" data-slot="lowStockChips">
+          <div
+            className="staff-ph-chips staff-ph-chips--inert"
+            data-slot="lowStockChips"
+          >
             {STAFF_PH_LOW_ORDER.map((key) => (
               <span
                 key={key}
-                className={
-                  lowFilter === key
-                    ? "staff-ph-chip staff-ph-chip--selected"
-                    : "staff-ph-chip"
-                }
+                className={[
+                  "staff-ph-chip",
+                  LOW_CHIP_MOD[key],
+                  lowFilter === key ? "staff-ph-chip--selected" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
               >
                 {LOW_LABEL[key]}
               </span>
@@ -164,7 +190,12 @@ export function StaffPurchaseHistoryPage() {
             {isLow ? STAFF_PH_EMPTY_LOW : STAFF_PH_EMPTY_PERIOD}
           </div>
           {/* Date headers + StaffPurchaseHistoryRow — FIELDS/WIRE */}
-          <div data-slot="list" data-deferred="purchase-rows" hidden />
+          <div
+            className="staff-ph-list"
+            data-slot="list"
+            data-deferred="purchase-rows"
+            hidden
+          />
         </div>
       </main>
     </div>

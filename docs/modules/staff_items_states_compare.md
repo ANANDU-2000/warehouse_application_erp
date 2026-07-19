@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff search COMPARE · Staff items SCAFFOLD→**STATES** |
-| 🟡 Current | Staff items **STATES PASS** — ask before COMPARE |
-| ⬜ Pending | Staff items COMPARE · other Subagent 4 stubs |
+| ✅ Completed | Staff search COMPARE · Staff items SCAFFOLD→**COMPARE** |
+| 🟡 Current | Staff items **COMPARE PASS** — ask before next stub |
+| ⬜ Pending | Other Subagent 4 stubs |
 | ⏸ Deferred | `/staff/settings` · `/settings`; QuickStockActionSheet |
 
 ## Legacy vs New
@@ -33,4 +33,4 @@
 
 **Rollback:** Revert STATES commit; restore WIRE string error + results-area loading; remove load-subtitle helper + this compare + script; boards → ask before STATES.
 
-**Next (ask first):** `/staff/items` COMPARE — do not start until approved.
+**Next (ask first):** COMPARE done — [`staff_items_compare.md`](staff_items_compare.md). Ask before next Subagent 4 stub.

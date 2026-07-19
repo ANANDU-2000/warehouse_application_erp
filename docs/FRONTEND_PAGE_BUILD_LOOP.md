@@ -151,7 +151,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 4 BUTTONS | ✅ | expand/subtabs/row menu/nav — [`staff_items_buttons_compare.md`](modules/staff_items_buttons_compare.md) |
 | 5 WIRE | ✅ | listStock paginate + gallery fields — [`staff_items_wire_compare.md`](modules/staff_items_wire_compare.md) |
 | 6 STATES | ✅ | FriendlyLoadError + body gates + 3m cache — [`staff_items_states_compare.md`](modules/staff_items_states_compare.md) |
-| 7 COMPARE | ⬜ | — |
+| 7 COMPARE | ✅ | in-scope PASS — [`staff_items_compare.md`](modules/staff_items_compare.md) |
 
 ### Prompt template (copy per page)
 

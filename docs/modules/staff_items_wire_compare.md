@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff search COMPARE · Staff items SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · **STATES** |
-| 🟡 Current | Staff items **STATES PASS** — ask before COMPARE |
-| ⬜ Pending | Staff items COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | `/staff/settings` · `/settings`; QuickStockActionSheet; FriendlyLoadError map polish (STATES) |
+| ✅ Completed | Staff search COMPARE · Staff items SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
+| 🟡 Current | Staff items **COMPARE PASS** — ask before next stub |
+| ⬜ Pending | Other Subagent 4 stubs |
+| ⏸ Deferred | `/staff/settings` · `/settings`; QuickStockActionSheet |
 
 ## Legacy vs New
 
@@ -37,4 +37,4 @@
 
 **Rollback:** Revert WIRE commit; restore BUTTONS empty `allItems`; remove `staffItemGalleryApi.ts` + gallery fields from `listStock` SELECT/itemOut (keep slim fields if needed for staff home); remove this compare + script; boards → ask before WIRE.
 
-**Next (ask first):** STATES done — [`staff_items_states_compare.md`](staff_items_states_compare.md). Ask before COMPARE.
+**Next (ask first):** STATES → [`staff_items_states_compare.md`](staff_items_states_compare.md). COMPARE → [`staff_items_compare.md`](staff_items_compare.md). Ask before next stub.

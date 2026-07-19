@@ -9,8 +9,8 @@
 | State | Step |
 |---|---|
 | ✅ Completed | Profile SCAFFOLD→COMPARE · **Activity WIRE** |
-| 🟡 Current | Activity WIRE PASS — ask before Subagent 4 |
-| ⬜ Pending | Subagent 4 satellites |
+| 🟡 Current | Activity WIRE PASS — Notifications SCAFFOLD next done |
+| ⬜ Pending | Notifications LAYOUT · other Subagent 4 stubs |
 | ⏸ Deferred | Merge to `main` |
 
 ## Legacy vs New
@@ -40,4 +40,4 @@
 
 **Rollback:** Revert Activity WIRE commit; restore empty activity panel; remove panel/timeline/API activity helpers + this compare + script; boards → ask before activity WIRE.
 
-**Next (ask first):** one **Subagent 4 satellite** from [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md).
+**Next (ask first):** `/notifications` LAYOUT — see [`notifications_scaffold_compare.md`](notifications_scaffold_compare.md).

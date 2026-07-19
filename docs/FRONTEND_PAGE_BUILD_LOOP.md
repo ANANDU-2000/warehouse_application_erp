@@ -117,6 +117,18 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 7 COMPARE | ✅ | Master PASS — [`user_profile_compare.md`](modules/user_profile_compare.md) |
 | — Activity WIRE | ✅ | feed/stock/purchases/items/ledger — [`user_profile_activity_wire_compare.md`](modules/user_profile_activity_wire_compare.md) |
 
+### Notifications (`/notifications`) — Subagent 4
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | appBar/search/filters/list slots — [`notifications_scaffold_compare.md`](modules/notifications_scaffold_compare.md) |
+| 2 LAYOUT | ⬜ | Ask before next |
+| 3 FIELDS | ⬜ | |
+| 4 BUTTONS | ⬜ | |
+| 5 WIRE | ⬜ | |
+| 6 STATES | ⬜ | |
+| 7 COMPARE | ⬜ | |
+
 ### Prompt template (copy per page)
 
 ```

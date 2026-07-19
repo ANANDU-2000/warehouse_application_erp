@@ -9,9 +9,11 @@ import { DashboardRouteStubPage } from "../features/home/DashboardRouteStubPage"
 import { StaffHomePage } from "../features/staff/StaffHomePage";
 import { UserManagementPage } from "../features/users/UserManagementPage";
 import { UserProfilePage } from "../features/users/UserProfilePage";
+import { NotificationsPage } from "../features/notifications/NotificationsPage";
 
 /**
- * Splash + Login + owner /home + activity + breakdown-more SCAFFOLD + staff /staff/home + stubs.
+ * Splash + Login + owner /home + activity + breakdown-more + staff /staff/home +
+ * users + notifications SCAFFOLD + stubs.
  * Source: docs/05_Navigation_Map.md; dashboard.md
  */
 export function AppRouter() {
@@ -80,10 +82,7 @@ export function AppRouter() {
           path="/barcode/bulk-print"
           element={<DashboardRouteStubPage title="Bulk print labels" />}
         />
-        <Route
-          path="/notifications"
-          element={<DashboardRouteStubPage title="Notifications" />}
-        />
+        <Route path="/notifications" element={<NotificationsPage />} />
         <Route
           path="/settings"
           element={<DashboardRouteStubPage title="Settings" />}

@@ -1,0 +1,135 @@
+/**
+ * Notifications SCAFFOLD chrome — brand tokens; no list rows / API.
+ */
+.notifications-page {
+  --notif-brand: #0e4f46;
+  --notif-bg: #f7f9f6;
+  --notif-text: #0f172a;
+  --notif-muted: #5c6578;
+  --notif-border: #e5e7eb;
+  --notif-surface: #ffffff;
+
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  background: var(--notif-bg);
+  color: var(--notif-text);
+}
+
+.notifications-page__appbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 56px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  background: var(--notif-bg);
+}
+
+.notifications-page__appbar-leading,
+.notifications-page__appbar-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 4px;
+  min-height: 40px;
+}
+
+.notifications-page__icon-btn,
+.notifications-page__text-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--notif-muted);
+  font-family: inherit;
+  cursor: default;
+  opacity: 0.55;
+  padding: 0;
+  border-radius: 8px;
+}
+
+.notifications-page__icon-btn {
+  width: 40px;
+  height: 40px;
+}
+
+.notifications-page__text-btn {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+.notifications-page__title {
+  flex: 1;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--notif-text);
+}
+
+.notifications-page__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.notifications-page__search {
+  padding: 4px 16px 0;
+  box-sizing: border-box;
+}
+
+.notifications-page__search-input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--notif-border);
+  border-radius: 12px;
+  font: inherit;
+  font-size: 14px;
+  background: var(--notif-surface);
+  color: var(--notif-muted);
+}
+
+.notifications-page__filters {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 16px;
+  box-sizing: border-box;
+}
+
+.notifications-page__chip {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--notif-border);
+  background: var(--notif-surface);
+  color: var(--notif-muted);
+  cursor: default;
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+.notifications-page__chip--selected {
+  border-color: var(--notif-brand);
+  color: var(--notif-brand);
+  background: rgba(14, 79, 70, 0.08);
+  opacity: 1;
+}
+
+.notifications-page__list {
+  flex: 1;
+  min-height: 120px;
+  background: var(--notif-surface);
+  border-top: 1px solid var(--notif-border);
+}

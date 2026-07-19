@@ -36,7 +36,7 @@
 
 | Path | Stub title |
 |---|---|
-| `/notifications` | Notifications (full page; bell badge already WIRE-2e) |
+| `/notifications` | **SCAFFOLD PASS** — [`notifications_scaffold_compare.md`](notifications_scaffold_compare.md); LAYOUT next |
 | `/barcode/scan` | Barcode scan |
 | `/barcode/bulk-print` | Bulk print labels |
 | `/catalog/item/:itemId` | Catalog item |
@@ -44,7 +44,7 @@
 | `/stock` · `/stock/low-stock` · `/stock/reorder` · `/stock/opening-setup` · `/stock/missing-barcodes` | Stock family |
 | `/purchase` · `/purchase/new` | Purchases |
 | `/reports` | Reports |
-| `/settings` | Settings |
+| `/settings` | Settings (implement locked) |
 
 ### Seq 3 — Users & Roles (partial backend)
 
@@ -59,10 +59,11 @@
 | Realtime invalidation | No websocket/SSE in new-app; WIRE-2f N/A |
 | Profile sheet business title | Name/role only on staff home |
 | Mark-arrived / verify write APIs | WIRE-2b deferred writes |
+| `/staff/settings` · `/settings` | Settings **implement locked** until Settings backend |
 
 ## Next (ask first)
 
-1. One **satellite** from the stub tables above (start page loop), **or**  
+1. **`/notifications` LAYOUT** (page loop step 2), **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Activity WIRE done — see [`user_profile_activity_wire_compare.md`](user_profile_activity_wire_compare.md).)*
+*(Notifications SCAFFOLD done — see [`notifications_scaffold_compare.md`](notifications_scaffold_compare.md). `/staff/settings` skipped — Settings implement locked.)*

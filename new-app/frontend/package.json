@@ -65,7 +65,8 @@
     "test:user-profile-wire": "node scripts/check-user-profile-wire.mjs",
     "test:user-profile-states": "node scripts/check-user-profile-states.mjs",
     "test:user-profile-compare": "node scripts/check-user-profile-compare.mjs",
-    "test:user-profile-activity-wire": "node scripts/check-user-profile-activity-wire.mjs"
+    "test:user-profile-activity-wire": "node scripts/check-user-profile-activity-wire.mjs",
+    "test:notifications-scaffold": "node scripts/check-notifications-scaffold.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

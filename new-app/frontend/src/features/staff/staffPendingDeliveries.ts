@@ -25,6 +25,10 @@ export type StaffPendingPurchase = {
   itemsSummary: string;
   qty: number;
   unit: string;
+  /** Flutter supplierName — deliveries ListTile title */
+  supplierName: string | null;
+  /** Flutter _bagsQtySummary — unit aggregates or em dash */
+  bagsLine: string;
 };
 
 const DELIVERY_LABELS: Record<DeliveryStatusWire, string> = {
@@ -100,8 +104,25 @@ export type TradePurchaseListRow = {
   status?: string;
   is_delivered?: boolean;
   total_qty?: number | null;
+  supplier_name?: string | null;
   lines?: LineLike[];
 };
+
+function bagsQtySummary(lines: LineLike[]): string {
+  const byUnit = new Map<string, number>();
+  for (const l of lines) {
+    const u = String(l.unit ?? "")
+      .trim()
+      .toUpperCase();
+    const q = Number(l.qty ?? 0);
+    if (!Number.isFinite(q)) continue;
+    byUnit.set(u, (byUnit.get(u) ?? 0) + q);
+  }
+  if (byUnit.size === 0) return "—";
+  return [...byUnit.entries()]
+    .map(([u, q]) => `${formatStockQtyNumber(q)}${u ? ` ${u}` : ""}`)
+    .join(" · ");
+}
 
 function itemsSummaryFromLines(lines: LineLike[]): string {
   if (lines.length === 0) return "";
@@ -117,11 +138,16 @@ function coercePurchase(row: TradePurchaseListRow): StaffPendingPurchase | null 
   const id = String(row.id ?? "").trim();
   if (!id) return null;
   const lines = Array.isArray(row.lines) ? row.lines : [];
-  const qty = lines.reduce((a, l) => a + Number(l.qty ?? 0), 0);
+  const qtyFromLines = lines.reduce((a, l) => a + Number(l.qty ?? 0), 0);
+  const qty =
+    lines.length > 0
+      ? qtyFromLines
+      : Number(row.total_qty ?? 0) || 0;
   const unit =
     lines.length > 0 ? String(lines[0]?.unit ?? "").trim() : "";
   const humanId = String(row.human_id ?? "").trim() || id;
   const summary = itemsSummaryFromLines(lines);
+  const supplierRaw = row.supplier_name != null ? String(row.supplier_name).trim() : "";
   return {
     id,
     humanId,
@@ -132,6 +158,8 @@ function coercePurchase(row: TradePurchaseListRow): StaffPendingPurchase | null 
     itemsSummary: summary,
     qty,
     unit,
+    supplierName: supplierRaw.length > 0 ? supplierRaw : null,
+    bagsLine: bagsQtySummary(lines),
   };
 }
 
@@ -212,6 +240,16 @@ export function staffPendingDeliveriesFromRows(
   ];
   pending.sort((a, b) => a.purchaseDate.localeCompare(b.purchaseDate));
   return pending;
+}
+
+/** Parse list rows then group — staffDeliverySectionsProvider */
+export function staffDeliverySectionsFromRows(
+  rows: TradePurchaseListRow[],
+): StaffDeliverySections {
+  const parsed = rows
+    .map(coercePurchase)
+    .filter((p): p is StaffPendingPurchase => p != null);
+  return groupStaffDeliverySections(parsed);
 }
 
 export function showMarkArrived(ds: DeliveryStatusWire): boolean {

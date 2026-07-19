@@ -47,7 +47,9 @@ assert(fields.includes("STAFF_DEL_EMPTY_COUNTS"), "empty counts");
 assert(copy.includes("STAFF_DEL_TITLE_COUNTED"), "counted title");
 
 assert(
-  page.includes("FIELDS") || page.includes("BUTTONS"),
+  page.includes("FIELDS") ||
+    page.includes("BUTTONS") ||
+    page.includes("WIRE"),
   "FIELDS+ header",
 );
 assert(page.includes("useState"), "useState");
@@ -57,7 +59,9 @@ assert(page.includes("staffDelShowEmptyAll"), "uses empty gate");
 assert(page.includes("STAFF_DEL_SECTION_ORDER"), "section catalog");
 assert(page.includes('data-total={total}'), "data-total");
 assert(
-  page.includes('data-step="fields"') || page.includes('data-step="buttons"'),
+  page.includes('data-step="fields"') ||
+    page.includes('data-step="buttons"') ||
+    page.includes('data-step="wire"'),
   "fields+ step",
 );
 assert(!page.includes('type="search"'), "no search input on page");
@@ -71,10 +75,14 @@ assert(
 );
 assert(
   page.includes('data-deferred="delivery-rows"') ||
-    page.includes("onOpenReceive"),
-  "rows deferred or BUTTONS",
+    page.includes("onOpenReceive") ||
+    page.includes("staffDeliverySectionsFromRows"),
+  "rows deferred or WIRE",
 );
-assert(!page.includes("fetch("), "no fetch");
+assert(
+  page.includes("fetchTradePurchasesRecent") || !page.includes("fetch("),
+  "no raw fetch unless WIRE",
+);
 assert(
   !page.includes("onClick") ||
     page.includes("onBack") ||

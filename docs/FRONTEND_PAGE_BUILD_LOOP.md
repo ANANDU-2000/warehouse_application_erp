@@ -209,7 +209,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 2 LAYOUT | ✅ | Hexa tokens + card/row chrome — [`staff_deliveries_layout_compare.md`](modules/staff_deliveries_layout_compare.md) |
 | 3 FIELDS | ✅ | title/count/empty gates (no inputs) — [`staff_deliveries_fields_compare.md`](modules/staff_deliveries_fields_compare.md) |
 | 4 BUTTONS | ✅ | back + scan + row→receive stubs — [`staff_deliveries_buttons_compare.md`](modules/staff_deliveries_buttons_compare.md) |
-| 5 WIRE | ⬜ | — |
+| 5 WIRE | ✅ | trade-purchases + groupStaffDeliverySections — [`staff_deliveries_wire_compare.md`](modules/staff_deliveries_wire_compare.md) |
 | 6 STATES | ⬜ | — |
 | 7 COMPARE | ⬜ | — |
 

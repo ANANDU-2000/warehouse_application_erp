@@ -41,7 +41,10 @@ assert(copy.includes('STAFF_DEL_SCAN_PATH = "/barcode/scan"'), "scan path");
 assert(copy.includes("staffDelReceivePath"), "receive path helper");
 assert(copy.includes("/staff/receive/"), "receive base");
 
-assert(page.includes("BUTTONS"), "BUTTONS header");
+assert(
+  page.includes("BUTTONS") || page.includes("WIRE"),
+  "BUTTONS+ header",
+);
 assert(page.includes("onBack"), "onBack");
 assert(page.includes("onScan"), "onScan");
 assert(page.includes("onOpenReceive"), "onOpenReceive");
@@ -53,8 +56,15 @@ assert(page.includes("staffDelReceivePath"), "uses receive path");
 assert(page.includes("popOrGo"), "popOrGo");
 assert(page.includes("STAFF_DEL_BACK_FALLBACK"), "back fallback");
 assert(page.includes("useNavigate"), "navigate");
-assert(!page.includes("fetch("), "no fetch");
-assert(page.includes('data-deferred="delivery-rows"'), "rows still sample until WIRE");
+assert(
+  page.includes("fetchTradePurchasesRecent") || !page.includes("fetch("),
+  "no raw fetch unless WIRE",
+);
+assert(
+  page.includes('data-deferred="delivery-rows"') ||
+    page.includes("staffDeliverySectionsFromRows"),
+  "rows deferred or WIRE",
+);
 
 assert(css.includes("staff-del-appbar__back--active"), "back active css");
 assert(css.includes("staff-del-row__hit"), "row hit target");

@@ -35,7 +35,8 @@ assert(
   page.includes("LAYOUT") ||
     page.includes("SCAFFOLD") ||
     page.includes("FIELDS") ||
-    page.includes("BUTTONS"),
+    page.includes("BUTTONS") ||
+    page.includes("WIRE"),
   "step header",
 );
 assert(page.includes('data-slot="appBar"'), "appBar");
@@ -50,10 +51,14 @@ assert(
 );
 assert(
   page.includes('data-deferred="delivery-rows"') ||
-    page.includes("onOpenReceive"),
-  "rows deferred or BUTTONS",
+    page.includes("onOpenReceive") ||
+    page.includes("staffDeliverySectionsFromRows"),
+  "rows deferred or WIRE",
 );
-assert(!page.includes("fetch("), "no fetch");
+assert(
+  page.includes("fetchTradePurchasesRecent") || !page.includes("fetch("),
+  "no raw fetch unless WIRE",
+);
 assert(
   !page.includes("onClick") ||
     page.includes("onBack") ||

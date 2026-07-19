@@ -76,7 +76,8 @@ assert(
   page.includes("SCAFFOLD") ||
     page.includes("LAYOUT") ||
     page.includes("FIELDS") ||
-    page.includes("BUTTONS"),
+    page.includes("BUTTONS") ||
+    page.includes("WIRE"),
   "SCAFFOLD+ header",
 );
 assert(page.includes('data-slot="appBar"'), "appBar");
@@ -107,10 +108,18 @@ assert(
 );
 assert(page.includes('data-slot="emptyAll"'), "empty all");
 assert(page.includes('data-deferred="scan-barcode"') || page.includes('data-action="scan-barcode"'), "scan slot");
-assert(page.includes('data-deferred="delivery-rows"') || page.includes("onOpenReceive"), "rows deferred or BUTTONS");
+assert(
+  page.includes('data-deferred="delivery-rows"') ||
+    page.includes("onOpenReceive") ||
+    page.includes("staffDeliverySectionsFromRows"),
+  "rows deferred or WIRE",
+);
 assert(page.includes('data-deferred="back"') || page.includes('data-action="back"'), "back slot");
 assert(page.includes("STAFF_DEL_EMPTY_ALL"), "empty copy");
-assert(!page.includes("fetch("), "no fetch");
+assert(
+  page.includes("fetchTradePurchasesRecent") || !page.includes("fetch("),
+  "no raw fetch unless WIRE",
+);
 assert(
   page.includes("onClick") === false ||
     page.includes("onBack") ||

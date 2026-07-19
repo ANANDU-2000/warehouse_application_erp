@@ -14,8 +14,8 @@
 | State | Step |
 |---|---|
 | ✅ Completed | Staff stock COMPARE · Staff purchase-history **SCAFFOLD→COMPARE** |
-| 🟡 Current | Staff purchase-history **COMPARE PASS** — ask before next stub |
-| ⬜ Pending (ask first) | `/staff/low-stock` · other Subagent 4 stubs — [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md) |
+| 🟡 Current | Staff purchase-history **COMPARE PASS** — ask before next stub (`/staff/low-stock` started) |
+| ⬜ Pending (ask first) | `/staff/low-stock` LAYOUT → COMPARE · other Subagent 4 stubs — [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md) |
 | ⏸ Deferred | full pack summary · delivery badge · detail body · staff ₹ redact · purchase entry · barcode/print · owner `/stock` · Settings · merge to `main` |
 
 ---
@@ -74,7 +74,7 @@ Docs/checklist + smoke script only: revert COMPARE commit. Application code unch
 
 ## 5. Next after Approve
 
-1. Ask before: **`/staff/low-stock` SCAFFOLD** (Inform owner target — still stub), **or**  
+1. Ask before: **`/staff/low-stock` LAYOUT** (SCAFFOLD done — [`staff_low_stock_scaffold_compare.md`](staff_low_stock_scaffold_compare.md)), **or**  
 2. Another Subagent 4 stub from [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md), **or**  
 3. Hold / merge review of `ops/dashboard-module` → `main`.
 

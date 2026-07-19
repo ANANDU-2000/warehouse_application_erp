@@ -177,6 +177,18 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 6 STATES | ✅ | ListSkeleton + FriendlyLoadError + 2m cache — [`staff_purchase_history_states_compare.md`](modules/staff_purchase_history_states_compare.md) |
 | 7 COMPARE | ✅ | Aggregator SCAFFOLD→STATES — [`staff_purchase_history_compare.md`](modules/staff_purchase_history_compare.md) |
 
+### Staff low stock (`/staff/low-stock`) — Subagent 4
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | AppBar + search/tabs/empty — [`staff_low_stock_scaffold_compare.md`](modules/staff_low_stock_scaffold_compare.md) |
+| 2 LAYOUT | ⬜ | — |
+| 3 FIELDS | ⬜ | — |
+| 4 BUTTONS | ⬜ | — |
+| 5 WIRE | ⬜ | — |
+| 6 STATES | ⬜ | — |
+| 7 COMPARE | ⬜ | — |
+
 ### Prompt template (copy per page)
 
 ```

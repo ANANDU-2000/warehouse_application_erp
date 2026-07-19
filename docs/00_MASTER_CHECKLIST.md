@@ -22,15 +22,15 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: Subagent 4 **Staff purchase-history COMPARE** on `ops/dashboard-module` — ask before next stub.
+**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: Subagent 4 **Staff low-stock SCAFFOLD** on `ops/dashboard-module` — ask before LAYOUT.
 
 ### Task board (Dashboard staff WIRE-2)
 
 | State | Step |
 |---|---|
-| ✅ Completed | Login/Splash/home/staff COMPARE · WIRE-2a–2f · Users COMPARE · Activity WIRE · Notifications COMPARE · Staff search COMPARE · Staff items COMPARE · Staff stock COMPARE · Staff purchase-history **SCAFFOLD→COMPARE** |
-| 🟡 Current | `/staff/purchase-history` **COMPARE PASS** — ask before `/staff/low-stock` (or other stub) |
-| ⬜ Pending | `/staff/low-stock` · other Subagent 4 stubs — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
+| ✅ Completed | Login/Splash/home/staff COMPARE · WIRE-2a–2f · Users COMPARE · Activity WIRE · Notifications COMPARE · Staff search COMPARE · Staff items COMPARE · Staff stock COMPARE · Staff purchase-history COMPARE · Staff low-stock **SCAFFOLD** |
+| 🟡 Current | `/staff/low-stock` **SCAFFOLD PASS** — ask before LAYOUT |
+| ⬜ Pending | Staff low-stock LAYOUT → COMPARE · other Subagent 4 stubs — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
 | ⏸ Deferred | `/staff/settings` · `/settings`; owner `/stock`; purchase entry; barcode/print; merge to `main`; full Dashboard Subagent 4 sign-off |
 
 ### Phase 1 module analysis queue (strict — one at a time)
@@ -38,7 +38,7 @@
 | # | Module | Status | Evidence |
 |---|---|---|---|
 | 1 | Login | ✅ UI COMPARE PASS | COMPARE [`login_compare.md`](modules/login_compare.md) · Splash [`splash_compare.md`](modules/splash_compare.md) |
-| 2 | Dashboard | 🟡 WIRE-2 · Staff purchase-history COMPARE | [`staff_purchase_history_compare.md`](modules/staff_purchase_history_compare.md) · [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
+| 2 | Dashboard | 🟡 WIRE-2 · Staff low-stock SCAFFOLD | [`staff_low_stock_scaffold_compare.md`](modules/staff_low_stock_scaffold_compare.md) · [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
 | 3 | Users & Roles | 🟡 Backend 1–14 · list+profile COMPARE · Activity WIRE | [`user_profile_activity_wire_compare.md`](modules/user_profile_activity_wire_compare.md) · [`user_profile_compare.md`](modules/user_profile_compare.md) |
 | 4 | Products | ✅ Analyze+Review PASS | `docs/modules/products.md`, `docs/matrix/products_traceability.md`, branch `phase1/products-analysis` |
 | 5 | Categories | ✅ Analyze+Review PASS | `docs/modules/categories.md`, `docs/matrix/categories_traceability.md`, branch `phase1/categories-analysis` |
@@ -53,7 +53,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). Subagent 4: Staff purchase-history **COMPARE PASS**. Ask before next stub (`/staff/low-stock`).
+**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). Subagent 4: Staff low-stock **SCAFFOLD PASS**. Ask before LAYOUT.
 
 ### Cursor operator setup (workspace)
 
@@ -111,7 +111,7 @@
 
 ## PHASE 4 — Frontend Migration (React + TypeScript) 🟡
 
-**Unlocked.** Phase 3 platform PASS. Subagent 4: `/staff/purchase-history` **COMPARE PASS**. Next: ask before `/staff/low-stock` (or other stub).
+**Unlocked.** Phase 3 platform PASS. Subagent 4: `/staff/low-stock` **SCAFFOLD PASS**. Next: ask before LAYOUT.
 
 | # | Task | Status |
 |---|---|---|
@@ -125,7 +125,7 @@
 | 4.8 | Accessibility | 🔒 |
 | 4.9 | Phase 4 sign-off (per module) | 🔒 |
 
-**4.2 / 4.5 note:** Subagent 4 Staff purchase-history COMPARE PASS — [`staff_purchase_history_compare.md`](modules/staff_purchase_history_compare.md). Ask before `/staff/low-stock`. Settings hub skipped (implement locked).
+**4.2 / 4.5 note:** Subagent 4 Staff low-stock SCAFFOLD PASS — [`staff_low_stock_scaffold_compare.md`](modules/staff_low_stock_scaffold_compare.md). Ask before LAYOUT. Settings hub skipped (implement locked).
  
 ---
 
@@ -203,4 +203,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-19 — Staff purchase-history COMPARE PASS ([`staff_purchase_history_compare.md`](modules/staff_purchase_history_compare.md)); ask before `/staff/low-stock`.*
+*Last updated: 2026-07-19 — Staff low-stock SCAFFOLD PASS ([`staff_low_stock_scaffold_compare.md`](modules/staff_low_stock_scaffold_compare.md)); ask before LAYOUT.*

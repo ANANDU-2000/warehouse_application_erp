@@ -1,0 +1,176 @@
+/**
+ * Staff low stock SCAFFOLD chrome only.
+ * Source: LowStockDashboardPage brandBackground; AppBar brandPrimary;
+ * search OutlineInputBorder radius 10; segmented tabs All/Out/Bought/Pending/Delivery.
+ * Forbidden: interactive fields, API, export handlers.
+ */
+
+.staff-ls-page {
+  --sls-bg: #f7f9f6;
+  --sls-fg: #0f172a;
+  --sls-brand: #0e4f46;
+  --sls-muted: #64748b;
+  --sls-border: #e2e8e6;
+  --sls-surface: #ffffff;
+  --sls-tab: #f1f5f4;
+  --sls-tab-selected: #065f46;
+  --sls-gutter: 12px;
+
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  background: var(--sls-bg);
+  color: var(--sls-fg);
+}
+
+.staff-ls-appbar {
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  color: var(--sls-brand);
+}
+
+.staff-ls-appbar__row {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  padding: 0 4px;
+  gap: 4px;
+  box-sizing: border-box;
+}
+
+.staff-ls-appbar__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font-size: 1.25rem;
+  color: var(--sls-brand);
+  border-radius: 8px;
+}
+
+.staff-ls-appbar__title {
+  margin: 0;
+  flex: 1;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--sls-brand);
+}
+
+.staff-ls-appbar__actions {
+  display: flex;
+  gap: 4px;
+}
+
+.staff-ls-appbar__action {
+  border: 1px solid var(--sls-border);
+  background: var(--sls-surface);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sls-muted);
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.staff-ls-appbar__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 6px;
+}
+
+.staff-ls-search-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 var(--sls-gutter) 4px;
+}
+
+.staff-ls-search__input {
+  flex: 1;
+  box-sizing: border-box;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid var(--sls-border);
+  border-radius: 10px;
+  background: var(--sls-surface);
+  font-size: 14px;
+  color: var(--sls-fg);
+}
+
+.staff-ls-filter-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--sls-border);
+  border-radius: 10px;
+  background: var(--sls-surface);
+  color: var(--sls-muted);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.staff-ls-attention {
+  margin: 0;
+  padding: 0 var(--sls-gutter) 2px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--sls-muted);
+}
+
+.staff-ls-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 0 var(--sls-gutter) 6px;
+}
+
+.staff-ls-tab {
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 20px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--sls-tab);
+  color: #334155;
+  cursor: pointer;
+}
+
+.staff-ls-tab--selected {
+  background: var(--sls-tab-selected);
+  color: #ffffff;
+}
+
+.staff-ls-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.staff-ls-results {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.staff-ls-results__empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--sls-muted);
+}

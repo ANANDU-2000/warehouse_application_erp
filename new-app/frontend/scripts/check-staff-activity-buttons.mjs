@@ -27,7 +27,7 @@ const page = readFileSync(pagePath, "utf8");
 const pkg = readFileSync(pkgPath, "utf8");
 
 assert(
-  page.includes("BUTTONS") || page.includes("WIRE"),
+  page.includes("BUTTONS") || page.includes("WIRE") || page.includes("STATES"),
   "BUTTONS+ header",
 );
 assert(page.includes("onBack"), "onBack");

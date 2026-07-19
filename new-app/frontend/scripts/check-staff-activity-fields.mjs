@@ -39,7 +39,10 @@ const css = readFileSync(cssPath, "utf8");
 const pkg = readFileSync(pkgPath, "utf8");
 
 assert(
-  page.includes("FIELDS") || page.includes("BUTTONS") || page.includes("WIRE"),
+  page.includes("FIELDS") ||
+    page.includes("BUTTONS") ||
+    page.includes("WIRE") ||
+    page.includes("STATES"),
   "FIELDS+ header",
 );
 assert(page.includes("useState"), "useState");

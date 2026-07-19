@@ -37,6 +37,7 @@ assert(
     page.includes("FIELDS") ||
     page.includes("BUTTONS") ||
     page.includes("WIRE") ||
+    page.includes("STATES") ||
     page.includes("SCAFFOLD"),
   "step header",
 );

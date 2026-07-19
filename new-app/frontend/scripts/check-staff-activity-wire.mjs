@@ -74,13 +74,17 @@ assert(fmt.includes("d ago"), "days ago branch");
 assert(fmt.includes("staffActWhenStamp"), "when stamp");
 assert(fmt.includes("staffActRowKind"), "row kind");
 
-assert(page.includes("WIRE"), "WIRE header");
+assert(page.includes("WIRE") || page.includes("STATES"), "WIRE+ header");
 assert(page.includes("fetchStaffActivityLog"), "page fetch");
 assert(page.includes("staffActLabel") || page.includes("mapRows"), "labels used");
 assert(page.includes('data-slot="loading"'), "loading");
 assert(page.includes('data-slot="error"'), "error");
 assert(page.includes("retryLoad"), "retry");
-assert(page.includes("STAFF_ACT_LOAD_FAILED"), "load failed");
+assert(
+  page.includes("STAFF_ACT_LOAD_FAILED") ||
+    page.includes("mapStaffActLoadTitle"),
+  "load failed",
+);
 assert(page.includes('data-interactive="false"'), "rows not interactive");
 assert(!page.includes('data-deferred="activity-rows"'), "rows not deferred");
 assert(page.includes("setPeriod"), "period still FIELDS");

@@ -112,7 +112,8 @@
     "test:staff-activity-layout": "node scripts/check-staff-activity-layout.mjs",
     "test:staff-activity-fields": "node scripts/check-staff-activity-fields.mjs",
     "test:staff-activity-buttons": "node scripts/check-staff-activity-buttons.mjs",
-    "test:staff-activity-wire": "node scripts/check-staff-activity-wire.mjs"
+    "test:staff-activity-wire": "node scripts/check-staff-activity-wire.mjs",
+    "test:staff-activity-states": "node scripts/check-staff-activity-states.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

@@ -8,8 +8,8 @@
 | State | Step |
 |---|---|
 | ✅ Completed | Staff low-stock COMPARE · Staff activity SCAFFOLD → **WIRE** |
-| 🟡 Current | `/staff/activity` **WIRE PASS** — ask before STATES |
-| ⬜ Pending | STATES → COMPARE · other Subagent 4 stubs |
+| 🟡 Current | superseded — see [`staff_activity_states_compare.md`](staff_activity_states_compare.md) |
+| ⬜ Pending | COMPARE · other Subagent 4 stubs |
 | ⏸ Deferred | ListSkeleton / HexaErrorCard polish · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New

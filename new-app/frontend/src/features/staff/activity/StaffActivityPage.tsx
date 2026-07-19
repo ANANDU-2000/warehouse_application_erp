@@ -1,8 +1,9 @@
 /**
- * Staff activity `/staff/activity` — WIRE (Step 5).
- * Source: staff_activity_page.dart — listActivityLog(period);
- * `_staffActivityLabel` / `_timeAgo` / ListTile display-only (no onTap).
- * Deferred: ListSkeleton / HexaErrorCard polish → STATES.
+ * Staff activity `/staff/activity` — STATES (Step 6).
+ * Source: staff_activity_page.dart — ListSkeleton(rowCount: 10);
+ * HexaErrorCard.fromError(title: 'Could not load activity') →
+ * loadStateErrorSubtitle / FriendlyLoadError.
+ * No RefreshIndicator / keepAlive on this page (autoDispose provider).
  */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -19,13 +20,19 @@ import {
   staffActWhenStamp,
 } from "./staffActivityFormat";
 import {
+  mapStaffActLoadSubtitle,
+  mapStaffActLoadTitle,
+} from "./staffActivityLoadSubtitle";
+import {
   STAFF_ACT_BACK_FALLBACK,
   STAFF_ACT_DEFAULT_PERIOD,
   STAFF_ACT_EMPTY,
   STAFF_ACT_EMPTY_SUB,
-  STAFF_ACT_LOAD_FAILED,
   STAFF_ACT_PERIOD_LABEL,
   STAFF_ACT_PERIOD_ORDER,
+  STAFF_ACT_RETRY,
+  STAFF_ACT_SKELETON_HEIGHT_PX,
+  STAFF_ACT_SKELETON_ROWS,
   STAFF_ACT_TITLE,
   type StaffActPeriod,
 } from "./staffActivityCopy";
@@ -115,17 +122,20 @@ export function StaffActivityPage() {
     setRetryTick((n) => n + 1);
   }
 
-  const showLoading = loading;
+  /** Flutter: AppBar + SegmentedButton stay; Expanded = skeleton/error/data */
+  const showInitialSkeleton = loading;
   const showError = !loading && loadError != null;
   const showEmpty = !loading && loadError == null && rows.length === 0;
   const showList = !loading && loadError == null && rows.length > 0;
+  const errorTitle = mapStaffActLoadTitle(loadError);
+  const errorSubtitle = mapStaffActLoadSubtitle(loadError);
 
   return (
     <div
       className="staff-act-page"
       data-page="staff-activity"
       data-period={period}
-      data-step="wire"
+      data-step="states"
     >
       <header className="staff-act-appbar" data-slot="appBar">
         <button
@@ -169,22 +179,41 @@ export function StaffActivityPage() {
         </div>
 
         <div className="staff-act-results" data-slot="results">
-          {showLoading ? (
-            <div className="staff-act-loading" data-slot="loading" role="status">
-              Loading…
+          {showInitialSkeleton ? (
+            <div
+              className="staff-act-skeleton"
+              data-slot="loading"
+              data-testid="staff-act-loading"
+              aria-busy="true"
+              aria-label="ListSkeleton"
+            >
+              {Array.from({ length: STAFF_ACT_SKELETON_ROWS }, (_, i) => (
+                <div
+                  key={i}
+                  className="staff-act-skeleton__row"
+                  style={{ height: STAFF_ACT_SKELETON_HEIGHT_PX }}
+                />
+              ))}
             </div>
           ) : null}
 
           {showError ? (
-            <div className="staff-act-error" data-slot="error" role="alert">
-              <p className="staff-act-error__title">{STAFF_ACT_LOAD_FAILED}</p>
+            <div
+              className="staff-act-friendly-error"
+              data-slot="error"
+              data-testid="staff-act-error"
+              role="alert"
+            >
+              <p className="staff-act-friendly-error__title">{errorTitle}</p>
+              <p className="staff-act-friendly-error__sub">{errorSubtitle}</p>
               <button
                 type="button"
-                className="staff-act-error__retry"
+                className="staff-act-friendly-error__retry"
                 data-action="retry"
+                data-testid="staff-act-retry"
                 onClick={retryLoad}
               >
-                Retry
+                {STAFF_ACT_RETRY}
               </button>
             </div>
           ) : null}

@@ -77,6 +77,7 @@
 
 /* Padding HexaOp.pageGutter 16, bottom 4 — OutlineInputBorder radius 10 */
 .staff-gallery-page__search {
+  position: relative;
   padding: 0 16px 4px;
   box-sizing: border-box;
 }
@@ -92,6 +93,10 @@
   min-height: 40px;
   box-sizing: border-box;
   pointer-events: none;
+}
+
+.staff-gallery-page__search-field--active {
+  pointer-events: auto;
 }
 
 .staff-gallery-page__search-icon {
@@ -164,6 +169,46 @@
   background: var(--sg-chip-selected);
   color: var(--sg-brand);
   border-color: transparent;
+}
+
+.staff-gallery-page__chip--active {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.staff-gallery-page__suggest {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 100%;
+  z-index: 20;
+  margin: 4px 0 0;
+  padding: 4px 0;
+  list-style: none;
+  background: var(--sg-surface);
+  border: 1px solid var(--sg-border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  max-height: 240px;
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+.staff-gallery-page__suggest-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  padding: 8px 12px;
+  color: var(--sg-text);
+  cursor: pointer;
+}
+
+.staff-gallery-page__suggest-item:hover {
+  background: var(--sg-chip-selected);
 }
 
 /* Padding fromLTRB(16, 4, 16, 8); HexaDsType.label 11 textMuted */

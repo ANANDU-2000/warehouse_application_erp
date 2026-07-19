@@ -23,7 +23,7 @@
 |---|---|
 | `/staff/settings` | Staff settings (**implement locked** — Settings backend) |
 | `/staff/search` | **COMPARE PASS** — [`staff_search_compare.md`](staff_search_compare.md) |
-| `/staff/items` | **LAYOUT PASS** — [`staff_items_layout_compare.md`](staff_items_layout_compare.md); ask before FIELDS |
+| `/staff/items` | **FIELDS PASS** — [`staff_items_fields_compare.md`](staff_items_fields_compare.md); ask before BUTTONS |
 | `/staff/stock` | Staff stock |
 | `/staff/purchase-history` | Purchase history |
 | `/staff/low-stock` | Staff low stock |
@@ -63,7 +63,7 @@
 
 ## Next (ask first)
 
-1. **`/staff/items` FIELDS** (LAYOUT done), **or**  
+1. **`/staff/items` BUTTONS** (FIELDS done), **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Notifications COMPARE — [`notifications_compare.md`](notifications_compare.md). Staff search COMPARE — [`staff_search_compare.md`](staff_search_compare.md). Staff items LAYOUT — [`staff_items_layout_compare.md`](staff_items_layout_compare.md). `/staff/settings` skipped — Settings implement locked.)*
+*(Notifications COMPARE — [`notifications_compare.md`](notifications_compare.md). Staff search COMPARE — [`staff_search_compare.md`](staff_search_compare.md). Staff items FIELDS — [`staff_items_fields_compare.md`](staff_items_fields_compare.md). `/staff/settings` skipped — Settings implement locked.)*

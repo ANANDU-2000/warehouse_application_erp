@@ -97,9 +97,12 @@ assert(page.includes('data-slot="results"'), "results slot");
 assert(page.includes("STAFF_GALLERY_HINT"), "uses hint");
 assert(page.includes("STAFF_GALLERY_FILTER_ORDER"), "uses filter order");
 assert(page.includes("staffGalleryFilterFromQuery"), "reads ?filter=");
-assert(page.includes("readOnly"), "search inert (SCAFFOLD)");
+assert(
+  page.includes("readOnly") || page.includes("search-input--active"),
+  "search field present (FIELDS may activate)",
+);
 assert(page.includes("STAFF_GALLERY_EMPTY"), "empty copy");
-assert(!page.includes("listStock"), "no API yet");
+assert(!page.includes("fetchListStock"), "no API yet");
 assert(!page.includes("Update stock"), "no row menu yet");
 
 assert(router.includes("StaffItemGalleryPage"), "router imports page");

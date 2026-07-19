@@ -1,21 +1,31 @@
 /**
- * Staff item gallery `/staff/items` — LAYOUT (Step 2).
- * Source: staff_item_gallery_page.dart + app_theme chipTheme / HexaColors
- * Inert: typing, chip select, stock list API, expand, row menus (FIELDS/BUTTONS/WIRE).
+ * Staff item gallery `/staff/items` — FIELDS (Step 3).
+ * Source: staff_item_gallery_page.dart — Autocomplete debounce 200ms + filter chips + local filter/search
+ * Deferred: listStock API / category expand / row menus (BUTTONS/WIRE); load error (STATES).
  */
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   STAFF_GALLERY_BACK_FALLBACK,
+  STAFF_GALLERY_DEBOUNCE_MS,
   STAFF_GALLERY_EMPTY,
   STAFF_GALLERY_HINT,
-  STAFF_GALLERY_SUMMARY_EMPTY,
+  STAFF_GALLERY_SUGGESTIONS_MAX,
   STAFF_GALLERY_TITLE,
 } from "./staffItemGalleryCopy";
 import {
   STAFF_GALLERY_FILTER_LABELS,
   STAFF_GALLERY_FILTER_ORDER,
+  type StaffGalleryFilter,
   staffGalleryFilterFromQuery,
 } from "./staffItemGalleryFilters";
+import {
+  filterGalleryItems,
+  formatGallerySummary,
+  gallerySuggestions,
+  groupGalleryItems,
+  type StaffGalleryItem,
+} from "./staffItemGalleryLogic";
 import "./StaffItemGalleryPage.css";
 
 /** Flutter navigation_ext.popOrGo — pop when stack allows, else go fallback. */
@@ -33,7 +43,40 @@ function popOrGo(
 export function StaffItemGalleryPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const filter = staffGalleryFilterFromQuery(searchParams.get("filter"));
+  const [filter, setFilter] = useState<StaffGalleryFilter>(() =>
+    staffGalleryFilterFromQuery(searchParams.get("filter")),
+  );
+  const [query, setQuery] = useState("");
+  const [debounced, setDebounced] = useState("");
+  /** WIRE fills via listStock; FIELDS runs filter/group on empty catalog. */
+  const [allItems] = useState<StaffGalleryItem[]>([]);
+  const [suggestOpen, setSuggestOpen] = useState(false);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      setDebounced(query.trim());
+    }, STAFF_GALLERY_DEBOUNCE_MS);
+    return () => window.clearTimeout(t);
+  }, [query]);
+
+  const q = debounced.toLowerCase();
+  const filtered = filterGalleryItems(allItems, filter, q);
+  const grouped = groupGalleryItems(filtered);
+  const cats = [...grouped.keys()].sort();
+  const summary = formatGallerySummary(filtered.length, cats.length);
+
+  const needle = query.trim().toLowerCase();
+  const suggestions = !needle
+    ? []
+    : gallerySuggestions(allItems)
+        .filter((s) => s.toLowerCase().includes(needle))
+        .slice(0, STAFF_GALLERY_SUGGESTIONS_MAX);
+
+  function applySuggestion(v: string) {
+    setQuery(v);
+    setDebounced(v.trim());
+    setSuggestOpen(false);
+  }
 
   return (
     <div
@@ -41,6 +84,7 @@ export function StaffItemGalleryPage() {
       data-testid="staff-item-gallery-page"
       data-back-fallback={STAFF_GALLERY_BACK_FALLBACK}
       data-filter={filter}
+      data-debounced={debounced}
     >
       <header className="staff-gallery-page__appbar" data-slot="appBar">
         <div
@@ -72,7 +116,7 @@ export function StaffItemGalleryPage() {
 
       <div className="staff-gallery-page__body" data-slot="body">
         <div className="staff-gallery-page__search" data-slot="search">
-          <label className="staff-gallery-page__search-field">
+          <label className="staff-gallery-page__search-field staff-gallery-page__search-field--active">
             <span className="staff-gallery-page__search-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="20" height="20">
                 <path
@@ -83,38 +127,70 @@ export function StaffItemGalleryPage() {
             </span>
             <input
               type="search"
-              className="staff-gallery-page__search-input"
+              className="staff-gallery-page__search-input staff-gallery-page__search-input--active"
               placeholder={STAFF_GALLERY_HINT}
-              readOnly
-              aria-readonly="true"
               data-testid="staff-gallery-search"
-              value=""
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setSuggestOpen(true);
+              }}
+              onFocus={() => setSuggestOpen(true)}
+              onBlur={() => {
+                window.setTimeout(() => setSuggestOpen(false), 150);
+              }}
+              autoComplete="off"
             />
           </label>
+          {suggestOpen && suggestions.length > 0 ? (
+            <ul
+              className="staff-gallery-page__suggest"
+              data-slot="suggest"
+              data-testid="staff-gallery-suggest"
+              role="listbox"
+            >
+              {suggestions.map((s) => (
+                <li key={s}>
+                  <button
+                    type="button"
+                    className="staff-gallery-page__suggest-item"
+                    role="option"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applySuggestion(s)}
+                  >
+                    {s}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </div>
 
         <div className="staff-gallery-page__filters" data-slot="filters">
           <div
-            className="staff-gallery-page__filter-row"
+            className="staff-gallery-page__filter-row staff-gallery-page__filter-row--active"
             role="listbox"
             aria-label="Gallery filters"
           >
             {STAFF_GALLERY_FILTER_ORDER.map((key) => {
               const selected = filter === key;
               return (
-                <span
+                <button
                   key={key}
+                  type="button"
                   role="option"
                   aria-selected={selected}
                   className={
                     selected
-                      ? "staff-gallery-page__chip staff-gallery-page__chip--selected"
-                      : "staff-gallery-page__chip"
+                      ? "staff-gallery-page__chip staff-gallery-page__chip--selected staff-gallery-page__chip--active"
+                      : "staff-gallery-page__chip staff-gallery-page__chip--active"
                   }
                   data-filter-key={key}
+                  data-testid={`staff-gallery-filter-${key}`}
+                  onClick={() => setFilter(key)}
                 >
                   {STAFF_GALLERY_FILTER_LABELS[key]}
-                </span>
+                </button>
               );
             })}
           </div>
@@ -125,18 +201,21 @@ export function StaffItemGalleryPage() {
           data-slot="summary"
           data-testid="staff-gallery-summary"
         >
-          {STAFF_GALLERY_SUMMARY_EMPTY}
+          {summary}
         </p>
 
         <div className="staff-gallery-page__results" data-slot="results">
           <div className="staff-gallery-page__list" data-slot="list">
-            <p
-              className="staff-gallery-page__empty"
-              data-slot="empty"
-              data-testid="staff-gallery-empty"
-            >
-              {STAFF_GALLERY_EMPTY}
-            </p>
+            {/* Category expand + item rows — BUTTONS/WIRE (empty catalog until listStock) */}
+            {filtered.length === 0 ? (
+              <p
+                className="staff-gallery-page__empty"
+                data-slot="empty"
+                data-testid="staff-gallery-empty"
+              >
+                {STAFF_GALLERY_EMPTY}
+              </p>
+            ) : null}
           </div>
         </div>
       </div>

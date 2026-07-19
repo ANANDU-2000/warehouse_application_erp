@@ -40,7 +40,10 @@ assert(page.includes('data-slot="results"'), "results slot");
 assert(page.includes('data-slot="list"'), "list slot");
 assert(page.includes('data-slot="empty"'), "empty slot");
 assert(page.includes("STAFF_GALLERY_EMPTY"), "empty copy");
-assert(page.includes("readOnly"), "search inert");
+assert(
+  page.includes("readOnly") || page.includes("search-input--active"),
+  "search field present (FIELDS may activate)",
+);
 
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "brand background");
 assert(css.includes("#0e4f46") || css.includes("#0E4F46"), "brand primary");

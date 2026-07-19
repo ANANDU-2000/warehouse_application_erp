@@ -22,6 +22,12 @@ export const STAFF_GALLERY_EMPTY = "No items match";
 /** Summary line template — Flutter `'${filtered.length} items · ${cats.length} categories'` */
 export const STAFF_GALLERY_SUMMARY_EMPTY = "0 items · 0 categories";
 
+/** Debounce ms — staff_item_gallery_page.dart Timer onChanged */
+export const STAFF_GALLERY_DEBOUNCE_MS = 200;
+
+/** Autocomplete optionsBuilder `.take(12)` */
+export const STAFF_GALLERY_SUGGESTIONS_MAX = 12;
+
 /** FriendlyLoadError — deferred STATES */
 export const STAFF_GALLERY_LOAD_FAILED = "Could not load items";
 

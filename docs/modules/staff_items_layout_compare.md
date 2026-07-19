@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff search COMPARE · Staff items SCAFFOLD · **LAYOUT** |
-| 🟡 Current | Staff items **LAYOUT PASS** — ask before FIELDS |
-| ⬜ Pending | Staff items FIELDS → COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | `/staff/settings` · `/settings`; typing/chip select (FIELDS); listStock (WIRE) |
+| ✅ Completed | Staff search COMPARE · Staff items SCAFFOLD · LAYOUT · **FIELDS** |
+| 🟡 Current | Staff items **FIELDS PASS** — ask before BUTTONS |
+| ⬜ Pending | Staff items BUTTONS → COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | `/staff/settings` · `/settings`; typing/chip select done; listStock (WIRE) |
 
 ## Legacy vs New
 
@@ -36,4 +36,4 @@
 
 **Rollback:** Revert LAYOUT commit; restore SCAFFOLD page/CSS; remove layout script + this compare; boards → ask before LAYOUT.
 
-**Next (ask first):** `/staff/items` FIELDS — do not start until approved.
+**Next (ask first):** FIELDS done — [`staff_items_fields_compare.md`](staff_items_fields_compare.md). Ask before BUTTONS.

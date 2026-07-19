@@ -75,7 +75,8 @@ assert(
 assert(
   page.includes("SCAFFOLD") ||
     page.includes("LAYOUT") ||
-    page.includes("FIELDS"),
+    page.includes("FIELDS") ||
+    page.includes("BUTTONS"),
   "SCAFFOLD+ header",
 );
 assert(page.includes('data-slot="appBar"'), "appBar");
@@ -105,17 +106,18 @@ assert(
   "pending section",
 );
 assert(page.includes('data-slot="emptyAll"'), "empty all");
-assert(page.includes('data-deferred="scan-barcode"'), "scan deferred");
-assert(page.includes('data-deferred="delivery-rows"'), "rows deferred");
-assert(page.includes('data-deferred="receive-nav"'), "receive deferred");
-assert(page.includes('data-deferred="back"'), "back deferred");
+assert(page.includes('data-deferred="scan-barcode"') || page.includes('data-action="scan-barcode"'), "scan slot");
+assert(page.includes('data-deferred="delivery-rows"') || page.includes("onOpenReceive"), "rows deferred or BUTTONS");
+assert(page.includes('data-deferred="back"') || page.includes('data-action="back"'), "back slot");
 assert(page.includes("STAFF_DEL_EMPTY_ALL"), "empty copy");
 assert(!page.includes("fetch("), "no fetch");
 assert(
-  page.includes("onClick") === false || page.includes("data-deferred"),
-  "no live click unless later BUTTONS",
+  page.includes("onClick") === false ||
+    page.includes("onBack") ||
+    page.includes("onScan") ||
+    page.includes("onOpenReceive"),
+  "click only via BUTTONS handlers",
 );
-assert(!page.includes("useNavigate") || page.includes("LAYOUT"), "navigate gate");
 
 assert(css.includes("staff-del-page"), "page css");
 assert(css.includes("staff-del-section"), "section css");

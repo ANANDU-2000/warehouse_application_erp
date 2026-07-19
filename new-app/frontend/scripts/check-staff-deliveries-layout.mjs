@@ -34,7 +34,8 @@ const pkg = readFileSync(pkgPath, "utf8");
 assert(
   page.includes("LAYOUT") ||
     page.includes("SCAFFOLD") ||
-    page.includes("FIELDS"),
+    page.includes("FIELDS") ||
+    page.includes("BUTTONS"),
   "step header",
 );
 assert(page.includes('data-slot="appBar"'), "appBar");
@@ -42,10 +43,24 @@ assert(page.includes('data-slot="section"'), "sections");
 assert(page.includes("staff-del-section--highlight"), "highlight class");
 assert(page.includes("staff-del-section__title--hot"), "hot title class");
 assert(page.includes('data-title-hot'), "title-hot attr");
-assert(page.includes('data-deferred="scan-barcode"'), "scan deferred");
-assert(page.includes('data-deferred="delivery-rows"'), "rows deferred");
+assert(
+  page.includes('data-deferred="scan-barcode"') ||
+    page.includes('data-action="scan-barcode"'),
+  "scan deferred or BUTTONS",
+);
+assert(
+  page.includes('data-deferred="delivery-rows"') ||
+    page.includes("onOpenReceive"),
+  "rows deferred or BUTTONS",
+);
 assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("onClick"), "no click");
+assert(
+  !page.includes("onClick") ||
+    page.includes("onBack") ||
+    page.includes("onScan") ||
+    page.includes("onOpenReceive"),
+  "click only BUTTONS",
+);
 
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "page bg");
 assert(css.includes("#0e4f46") || css.includes("#0E4F46"), "brandPrimary");

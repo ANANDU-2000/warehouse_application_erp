@@ -10,8 +10,14 @@ export const STAFF_DEL_TITLE_COUNTED = (n: number) =>
 /** AppBar leading — Flutter uses default back; fallback staff home. */
 export const STAFF_DEL_BACK_FALLBACK = "/staff/home";
 
-/** AppBar scan tooltip — deferred barcode (backend blocked). */
+/** AppBar scan tooltip — Flutter → `/barcode/scan` (stub until barcode module). */
 export const STAFF_DEL_SCAN_TOOLTIP = "Scan purchase";
+export const STAFF_DEL_SCAN_PATH = "/barcode/scan";
+
+/** Row tap — Flutter → `/staff/receive/${id}` (stub until goods-receipt body). */
+export function staffDelReceivePath(purchaseId: string): string {
+  return `/staff/receive/${encodeURIComponent(purchaseId)}`;
+}
 
 /** Section titles — _DeliverySection */
 export const STAFF_DEL_SECTION_DISPATCHED = "Dispatched";

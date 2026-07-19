@@ -12,7 +12,7 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 · Staff deliveries FIELDS | Next: ask before BUTTONS — [`staff_deliveries_fields_compare.md`](modules/staff_deliveries_fields_compare.md) |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 · Staff deliveries BUTTONS | Next: ask before WIRE — [`staff_deliveries_buttons_compare.md`](modules/staff_deliveries_buttons_compare.md) |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list+profile COMPARE · Activity WIRE | Next: ask next Subagent 4 stub — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users list+profile **COMPARE PASS**. Profile Activity **WIRE PASS**. Subagent 4: `/notifications` **COMPARE PASS**. Staff search **COMPARE PASS**. Staff items **COMPARE PASS**. Staff stock **COMPARE PASS**. Staff purchase-history **COMPARE PASS**. Staff low-stock **COMPARE PASS**. Staff activity **COMPARE PASS**. Staff deliveries **FIELDS PASS**. Next: ask before **BUTTONS**. Purchase entry / barcode / receive **backend-blocked** (docs/06 Seq 7–8 / 11).
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users list+profile **COMPARE PASS**. Profile Activity **WIRE PASS**. Subagent 4: `/notifications` **COMPARE PASS**. Staff search **COMPARE PASS**. Staff items **COMPARE PASS**. Staff stock **COMPARE PASS**. Staff purchase-history **COMPARE PASS**. Staff low-stock **COMPARE PASS**. Staff activity **COMPARE PASS**. Staff deliveries **BUTTONS PASS**. Next: ask before **WIRE**. Purchase entry / barcode / receive **backend-blocked** (docs/06 Seq 7–8 / 11).
 
 ---
 
@@ -227,7 +227,7 @@ Primarily via `/catalog/taxonomy`, `/catalog/new-category`, `/catalog/category/:
 
 | Path | Notes |
 |---|---|
-| `/staff/deliveries` | Staff shell — **FIELDS PASS** — [`staff_deliveries_fields_compare.md`](modules/staff_deliveries_fields_compare.md) |
+| `/staff/deliveries` | Staff shell — **BUTTONS PASS** — [`staff_deliveries_buttons_compare.md`](modules/staff_deliveries_buttons_compare.md) |
 | `/staff/tasks` | Shell branch |
 | `/staff/purchase-history` | Staff shell — **COMPARE PASS** — [`staff_purchase_history_compare.md`](modules/staff_purchase_history_compare.md) |
 | `/staff/purchase-history/:purchaseId` | Detail stub (separate page) |

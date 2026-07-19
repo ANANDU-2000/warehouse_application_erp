@@ -117,7 +117,8 @@
     "test:staff-activity-compare": "node scripts/check-staff-activity-compare.mjs",
     "test:staff-deliveries-scaffold": "node scripts/check-staff-deliveries-scaffold.mjs",
     "test:staff-deliveries-layout": "node scripts/check-staff-deliveries-layout.mjs",
-    "test:staff-deliveries-fields": "node scripts/check-staff-deliveries-fields.mjs"
+    "test:staff-deliveries-fields": "node scripts/check-staff-deliveries-fields.mjs",
+    "test:staff-deliveries-buttons": "node scripts/check-staff-deliveries-buttons.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

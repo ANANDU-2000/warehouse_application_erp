@@ -1,18 +1,21 @@
 /**
- * Staff deliveries `/staff/deliveries` — FIELDS (Step 3).
- * Source: staff_pending_deliveries_page.dart — **no** search/filter inputs;
- * client title/count/empty gates only (`staffDelAppBarTitle` / section counts).
- * Deferred: back/scan/row → BUTTONS; trade-purchases → WIRE.
+ * Staff deliveries `/staff/deliveries` — BUTTONS (Step 4).
+ * Source: staff_pending_deliveries_page.dart —
+ * AppBar back; scan → `/barcode/scan`; ListTile onTap → `/staff/receive/:id`.
+ * Deferred: trade-purchases fill → WIRE; receive/barcode **bodies** backend-blocked.
  */
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   STAFF_DEL_BACK_FALLBACK,
   STAFF_DEL_EMPTY_ALL,
   STAFF_DEL_EMPTY_ARRIVED,
   STAFF_DEL_EMPTY_DISPATCHED,
   STAFF_DEL_EMPTY_PENDING_VERIFY,
+  STAFF_DEL_SCAN_PATH,
   STAFF_DEL_SCAN_TOOLTIP,
   STAFF_DEL_SUPPLIER_FALLBACK,
+  staffDelReceivePath,
 } from "./staffDeliveriesCopy";
 import {
   STAFF_DEL_EMPTY_COUNTS,
@@ -38,29 +41,55 @@ const SECTION_HIGHLIGHT: Partial<Record<StaffDelSectionKey, boolean>> = {
   arrived: true,
 };
 
+/** BUTTONS sample id until WIRE fills real purchase ids */
+const SAMPLE_PURCHASE_ID = "sample-delivery";
+
+function popOrGo(
+  navigate: ReturnType<typeof useNavigate>,
+  fallback: string,
+): void {
+  if (window.history.length > 1) {
+    navigate(-1);
+    return;
+  }
+  navigate(fallback);
+}
+
 export function StaffDeliveriesPage() {
-  /* FIELDS: client section counts (empty catalog); WIRE replaces values */
+  const navigate = useNavigate();
   const [sectionCounts] = useState<StaffDelSectionCounts>(STAFF_DEL_EMPTY_COUNTS);
   const total = staffDelTotal(sectionCounts);
   const title = staffDelAppBarTitle(total);
   const showEmptyAll = staffDelShowEmptyAll(total);
 
+  function onBack(): void {
+    popOrGo(navigate, STAFF_DEL_BACK_FALLBACK);
+  }
+
+  function onScan(): void {
+    navigate(STAFF_DEL_SCAN_PATH);
+  }
+
+  function onOpenReceive(purchaseId: string): void {
+    navigate(staffDelReceivePath(purchaseId));
+  }
+
   return (
     <div
       className="staff-del-page"
       data-page="staff-deliveries"
-      data-step="fields"
+      data-step="buttons"
       data-total={total}
       data-back-fallback={STAFF_DEL_BACK_FALLBACK}
     >
       <header className="staff-del-appbar" data-slot="appBar">
         <button
           type="button"
-          className="staff-del-appbar__back"
+          className="staff-del-appbar__back staff-del-appbar__back--active"
           aria-label="Back"
           data-testid="staff-del-back"
-          data-deferred="back"
-          disabled
+          data-action="back"
+          onClick={onBack}
         >
           ←
         </button>
@@ -69,12 +98,12 @@ export function StaffDeliveriesPage() {
         </h1>
         <button
           type="button"
-          className="staff-del-appbar__scan"
+          className="staff-del-appbar__scan staff-del-appbar__scan--active"
           aria-label={STAFF_DEL_SCAN_TOOLTIP}
           title={STAFF_DEL_SCAN_TOOLTIP}
           data-testid="staff-del-scan"
-          data-deferred="scan-barcode"
-          disabled
+          data-action="scan-barcode"
+          onClick={onScan}
         >
           ⌕
         </button>
@@ -116,32 +145,37 @@ export function StaffDeliveriesPage() {
                   {SECTION_EMPTY[key]}
                 </div>
               ) : null}
+              {/* BUTTONS sample row — WIRE replaces with real purchases */}
               <ul
                 className="staff-del-list"
                 data-slot="list"
-                data-deferred="delivery-rows"
-                aria-hidden={count === 0 ? "true" : undefined}
-                hidden={count === 0}
+                data-sample="buttons"
               >
-                <li
-                  className="staff-del-row"
-                  data-slot="row"
-                  data-deferred="receive-nav"
-                >
-                  <span className="staff-del-row__avatar" aria-hidden="true">
-                    1
-                  </span>
-                  <div className="staff-del-row__body">
-                    <div className="staff-del-row__title">
-                      {STAFF_DEL_SUPPLIER_FALLBACK}
+                <li className="staff-del-row staff-del-row--interactive">
+                  <button
+                    type="button"
+                    className="staff-del-row__hit"
+                    data-slot="row"
+                    data-action="open-receive"
+                    data-purchase-id={SAMPLE_PURCHASE_ID}
+                    data-deferred="delivery-rows"
+                    onClick={() => onOpenReceive(SAMPLE_PURCHASE_ID)}
+                  >
+                    <span className="staff-del-row__avatar" aria-hidden="true">
+                      1
+                    </span>
+                    <div className="staff-del-row__body">
+                      <div className="staff-del-row__title">
+                        {STAFF_DEL_SUPPLIER_FALLBACK}
+                      </div>
+                      <div className="staff-del-row__sub">PO · date</div>
+                      <div className="staff-del-row__bags">—</div>
                     </div>
-                    <div className="staff-del-row__sub">PO · date</div>
-                    <div className="staff-del-row__bags">—</div>
-                  </div>
-                  <div className="staff-del-row__meta">
-                    <span className="staff-del-row__index">1/1</span>
-                    <span className="staff-del-row__qty">0 qty</span>
-                  </div>
+                    <div className="staff-del-row__meta">
+                      <span className="staff-del-row__index">1/1</span>
+                      <span className="staff-del-row__qty">0 qty</span>
+                    </div>
+                  </button>
                 </li>
               </ul>
             </section>

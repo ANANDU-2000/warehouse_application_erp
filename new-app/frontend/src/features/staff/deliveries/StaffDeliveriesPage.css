@@ -46,9 +46,20 @@
   font-size: 22px;
   line-height: 1;
   padding: 8px 4px;
+}
+
+.staff-del-appbar__back:disabled,
+.staff-del-appbar__scan:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+.staff-del-appbar__back--active,
+.staff-del-appbar__scan--active {
+  opacity: 1;
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 .staff-del-appbar__title {
@@ -103,12 +114,32 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 12px;
+  padding: 0;
   border-radius: 12px;
   border: 1px solid var(--sd-border);
   background: var(--sd-surface);
-  pointer-events: none;
   box-sizing: border-box;
+  list-style: none;
+}
+
+.staff-del-row__hit {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+  border-radius: 12px;
+}
+
+.staff-del-row--interactive .staff-del-row__hit:hover {
+  background: rgba(14, 79, 70, 0.04);
 }
 
 .staff-del-row__avatar {

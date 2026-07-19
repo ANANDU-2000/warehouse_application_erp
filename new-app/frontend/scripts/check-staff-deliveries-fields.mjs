@@ -46,22 +46,42 @@ assert(fields.includes("STAFF_DEL_SECTION_ORDER"), "section order");
 assert(fields.includes("STAFF_DEL_EMPTY_COUNTS"), "empty counts");
 assert(copy.includes("STAFF_DEL_TITLE_COUNTED"), "counted title");
 
-assert(page.includes("FIELDS"), "FIELDS header");
+assert(
+  page.includes("FIELDS") || page.includes("BUTTONS"),
+  "FIELDS+ header",
+);
 assert(page.includes("useState"), "useState");
 assert(page.includes("staffDelAppBarTitle"), "uses title helper");
 assert(page.includes("staffDelTotal"), "uses total");
 assert(page.includes("staffDelShowEmptyAll"), "uses empty gate");
 assert(page.includes("STAFF_DEL_SECTION_ORDER"), "section catalog");
 assert(page.includes('data-total={total}'), "data-total");
-assert(page.includes('data-step="fields"'), "fields step");
+assert(
+  page.includes('data-step="fields"') || page.includes('data-step="buttons"'),
+  "fields+ step",
+);
 assert(!page.includes('type="search"'), "no search input on page");
 assert(!page.includes("placeholder="), "no filter placeholders");
 assert(!page.includes("<input"), "no input elements");
 assert(!page.includes("<select"), "no select elements");
-assert(page.includes('data-deferred="scan-barcode"'), "scan still deferred");
-assert(page.includes('data-deferred="delivery-rows"'), "rows deferred");
+assert(
+  page.includes('data-deferred="scan-barcode"') ||
+    page.includes('data-action="scan-barcode"'),
+  "scan slot",
+);
+assert(
+  page.includes('data-deferred="delivery-rows"') ||
+    page.includes("onOpenReceive"),
+  "rows deferred or BUTTONS",
+);
 assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("onClick"), "no click handlers");
+assert(
+  !page.includes("onClick") ||
+    page.includes("onBack") ||
+    page.includes("onScan") ||
+    page.includes("onOpenReceive"),
+  "click only BUTTONS",
+);
 
 assert(pkg.includes("test:staff-deliveries-fields"), "package script");
 

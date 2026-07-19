@@ -1,8 +1,8 @@
 /**
- * Staff stock `/staff/stock` — SCAFFOLD (Step 1).
+ * Staff stock `/staff/stock` — LAYOUT (Step 2).
  * Source: stock_page.dart StockPage(mode: staff); StockOperationalTopBar;
- * stock_status_quick_chips; stock_warehouse_table_header; empty HexaEmptyState.
- * Forbidden this step: interactive fields, CTA menus, stock list API.
+ * stock_status_quick_chips; stock_warehouse_table_header; stock_table_layout;
+ * stock_inline_search_bar. Forbidden: interactive fields, CTA menus, stock list API.
  */
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
@@ -37,6 +37,12 @@ const STATUS_LABEL: Record<StaffStockStatus, string> = {
   all: STAFF_STOCK_STATUS_ALL,
   shortage: STAFF_STOCK_STATUS_LOW,
   out: STAFF_STOCK_STATUS_OUT,
+};
+
+const STATUS_CHIP_MOD: Record<StaffStockStatus, string> = {
+  all: "staff-stock-chip--all",
+  shortage: "staff-stock-chip--low",
+  out: "staff-stock-chip--out",
 };
 
 const TAB_LABEL: Record<StaffStockTab, string> = {
@@ -74,10 +80,22 @@ export function StaffStockPage() {
             aria-hidden="true"
           >
             {/* Period / Filters / Search / More — BUTTONS */}
-            <span className="staff-stock-appbar__action-slot" data-deferred="period" />
-            <span className="staff-stock-appbar__action-slot" data-deferred="filters" />
-            <span className="staff-stock-appbar__action-slot" data-deferred="search-toggle" />
-            <span className="staff-stock-appbar__action-slot" data-deferred="more" />
+            <span
+              className="staff-stock-appbar__action-slot"
+              data-deferred="period"
+            />
+            <span
+              className="staff-stock-appbar__action-slot"
+              data-deferred="filters"
+            />
+            <span
+              className="staff-stock-appbar__action-slot"
+              data-deferred="search-toggle"
+            />
+            <span
+              className="staff-stock-appbar__action-slot"
+              data-deferred="more"
+            />
           </div>
         </div>
         <div className="staff-stock-tabs" data-slot="tabs" role="tablist">
@@ -107,11 +125,13 @@ export function StaffStockPage() {
               {STAFF_STOCK_STATUS_ORDER.map((key) => (
                 <span
                   key={key}
-                  className={
-                    status === key
-                      ? "staff-stock-chip staff-stock-chip--active"
-                      : "staff-stock-chip"
-                  }
+                  className={[
+                    "staff-stock-chip",
+                    STATUS_CHIP_MOD[key],
+                    status === key ? "staff-stock-chip--active" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                 >
                   {STATUS_LABEL[key]}
                 </span>
@@ -146,7 +166,11 @@ export function StaffStockPage() {
               </div>
             </div>
             <div className="staff-stock-results" data-slot="results">
-              {STAFF_STOCK_EMPTY}
+              <div className="staff-stock-results__empty" data-slot="empty">
+                {STAFF_STOCK_EMPTY}
+              </div>
+              {/* Row list chrome CSS ready — WIRE fills */}
+              <div className="staff-stock-list" data-slot="list" hidden />
             </div>
           </>
         ) : (

@@ -8,9 +8,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Notifications COMPARE · Staff search COMPARE · Staff items SCAFFOLD→COMPARE · Staff stock **SCAFFOLD** |
-| 🟡 Current | Staff stock **SCAFFOLD PASS** — ask before LAYOUT |
-| ⬜ Pending | Staff stock LAYOUT → COMPARE · other Subagent 4 stubs |
+| ✅ Completed | Notifications COMPARE · Staff search COMPARE · Staff items SCAFFOLD→COMPARE · Staff stock SCAFFOLD · **LAYOUT** |
+| 🟡 Current | Staff stock **LAYOUT PASS** — ask before FIELDS |
+| ⬜ Pending | Staff stock FIELDS → COMPARE · other Subagent 4 stubs |
 | ⏸ Deferred | `/staff/settings` · `/settings` (implement locked); owner `/stock`; listStock / Activity feed (WIRE); export PDF/Excel (staff null in legacy) |
 
 ## Legacy vs New
@@ -41,4 +41,4 @@
 
 **Rollback:** Revert SCAFFOLD commit; restore route → `DashboardRouteStubPage` title “Staff stock”; remove `features/staff/stock/*` + this compare + script; boards → ask before staff stock SCAFFOLD.
 
-**Next (ask first):** `/staff/stock` LAYOUT — do not start until approved.
+**Next (ask first):** LAYOUT → [`staff_stock_layout_compare.md`](staff_stock_layout_compare.md). Ask before FIELDS.

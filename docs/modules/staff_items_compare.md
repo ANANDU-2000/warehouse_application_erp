@@ -14,8 +14,8 @@
 | State | Step |
 |---|---|
 | ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
-| 🟡 Current | Staff stock **SCAFFOLD PASS** — ask before LAYOUT |
-| ⬜ Pending (ask first) | Staff stock LAYOUT → COMPARE · other Subagent 4 stubs |
+| 🟡 Current | Staff stock **LAYOUT PASS** — ask before FIELDS |
+| ⬜ Pending (ask first) | Staff stock FIELDS → COMPARE · other Subagent 4 stubs |
 | ⏸ Deferred | `/staff/settings` · `/settings` (implement locked); QuickStockActionSheet; full StockListItemOut trade/period meta; merge to `main` |
 
 ---
@@ -79,7 +79,7 @@ Docs/checklist + smoke script only: revert COMPARE commit. Application code unch
 
 ## 5. Next after Approve
 
-1. Ask before: **`/staff/stock` LAYOUT** (SCAFFOLD done — [`staff_stock_scaffold_compare.md`](staff_stock_scaffold_compare.md)), **or**  
+1. Ask before: **`/staff/stock` FIELDS** (LAYOUT done — [`staff_stock_layout_compare.md`](staff_stock_layout_compare.md)), **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
 **Do not merge to `main` unless asked.**

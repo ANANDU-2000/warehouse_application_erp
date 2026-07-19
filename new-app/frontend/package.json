@@ -87,7 +87,8 @@
     "test:staff-items-wire": "node scripts/check-staff-items-wire.mjs",
     "test:staff-items-states": "node scripts/check-staff-items-states.mjs",
     "test:staff-items-compare": "node scripts/check-staff-items-compare.mjs",
-    "test:staff-stock-scaffold": "node scripts/check-staff-stock-scaffold.mjs"
+    "test:staff-stock-scaffold": "node scripts/check-staff-stock-scaffold.mjs",
+    "test:staff-stock-layout": "node scripts/check-staff-stock-layout.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

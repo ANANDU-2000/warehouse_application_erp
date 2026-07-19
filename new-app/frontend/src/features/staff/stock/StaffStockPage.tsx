@@ -1,14 +1,15 @@
 /**
- * Staff stock `/staff/stock` — LAYOUT (Step 2).
- * Source: stock_page.dart StockPage(mode: staff); StockOperationalTopBar;
- * stock_status_quick_chips; stock_warehouse_table_header; stock_table_layout;
- * stock_inline_search_bar. Forbidden: interactive fields, CTA menus, stock list API.
+ * Staff stock `/staff/stock` — FIELDS (Step 3).
+ * Source: stock_page.dart search debounce 180ms · status chips · tab client state;
+ * stock_period_utils prefix rank; HexaEmptyState titles.
+ * Forbidden: AppBar action handlers (BUTTONS), stock list API (WIRE).
  */
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   STAFF_STOCK_ACTIVITY_EMPTY,
   STAFF_STOCK_BACK_HOME,
-  STAFF_STOCK_EMPTY,
+  STAFF_STOCK_DEBOUNCE_MS,
   STAFF_STOCK_HDR_DIFF,
   STAFF_STOCK_HDR_ITEM,
   STAFF_STOCK_HDR_PHYS,
@@ -21,6 +22,11 @@ import {
   STAFF_STOCK_TAB_STOCK,
   STAFF_STOCK_TITLE,
 } from "./staffStockCopy";
+import {
+  filterStaffStockRows,
+  staffStockListEmptyTitle,
+  type StaffStockRow,
+} from "./staffStockLogic";
 import {
   STAFF_STOCK_STATUS_ORDER,
   staffStockStatusFromQuery,
@@ -58,8 +64,33 @@ function goStaffHome(navigate: ReturnType<typeof useNavigate>): void {
 export function StaffStockPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const tab = staffStockTabFromQuery(searchParams.get("tab"));
-  const status = staffStockStatusFromQuery(searchParams.get("status"));
+  const [tab, setTab] = useState<StaffStockTab>(() =>
+    staffStockTabFromQuery(searchParams.get("tab")),
+  );
+  const [status, setStatus] = useState<StaffStockStatus>(() =>
+    staffStockStatusFromQuery(searchParams.get("status")),
+  );
+  const [query, setQuery] = useState("");
+  const [debounced, setDebounced] = useState("");
+  /** Local catalog — WIRE fills; FIELDS filters empty → empty titles. */
+  const [allItems] = useState<StaffStockRow[]>([]);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      setDebounced(query.trim());
+    }, STAFF_STOCK_DEBOUNCE_MS);
+    return () => window.clearTimeout(t);
+  }, [query]);
+
+  const filtered = filterStaffStockRows(allItems, {
+    status,
+    query: debounced,
+  });
+  const emptyTitle = staffStockListEmptyTitle({
+    itemCount: filtered.length,
+    status,
+    query: debounced,
+  });
 
   return (
     <div className="staff-stock-page" data-page="staff-stock">
@@ -79,7 +110,7 @@ export function StaffStockPage() {
             data-slot="actions"
             aria-hidden="true"
           >
-            {/* Period / Filters / Search / More — BUTTONS */}
+            {/* Period / Filters / Search toggle / More — BUTTONS */}
             <span
               className="staff-stock-appbar__action-slot"
               data-deferred="period"
@@ -98,7 +129,11 @@ export function StaffStockPage() {
             />
           </div>
         </div>
-        <div className="staff-stock-tabs" data-slot="tabs" role="tablist">
+        <div
+          className="staff-stock-tabs staff-stock-tabs--active"
+          data-slot="tabs"
+          role="tablist"
+        >
           {STAFF_STOCK_TAB_ORDER.map((key) => (
             <button
               key={key}
@@ -110,7 +145,7 @@ export function StaffStockPage() {
                   ? "staff-stock-tab staff-stock-tab--active"
                   : "staff-stock-tab"
               }
-              tabIndex={-1}
+              onClick={() => setTab(key)}
             >
               {TAB_LABEL[key]}
             </button>
@@ -121,10 +156,14 @@ export function StaffStockPage() {
       <main className="staff-stock-body" data-slot="body">
         {tab === "stock" ? (
           <>
-            <div className="staff-stock-status-chips" data-slot="statusChips">
+            <div
+              className="staff-stock-status-chips staff-stock-status-chips--active"
+              data-slot="statusChips"
+            >
               {STAFF_STOCK_STATUS_ORDER.map((key) => (
-                <span
+                <button
                   key={key}
+                  type="button"
                   className={[
                     "staff-stock-chip",
                     STATUS_CHIP_MOD[key],
@@ -132,19 +171,34 @@ export function StaffStockPage() {
                   ]
                     .filter(Boolean)
                     .join(" ")}
+                  onClick={() => setStatus(key)}
                 >
                   {STATUS_LABEL[key]}
-                </span>
+                </button>
               ))}
             </div>
-            <div className="staff-stock-search" data-slot="search">
+            <div
+              className="staff-stock-search staff-stock-search--active"
+              data-slot="search"
+            >
               <input
-                className="staff-stock-search__input"
+                className="staff-stock-search__input staff-stock-search__input--active"
                 type="search"
-                readOnly
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
                 placeholder={STAFF_STOCK_SEARCH_HINT}
                 aria-label={STAFF_STOCK_SEARCH_HINT}
               />
+              {query.trim().length > 0 ? (
+                <button
+                  type="button"
+                  className="staff-stock-search__clear"
+                  aria-label="Clear"
+                  onClick={() => setQuery("")}
+                >
+                  ×
+                </button>
+              ) : null}
             </div>
             <div
               className="staff-stock-delivery"
@@ -166,10 +220,11 @@ export function StaffStockPage() {
               </div>
             </div>
             <div className="staff-stock-results" data-slot="results">
-              <div className="staff-stock-results__empty" data-slot="empty">
-                {STAFF_STOCK_EMPTY}
-              </div>
-              {/* Row list chrome CSS ready — WIRE fills */}
+              {emptyTitle ? (
+                <div className="staff-stock-results__empty" data-slot="empty">
+                  {emptyTitle}
+                </div>
+              ) : null}
               <div className="staff-stock-list" data-slot="list" hidden />
             </div>
           </>

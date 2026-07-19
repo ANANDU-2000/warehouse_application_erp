@@ -37,8 +37,16 @@ assert(page.includes('data-slot="list"'), "list");
 assert(page.includes("staff-stock-chip--all"), "chip all mod");
 assert(page.includes("staff-stock-chip--low"), "chip low mod");
 assert(page.includes("staff-stock-chip--out"), "chip out mod");
-assert(page.includes("readOnly"), "search inert");
-assert(page.includes("STAFF_STOCK_EMPTY"), "empty copy");
+assert(
+  page.includes("readOnly") ||
+    page.includes("staff-stock-search__input--active"),
+  "search field present (FIELDS may activate)",
+);
+assert(
+  page.includes("STAFF_STOCK_EMPTY") ||
+    page.includes("staffStockListEmptyTitle"),
+  "empty copy",
+);
 
 assert(css.includes("#f5f3ee") || css.includes("#F5F3EE"), "page bg F5F3EE");
 assert(css.includes("#0e4f46") || css.includes("#0E4F46"), "brandPrimary All");

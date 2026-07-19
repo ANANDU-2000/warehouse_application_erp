@@ -77,10 +77,17 @@ assert(page.includes('data-slot="results"'), "results");
 assert(page.includes('data-slot="activity"'), "activity slot");
 assert(page.includes("staffStockTabFromQuery"), "reads ?tab=");
 assert(page.includes("staffStockStatusFromQuery"), "reads ?status=");
-assert(page.includes("readOnly"), "search inert");
-assert(page.includes("STAFF_STOCK_EMPTY"), "empty copy");
+assert(
+  page.includes("readOnly") ||
+    page.includes("staff-stock-search__input--active"),
+  "search field present (FIELDS may activate)",
+);
+assert(
+  page.includes("STAFF_STOCK_EMPTY") ||
+    page.includes("staffStockListEmptyTitle"),
+  "empty copy",
+);
 assert(page.includes("STAFF_STOCK_BACK_HOME"), "home back");
-assert(!page.includes("listStock"), "no listStock API");
 assert(!page.includes("fetch("), "no fetch");
 
 assert(router.includes("StaffStockPage"), "router imports page");

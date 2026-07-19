@@ -27,4 +27,13 @@ export const STAFF_STOCK_HDR_DIFF = "DIFF";
 /** HexaEmptyState when catalog empty (no filters). */
 export const STAFF_STOCK_EMPTY = "No stock items yet";
 
+/** HexaEmptyState when status/search/delivery filters active — stock_page.dart */
+export const STAFF_STOCK_EMPTY_FILTERED = "No items match filters";
+
 export const STAFF_STOCK_ACTIVITY_EMPTY = "Activity";
+
+/** stock_page.dart `_onSearchChanged` Timer */
+export const STAFF_STOCK_DEBOUNCE_MS = 180;
+
+/** Bootstrap list query sort — stock_page `_bootstrapStockListQueryOnce` */
+export const STAFF_STOCK_DEFAULT_SORT = "recent";

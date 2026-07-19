@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff purchase-history COMPARE · Staff low-stock SCAFFOLD → **STATES** |
-| 🟡 Current | `/staff/low-stock` **STATES PASS** — ask before COMPARE |
-| ⬜ Pending | COMPARE · other Subagent 4 stubs |
+| ✅ Completed | Staff purchase-history COMPARE · Staff low-stock SCAFFOLD → **STATES** · **COMPARE** |
+| 🟡 Current | `/staff/low-stock` **COMPARE PASS** — ask before next stub |
+| ⬜ Pending | Next Subagent 4 stub |
 | ⏸ Deferred | PDF/CSV bytes · + Stock / reorder sheets · ops summary KPI · ListSkeleton (Flutter uses spinner) · keepAlive TTL (ops provider is autoDispose) · purchase entry · barcode/print · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -33,4 +33,4 @@
 
 **Rollback:** Revert STATES commit; restore WIRE always-on chrome + text loading; roll back load-subtitle HTTP map + this compare + script; boards → ask before STATES.
 
-**Next (ask first):** COMPARE — do not start until approved.
+**Next (ask first):** COMPARE done — [`staff_low_stock_compare.md`](staff_low_stock_compare.md). Ask before next Subagent 4 stub.

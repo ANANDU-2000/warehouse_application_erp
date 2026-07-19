@@ -187,7 +187,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 4 BUTTONS | ✅ | Inform/Receive/profile/export empty snack — [`staff_low_stock_buttons_compare.md`](modules/staff_low_stock_buttons_compare.md) |
 | 5 WIRE | ✅ | ops list + notify-owner — [`staff_low_stock_wire_compare.md`](modules/staff_low_stock_wire_compare.md) |
 | 6 STATES | ✅ | spinner + 10s slow + FriendlyLoadError + pull — [`staff_low_stock_states_compare.md`](modules/staff_low_stock_states_compare.md) |
-| 7 COMPARE | ⬜ | — |
+| 7 COMPARE | ✅ | Aggregator SCAFFOLD→STATES — [`staff_low_stock_compare.md`](modules/staff_low_stock_compare.md) |
 
 ### Prompt template (copy per page)
 

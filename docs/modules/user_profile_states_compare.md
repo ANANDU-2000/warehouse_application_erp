@@ -8,9 +8,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · **STATES** |
-| 🟡 Current | STATES PASS — ask before **COMPARE** |
-| ⬜ Pending | Profile COMPARE · Subagent 4 |
+| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
+| 🟡 Current | STATES/COMPARE done — profile **COMPARE PASS**; ask Subagent 4 |
+| ⬜ Pending | Subagent 4 · optional activity WIRE |
 | ⏸ Deferred | Activity feed/stock/purchases/ledger load STATES; pull-to-refresh |
 
 ## Legacy vs New
@@ -34,4 +34,4 @@
 
 **Rollback:** Revert STATES commit; restore WIRE minimal loading/error paragraph; remove states compare + script; boards → ask before STATES.
 
-**Next (ask first):** `/settings/users/:userId` COMPARE — master Legacy vs New PASS/FAIL.
+**Next (ask first):** `/settings/users/:userId` COMPARE — done → [`user_profile_compare.md`](user_profile_compare.md). Ask before Subagent 4 or activity WIRE.

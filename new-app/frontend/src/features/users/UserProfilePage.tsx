@@ -40,6 +40,7 @@ import {
   USER_PROFILE_NAME_EMPTY,
   USER_PROFILE_NEW_PASSWORD_TITLE,
   USER_PROFILE_NOT_FOUND,
+  USER_PROFILE_NOTES_LABEL,
   USER_PROFILE_PERMISSIONS_SAVED,
   USER_PROFILE_PERMS_VIEW_ONLY,
   USER_PROFILE_RETRY,
@@ -650,24 +651,40 @@ export function UserProfilePage() {
           data-testid="user-profile-tab-body-chrome"
         >
           {tab === "overview" ? (
-            <div
-              className="user-profile__kpi-grid"
-              data-testid="user-profile-kpi-grid"
-            >
-              {USER_PROFILE_KPI_ORDER.map((key) => (
+            <div data-testid="user-profile-overview">
+              <div
+                className="user-profile__kpi-grid"
+                data-testid="user-profile-kpi-grid"
+              >
+                {USER_PROFILE_KPI_ORDER.map((key) => (
+                  <div
+                    key={key}
+                    className="user-profile__kpi-card"
+                    data-testid={`user-profile-kpi-${key}`}
+                  >
+                    <span className="user-profile__kpi-label">
+                      {USER_PROFILE_KPI_LABELS[key]}
+                    </span>
+                    <span className="user-profile__kpi-value">
+                      {kpiValue(key, profile?.stats ?? null)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {profile?.notes != null &&
+              profile.notes.toString().trim() !== "" ? (
                 <div
-                  key={key}
-                  className="user-profile__kpi-card"
-                  data-testid={`user-profile-kpi-${key}`}
+                  className="user-profile__notes-card"
+                  data-testid="user-profile-notes"
                 >
-                  <span className="user-profile__kpi-label">
-                    {USER_PROFILE_KPI_LABELS[key]}
-                  </span>
-                  <span className="user-profile__kpi-value">
-                    {kpiValue(key, profile?.stats ?? null)}
-                  </span>
+                  <h3 className="user-profile__notes-label">
+                    {USER_PROFILE_NOTES_LABEL}
+                  </h3>
+                  <p className="user-profile__notes-body">
+                    {profile.notes.toString()}
+                  </p>
                 </div>
-              ))}
+              ) : null}
             </div>
           ) : null}
 

@@ -6,6 +6,8 @@ export const USER_PROFILE_TITLE = "User profile";
 export const USER_PROFILE_TAB_OVERVIEW = "Overview";
 export const USER_PROFILE_TAB_ACTIVITY = "Activity";
 export const USER_PROFILE_TAB_PERMISSIONS = "Permissions";
+/** Overview notes card — user_profile_page.dart _OverviewTab */
+export const USER_PROFILE_NOTES_LABEL = "Notes";
 export const USER_PROFILE_BACK_FALLBACK = "/settings/users";
 export const USER_PROFILE_EDIT_USER = "Edit user";
 export const USER_PROFILE_TOOLTIP_MORE = "More actions";

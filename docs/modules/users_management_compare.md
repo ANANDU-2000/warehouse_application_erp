@@ -14,8 +14,8 @@
 | State | Step |
 |---|---|
 | ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · COMPARE |
-| 🟡 Current | List COMPARE PASS — profile **STATES PASS**; ask before COMPARE |
-| ⬜ Pending (ask first) | Profile LAYOUT→COMPARE · Subagent 4 — [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md) |
+| 🟡 Current | List COMPARE PASS — profile **COMPARE PASS**; ask before Subagent 4 |
+| ⬜ Pending (ask first) | Subagent 4 — [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md) · optional activity WIRE |
 | ⏸ Deferred | Merge to `main`; desktop detail panel live; card overflow menus |
 
 ---
@@ -35,7 +35,7 @@
 | 9 | STATES loading | `ListSkeleton` 6×84 | `UsersListSkeleton` | PASS | [`users_management_states_compare.md`](users_management_states_compare.md) |
 | 10 | STATES errors | HexaErrorCard `Could not load users` | FriendlyLoadError + subtitle map | PASS | states compare |
 | 11 | STATES empty | `No users match your filters.` | exact | PASS | states compare |
-| 12 | Profile tap route exists | `/settings/users/:id` | stub “User profile” | PASS | router + wire |
+| 12 | Profile tap route exists | `/settings/users/:id` | `UserProfilePage` COMPARE PASS | PASS | [`user_profile_compare.md`](user_profile_compare.md) |
 
 **Overall (in-scope `/settings/users` list):** **PASS**
 
@@ -45,7 +45,7 @@
 
 | Item | Why deferred |
 |---|---|
-| Profile page tabs / permissions / ledger | Separate route page loop (stub only) |
+| Profile page tabs / permissions / ledger | Profile COMPARE PASS — activity APIs still deferred |
 | Card overflow: reset password / block / copy credentials / delete | Use bulk or profile later |
 | Desktop `UserManagementDetailPanel` live content | Split chrome present; body deferred |
 | Pull-to-refresh `RefreshIndicator` | AppBar refresh covers invalidate |
@@ -73,10 +73,10 @@ Docs/checklist + smoke script only: revert COMPARE commit. Application code unch
 
 ## 5. Next after Approve
 
-1. Ask before: **User profile COMPARE**, **or**  
-2. One **Subagent 4 satellite** from [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md), **or**  
+1. Ask before: one **Subagent 4 satellite** from [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md), **or**  
+2. Optional: **Activity tab WIRE** on profile, **or**  
 3. Hold / merge review of `ops/dashboard-module` → `main`.
 
 **Do not merge to `main` unless asked.**
 
-*(Profile STATES done — see [`user_profile_states_compare.md`](user_profile_states_compare.md).)*
+*(Profile COMPARE done — see [`user_profile_compare.md`](user_profile_compare.md).)*

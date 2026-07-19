@@ -114,7 +114,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 4 BUTTONS | ✅ | back/Edit/More/Save stubs — [`user_profile_buttons_compare.md`](modules/user_profile_buttons_compare.md) |
 | 5 WIRE | ✅ | profile GET/PATCH/reset/delete/perms — [`user_profile_wire_compare.md`](modules/user_profile_wire_compare.md) |
 | 6 STATES | ✅ | spinner + HexaErrorCard/FriendlyLoadError — [`user_profile_states_compare.md`](modules/user_profile_states_compare.md) |
-| 7 COMPARE | ⬜ | Ask before next |
+| 7 COMPARE | ✅ | Master PASS — [`user_profile_compare.md`](modules/user_profile_compare.md) |
 
 ### Prompt template (copy per page)
 

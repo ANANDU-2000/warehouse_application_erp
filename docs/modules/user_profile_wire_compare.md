@@ -22,4 +22,4 @@
 
 **Rollback:** Revert WIRE commit; restore BUTTONS stubs; remove wire compare + script; boards → ask before WIRE.
 
-**Next (ask first):** `/settings/users/:userId` STATES — done → [`user_profile_states_compare.md`](user_profile_states_compare.md). Ask before COMPARE.
+**Next (ask first):** `/settings/users/:userId` STATES — done → [`user_profile_states_compare.md`](user_profile_states_compare.md). COMPARE — done → [`user_profile_compare.md`](user_profile_compare.md). Ask before Subagent 4.

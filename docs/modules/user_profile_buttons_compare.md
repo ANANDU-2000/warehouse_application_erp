@@ -19,4 +19,4 @@
 
 **Rollback:** Revert BUTTONS commit; restore FIELDS inert Edit/More; remove this compare + script; boards → ask before BUTTONS.
 
-**Next (ask first):** `/settings/users/:userId` WIRE — done → [`user_profile_wire_compare.md`](user_profile_wire_compare.md). STATES — done → [`user_profile_states_compare.md`](user_profile_states_compare.md). Ask before COMPARE.
+**Next (ask first):** `/settings/users/:userId` WIRE — done → [`user_profile_wire_compare.md`](user_profile_wire_compare.md). STATES — done → [`user_profile_states_compare.md`](user_profile_states_compare.md). COMPARE — done → [`user_profile_compare.md`](user_profile_compare.md). Ask before Subagent 4.

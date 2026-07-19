@@ -73,10 +73,9 @@ Docs/checklist + smoke script only: revert COMPARE commit. Application code unch
 
 ## 5. Next after Approve
 
-1. Ask before: one **Subagent 4 satellite** from [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md), **or**  
-2. Optional: **Activity tab WIRE** on profile, **or**  
-3. Hold / merge review of `ops/dashboard-module` → `main`.
+1. Ask before: **`/notifications` LAYOUT** — [`notifications_scaffold_compare.md`](notifications_scaffold_compare.md), **or**  
+2. Hold / merge review of `ops/dashboard-module` → `main`.
 
 **Do not merge to `main` unless asked.**
 
-*(Profile COMPARE done — see [`user_profile_compare.md`](user_profile_compare.md).)*
+*(Notifications SCAFFOLD done — see [`notifications_scaffold_compare.md`](notifications_scaffold_compare.md).)*

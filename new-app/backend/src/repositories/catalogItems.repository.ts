@@ -201,6 +201,14 @@ export type CatalogItemsRepository = {
     itemId: string,
     barcode: string,
   ): Promise<void>;
+  /** Soft-delete active items by id list. Returns count updated. */
+  bulkSoftDelete(businessId: string, itemIds: string[]): Promise<number>;
+  /** Set reorder_level on active items. Returns count updated. */
+  bulkSetReorderLevel(
+    businessId: string,
+    itemIds: string[],
+    reorderLevel: number,
+  ): Promise<number>;
 };
 
 const ITEM_SELECT = `
@@ -1319,6 +1327,53 @@ export function createCatalogItemsRepository(
           { name: "barcode", type: sql.NVarChar(64), value: barcode },
         ],
       );
+    },
+
+    async bulkSoftDelete(businessId, itemIds) {
+      if (itemIds.length === 0) return 0;
+      const params: SqlParam[] = [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+      ];
+      const ph = itemIds.map((id, i) => {
+        const n = `id${i}`;
+        params.push({ name: n, type: sql.UniqueIdentifier, value: id });
+        return `@${n}`;
+      });
+      const rows = await queryMany<Record<string, unknown>>(
+        db,
+        `UPDATE catalog_items
+         SET [deleted_at] = SYSUTCDATETIME()
+         OUTPUT INSERTED.[id]
+         WHERE [business_id] = @businessId
+           AND [deleted_at] IS NULL
+           AND [id] IN (${ph.join(",")})`,
+        params,
+      );
+      return rows.length;
+    },
+
+    async bulkSetReorderLevel(businessId, itemIds, reorderLevel) {
+      if (itemIds.length === 0) return 0;
+      const params: SqlParam[] = [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "reorder", type: sql.Decimal(12, 3), value: reorderLevel },
+      ];
+      const ph = itemIds.map((id, i) => {
+        const n = `id${i}`;
+        params.push({ name: n, type: sql.UniqueIdentifier, value: id });
+        return `@${n}`;
+      });
+      const rows = await queryMany<Record<string, unknown>>(
+        db,
+        `UPDATE catalog_items
+         SET [reorder_level] = @reorder
+         OUTPUT INSERTED.[id]
+         WHERE [business_id] = @businessId
+           AND [deleted_at] IS NULL
+           AND [id] IN (${ph.join(",")})`,
+        params,
+      );
+      return rows.length;
     },
   };
 }

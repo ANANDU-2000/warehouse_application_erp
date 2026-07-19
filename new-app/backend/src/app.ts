@@ -257,6 +257,8 @@ function unavailableCatalogItemsRepository(): CatalogItemsRepository {
     listFuzzyNamePairs: fail,
     updateItemCode: fail,
     updateBarcode: fail,
+    bulkSoftDelete: fail,
+    bulkSetReorderLevel: fail,
   };
 }
 

@@ -145,6 +145,8 @@ function baseRepo(
     listFuzzyNamePairs: async () => [],
     updateItemCode: async () => undefined,
     updateBarcode: async () => undefined,
+    bulkSoftDelete: async () => 0,
+    bulkSetReorderLevel: async () => 0,
     ...overrides,
   };
 }

@@ -12,7 +12,7 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 nest COMPLETE · Products Slice 6 | Products Slice 6 — [`products_backend_slice6.md`](modules/products_backend_slice6.md) |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 nest COMPLETE · Products Slice 7 | Products Slice 7 — [`products_backend_slice7.md`](modules/products_backend_slice7.md) |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list+profile COMPARE · Activity WIRE | Next: ask next Subagent 4 stub — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | 🟡 Slice 1–6 + variants | Next: ask before Slice 7 — [`products_backend_slice6.md`](modules/products_backend_slice6.md) |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |

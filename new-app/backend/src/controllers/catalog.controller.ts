@@ -1,6 +1,6 @@
 /**
- * Catalog hub routes — fuzzy-check (not under catalog-items)
- * Source: catalog.py GET /catalog/fuzzy-check
+ * Catalog controller — fuzzy-check + bulk-archive + bulk-reorder
+ * Source: catalog.py
  */
 import type { Request, Response, NextFunction } from "express";
 import { Router } from "express";
@@ -8,6 +8,11 @@ import type { AuthzMiddleware } from "../middleware/authz";
 import { sendDetail } from "../http/sendDetail";
 import type { CatalogItemsRepository } from "../repositories/catalogItems.repository";
 import { runCatalogFuzzyCheck } from "../services/catalogFuzzyCheck.service";
+import {
+  bulkItemIdsSchema,
+  bulkReorderSchema,
+} from "../validation/catalogBulk.schemas";
+import { validateWithSchema } from "../validation/validate";
 
 export type CatalogControllerDeps = {
   catalogItems: CatalogItemsRepository;
@@ -50,6 +55,50 @@ export function createCatalogController(deps: CatalogControllerDeps) {
         next(e);
       }
     },
+
+    /** Formula source: catalog.py:bulk_archive_catalog_items */
+    async bulkArchive(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string") {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        const data = validateWithSchema(
+          bulkItemIdsSchema,
+          req.body,
+          "Invalid bulk archive body",
+        );
+        await deps.catalogItems.bulkSoftDelete(businessId, data.item_ids);
+        res.status(204).send();
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    /** Formula source: catalog.py:bulk_reorder_catalog_items */
+    async bulkReorder(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string") {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        const data = validateWithSchema(
+          bulkReorderSchema,
+          req.body,
+          "Invalid bulk reorder body",
+        );
+        const updated = await deps.catalogItems.bulkSetReorderLevel(
+          businessId,
+          data.item_ids,
+          data.reorder_level,
+        );
+        res.json({ updated });
+      } catch (e) {
+        next(e);
+      }
+    },
   };
 }
 
@@ -65,6 +114,20 @@ export function createCatalogRoutes(
     authz.requireAuth,
     authz.requireMembership,
     (req, res, next) => void catalog.fuzzyCheck(req, res, next),
+  );
+  r.post(
+    "/items/bulk-archive",
+    authz.requireAuth,
+    authz.requireMembership,
+    authz.requireOwnerMembership,
+    (req, res, next) => void catalog.bulkArchive(req, res, next),
+  );
+  r.patch(
+    "/items/bulk-reorder",
+    authz.requireAuth,
+    authz.requireMembership,
+    authz.requireOwnerMembership,
+    (req, res, next) => void catalog.bulkReorder(req, res, next),
   );
   return r;
 }

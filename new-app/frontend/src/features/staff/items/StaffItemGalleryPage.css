@@ -252,9 +252,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   padding: 8px 12px;
   min-height: 40px;
   box-sizing: border-box;
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
 }
 
 .staff-gallery-page__category-title {
@@ -269,16 +276,53 @@
   display: inline-flex;
 }
 
+.staff-gallery-page__category-body {
+  border-top: 1px solid var(--sg-border);
+}
+
+.staff-gallery-page__sub-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 0 8px 6px;
+  box-sizing: border-box;
+}
+
 /* Item row stock line — normal #64748B / low #DC2626; sub #94A3B8 */
 .staff-gallery-page__item-row {
-  padding: 0 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 4px 4px 4px 12px;
   box-sizing: border-box;
+  border-top: 1px solid #f1f5f4;
+}
+
+.staff-gallery-page__item-main {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  padding: 4px 0;
+  color: inherit;
+}
+
+.staff-gallery-page__item-main:disabled {
+  cursor: default;
+  opacity: 0.7;
 }
 
 .staff-gallery-page__item-name {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .staff-gallery-page__item-sub {
@@ -297,4 +341,58 @@
 .staff-gallery-page__item-stock--low {
   color: var(--sg-low);
   font-weight: 700;
+}
+
+.staff-gallery-page__item-menu-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.staff-gallery-page__item-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--sg-muted);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.staff-gallery-page__item-menu-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.staff-gallery-page__item-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 30;
+  min-width: 180px;
+  padding: 4px 0;
+  background: var(--sg-surface);
+  border: 1px solid var(--sg-border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+
+.staff-gallery-page__item-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  padding: 10px 14px;
+  color: var(--sg-text);
+  cursor: pointer;
+}
+
+.staff-gallery-page__item-menu-item:hover {
+  background: var(--sg-chip-selected);
 }

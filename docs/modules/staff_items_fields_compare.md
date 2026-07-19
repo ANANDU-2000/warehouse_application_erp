@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff search COMPARE · Staff items SCAFFOLD · LAYOUT · **FIELDS** |
-| 🟡 Current | Staff items **FIELDS PASS** — ask before BUTTONS |
-| ⬜ Pending | Staff items BUTTONS → COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | `/staff/settings` · `/settings`; listStock (WIRE); category expand / row menus (BUTTONS) |
+| ✅ Completed | Staff search COMPARE · Staff items SCAFFOLD · LAYOUT · FIELDS · **BUTTONS** |
+| 🟡 Current | Staff items **BUTTONS PASS** — ask before WIRE |
+| ⬜ Pending | Staff items WIRE → COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | `/staff/settings` · `/settings`; listStock (WIRE); QuickStockActionSheet (WIRE) |
 
 ## Legacy vs New
 
@@ -36,4 +36,4 @@
 
 **Rollback:** Revert FIELDS commit; restore LAYOUT inert search/chips; remove `staffItemGalleryLogic.ts` + this compare + fields script; boards → ask before FIELDS.
 
-**Next (ask first):** `/staff/items` BUTTONS — do not start until approved.
+**Next (ask first):** BUTTONS done — [`staff_items_buttons_compare.md`](staff_items_buttons_compare.md). Ask before WIRE.

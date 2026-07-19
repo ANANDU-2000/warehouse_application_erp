@@ -8,9 +8,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Notifications COMPARE · Staff search SCAFFOLD→COMPARE · Staff items SCAFFOLD · LAYOUT · **FIELDS** |
-| 🟡 Current | Staff items **FIELDS PASS** — ask before BUTTONS |
-| ⬜ Pending | Staff items BUTTONS → COMPARE · other Subagent 4 stubs |
+| ✅ Completed | Notifications COMPARE · Staff search SCAFFOLD→COMPARE · Staff items SCAFFOLD · LAYOUT · FIELDS · **BUTTONS** |
+| 🟡 Current | Staff items **BUTTONS PASS** — ask before WIRE |
+| ⬜ Pending | Staff items WIRE → COMPARE · other Subagent 4 stubs |
 | ⏸ Deferred | `/staff/settings` · `/settings` (implement locked); owner `/stock` gallery; `listStock` API (WIRE) |
 
 ## Legacy vs New
@@ -34,4 +34,4 @@
 
 **Rollback:** Revert SCAFFOLD commit; restore route → `DashboardRouteStubPage` title “Staff gallery”; remove `features/staff/items/*` + this compare + script; boards → ask before staff items SCAFFOLD.
 
-**Next (ask first):** LAYOUT → [`staff_items_layout_compare.md`](staff_items_layout_compare.md). FIELDS → [`staff_items_fields_compare.md`](staff_items_fields_compare.md). Ask before BUTTONS.
+**Next (ask first):** LAYOUT → [`staff_items_layout_compare.md`](staff_items_layout_compare.md). FIELDS → [`staff_items_fields_compare.md`](staff_items_fields_compare.md). BUTTONS → [`staff_items_buttons_compare.md`](staff_items_buttons_compare.md). Ask before WIRE.

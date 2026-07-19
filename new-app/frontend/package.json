@@ -82,7 +82,8 @@
     "test:staff-search-compare": "node scripts/check-staff-search-compare.mjs",
     "test:staff-items-scaffold": "node scripts/check-staff-items-scaffold.mjs",
     "test:staff-items-layout": "node scripts/check-staff-items-layout.mjs",
-    "test:staff-items-fields": "node scripts/check-staff-items-fields.mjs"
+    "test:staff-items-fields": "node scripts/check-staff-items-fields.mjs",
+    "test:staff-items-buttons": "node scripts/check-staff-items-buttons.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

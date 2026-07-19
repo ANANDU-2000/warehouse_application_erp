@@ -81,7 +81,7 @@ assert(
   !page.includes("fetchListStock") && !page.includes("listStock("),
   "no listStock API yet",
 );
-/* BUTTONS owns category expand + row menus; WIRE owns listStock */
+/* BUTTONS may add expand/menus; WIRE owns listStock */
 
 assert(css.includes("search-input--active"), "css search active");
 assert(css.includes("chip--active"), "css chip active");

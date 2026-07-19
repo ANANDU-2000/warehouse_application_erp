@@ -103,7 +103,7 @@ assert(
 );
 assert(page.includes("STAFF_GALLERY_EMPTY"), "empty copy");
 assert(!page.includes("fetchListStock"), "no API yet");
-assert(!page.includes("Update stock"), "no row menu yet");
+/* BUTTONS may add Update stock menu labels */
 
 assert(router.includes("StaffItemGalleryPage"), "router imports page");
 assert(router.includes('path="/staff/items"'), "staff items route");

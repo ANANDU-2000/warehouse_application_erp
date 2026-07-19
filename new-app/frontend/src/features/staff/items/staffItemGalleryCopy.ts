@@ -31,7 +31,16 @@ export const STAFF_GALLERY_SUGGESTIONS_MAX = 12;
 /** FriendlyLoadError — deferred STATES */
 export const STAFF_GALLERY_LOAD_FAILED = "Could not load items";
 
-/** Row popup — deferred BUTTONS/WIRE */
+/** Row popup — staff_item_gallery_page.dart PopupMenuButton */
 export const STAFF_GALLERY_MENU_STOCK = "Update stock";
 export const STAFF_GALLERY_MENU_REORDER = "Reorder / opening";
 export const STAFF_GALLERY_MENU_ITEM = "Item profile";
+
+/** Stock line suffixes — `_StaffGalleryItemRow` */
+export const STAFF_GALLERY_NO_CODE = "No code";
+export const STAFF_GALLERY_NO_BARCODE = "No barcode";
+export const STAFF_GALLERY_DEFAULT_ITEM_NAME = "Item";
+export const STAFF_GALLERY_DEFAULT_UNIT = "bag";
+
+/** Subcategory tab — Flutter ChoiceChip `All` when expanded */
+export const STAFF_GALLERY_SUB_TAB_ALL = "All";

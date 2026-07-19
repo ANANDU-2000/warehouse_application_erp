@@ -146,6 +146,25 @@ export function formatGallerySummary(
   return `${itemCount} items · ${categoryCount} categories`;
 }
 
+/**
+ * Stock subtitle line — Flutter `_StaffGalleryItemRow`:
+ * `Stock: ${qty} $unit · $code|No code · No barcode?`
+ */
+export function formatGalleryStockLine(
+  stockFormatted: string,
+  unit: string,
+  code: string,
+  missingBarcode: boolean,
+  noCodeLabel: string,
+  noBarcodeLabel: string,
+): string {
+  const codePart = code.length > 0 ? code : noCodeLabel;
+  return (
+    `Stock: ${stockFormatted} ${unit} · ${codePart}` +
+    (missingBarcode ? ` · ${noBarcodeLabel}` : "")
+  );
+}
+
 /** Canonical `?filter=` value for a chip (deep-link write; Flutter chip select is local-only). */
 export function staffGalleryFilterToQuery(
   filter: StaffGalleryFilter,

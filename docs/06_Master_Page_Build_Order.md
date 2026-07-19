@@ -12,7 +12,7 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 · Staff items FIELDS | Next: ask before BUTTONS — [`staff_items_fields_compare.md`](modules/staff_items_fields_compare.md) |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 · Staff items BUTTONS | Next: ask before WIRE — [`staff_items_buttons_compare.md`](modules/staff_items_buttons_compare.md) |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list+profile COMPARE · Activity WIRE | Next: ask next Subagent 4 stub — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users list+profile **COMPARE PASS**. Profile Activity **WIRE PASS**. Subagent 4: `/notifications` **COMPARE PASS**. Staff search **COMPARE PASS**. Staff items **FIELDS PASS**. Next: ask before **BUTTONS**.
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users list+profile **COMPARE PASS**. Profile Activity **WIRE PASS**. Subagent 4: `/notifications` **COMPARE PASS**. Staff search **COMPARE PASS**. Staff items **BUTTONS PASS**. Next: ask before **WIRE**.
 
 ---
 
@@ -183,7 +183,7 @@ Primarily via `/catalog/taxonomy`, `/catalog/new-category`, `/catalog/category/:
 | `/stock/slow-moving` | |
 | `/staff/stock` | Staff shell |
 | `/staff/low-stock` | |
-| `/staff/items` | Staff gallery — **FIELDS PASS** — [`staff_items_fields_compare.md`](modules/staff_items_fields_compare.md) |
+| `/staff/items` | Staff gallery — **BUTTONS PASS** — [`staff_items_buttons_compare.md`](modules/staff_items_buttons_compare.md) |
 
 ### Seq 10 — Stock Movement
 

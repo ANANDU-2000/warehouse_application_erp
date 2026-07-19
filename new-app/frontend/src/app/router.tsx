@@ -129,6 +129,10 @@ export function AppRouter() {
           path="/catalog/item/:itemId"
           element={<DashboardRouteStubPage title="Catalog item" />}
         />
+        <Route
+          path="/catalog/item/:itemId/edit"
+          element={<DashboardRouteStubPage title="Edit catalog item" />}
+        />
         <Route path="/" element={<Navigate to="/splash" replace />} />
         <Route path="*" element={<Navigate to="/splash" replace />} />
       </Routes>

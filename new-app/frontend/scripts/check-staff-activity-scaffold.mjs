@@ -64,11 +64,20 @@ assert(copy.includes('STAFF_ACT_DEFAULT_PERIOD: StaffActPeriod = "today"'), "def
 assert(page.includes('data-slot="appBar"'), "appBar");
 assert(page.includes('data-slot="periods"'), "periods");
 assert(page.includes('data-slot="empty"'), "empty");
-assert(page.includes('data-deferred="period-select"'), "period deferred");
 assert(page.includes('data-deferred="activity-rows"'), "rows deferred");
 assert(page.includes("STAFF_ACT_BACK_FALLBACK"), "back");
 assert(page.includes("STAFF_ACT_EMPTY"), "empty copy");
-assert(page.includes("disabled"), "periods disabled");
+assert(
+  page.includes("disabled") ||
+    page.includes("setPeriod") ||
+    page.includes('data-action="select-period"'),
+  "period control present (FIELDS may activate)",
+);
+assert(
+  page.includes('data-deferred="period-select"') ||
+    page.includes('data-action="select-period"'),
+  "period select slot",
+);
 assert(!page.includes("fetch("), "no fetch");
 
 assert(css.includes("staff-act-page"), "page css");

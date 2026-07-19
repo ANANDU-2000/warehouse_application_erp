@@ -1,9 +1,10 @@
 /**
- * Staff activity `/staff/activity` — LAYOUT (Step 2).
- * Source: staff_activity_page.dart · HexaColors · HexaDsLayout pageGutter 24 /
- * sectionGap · ListTile CircleAvatar brandPrimary@12% · Divider.
- * Forbidden: period handlers, API, skeleton (FIELDS/WIRE/STATES).
+ * Staff activity `/staff/activity` — FIELDS (Step 3).
+ * Source: staff_activity_page.dart SegmentedButton onSelectionChanged →
+ * _staffActivityPeriodProvider (today|week|month).
+ * Deferred: listActivityLog → WIRE; ListSkeleton / HexaErrorCard → STATES.
  */
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   STAFF_ACT_BACK_FALLBACK,
@@ -30,11 +31,14 @@ function popOrGo(
 
 export function StaffActivityPage() {
   const navigate = useNavigate();
-  /** LAYOUT: fixed today; FIELDS activates SegmentedButton. */
-  const period: StaffActPeriod = STAFF_ACT_DEFAULT_PERIOD;
+  const [period, setPeriod] = useState<StaffActPeriod>(STAFF_ACT_DEFAULT_PERIOD);
 
   return (
-    <div className="staff-act-page" data-page="staff-activity">
+    <div
+      className="staff-act-page"
+      data-page="staff-activity"
+      data-period={period}
+    >
       <header className="staff-act-appbar" data-slot="appBar">
         <button
           type="button"
@@ -50,9 +54,8 @@ export function StaffActivityPage() {
 
       <main className="staff-act-body" data-slot="body">
         <div
-          className="staff-act-periods staff-act-periods--inert"
+          className="staff-act-periods staff-act-periods--active"
           data-slot="periods"
-          data-deferred="period-select"
           role="tablist"
           aria-label="Activity period"
         >
@@ -67,8 +70,9 @@ export function StaffActivityPage() {
                   ? "staff-act-period staff-act-period--selected"
                   : "staff-act-period"
               }
-              disabled
-              data-deferred="period-select"
+              data-action="select-period"
+              data-period={key}
+              onClick={() => setPeriod(key)}
             >
               {STAFF_ACT_PERIOD_LABEL[key]}
             </button>

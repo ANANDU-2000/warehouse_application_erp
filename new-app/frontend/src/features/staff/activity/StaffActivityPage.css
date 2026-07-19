@@ -81,6 +81,10 @@
   pointer-events: none;
 }
 
+.staff-act-periods--active .staff-act-period {
+  cursor: pointer;
+}
+
 .staff-act-period {
   flex: 1;
   border: none;

@@ -195,7 +195,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 |---|---|---|
 | 1 SCAFFOLD | ✅ | AppBar + period chips + empty — [`staff_activity_scaffold_compare.md`](modules/staff_activity_scaffold_compare.md) |
 | 2 LAYOUT | ✅ | Hexa tokens + avatar/row chrome — [`staff_activity_layout_compare.md`](modules/staff_activity_layout_compare.md) |
-| 3 FIELDS | ⬜ | — |
+| 3 FIELDS | ✅ | period Today/Week/Month select — [`staff_activity_fields_compare.md`](modules/staff_activity_fields_compare.md) |
 | 4 BUTTONS | ⬜ | — |
 | 5 WIRE | ⬜ | — |
 | 6 STATES | ⬜ | — |

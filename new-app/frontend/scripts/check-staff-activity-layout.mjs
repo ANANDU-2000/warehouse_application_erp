@@ -32,17 +32,20 @@ const page = readFileSync(pagePath, "utf8");
 const css = readFileSync(cssPath, "utf8");
 const pkg = readFileSync(pkgPath, "utf8");
 
-assert(page.includes("LAYOUT"), "LAYOUT header");
+assert(page.includes("LAYOUT") || page.includes("FIELDS") || page.includes("SCAFFOLD"), "step header");
 assert(page.includes('data-slot="appBar"'), "appBar");
 assert(page.includes('data-slot="periods"'), "periods");
 assert(page.includes('data-slot="empty"'), "empty");
 assert(page.includes('data-slot="emptyIcon"'), "empty icon");
-assert(page.includes("staff-act-periods--inert"), "periods inert");
+assert(page.includes("staff-act-periods--inert") || page.includes("staff-act-periods--active"), "periods class");
 assert(page.includes('data-kind="history"'), "history row");
 assert(page.includes('data-kind="purchase"'), "purchase row");
 assert(page.includes("staff-act-row__avatar--history"), "history avatar");
 assert(page.includes("staff-act-row__avatar--purchase"), "purchase avatar");
-assert(page.includes("disabled"), "periods disabled");
+assert(
+  page.includes("disabled") || page.includes("setPeriod") || page.includes("data-action=\"select-period\""),
+  "period control present (FIELDS may activate)",
+);
 assert(!page.includes("fetch("), "no fetch");
 
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "page bg");

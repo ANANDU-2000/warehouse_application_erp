@@ -145,5 +145,17 @@ export function createStockRoutes(
     authz.requireMembership,
     (req, res, next) => void homeActivity.listStaffPurchases(req, res, next),
   );
+  r.get(
+    "/low-stock/operations",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void staffHome.listLowStockOperations(req, res, next),
+  );
+  r.post(
+    "/:itemId/notify-owner",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void staffHome.notifyOwnerStockItem(req, res, next),
+  );
   return r;
 }

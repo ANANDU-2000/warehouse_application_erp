@@ -399,6 +399,97 @@ export function createStaffHomeController(deps: StaffHomeControllerDeps) {
         next(e);
       }
     },
+
+    /**
+     * GET …/stock/low-stock/operations
+     * Source: stock_list.low_stock_operations
+     */
+    async listLowStockOperations(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ) {
+      try {
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string") {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        const page = Number(req.query.page ?? 1) || 1;
+        const perPage = Number(req.query.per_page ?? 50) || 50;
+        const q = typeof req.query.q === "string" ? req.query.q : "";
+        const periodStart =
+          typeof req.query.period_start === "string"
+            ? req.query.period_start
+            : null;
+        const periodEnd =
+          typeof req.query.period_end === "string"
+            ? req.query.period_end
+            : null;
+        res.json(
+          await deps.staffHome.listLowStockOperations({
+            businessId,
+            page,
+            perPage,
+            q,
+            periodStart,
+            periodEnd,
+          }),
+        );
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    /**
+     * POST …/stock/:itemId/notify-owner
+     * Source: stock_detail.notify_owner_about_item
+     */
+    async notifyOwnerStockItem(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ) {
+      try {
+        const businessId = req.params.businessId;
+        const itemId = req.params.itemId;
+        if (typeof businessId !== "string" || typeof itemId !== "string") {
+          sendDetail(res, 400, "businessId and itemId required");
+          return;
+        }
+        const user = req.user;
+        if (!user) {
+          sendDetail(res, 401, "Not authenticated");
+          return;
+        }
+        const alert =
+          typeof req.query.alert === "string" ? req.query.alert : "reorder";
+        const fromUserName =
+          (user.name && user.name.trim()) ||
+          user.username ||
+          user.email ||
+          "Staff";
+        try {
+          const out = await deps.staffHome.notifyOwnerStockItem({
+            businessId,
+            itemId,
+            fromUserId: user.id,
+            fromUserName,
+            alert,
+          });
+          res.status(201).json(out);
+        } catch (e) {
+          const err = e as Error & { status?: number };
+          if (err.status === 404 || err.status === 400) {
+            sendDetail(res, err.status, err.message);
+            return;
+          }
+          throw e;
+        }
+      } catch (e) {
+        next(e);
+      }
+    },
   };
 }
 

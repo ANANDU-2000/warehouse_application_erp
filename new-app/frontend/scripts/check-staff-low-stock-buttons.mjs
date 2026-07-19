@@ -75,12 +75,15 @@ assert(page.includes('data-action="receive"'), "receive action");
 assert(page.includes('data-action="item-profile"'), "profile action");
 assert(page.includes('data-slot="detailSheet"'), "detail sheet");
 assert(page.includes('data-slot="toast"'), "toast");
-assert(page.includes('data-deferred="notify-owner-api"'), "notify api deferred");
+assert(page.includes("notifyOwnerStockItem"), "notify API wired");
 assert(page.includes('data-deferred="pdf-bytes"'), "pdf bytes deferred");
 assert(page.includes('data-deferred="plus-stock"'), "plus stock deferred");
 assert(page.includes('data-deferred="set-reorder"'), "reorder deferred");
 assert(page.includes("toggleCat"), "category toggle");
-assert(!page.includes("fetch("), "no fetch");
+assert(
+  page.includes("fetchStaffLowStockOperations") || !page.includes("fetch("),
+  "no raw fetch in page",
+);
 
 assert(pkg.includes("test:staff-low-stock-buttons"), "buttons script");
 

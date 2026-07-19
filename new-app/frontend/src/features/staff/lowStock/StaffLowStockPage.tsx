@@ -1,11 +1,18 @@
 /**
- * Staff low stock `/staff/low-stock` — BUTTONS (Step 4).
- * Source: LowStockCompactItemRow · low_stock_item_detail_sheet ·
- * _notifyOwner / _receive / _exportPdf empty snack · Item profile push.
- * Deferred WIRE: notifyOwnerStockItem API · PDF/CSV bytes · + Stock / reorder sheets · ops list.
+ * Staff low stock `/staff/low-stock` — WIRE (Step 5).
+ * Source: lowStockOperationsPageProvider / groupLowStockOperationItems /
+ * _notifyOwner → notifyOwnerStockItem · _receive / export empty snack.
+ * Deferred: PDF/CSV bytes · + Stock / reorder sheets · summary endpoint.
  */
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { readPrimaryBusiness } from "../../../shared/auth/sessionStore";
+import {
+  fetchStaffLowStockOperations,
+  notifyOwnerStockItem,
+  STAFF_LS_DEFAULT_PERIOD,
+  STAFF_LS_OPS_MAX_PER_PAGE,
+} from "./staffLowStockApi";
 import {
   STAFF_LS_BACK_FALLBACK,
   STAFF_LS_CSV_TOOLTIP,
@@ -22,11 +29,13 @@ import {
   STAFF_LS_INFORM,
   STAFF_LS_INFORM_OWNER,
   STAFF_LS_ITEM_PROFILE,
+  STAFF_LS_LOADING,
   STAFF_LS_MORE,
   STAFF_LS_OWNER_INFORMED,
   STAFF_LS_PDF_TOOLTIP,
   STAFF_LS_PLUS_STOCK,
   STAFF_LS_RECEIVE,
+  STAFF_LS_RETRY,
   STAFF_LS_SEARCH_HINT,
   STAFF_LS_SENT,
   STAFF_LS_SET_REORDER,
@@ -50,6 +59,7 @@ import {
   countFilteredItems,
   countLowStockForTab,
   filterLowStockGrouped,
+  groupLowStockOperationItems,
   lowStockItemPendingDelivery,
   lowStockSubcategoryOptions,
   staffLsEmptyTitle,
@@ -58,6 +68,10 @@ import {
   type StaffLsGrouped,
   type StaffLsItem,
 } from "./staffLowStockLogic";
+import {
+  mapStaffLsLoadSubtitle,
+  mapStaffLsLoadTitle,
+} from "./staffLowStockLoadSubtitle";
 import {
   formatStaffLsQtyDisplay,
   staffLsHumanId,
@@ -84,9 +98,6 @@ const TAB_LABEL: Record<StaffLsTab, string> = {
   pendingDelivery: STAFF_LS_TAB_DELIVERY,
 };
 
-/** BUTTONS: empty until WIRE fills operations grouped. */
-const EMPTY_GROUPED: StaffLsGrouped = {};
-
 function popOrGo(
   navigate: ReturnType<typeof useNavigate>,
   fallback: string,
@@ -101,6 +112,8 @@ function popOrGo(
 export function StaffLowStockPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const session = readPrimaryBusiness();
+  const businessId = session?.id ?? "";
   const [tab, setTab] = useState<StaffLsTab>(() =>
     staffLsTabFromFilter(searchParams.get("filter")),
   );
@@ -125,8 +138,11 @@ export function StaffLowStockPage() {
     () => new Set(),
   );
   const [toast, setToast] = useState<string | null>(null);
-
-  const grouped = EMPTY_GROUPED;
+  const [grouped, setGrouped] = useState<StaffLsGrouped>({});
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<unknown | null>(null);
+  const [retryTick, setRetryTick] = useState(0);
+  const [notifyingId, setNotifyingId] = useState<string | null>(null);
 
   useEffect(() => {
     const t = window.setTimeout(() => {
@@ -141,6 +157,37 @@ export function StaffLowStockPage() {
     return () => window.clearTimeout(t);
   }, [toast]);
 
+  useEffect(() => {
+    if (!businessId) {
+      setLoading(false);
+      setGrouped({});
+      setLoadError("Not signed in");
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    setLoadError(null);
+    void fetchStaffLowStockOperations(businessId, {
+      page: 1,
+      perPage: STAFF_LS_OPS_MAX_PER_PAGE,
+      period: STAFF_LS_DEFAULT_PERIOD,
+    })
+      .then((res) => {
+        if (cancelled) return;
+        setGrouped(groupLowStockOperationItems(res.items));
+        setLoading(false);
+      })
+      .catch((e: unknown) => {
+        if (cancelled) return;
+        setGrouped({});
+        setLoadError(e);
+        setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [businessId, retryTick]);
+
   const filtered = filterLowStockGrouped({
     grouped,
     tab,
@@ -149,16 +196,21 @@ export function StaffLowStockPage() {
     subcategoryFilter,
   });
   const itemCount = countFilteredItems(filtered);
-  const emptyTitle = staffLsEmptyTitle({
-    itemCount,
-    query: debounced,
-    subcategoryFilter,
-  });
+  const emptyTitle =
+    loading || loadError
+      ? null
+      : staffLsEmptyTitle({
+          itemCount,
+          query: debounced,
+          subcategoryFilter,
+        });
   const filtersActive = staffLsFiltersActive({
     searchScope,
     subcategoryFilter,
   });
   const subOptions = lowStockSubcategoryOptions(grouped);
+  const errorTitle = mapStaffLsLoadTitle(loadError);
+  const errorSubtitle = mapStaffLsLoadSubtitle(loadError);
 
   const counts: Record<StaffLsTab, number> = {
     allLow: countLowStockForTab(grouped, "allLow"),
@@ -167,6 +219,10 @@ export function StaffLowStockPage() {
     pendingOrder: countLowStockForTab(grouped, "pendingOrder"),
     pendingDelivery: countLowStockForTab(grouped, "pendingDelivery"),
   };
+
+  function retryLoad(): void {
+    setRetryTick((n) => n + 1);
+  }
 
   function openFilters(): void {
     setDraftScope(searchScope);
@@ -188,7 +244,7 @@ export function StaffLowStockPage() {
     setFiltersOpen(false);
   }
 
-  /** Flutter empty export snack — PDF/CSV bytes deferred WIRE. */
+  /** Flutter empty export snack — PDF/CSV bytes deferred. */
   function onExportPdf(): void {
     if (itemCount === 0) {
       setToast(STAFF_LS_EXPORT_EMPTY);
@@ -205,14 +261,24 @@ export function StaffLowStockPage() {
     setToast(STAFF_LS_EXPORT_EMPTY);
   }
 
-  /** Local informed mark; notifyOwnerStockItem API → WIRE. */
+  /** Flutter _notifyOwner → POST notify-owner */
   function onNotifyOwner(item: StaffLsItem): void {
     const id = staffLsItemId(item);
     const name = staffLsItemName(item);
-    if (!id) return;
-    setInformedOwnerIds((prev) => new Set(prev).add(id));
-    setDetailItem(null);
-    setToast(staffLsOwnerNotified(name));
+    if (!id || !businessId || notifyingId) return;
+    setNotifyingId(id);
+    void notifyOwnerStockItem(businessId, id, "reorder")
+      .then(() => {
+        setInformedOwnerIds((prev) => new Set(prev).add(id));
+        setDetailItem(null);
+        setToast(staffLsOwnerNotified(name));
+      })
+      .catch((e: unknown) => {
+        setToast(mapStaffLsLoadSubtitle(e));
+      })
+      .finally(() => {
+        setNotifyingId(null);
+      });
   }
 
   function onReceive(item: StaffLsItem): void {
@@ -286,7 +352,7 @@ export function StaffLowStockPage() {
               : "staff-ls-row__inform staff-ls-row__inform--active"
           }
           data-action="inform-owner"
-          disabled={informed}
+          disabled={informed || notifyingId === id}
           onClick={(e) => {
             e.stopPropagation();
             onNotifyOwner(item);
@@ -402,11 +468,7 @@ export function StaffLowStockPage() {
             </div>
           ) : null}
 
-          <p
-            className="staff-ls-attention"
-            data-slot="attention"
-            data-deferred="attention-count"
-          >
+          <p className="staff-ls-attention" data-slot="attention">
             {staffLsAttentionLine(counts.allLow)}
           </p>
 
@@ -438,13 +500,44 @@ export function StaffLowStockPage() {
 
       <main className="staff-ls-body" data-slot="body">
         <div className="staff-ls-results" data-slot="results">
-          {emptyTitle ? (
+          {loading ? (
+            <div
+              className="staff-ls-results__loading"
+              data-slot="loading"
+              data-testid="staff-ls-loading"
+              aria-busy="true"
+            >
+              {STAFF_LS_LOADING}
+            </div>
+          ) : null}
+
+          {loadError && !loading ? (
+            <div
+              className="staff-ls-results__error"
+              data-slot="error"
+              data-testid="staff-ls-error"
+              role="alert"
+            >
+              <p className="staff-ls-results__error-title">{errorTitle}</p>
+              <p className="staff-ls-results__error-sub">{errorSubtitle}</p>
+              <button
+                type="button"
+                className="staff-ls-results__retry"
+                data-action="retry"
+                onClick={retryLoad}
+              >
+                {STAFF_LS_RETRY}
+              </button>
+            </div>
+          ) : null}
+
+          {!loading && !loadError && emptyTitle ? (
             <div className="staff-ls-results__empty" data-slot="empty">
               {emptyTitle}
             </div>
           ) : null}
 
-          {itemCount > 0 ? (
+          {!loading && !loadError && itemCount > 0 ? (
             <div className="staff-ls-tree" data-slot="tree">
               {Object.entries(filtered).map(([cat, subMap]) => {
                 const catItems = Object.values(subMap).flat();
@@ -582,10 +675,10 @@ export function StaffLowStockPage() {
               type="button"
               className="staff-ls-detail__primary"
               data-action="inform-owner"
-              data-deferred="notify-owner-api"
               disabled={
-                !!staffLsItemId(detailItem) &&
-                informedOwnerIds.has(staffLsItemId(detailItem))
+                !!notifyingId ||
+                (!!staffLsItemId(detailItem) &&
+                  informedOwnerIds.has(staffLsItemId(detailItem)))
               }
               onClick={() => onNotifyOwner(detailItem)}
             >

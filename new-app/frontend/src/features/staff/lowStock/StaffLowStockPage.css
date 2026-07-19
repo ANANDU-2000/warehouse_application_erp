@@ -252,6 +252,52 @@
   color: var(--sls-muted);
 }
 
+.staff-ls-results__loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  font-size: 14px;
+  color: var(--sls-muted);
+}
+
+.staff-ls-results__error {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.staff-ls-results__error-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--sls-fg);
+}
+
+.staff-ls-results__error-sub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--sls-muted);
+}
+
+.staff-ls-results__retry {
+  margin-top: 8px;
+  border: 1px solid var(--sls-border);
+  border-radius: 8px;
+  background: var(--sls-surface);
+  color: var(--sls-brand);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
 /* Category card — low_stock_category_tree ExpansionTile chrome */
 .staff-ls-category {
   margin: 8px var(--sls-gutter);

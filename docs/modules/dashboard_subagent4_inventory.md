@@ -26,7 +26,7 @@
 | `/staff/items` | **COMPARE PASS** — [`staff_items_compare.md`](staff_items_compare.md) |
 | `/staff/stock` | **COMPARE PASS** — [`staff_stock_compare.md`](staff_stock_compare.md); ask before next stub |
 | `/staff/purchase-history` | **COMPARE PASS** — [`staff_purchase_history_compare.md`](staff_purchase_history_compare.md); ask before next stub |
-| `/staff/low-stock` | **BUTTONS PASS** — [`staff_low_stock_buttons_compare.md`](staff_low_stock_buttons_compare.md); ask before WIRE |
+| `/staff/low-stock` | **WIRE PASS** — [`staff_low_stock_wire_compare.md`](staff_low_stock_wire_compare.md); ask before STATES |
 | `/staff/activity` | Staff activity (full log) |
 | `/staff/deliveries` | Staff deliveries |
 | `/staff/receive` · `/staff/receive/:purchaseId` | Receive shipment |
@@ -63,7 +63,7 @@
 
 ## Next (ask first)
 
-1. **`/staff/low-stock` WIRE** (BUTTONS done), **or**  
+1. **`/staff/low-stock` STATES** (WIRE done), **or**  
 2. Another Subagent 4 stub from this inventory, **or**  
 3. Hold / merge review of `ops/dashboard-module` → `main`.
 

@@ -185,7 +185,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 2 LAYOUT | ✅ | Hexa tokens + category/row chrome — [`staff_low_stock_layout_compare.md`](modules/staff_low_stock_layout_compare.md) |
 | 3 FIELDS | ✅ | debounce 200ms + scopes + tab filters — [`staff_low_stock_fields_compare.md`](modules/staff_low_stock_fields_compare.md) |
 | 4 BUTTONS | ✅ | Inform/Receive/profile/export empty snack — [`staff_low_stock_buttons_compare.md`](modules/staff_low_stock_buttons_compare.md) |
-| 5 WIRE | ⬜ | — |
+| 5 WIRE | ✅ | ops list + notify-owner — [`staff_low_stock_wire_compare.md`](modules/staff_low_stock_wire_compare.md) |
 | 6 STATES | ⬜ | — |
 | 7 COMPARE | ⬜ | — |
 

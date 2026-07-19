@@ -168,6 +168,8 @@ function unavailableStaffHomeRepository(): StaffHomeRepository {
     clearAllNotifications: fail,
     patchNotificationRead: fail,
     stockAlertsSummary: fail,
+    listLowStockOperations: fail,
+    notifyOwnerStockItem: fail,
   } as unknown as StaffHomeRepository;
 }
 

@@ -221,6 +221,26 @@ export function countFilteredItems(grouped: StaffLsGrouped): number {
   return n;
 }
 
+/**
+ * groupLowStockOperationItems — low_stock_providers.dart
+ * Flat ops rows → category → subcategory → items.
+ */
+export function groupLowStockOperationItems(
+  items: Iterable<StaffLsItem>,
+): StaffLsGrouped {
+  const result: StaffLsGrouped = {};
+  for (const item of items) {
+    const catRaw = asStr(item.category_name);
+    const catKey = catRaw || "Unknown";
+    const subRaw = asStr(item.subcategory_name);
+    const subKey = subRaw || "Other";
+    if (!result[catKey]) result[catKey] = {};
+    if (!result[catKey][subKey]) result[catKey][subKey] = [];
+    result[catKey][subKey].push(item);
+  }
+  return result;
+}
+
 export function lowStockSubcategoryOptions(grouped: StaffLsGrouped): string[] {
   const subs = new Set<string>();
   for (const subMap of Object.values(grouped)) {

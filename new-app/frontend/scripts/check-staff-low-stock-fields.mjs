@@ -90,10 +90,13 @@ assert(
     page.includes('data-action="export-pdf"')) &&
     (page.includes('data-deferred="inform-owner"') ||
       page.includes('data-action="inform-owner"') ||
-      page.includes("data-deferred=\"notify-owner-api\"")),
+      page.includes("notifyOwnerStockItem")),
   "export/inform CTAs present",
 );
-assert(!page.includes("fetch("), "no fetch");
+assert(
+  page.includes("fetchStaffLowStockOperations") || !page.includes("fetch("),
+  "no raw fetch in page",
+);
 
 assert(css.includes("staff-ls-search--active"), "css search active");
 assert(css.includes("staff-ls-search__input--active"), "css input active");

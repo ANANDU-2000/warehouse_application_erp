@@ -82,6 +82,18 @@ export function staffLsOwnerNotified(name: string): string {
   return `Owner notified about ${name}`;
 }
 
+/** WIRE load / error — FriendlyLoadError pattern (STATES may refine) */
+export const STAFF_LS_LOADING = "Loading…";
+export const STAFF_LS_LOAD_FAILED = "Could not load low stock items";
+export const STAFF_LS_RETRY = "Retry";
+export const STAFF_LS_RETRY_SUBTITLE = "Check your connection and try again.";
+export const STAFF_LS_SESSION_EXPIRED = "Session expired — sign in again";
+export const STAFF_LS_FRIENDLY_NETWORK = "Network error";
+export const STAFF_LS_FRIENDLY_GENERIC = "Something went wrong. Please try again.";
+export const STAFF_LS_FRIENDLY_401 = "Not authenticated";
+export const STAFF_LS_FRIENDLY_404 = "Not found";
+export const STAFF_LS_FRIENDLY_5XX = "Server error — please try again";
+
 /** Staff receive — _receive(staffMode) */
 export const STAFF_LS_RECEIVE_PATH = "/staff/receive";
 export function staffLsReceivePath(humanId: string | null): string {

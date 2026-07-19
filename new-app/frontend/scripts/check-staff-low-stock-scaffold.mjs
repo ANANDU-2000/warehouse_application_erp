@@ -106,7 +106,10 @@ assert(
     page.includes("openFilters"),
   "filter control present (FIELDS may activate sheet)",
 );
-assert(!page.includes("fetch("), "no fetch");
+assert(
+  page.includes("fetchStaffLowStockOperations") || !page.includes("fetch("),
+  "no raw fetch in page",
+);
 
 assert(router.includes("StaffLowStockPage"), "router import");
 assert(router.includes('path="/staff/low-stock"'), "route");

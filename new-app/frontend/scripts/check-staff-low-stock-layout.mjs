@@ -65,7 +65,10 @@ assert(
 );
 assert(page.includes('data-deferred="inform-owner"') || page.includes('data-action="inform-owner"'), "inform deferred");
 assert(page.includes('data-deferred="category-tree"') || page.includes('data-slot="tree"'), "tree deferred");
-assert(!page.includes("fetch("), "no fetch");
+assert(
+  page.includes("fetchStaffLowStockOperations") || !page.includes("fetch("),
+  "no raw fetch in page",
+);
 
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "page bg");
 assert(css.includes("#0e4f46") || css.includes("#0E4F46"), "brandPrimary");

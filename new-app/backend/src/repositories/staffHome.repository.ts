@@ -5,6 +5,7 @@
  *         stock_ops.missing_opening_stock / stock_totals / _stock_totals_purchased_in_period
  *         stock_audit.variances_today
  */
+import { randomUUID } from "node:crypto";
 import { sql } from "../config/database";
 import {
   tradeLineQtyBagsExprSql,
@@ -50,6 +51,26 @@ export type StockListItemOut = {
   physical_stock_qty?: number | null;
   physical_stock_difference_qty?: number | null;
   last_stock_updated_at?: string | null;
+  /** Low-stock ops enrichment — stock_helpers pending / period / last PO */
+  has_pending_order?: boolean;
+  pending_delivery_qty?: number | null;
+  period_purchased_qty?: number | null;
+  last_purchase_human_id?: string | null;
+  last_purchase_delivered?: boolean | null;
+  supplier_name?: string | null;
+};
+
+/** FastAPI LowStockOpsOut — stock_list.low_stock_operations */
+export type LowStockOpsOut = {
+  items: StockListItemOut[];
+  total: number;
+  page: number;
+  per_page: number;
+  summary_slice: {
+    total_attention: number;
+    out_of_stock: number;
+    pending_purchase: number;
+  };
 };
 
 export type StockListOut = {
@@ -1130,6 +1151,438 @@ export class StaffHomeRepository {
       eviction_count: Number(row?.eviction ?? 0),
       total_items: catalogTotal,
     };
+  }
+
+  /**
+   * GET …/stock/low-stock/operations — Flutter lowStockOperationsPageProvider.
+   * Shortage candidates + pending/period/last-PO enrichment (tab fields).
+   */
+  async listLowStockOperations(opts: {
+    businessId: string;
+    page: number;
+    perPage: number;
+    q?: string;
+    periodStart?: string | null;
+    periodEnd?: string | null;
+  }): Promise<LowStockOpsOut> {
+    const page = Math.max(1, opts.page);
+    const perPage = Math.min(200, Math.max(1, opts.perPage));
+    /** Fetch shortage pool (Flutter max ~200 / page). */
+    const base = await this.listStock({
+      businessId: opts.businessId,
+      page: 1,
+      perPage: 200,
+      status: "shortage",
+      sort: "stock_asc",
+      q: opts.q ?? "",
+    });
+
+    const ids = base.items.map((i) => i.id);
+    const pending = await this.pendingOrderMetaMap(opts.businessId, ids);
+    const lastPo = await this.lastPurchaseMetaMap(opts.businessId, ids);
+    const suppliers = await this.supplierNameMap(opts.businessId, ids);
+    const period = this.parsePeriod(opts.periodStart, opts.periodEnd);
+    const purchased = period
+      ? await this.periodPurchasedMap(
+          opts.businessId,
+          ids,
+          period.start,
+          period.end,
+        )
+      : new Map<string, number>();
+
+    const enriched: StockListItemOut[] = base.items.map((it) => {
+      const pend = pending.get(it.id);
+      const last = lastPo.get(it.id);
+      const pendQty = pend?.qty;
+      return {
+        ...it,
+        has_pending_order: pend?.hasPending ?? false,
+        pending_delivery_qty:
+          pendQty != null && pendQty > 0 ? pendQty : null,
+        period_purchased_qty: purchased.get(it.id) ?? null,
+        last_purchase_human_id: last?.humanId ?? null,
+        last_purchase_delivered: last?.delivered ?? null,
+        supplier_name: suppliers.get(it.id) ?? null,
+      };
+    });
+
+    const total = enriched.length;
+    const start = (page - 1) * perPage;
+    const slice = enriched.slice(start, start + perPage);
+    const outOfStock = enriched.filter(
+      (i) =>
+        (i.stock_status ?? "").toLowerCase() === "out" ||
+        Number(i.current_stock) <= 0,
+    ).length;
+    const pendingPurchase = enriched.filter((i) => i.has_pending_order).length;
+
+    return {
+      items: slice,
+      total,
+      page,
+      per_page: perPage,
+      summary_slice: {
+        total_attention: total,
+        out_of_stock: outOfStock,
+        pending_purchase: pendingPurchase,
+      },
+    };
+  }
+
+  /**
+   * POST …/stock/:itemId/notify-owner — staff Inform owner.
+   * Source: stock_detail.notify_owner_about_item
+   */
+  async notifyOwnerStockItem(opts: {
+    businessId: string;
+    itemId: string;
+    fromUserId: string;
+    fromUserName: string;
+    alert?: string;
+  }): Promise<{ ok: boolean; notifications_created: number }> {
+    const item = await queryOne<{
+      id: string;
+      name: string;
+      current_stock: number | null;
+      reorder_level: number | null;
+    }>(
+      this.client,
+      `SELECT [id], [name], [current_stock], [reorder_level]
+       FROM catalog_items
+       WHERE [id] = @itemId AND [business_id] = @businessId AND [deleted_at] IS NULL`,
+      [
+        { name: "itemId", type: sql.UniqueIdentifier, value: opts.itemId },
+        {
+          name: "businessId",
+          type: sql.UniqueIdentifier,
+          value: opts.businessId,
+        },
+      ],
+    );
+    if (!item) {
+      const err = new Error("Item not found") as Error & { status?: number };
+      err.status = 404;
+      throw err;
+    }
+
+    const targets = await queryMany<{ user_id: string; role: string }>(
+      this.client,
+      `SELECT [user_id], [role]
+       FROM memberships
+       WHERE [business_id] = @businessId
+         AND LOWER([role]) IN (N'owner', N'manager', N'admin')
+         AND [user_id] <> @fromUserId`,
+      [
+        {
+          name: "businessId",
+          type: sql.UniqueIdentifier,
+          value: opts.businessId,
+        },
+        {
+          name: "fromUserId",
+          type: sql.UniqueIdentifier,
+          value: opts.fromUserId,
+        },
+      ],
+    );
+    if (targets.length === 0) {
+      const err = new Error("No owner/manager to notify") as Error & {
+        status?: number;
+      };
+      err.status = 400;
+      throw err;
+    }
+
+    const alert = opts.alert === "missing_barcode" ? "missing_barcode" : "reorder";
+    const cur = Number(item.current_stock ?? 0);
+    const ro = Number(item.reorder_level ?? 0);
+    const day = new Date().toISOString().slice(0, 10);
+    let kind = "reorder_request";
+    let title = "Reorder requested";
+    let body = `${opts.fromUserName} needs reorder for ${item.name} (${cur} on hand, reorder ${ro})`;
+    let dedupePrefix = "reorder_request";
+    let cta = "purchase";
+    if (alert === "missing_barcode") {
+      kind = "missing_barcode";
+      title = "Missing barcode label";
+      body = `${opts.fromUserName} flagged ${item.name} — needs packaging barcode + label print`;
+      dedupePrefix = "missing_barcode";
+      cta = "labels";
+    }
+
+    let inserted = 0;
+    for (const t of targets) {
+      const dedupe = `${dedupePrefix}:${opts.itemId}:${t.user_id}:${day}`;
+      const exists = await queryOne<{ id: string }>(
+        this.client,
+        `SELECT TOP (1) [id] FROM notifications
+         WHERE [business_id] = @businessId AND [dedupe_key] = @dedupe`,
+        [
+          {
+            name: "businessId",
+            type: sql.UniqueIdentifier,
+            value: opts.businessId,
+          },
+          { name: "dedupe", type: sql.NVarChar(200), value: dedupe },
+        ],
+      );
+      if (exists) continue;
+
+      const id = randomUUID();
+      const payload = JSON.stringify({
+        item_id: opts.itemId,
+        from_user_id: opts.fromUserId,
+        from_user_name: opts.fromUserName,
+        target_role: t.role,
+        cta,
+      });
+      await queryOne(
+        this.client,
+        `INSERT INTO notifications (
+           [id], [business_id], [user_id], [kind], [title], [body],
+           [priority], [category], [action_route], [triggered_by_user_id],
+           [related_item_id], [payload], [dedupe_key], [created_at]
+         ) VALUES (
+           @id, @businessId, @userId, @kind, @title, @body,
+           N'high', N'staff', @route, @fromUserId,
+           @itemId, @payload, @dedupe, SYSUTCDATETIME()
+         )`,
+        [
+          { name: "id", type: sql.UniqueIdentifier, value: id },
+          {
+            name: "businessId",
+            type: sql.UniqueIdentifier,
+            value: opts.businessId,
+          },
+          { name: "userId", type: sql.UniqueIdentifier, value: t.user_id },
+          { name: "kind", type: sql.NVarChar(64), value: kind },
+          { name: "title", type: sql.NVarChar(500), value: title },
+          { name: "body", type: sql.NVarChar(sql.MAX), value: body },
+          {
+            name: "route",
+            type: sql.NVarChar(256),
+            value: `/catalog/item/${opts.itemId}`,
+          },
+          {
+            name: "fromUserId",
+            type: sql.UniqueIdentifier,
+            value: opts.fromUserId,
+          },
+          { name: "itemId", type: sql.UniqueIdentifier, value: opts.itemId },
+          { name: "payload", type: sql.NVarChar(sql.MAX), value: payload },
+          { name: "dedupe", type: sql.NVarChar(220), value: dedupe },
+        ],
+      );
+      inserted += 1;
+    }
+
+    return { ok: true, notifications_created: inserted };
+  }
+
+  private parsePeriod(
+    start: string | null | undefined,
+    end: string | null | undefined,
+  ): { start: string; end: string } | null {
+    const ps = (start ?? "").trim().slice(0, 10);
+    const pe = (end ?? "").trim().slice(0, 10);
+    if (!ps || !pe) return null;
+    return { start: ps, end: pe };
+  }
+
+  private async supplierNameMap(
+    businessId: string,
+    itemIds: string[],
+  ): Promise<Map<string, string>> {
+    const out = new Map<string, string>();
+    if (itemIds.length === 0) return out;
+    const rows = await queryMany<{
+      item_id: string;
+      supplier_name: string | null;
+    }>(
+      this.client,
+      `SELECT ci.[id] AS item_id, s.[name] AS supplier_name
+       FROM catalog_items ci
+       LEFT JOIN suppliers s ON s.[id] = ci.[last_supplier_id]
+       WHERE ci.[business_id] = @businessId
+         AND ci.[id] IN (${itemIds.map((_, i) => `@id${i}`).join(",")})`,
+      [
+        {
+          name: "businessId",
+          type: sql.UniqueIdentifier,
+          value: businessId,
+        },
+        ...itemIds.map((id, i) => ({
+          name: `id${i}`,
+          type: sql.UniqueIdentifier,
+          value: id,
+        })),
+      ],
+    );
+    for (const r of rows) {
+      const n = (r.supplier_name ?? "").trim();
+      if (n) out.set(r.item_id, n);
+    }
+    return out;
+  }
+
+  /**
+   * Pending undelivered qty — prefers qty_in_stock_unit snapshot
+   * (unit_normalization.line_qty_in_stock_unit).
+   */
+  private async pendingOrderMetaMap(
+    businessId: string,
+    itemIds: string[],
+  ): Promise<Map<string, { hasPending: boolean; qty: number }>> {
+    const out = new Map<string, { hasPending: boolean; qty: number }>();
+    if (itemIds.length === 0) return out;
+    const rows = await queryMany<{
+      catalog_item_id: string;
+      qty: number | null;
+    }>(
+      this.client,
+      `SELECT tpl.[catalog_item_id] AS catalog_item_id,
+              CAST(SUM(
+                COALESCE(
+                  CASE
+                    WHEN tpl.[qty_in_stock_unit] IS NOT NULL
+                      AND tpl.[qty_in_stock_unit] > 0
+                    THEN tpl.[qty_in_stock_unit]
+                  END,
+                  tpl.[qty],
+                  0
+                )
+              ) AS FLOAT) AS qty
+       FROM trade_purchase_lines tpl
+       INNER JOIN trade_purchases tp ON tp.[id] = tpl.[trade_purchase_id]
+       WHERE tp.[business_id] = @businessId
+         AND tp.[status] NOT IN (N'deleted', N'cancelled')
+         AND LOWER(COALESCE(tp.[delivery_status], N'')) NOT IN (N'stock_committed', N'cancelled')
+         AND tpl.[catalog_item_id] IN (${itemIds.map((_, i) => `@id${i}`).join(",")})
+       GROUP BY tpl.[catalog_item_id]`,
+      [
+        {
+          name: "businessId",
+          type: sql.UniqueIdentifier,
+          value: businessId,
+        },
+        ...itemIds.map((id, i) => ({
+          name: `id${i}`,
+          type: sql.UniqueIdentifier,
+          value: id,
+        })),
+      ],
+    );
+    for (const r of rows) {
+      out.set(r.catalog_item_id, {
+        hasPending: true,
+        qty: Number(r.qty ?? 0),
+      });
+    }
+    return out;
+  }
+
+  private async lastPurchaseMetaMap(
+    businessId: string,
+    itemIds: string[],
+  ): Promise<
+    Map<string, { humanId: string | null; delivered: boolean | null }>
+  > {
+    const out = new Map<
+      string,
+      { humanId: string | null; delivered: boolean | null }
+    >();
+    if (itemIds.length === 0) return out;
+    const rows = await queryMany<{
+      item_id: string;
+      human_id: string | null;
+      delivery_status: string | null;
+    }>(
+      this.client,
+      `SELECT ci.[id] AS item_id, tp.[human_id], tp.[delivery_status]
+       FROM catalog_items ci
+       INNER JOIN trade_purchases tp ON tp.[id] = ci.[last_trade_purchase_id]
+       WHERE ci.[business_id] = @businessId
+         AND ci.[id] IN (${itemIds.map((_, i) => `@id${i}`).join(",")})
+         AND tp.[status] NOT IN (N'deleted', N'cancelled')`,
+      [
+        {
+          name: "businessId",
+          type: sql.UniqueIdentifier,
+          value: businessId,
+        },
+        ...itemIds.map((id, i) => ({
+          name: `id${i}`,
+          type: sql.UniqueIdentifier,
+          value: id,
+        })),
+      ],
+    );
+    for (const r of rows) {
+      out.set(r.item_id, {
+        humanId: r.human_id,
+        delivered:
+          (r.delivery_status ?? "").trim().toLowerCase() === "stock_committed",
+      });
+    }
+    return out;
+  }
+
+  private async periodPurchasedMap(
+    businessId: string,
+    itemIds: string[],
+    periodStart: string,
+    periodEnd: string,
+  ): Promise<Map<string, number>> {
+    const out = new Map<string, number>();
+    if (itemIds.length === 0) return out;
+    const rows = await queryMany<{
+      catalog_item_id: string;
+      qty: number | null;
+    }>(
+      this.client,
+      `SELECT tpl.[catalog_item_id] AS catalog_item_id,
+              CAST(SUM(
+                COALESCE(
+                  CASE
+                    WHEN tpl.[qty_in_stock_unit] IS NOT NULL
+                      AND tpl.[qty_in_stock_unit] > 0
+                    THEN tpl.[qty_in_stock_unit]
+                  END,
+                  tpl.[qty],
+                  0
+                )
+              ) AS FLOAT) AS qty
+       FROM trade_purchase_lines tpl
+       INNER JOIN trade_purchases tp ON tp.[id] = tpl.[trade_purchase_id]
+       WHERE tp.[business_id] = @businessId
+         AND tp.[status] NOT IN (N'deleted', N'cancelled')
+         AND LOWER(COALESCE(tp.[delivery_status], N'')) IN (
+           N'stock_committed', N'partial', N'staff_verified'
+         )
+         AND CAST(tp.[purchase_date] AS date) >= CAST(@ps AS date)
+         AND CAST(tp.[purchase_date] AS date) <= CAST(@pe AS date)
+         AND tpl.[catalog_item_id] IN (${itemIds.map((_, i) => `@id${i}`).join(",")})
+       GROUP BY tpl.[catalog_item_id]`,
+      [
+        {
+          name: "businessId",
+          type: sql.UniqueIdentifier,
+          value: businessId,
+        },
+        { name: "ps", type: sql.NVarChar(10), value: periodStart },
+        { name: "pe", type: sql.NVarChar(10), value: periodEnd },
+        ...itemIds.map((id, i) => ({
+          name: `id${i}`,
+          type: sql.UniqueIdentifier,
+          value: id,
+        })),
+      ],
+    );
+    for (const r of rows) {
+      out.set(r.catalog_item_id, Number(r.qty ?? 0));
+    }
+    return out;
   }
 }
 

@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | SCAFFOLD · **LAYOUT** |
-| 🟡 Current | LAYOUT PASS — ask before **FIELDS** |
-| ⬜ Pending | FIELDS→COMPARE · other Subagent 4 stubs |
+| ✅ Completed | SCAFFOLD · LAYOUT · **FIELDS** |
+| 🟡 Current | FIELDS PASS — ask before **BUTTONS** |
+| ⬜ Pending | BUTTONS→COMPARE · other Subagent 4 stubs |
 | ⏸ Deferred | Settings hub; live list/API (WIRE) |
 
 ## Legacy vs New
@@ -32,4 +32,4 @@
 
 **Rollback:** Revert LAYOUT commit; restore SCAFFOLD page/CSS; remove this compare + script; boards → ask before LAYOUT.
 
-**Next (ask first):** `/notifications` FIELDS.
+**Next (ask first):** `/notifications` FIELDS — done → [`notifications_fields_compare.md`](notifications_fields_compare.md). Ask before BUTTONS.

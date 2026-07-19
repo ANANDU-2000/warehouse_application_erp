@@ -123,8 +123,8 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 |---|---|---|
 | 1 SCAFFOLD | ✅ | appBar/search/filters/list slots — [`notifications_scaffold_compare.md`](modules/notifications_scaffold_compare.md) |
 | 2 LAYOUT | ✅ | Hexa chips/search/card chrome — [`notifications_layout_compare.md`](modules/notifications_layout_compare.md) |
-| 3 FIELDS | ⬜ | Ask before next |
-| 4 BUTTONS | ⬜ | |
+| 3 FIELDS | ✅ | search/filter state + empty catalogs — [`notifications_fields_compare.md`](modules/notifications_fields_compare.md) |
+| 4 BUTTONS | ⬜ | Ask before next |
 | 5 WIRE | ⬜ | |
 | 6 STATES | ⬜ | |
 | 7 COMPARE | ⬜ | |

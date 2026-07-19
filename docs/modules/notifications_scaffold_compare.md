@@ -9,9 +9,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Profile Activity WIRE · Notifications **SCAFFOLD · LAYOUT** |
-| 🟡 Current | Notifications LAYOUT PASS — ask before **FIELDS** |
-| ⬜ Pending | Notifications FIELDS→COMPARE · other Subagent 4 stubs |
+| ✅ Completed | SCAFFOLD · LAYOUT · **FIELDS** |
+| 🟡 Current | FIELDS PASS — ask before **BUTTONS** |
+| ⬜ Pending | BUTTONS→COMPARE · other Subagent 4 stubs |
 | ⏸ Deferred | Settings hub; mark-read/clear WIRE; warehouse-alert merge |
 
 ## Legacy vs New
@@ -32,4 +32,4 @@
 
 **Rollback:** Revert SCAFFOLD commit; restore route → `DashboardRouteStubPage` title “Notifications”; remove `NotificationsPage*` + copy + filters + this compare + script; boards → ask before notifications SCAFFOLD.
 
-**Next (ask first):** `/notifications` LAYOUT — done → [`notifications_layout_compare.md`](notifications_layout_compare.md). Ask before FIELDS.
+**Next (ask first):** `/notifications` LAYOUT — done → [`notifications_layout_compare.md`](notifications_layout_compare.md). FIELDS — done → [`notifications_fields_compare.md`](notifications_fields_compare.md). Ask before BUTTONS.

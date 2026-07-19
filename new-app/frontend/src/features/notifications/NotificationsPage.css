@@ -107,7 +107,7 @@
   width: 100%;
   box-sizing: border-box;
   min-height: 40px;
-  padding: 8px 12px 8px 40px;
+  padding: 8px 40px 8px 40px;
   border: 1px solid var(--notif-input-border);
   border-radius: 12px;
   font: inherit;
@@ -117,8 +117,36 @@
   pointer-events: none;
 }
 
+.notifications-page__search-input--active {
+  pointer-events: auto;
+}
+
 .notifications-page__search-input::placeholder {
   color: var(--notif-hint);
+}
+
+.notifications-page__search-clear {
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-40%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--notif-muted);
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.notifications-page__search-clear:hover {
+  color: var(--notif-brand);
+  background: rgba(14, 79, 70, 0.08);
 }
 
 .notifications-page__filters {
@@ -145,9 +173,22 @@
   white-space: nowrap;
 }
 
+.notifications-page__chip--active {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 .notifications-page__chip--selected {
   background: var(--notif-accent);
   color: #ffffff;
+}
+
+.notifications-page__showing {
+  margin: 0;
+  padding: 0 16px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--notif-muted);
 }
 
 .notifications-page__list {
@@ -159,7 +200,68 @@
   overflow: auto;
 }
 
-/* notification_alert_card.dart inert shells */
+/* FIELDS — HexaEmptyState */
+.notifications-page__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 280px;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+.notifications-page__empty-icon {
+  color: var(--notif-muted);
+  opacity: 0.55;
+  margin-bottom: 12px;
+}
+
+.notifications-page__empty-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--notif-text);
+}
+
+.notifications-page__empty-sub {
+  margin: 8px 0 0;
+  max-width: 360px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--notif-muted);
+}
+
+.notifications-page__empty-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.notifications-page__empty-btn {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+}
+
+.notifications-page__empty-btn--filled {
+  background: var(--notif-brand);
+  color: #ffffff;
+}
+
+.notifications-page__empty-btn[aria-disabled="true"] {
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* notification_alert_card.dart inert shells (LAYOUT; unused while empty) */
 .notifications-page__card-chrome {
   display: flex;
   align-items: stretch;

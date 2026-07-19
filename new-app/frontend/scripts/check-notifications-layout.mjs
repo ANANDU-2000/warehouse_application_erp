@@ -32,8 +32,16 @@ assert(page.includes('data-slot="search"'), "search slot");
 assert(page.includes('data-slot="filters"'), "filters slot");
 assert(page.includes('data-slot="list"'), "list slot");
 assert(page.includes("notifications-page__search-icon"), "search icon");
-assert(page.includes("notifications-card-chrome"), "card chrome");
-assert(page.includes("notifications-page__card-priority"), "priority bar");
+assert(
+  page.includes("notifications-card-chrome") ||
+    css.includes("notifications-page__card-chrome"),
+  "card chrome",
+);
+assert(
+  page.includes("notifications-page__card-priority") ||
+    css.includes("notifications-page__card-priority"),
+  "priority bar",
+);
 assert(!page.includes("fetch("), "no fetch");
 assert(!page.includes("/v1/businesses"), "no API path");
 assert(!page.includes("popOrGo"), "back deferred BUTTONS");

@@ -1,17 +1,29 @@
 /**
- * Notifications `/notifications` — LAYOUT (Step 2).
- * Source: notifications_page.dart AppBar/search/_FilterChip;
- * notification_alert_card.dart row chrome; HexaColors (no API / no live rows).
+ * Notifications `/notifications` — FIELDS (Step 3).
+ * Source: notifications_page.dart search/filter/showing/empty catalogs;
+ * no API list rows (WIRE); back/clear/mark-all CTAs deferred BUTTONS.
  */
+import { useMemo, useState } from "react";
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import {
   NOTIFICATIONS_BACK_FALLBACK,
   NOTIFICATIONS_CLEAR_TOOLTIP,
+  NOTIFICATIONS_CTA_NEW_PURCHASE,
+  NOTIFICATIONS_CTA_RECEIVE,
+  NOTIFICATIONS_EMPTY_SUB_FILTER_HIDDEN,
+  NOTIFICATIONS_EMPTY_SUB_SEARCH,
+  NOTIFICATIONS_EMPTY_TITLE_SEARCH,
   NOTIFICATIONS_MARK_ALL_READ,
   NOTIFICATIONS_SEARCH_HINT,
+  NOTIFICATIONS_SHOW_ALL_ALERTS,
+  NOTIFICATIONS_SHOWING_MID,
+  NOTIFICATIONS_SHOWING_PREFIX,
+  NOTIFICATIONS_SHOWING_SUFFIX,
   NOTIFICATIONS_TITLE,
 } from "./notificationsCopy";
 import {
+  NOTIFICATIONS_EMPTY_SUBTITLE,
+  NOTIFICATIONS_EMPTY_TITLE,
   NOTIFICATIONS_FILTER_LABELS,
   NOTIFICATIONS_FILTER_ORDER_OWNER,
   NOTIFICATIONS_FILTER_ORDER_STAFF,
@@ -26,7 +38,35 @@ export function NotificationsPage() {
   const filters = staff
     ? NOTIFICATIONS_FILTER_ORDER_STAFF
     : NOTIFICATIONS_FILTER_ORDER_OWNER;
-  const selected: NotificationCategoryFilter = "all";
+
+  const [filter, setFilter] = useState<NotificationCategoryFilter>("all");
+  const [search, setSearch] = useState("");
+  /** Local feed until WIRE — empty matches cold empty HexaEmptyState. */
+  const items = useMemo(() => [] as { title: string; subtitle: string }[], []);
+
+  const q = search.trim().toLowerCase();
+  const filtered = items;
+  const visible =
+    q.length === 0
+      ? filtered
+      : filtered.filter((n) =>
+          `${n.title} ${n.subtitle}`.toLowerCase().includes(q),
+        );
+  const filterEmptyButHasItems =
+    items.length > 0 && filtered.length === 0 && q.length === 0;
+  const showShowing = filter !== "all" || q.length > 0;
+  const showEmptyState = visible.length === 0;
+
+  const emptyTitle =
+    q.length > 0
+      ? NOTIFICATIONS_EMPTY_TITLE_SEARCH
+      : NOTIFICATIONS_EMPTY_TITLE[filter];
+  const emptySubtitle =
+    q.length > 0
+      ? NOTIFICATIONS_EMPTY_SUB_SEARCH
+      : filterEmptyButHasItems
+        ? NOTIFICATIONS_EMPTY_SUB_FILTER_HIDDEN
+        : NOTIFICATIONS_EMPTY_SUBTITLE[filter];
 
   return (
     <div
@@ -102,14 +142,30 @@ export function NotificationsPage() {
             </svg>
           </span>
           <input
-            className="notifications-page__search-input"
+            className="notifications-page__search-input notifications-page__search-input--active"
             type="search"
             placeholder={NOTIFICATIONS_SEARCH_HINT}
             aria-label={NOTIFICATIONS_SEARCH_HINT}
             data-testid="notifications-search"
-            readOnly
-            tabIndex={-1}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
+          {search.length > 0 ? (
+            <button
+              type="button"
+              className="notifications-page__search-clear"
+              data-testid="notifications-search-clear"
+              aria-label="Clear search"
+              onClick={() => setSearch("")}
+            >
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                />
+              </svg>
+            </button>
+          ) : null}
         </div>
 
         <div
@@ -124,19 +180,32 @@ export function NotificationsPage() {
               key={f}
               type="button"
               role="tab"
-              aria-selected={selected === f}
+              aria-selected={filter === f}
               className={
-                selected === f
-                  ? "notifications-page__chip notifications-page__chip--selected"
-                  : "notifications-page__chip"
+                filter === f
+                  ? "notifications-page__chip notifications-page__chip--selected notifications-page__chip--active"
+                  : "notifications-page__chip notifications-page__chip--active"
               }
               data-testid={`notifications-filter-${f}`}
-              tabIndex={-1}
+              onClick={() => setFilter(f)}
             >
               {NOTIFICATIONS_FILTER_LABELS[f]}
             </button>
           ))}
         </div>
+
+        {showShowing ? (
+          <p
+            className="notifications-page__showing"
+            data-testid="notifications-showing"
+          >
+            {NOTIFICATIONS_SHOWING_PREFIX}
+            {visible.length}
+            {NOTIFICATIONS_SHOWING_MID}
+            {items.length}
+            {NOTIFICATIONS_SHOWING_SUFFIX}
+          </p>
+        ) : null}
 
         <section
           className="notifications-page__list"
@@ -144,23 +213,51 @@ export function NotificationsPage() {
           data-testid="notifications-list-chrome"
           aria-label="Notifications list"
         >
-          {/* Inert alert-card shells — notification_alert_card.dart shape; no copy/API */}
-          {[0, 1].map((i) => (
+          {showEmptyState ? (
             <div
-              key={i}
-              className="notifications-page__card-chrome"
-              data-testid="notifications-card-chrome"
-              aria-hidden="true"
+              className="notifications-page__empty"
+              data-testid="notifications-empty"
             >
-              <span className="notifications-page__card-priority" />
-              <span className="notifications-page__card-icon" />
-              <div className="notifications-page__card-lines">
-                <span className="notifications-page__card-bar notifications-page__card-bar--title" />
-                <span className="notifications-page__card-bar notifications-page__card-bar--sub" />
-                <span className="notifications-page__card-bar notifications-page__card-bar--time" />
+              <span
+                className="notifications-page__empty-icon"
+                aria-hidden="true"
+              >
+                <svg viewBox="0 0 24 24" width="40" height="40">
+                  <path
+                    fill="currentColor"
+                    d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"
+                  />
+                </svg>
+              </span>
+              <h2 className="notifications-page__empty-title">{emptyTitle}</h2>
+              <p className="notifications-page__empty-sub">{emptySubtitle}</p>
+              <div className="notifications-page__empty-actions">
+                {filterEmptyButHasItems ? (
+                  <button
+                    type="button"
+                    className="notifications-page__empty-btn notifications-page__empty-btn--filled"
+                    data-testid="notifications-show-all"
+                    onClick={() => setFilter("all")}
+                  >
+                    {NOTIFICATIONS_SHOW_ALL_ALERTS}
+                  </button>
+                ) : null}
+                {items.length === 0 ? (
+                  <button
+                    type="button"
+                    className="notifications-page__empty-btn notifications-page__empty-btn--filled"
+                    data-testid="notifications-empty-cta"
+                    tabIndex={-1}
+                    aria-disabled="true"
+                  >
+                    {staff
+                      ? NOTIFICATIONS_CTA_RECEIVE
+                      : NOTIFICATIONS_CTA_NEW_PURCHASE}
+                  </button>
+                ) : null}
               </div>
             </div>
-          ))}
+          ) : null}
         </section>
       </div>
     </div>

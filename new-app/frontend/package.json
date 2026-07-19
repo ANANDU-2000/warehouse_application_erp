@@ -67,7 +67,8 @@
     "test:user-profile-compare": "node scripts/check-user-profile-compare.mjs",
     "test:user-profile-activity-wire": "node scripts/check-user-profile-activity-wire.mjs",
     "test:notifications-scaffold": "node scripts/check-notifications-scaffold.mjs",
-    "test:notifications-layout": "node scripts/check-notifications-layout.mjs"
+    "test:notifications-layout": "node scripts/check-notifications-layout.mjs",
+    "test:notifications-fields": "node scripts/check-notifications-fields.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

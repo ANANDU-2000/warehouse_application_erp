@@ -73,9 +73,9 @@ Docs/checklist + smoke script only: revert COMPARE commit. Application code unch
 
 ## 5. Next after Approve
 
-1. Ask before: **`/notifications` FIELDS** — [`notifications_layout_compare.md`](notifications_layout_compare.md), **or**  
+1. Ask before: **`/notifications` BUTTONS** — [`notifications_fields_compare.md`](notifications_fields_compare.md), **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
 **Do not merge to `main` unless asked.**
 
-*(Notifications LAYOUT done — see [`notifications_layout_compare.md`](notifications_layout_compare.md).)*
+*(Notifications FIELDS done — see [`notifications_fields_compare.md`](notifications_fields_compare.md).)*

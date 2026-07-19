@@ -36,7 +36,7 @@
 
 | Path | Stub title |
 |---|---|
-| `/notifications` | **LAYOUT PASS** — [`notifications_layout_compare.md`](notifications_layout_compare.md); FIELDS next |
+| `/notifications` | **FIELDS PASS** — [`notifications_fields_compare.md`](notifications_fields_compare.md); BUTTONS next |
 | `/barcode/scan` | Barcode scan |
 | `/barcode/bulk-print` | Bulk print labels |
 | `/catalog/item/:itemId` | Catalog item |
@@ -63,7 +63,7 @@
 
 ## Next (ask first)
 
-1. **`/notifications` FIELDS** (page loop step 3), **or**  
+1. **`/notifications` BUTTONS** (page loop step 4), **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Notifications LAYOUT done — see [`notifications_layout_compare.md`](notifications_layout_compare.md). `/staff/settings` skipped — Settings implement locked.)*
+*(Notifications FIELDS done — see [`notifications_fields_compare.md`](notifications_fields_compare.md). `/staff/settings` skipped — Settings implement locked.)*

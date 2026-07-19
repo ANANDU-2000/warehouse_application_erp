@@ -55,6 +55,14 @@ import {
   createCatalogRoutes,
 } from "./controllers/catalog.controller";
 import { createCatalogItemsWriteService } from "./services/catalogItemsWrite.service";
+import type { CatalogVariantsRepository } from "./repositories/catalogVariants.repository";
+import { createCatalogVariantsRepository } from "./repositories/catalogVariants.repository";
+import { createCatalogVariantsService } from "./services/catalogVariants.service";
+import { createCatalogVariantsController } from "./controllers/catalogVariants.controller";
+import {
+  createCatalogItemVariantsRoutes,
+  createCatalogVariantsRoutes,
+} from "./routes/catalogVariants.routes";
 
 export type AppDeps = {
   /** Injected for tests / when pool is ready. */
@@ -80,6 +88,14 @@ export type AppDeps = {
   catalogWriteRepoForClient?: (
     client: import("./repositories/sql").SqlClient,
   ) => CatalogItemsRepository;
+  /** Products Slice 6 — catalog variants */
+  catalogVariants?: CatalogVariantsRepository;
+  catalogVariantsRunInTransaction?: <T>(
+    fn: (tx: import("./repositories/sql").SqlClient) => Promise<T>,
+  ) => Promise<T>;
+  catalogVariantsRepoForClient?: (
+    client: import("./repositories/sql").SqlClient,
+  ) => CatalogVariantsRepository;
   /** Users & Roles — business user list */
   businessUsers?: BusinessUsersRepository;
   /** SQL pool for transactional user create. */
@@ -244,6 +260,22 @@ function unavailableCatalogItemsRepository(): CatalogItemsRepository {
   };
 }
 
+function unavailableCatalogVariantsRepository(): CatalogVariantsRepository {
+  const fail = async (): Promise<never> => {
+    throw new Error("Database pool not connected. Call connect() first.");
+  };
+  return {
+    listByItem: fail,
+    getById: fail,
+    catalogItemExists: fail,
+    findDupVariantId: fail,
+    insert: fail,
+    patch: fail,
+    countArchivedEntryLines: fail,
+    delete: fail,
+  };
+}
+
 function unavailableBusinessUsersRepository(): BusinessUsersRepository {
   const fail = async (): Promise<never> => {
     throw new Error("Database pool not connected. Call connect() first.");
@@ -369,6 +401,29 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
       createCatalogController({ catalogItems }),
       app.authz,
     ),
+  );
+
+  const catalogVariantsRepo =
+    deps.catalogVariants ??
+    (deps.pool
+      ? createCatalogVariantsRepository(deps.pool)
+      : unavailableCatalogVariantsRepository());
+  const catalogVariantsSvc = createCatalogVariantsService({
+    variants: catalogVariantsRepo,
+    pool: deps.pool,
+    runInTransaction: deps.catalogVariantsRunInTransaction,
+    repoForClient: deps.catalogVariantsRepoForClient,
+  });
+  const catalogVariantsCtrl = createCatalogVariantsController({
+    variants: catalogVariantsSvc,
+  });
+  app.use(
+    "/v1/businesses/:businessId/catalog-items/:itemId/variants",
+    createCatalogItemVariantsRoutes(catalogVariantsCtrl, app.authz),
+  );
+  app.use(
+    "/v1/businesses/:businessId/catalog-variants",
+    createCatalogVariantsRoutes(catalogVariantsCtrl, app.authz),
   );
 
   const businessUsers =

@@ -235,6 +235,33 @@
 }
 
 /* _DateHeader — WIRE-ready */
+.staff-ph-results__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 16px;
+  color: var(--sph-muted);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.staff-ph-results__error-detail {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.staff-ph-results__error button {
+  margin-top: 4px;
+  padding: 8px 16px;
+  border: 1px solid var(--sph-border);
+  border-radius: 8px;
+  background: var(--sph-surface);
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .staff-ph-date-header {
   background: var(--sph-bg);
   padding: 10px var(--sph-gutter) 4px;

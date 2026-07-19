@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff stock COMPARE · Staff purchase-history SCAFFOLD → FIELDS · **BUTTONS** |
-| 🟡 Current | `/staff/purchase-history` **BUTTONS PASS** — ask before WIRE |
-| ⬜ Pending | WIRE → COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | Detail page body · full pack summary · delivery badge · RefreshIndicator · Settings · merge to `main` |
+| ✅ Completed | Staff stock COMPARE · Staff purchase-history SCAFFOLD → **WIRE** |
+| 🟡 Current | `/staff/purchase-history` **WIRE PASS** — ask before STATES |
+| ⬜ Pending | STATES → COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | FriendlyLoadError map · RefreshIndicator · full pack · delivery badge · staff amount redact · Settings · merge to `main` |
 
 ## Legacy vs New
 
@@ -35,4 +35,4 @@
 
 **Rollback:** Revert BUTTONS commit; restore FIELDS empty-only results; remove grouping module + this compare + script; boards → ask before BUTTONS.
 
-**Next (ask first):** WIRE — do not start until approved.
+**Next (ask first):** WIRE done — [`staff_purchase_history_wire_compare.md`](staff_purchase_history_wire_compare.md). Ask before STATES.

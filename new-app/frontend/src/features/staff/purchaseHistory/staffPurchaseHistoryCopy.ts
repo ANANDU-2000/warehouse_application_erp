@@ -46,3 +46,9 @@ export const STAFF_PH_LOW_STOCK_PATH = "/staff/low-stock";
 export function staffPhDetailPath(purchaseId: string): string {
   return `/staff/purchase-history/${encodeURIComponent(purchaseId)}`;
 }
+
+/** WIRE load (STATES polishes FriendlyLoadError map) */
+export const STAFF_PH_LOAD_FAILED = "Could not load purchase history";
+export const STAFF_PH_LOW_LOAD_FAILED = "Could not load low stock items";
+export const STAFF_PH_RETRY = "Retry";
+export const STAFF_PH_LOADING = "Loading…";

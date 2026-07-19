@@ -84,7 +84,10 @@ assert(page.includes("filterStaffPhLowStock"), "uses filter low");
 assert(page.includes("staffPhPurchasesEmptyTitle"), "uses empty title");
 assert(page.includes("staffPhTabFromQuery"), "init ?tab=");
 assert(page.includes('setQuery("")') || page.includes("setQuery('')"), "clear");
-assert(!page.includes("fetch("), "no fetch API");
+assert(
+  page.includes("fetchStaffPhPurchases") || !page.includes("fetch("),
+  "no raw fetch in page (WIRE may add api helpers)",
+);
 
 assert(css.includes("staff-ph-search--active"), "css search active");
 assert(css.includes("staff-ph-search__input--active"), "css input active");

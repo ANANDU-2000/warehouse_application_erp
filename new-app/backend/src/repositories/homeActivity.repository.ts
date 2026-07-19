@@ -12,11 +12,14 @@ export type TradePurchaseListRow = {
   invoice_number: string | null;
   purchase_date: string;
   created_at: string;
+  status: string;
   delivery_status: string;
   is_delivered: boolean;
   total_amount: number;
   total_qty: number | null;
+  items_count: number;
   supplier_name: string | null;
+  broker_name: string | null;
   created_by_name: string | null;
   staff_verified_by_name: string | null;
   delivery_notes: string | null;
@@ -62,11 +65,14 @@ type TpRow = {
   invoice_number: string | null;
   purchase_date: Date;
   created_at: Date;
+  status: string;
   delivery_status: string;
   is_delivered: boolean | number;
   total_amount: number;
   total_qty: number | null;
+  items_count: number;
   supplier_name: string | null;
+  broker_name: string | null;
   created_by_name: string | null;
   staff_verified_by_name: string | null;
   delivery_notes: string | null;
@@ -154,14 +160,18 @@ export function createHomeActivityRepository(
         db,
         `SELECT
             tp.[id], tp.[human_id], tp.[invoice_number], tp.[purchase_date],
-            tp.[created_at], tp.[delivery_status], tp.[is_delivered],
+            tp.[created_at], tp.[status], tp.[delivery_status], tp.[is_delivered],
             CAST(tp.[total_amount] AS FLOAT) AS total_amount,
             CAST(tp.[total_qty] AS FLOAT) AS total_qty,
+            (SELECT COUNT(*) FROM trade_purchase_lines tpl
+              WHERE tpl.[trade_purchase_id] = tp.[id]) AS items_count,
             s.[name] AS supplier_name,
+            b.[name] AS broker_name,
             u.[name] AS created_by_name,
             tp.[staff_verified_by_name], tp.[delivery_notes]
          FROM trade_purchases tp
          LEFT JOIN suppliers s ON s.[id] = tp.[supplier_id]
+         LEFT JOIN brokers b ON b.[id] = tp.[broker_id]
          LEFT JOIN users u ON u.[id] = tp.[user_id]
          WHERE tp.[business_id] = @businessId
            AND tp.[status] <> N'deleted'
@@ -198,11 +208,14 @@ export function createHomeActivityRepository(
         invoice_number: r.invoice_number,
         purchase_date: isoDate(new Date(r.purchase_date)),
         created_at: isoDateTime(new Date(r.created_at)),
+        status: String(r.status ?? "confirmed"),
         delivery_status: r.delivery_status,
         is_delivered: Boolean(r.is_delivered),
         total_amount: Number(r.total_amount ?? 0),
         total_qty: r.total_qty == null ? null : Number(r.total_qty),
+        items_count: Number(r.items_count ?? 0),
         supplier_name: r.supplier_name,
+        broker_name: r.broker_name,
         created_by_name: r.created_by_name,
         staff_verified_by_name: r.staff_verified_by_name,
         delivery_notes: r.delivery_notes,

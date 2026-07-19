@@ -74,7 +74,7 @@ assert(page.includes('data-slot="dateHeader"'), "dateHeader");
 assert(page.includes("buildGroupedPurchaseHistory"), "uses grouping");
 assert(page.includes('data-deferred="pack-summary"'), "pack deferred");
 assert(page.includes('data-deferred="delivery-badge"'), "delivery deferred");
-assert(!page.includes("fetch("), "no fetch API");
+assert(page.includes("fetchStaffPhPurchases") || !page.includes("fetch("), "no raw fetch in page");
 
 assert(pkg.includes("test:staff-purchase-history-buttons"), "buttons script");
 

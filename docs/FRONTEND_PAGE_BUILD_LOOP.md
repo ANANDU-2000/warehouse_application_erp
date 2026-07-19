@@ -173,7 +173,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 2 LAYOUT | ✅ | Hexa tokens + row/date chrome — [`staff_purchase_history_layout_compare.md`](modules/staff_purchase_history_layout_compare.md) |
 | 3 FIELDS | ✅ | debounce 250ms + status/low chips + empty titles — [`staff_purchase_history_fields_compare.md`](modules/staff_purchase_history_fields_compare.md) |
 | 4 BUTTONS | ✅ | row tap + Inform owner + date grouping — [`staff_purchase_history_buttons_compare.md`](modules/staff_purchase_history_buttons_compare.md) |
-| 5 WIRE | ⬜ | — |
+| 5 WIRE | ✅ | trade-purchases + low listStock — [`staff_purchase_history_wire_compare.md`](modules/staff_purchase_history_wire_compare.md) |
 | 6 STATES | ⬜ | — |
 | 7 COMPARE | ⬜ | — |
 

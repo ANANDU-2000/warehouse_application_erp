@@ -1,19 +1,29 @@
 /**
- * Staff purchase history `/staff/purchase-history` — BUTTONS (Step 4).
- * Source: staff_purchase_history_page.dart row onTap → detail;
- * _StaffLowStockRow → `/staff/low-stock` + Inform owner;
- * buildGroupedPurchaseHistory / StaffPurchaseHistoryRow chrome.
- * Deferred: RefreshIndicator (STATES) · trade-purchases API (WIRE) · full pack summary.
+ * Staff purchase history `/staff/purchase-history` — WIRE (Step 5).
+ * Source: staffTradePurchasesHistoryProvider · staffLowStockAlertsProvider ·
+ * hexa_api.listTradePurchases / listStock(status=low).
+ * Deferred: RefreshIndicator / FriendlyLoadError map (STATES) · full pack · delivery badge.
  */
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { readPrimaryBusiness } from "../../../shared/auth/sessionStore";
+import {
+  fetchStaffPhLowStock,
+  fetchStaffPhPurchases,
+  StaffPhApiError,
+  StaffPhNetworkError,
+} from "./staffPurchaseHistoryApi";
 import {
   STAFF_PH_BACK_FALLBACK,
   STAFF_PH_DEBOUNCE_MS,
   STAFF_PH_INFORM_OWNER,
+  STAFF_PH_LOAD_FAILED,
+  STAFF_PH_LOADING,
   STAFF_PH_LOW_ALL,
   STAFF_PH_LOW_CRITICAL,
+  STAFF_PH_LOW_LOAD_FAILED,
   STAFF_PH_LOW_STOCK_PATH,
+  STAFF_PH_RETRY,
   STAFF_PH_SEARCH_HINT,
   STAFF_PH_SEARCH_HINT_LOW,
   STAFF_PH_STATUS_ALL,
@@ -55,6 +65,7 @@ import {
   type StaffPhLowStockRow,
   type StaffPhPurchaseRow,
 } from "./staffPurchaseHistoryLogic";
+import { staffPhTabToPeriod } from "./staffPurchaseHistoryPeriod";
 import {
   STAFF_PH_TAB_ORDER,
   staffPhTabFromQuery,
@@ -105,6 +116,8 @@ function popOrGo(
 export function StaffPurchaseHistoryPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const session = readPrimaryBusiness();
+  const businessId = session?.id ?? "";
   const [tab, setTab] = useState<StaffPhTab>(() =>
     staffPhTabFromQuery(searchParams.get("tab")),
   );
@@ -116,11 +129,14 @@ export function StaffPurchaseHistoryPage() {
   );
   const [query, setQuery] = useState("");
   const [debounced, setDebounced] = useState("");
-  /** WIRE fills these; BUTTONS navigate when rows exist. */
-  const [purchases] = useState<StaffPhPurchaseRow[]>([]);
-  const [lowRows] = useState<StaffPhLowStockRow[]>([]);
+  const [purchases, setPurchases] = useState<StaffPhPurchaseRow[]>([]);
+  const [lowRows, setLowRows] = useState<StaffPhLowStockRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryTick, setRetryTick] = useState(0);
 
   const isLow = tab === "lowStock";
+  const period = staffPhTabToPeriod(tab);
 
   useEffect(() => {
     const t = window.setTimeout(() => {
@@ -128,6 +144,69 @@ export function StaffPurchaseHistoryPage() {
     }, STAFF_PH_DEBOUNCE_MS);
     return () => window.clearTimeout(t);
   }, [query]);
+
+  useEffect(() => {
+    if (!businessId) {
+      setLoading(false);
+      setLoadError("Not signed in");
+      setPurchases([]);
+      setLowRows([]);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    setLoadError(null);
+
+    /** Flutter: low alerts keepAlive independent of purchase period fetch. */
+    const lowP = fetchStaffPhLowStock(businessId).then(
+      (rows) => {
+        if (!cancelled) setLowRows(rows);
+        return null as unknown;
+      },
+      (err: unknown) => err,
+    );
+
+    const purchaseP = !isLow
+      ? fetchStaffPhPurchases(businessId, period ?? "allTime").then(
+          (rows) => {
+            if (!cancelled) setPurchases(rows);
+            return null as unknown;
+          },
+          (err: unknown) => err,
+        )
+      : Promise.resolve().then(() => {
+          if (!cancelled) setPurchases([]);
+          return null as unknown;
+        });
+
+    void Promise.all([lowP, purchaseP]).then(([lowErr, purchaseErr]) => {
+      if (cancelled) return;
+      if (isLow && lowErr != null) {
+        setLowRows([]);
+        if (lowErr instanceof StaffPhNetworkError) {
+          setLoadError(lowErr.message);
+        } else if (lowErr instanceof StaffPhApiError) {
+          setLoadError(lowErr.detail);
+        } else {
+          setLoadError(STAFF_PH_LOW_LOAD_FAILED);
+        }
+      } else if (!isLow && purchaseErr != null) {
+        setPurchases([]);
+        if (purchaseErr instanceof StaffPhNetworkError) {
+          setLoadError(purchaseErr.message);
+        } else if (purchaseErr instanceof StaffPhApiError) {
+          setLoadError(purchaseErr.detail);
+        } else {
+          setLoadError(STAFF_PH_LOAD_FAILED);
+        }
+      }
+      setLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [businessId, tab, period, isLow, retryTick]);
 
   const filteredPurchases = filterStaffPhPurchases(purchases, {
     status,
@@ -139,15 +218,18 @@ export function StaffPurchaseHistoryPage() {
   });
   const grouped = buildGroupedPurchaseHistory(filteredPurchases);
 
-  const emptyTitle = isLow
-    ? staffPhLowEmptyTitle({
-        itemCount: filteredLow.length,
-        query: debounced,
-      })
-    : staffPhPurchasesEmptyTitle({
-        itemCount: filteredPurchases.length,
-        query: debounced,
-      });
+  const emptyTitle =
+    !loading && !loadError
+      ? isLow
+        ? staffPhLowEmptyTitle({
+            itemCount: filteredLow.length,
+            query: debounced,
+          })
+        : staffPhPurchasesEmptyTitle({
+            itemCount: filteredPurchases.length,
+            query: debounced,
+          })
+      : null;
 
   function openPurchase(row: StaffPhPurchaseRow): void {
     const id = purchaseIdOf(row);
@@ -157,6 +239,10 @@ export function StaffPurchaseHistoryPage() {
 
   function openLowStock(): void {
     navigate(STAFF_PH_LOW_STOCK_PATH);
+  }
+
+  function retryLoad(): void {
+    setRetryTick((n) => n + 1);
   }
 
   return (
@@ -193,7 +279,9 @@ export function StaffPurchaseHistoryPage() {
               }
               onClick={() => setTab(key)}
             >
-              {TAB_LABEL[key]}
+              {key === "lowStock" && lowRows.length > 0
+                ? `${TAB_LABEL[key]} (${lowRows.length})`
+                : TAB_LABEL[key]}
             </button>
           ))}
         </div>
@@ -271,13 +359,29 @@ export function StaffPurchaseHistoryPage() {
         )}
 
         <div className="staff-ph-results" data-slot="results">
+          {loading ? (
+            <div className="staff-ph-results__empty" data-slot="loading">
+              {STAFF_PH_LOADING}
+            </div>
+          ) : null}
+          {loadError && !loading ? (
+            <div className="staff-ph-results__error" data-slot="error">
+              <div>
+                {isLow ? STAFF_PH_LOW_LOAD_FAILED : STAFF_PH_LOAD_FAILED}
+              </div>
+              <div className="staff-ph-results__error-detail">{loadError}</div>
+              <button type="button" onClick={retryLoad}>
+                {STAFF_PH_RETRY}
+              </button>
+            </div>
+          ) : null}
           {emptyTitle ? (
             <div className="staff-ph-results__empty" data-slot="empty">
               {emptyTitle}
             </div>
           ) : null}
 
-          {!isLow && filteredPurchases.length > 0 ? (
+          {!loading && !loadError && !isLow && filteredPurchases.length > 0 ? (
             <div className="staff-ph-list" data-slot="list">
               {grouped.map((entry, i) => {
                 if (entry.kind === "header") {
@@ -337,7 +441,7 @@ export function StaffPurchaseHistoryPage() {
             </div>
           ) : null}
 
-          {isLow && filteredLow.length > 0 ? (
+          {!loading && !loadError && isLow && filteredLow.length > 0 ? (
             <div className="staff-ph-list" data-slot="list">
               {filteredLow.map((item, i) => {
                 const critical = lowStockIsCritical(item);
@@ -391,8 +495,8 @@ export function StaffPurchaseHistoryPage() {
             </div>
           ) : null}
 
-          {/* Empty catalog still reserves list slot for WIRE */}
-          {emptyTitle ? (
+          {/* Empty catalog still reserves list slot */}
+          {emptyTitle && !loading && !loadError ? (
             <div
               className="staff-ph-list"
               data-slot="list"

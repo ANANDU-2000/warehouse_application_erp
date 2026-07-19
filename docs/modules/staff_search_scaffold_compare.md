@@ -8,9 +8,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Notifications SCAFFOLD→COMPARE · Staff search SCAFFOLD · LAYOUT · **FIELDS** |
-| 🟡 Current | Staff search **FIELDS PASS** — ask before BUTTONS |
-| ⬜ Pending | Staff search BUTTONS → COMPARE · other Subagent 4 stubs |
+| ✅ Completed | Notifications SCAFFOLD→COMPARE · Staff search SCAFFOLD · LAYOUT · FIELDS · **BUTTONS** |
+| 🟡 Current | Staff search **BUTTONS PASS** — ask before WIRE |
+| ⬜ Pending | Staff search WIRE → COMPARE · other Subagent 4 stubs |
 | ⏸ Deferred | `/staff/settings` · `/settings` (implement locked); owner `/search`; API `GET …/search` (WIRE) |
 
 ## Legacy vs New
@@ -32,4 +32,4 @@
 
 **Rollback:** Revert SCAFFOLD commit; restore route → `DashboardRouteStubPage` title “Staff search”; remove `features/staff/search/*` + this compare + script; boards → ask before staff search SCAFFOLD.
 
-**Next (ask first):** `/staff/search` LAYOUT — done → [`staff_search_layout_compare.md`](staff_search_layout_compare.md). FIELDS — done → [`staff_search_fields_compare.md`](staff_search_fields_compare.md). Ask before BUTTONS.
+**Next (ask first):** `/staff/search` LAYOUT — done → [`staff_search_layout_compare.md`](staff_search_layout_compare.md). FIELDS — done → [`staff_search_fields_compare.md`](staff_search_fields_compare.md). BUTTONS — done → [`staff_search_buttons_compare.md`](staff_search_buttons_compare.md). Ask before WIRE.

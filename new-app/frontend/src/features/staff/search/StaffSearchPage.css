@@ -251,6 +251,11 @@
   pointer-events: none;
 }
 
+.staff-search-page__action-chip--active {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 .staff-search-page__action-chip-icon {
   width: 18px;
   height: 18px;

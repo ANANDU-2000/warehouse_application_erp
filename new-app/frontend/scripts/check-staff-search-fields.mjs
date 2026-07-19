@@ -75,7 +75,10 @@ assert(
   "types gated note",
 );
 assert(page.includes("useSearchParams"), "section query param");
-assert(page.includes('aria-disabled="true"'), "QF inert until BUTTONS");
+assert(
+  page.includes("action-chip--active") || page.includes('aria-disabled="true"'),
+  "QF present (BUTTONS may activate)",
+);
 /* WIRE owns GET /search + addRecent on success */
 
 assert(css.includes("search-input--active"), "css search active");

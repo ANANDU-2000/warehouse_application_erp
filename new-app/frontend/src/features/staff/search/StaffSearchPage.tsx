@@ -1,10 +1,10 @@
 /**
- * Staff search `/staff/search` — FIELDS (Step 3).
+ * Staff search `/staff/search` — BUTTONS (Step 4).
  * Source: search_page.dart SearchPage(staffShellEmbedded: true)
- * Local query/section/recents — no API (WIRE).
+ * Quick-filter push/go — no API (WIRE).
  */
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   STAFF_SEARCH_BACK_FALLBACK,
   STAFF_SEARCH_DEBOUNCE_MS,
@@ -19,7 +19,10 @@ import {
   STAFF_SEARCH_SECTION_TITLE_BILLS,
   STAFF_SEARCH_SECTION_TITLE_ITEMS,
 } from "./staffSearchCopy";
-import { STAFF_SEARCH_QUICK_FILTERS } from "./staffSearchQuickFilters";
+import {
+  STAFF_SEARCH_QUICK_FILTERS,
+  type StaffSearchNavMode,
+} from "./staffSearchQuickFilters";
 import {
   clearRecentSearchQueries,
   loadRecentSearchQueries,
@@ -37,7 +40,21 @@ function parseSectionParam(raw: string | null): StaffSearchSection | null {
   return null;
 }
 
+/** Flutter context.push vs context.go */
+function navigateQuickFilter(
+  navigate: ReturnType<typeof useNavigate>,
+  path: string,
+  nav: StaffSearchNavMode,
+): void {
+  if (nav === "go") {
+    navigate(path, { replace: true });
+    return;
+  }
+  navigate(path);
+}
+
 export function StaffSearchPage() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [section, setSection] = useState<StaffSearchSection>(() => {
     return (
@@ -213,11 +230,13 @@ export function StaffSearchPage() {
                   <button
                     key={qf.id}
                     type="button"
-                    className="staff-search-page__action-chip"
+                    className="staff-search-page__action-chip staff-search-page__action-chip--active"
                     data-testid={`staff-search-qf-${qf.id}`}
                     data-path={qf.path}
-                    tabIndex={-1}
-                    aria-disabled="true"
+                    data-nav={qf.nav}
+                    onClick={() =>
+                      navigateQuickFilter(navigate, qf.path, qf.nav)
+                    }
                   >
                     <span
                       className="staff-search-page__action-chip-icon"

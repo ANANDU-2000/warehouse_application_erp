@@ -1,10 +1,10 @@
 /**
- * Users list — LAYOUT (Step 2).
- * Source: user_management_page.dart AppBar + body chrome.
- * Forbidden this step: form fields, click handlers, API.
+ * Users list — FIELDS (Step 3).
+ * Source: user_list_filters.dart + user_management_page.dart _searchBar.
+ * Forbidden this step: API, AppBar handlers, role-filter drawer (BUTTONS).
  */
+import { useMemo, useState, type ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import type { ReactNode } from "react";
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import {
   sessionCanAdminUsers,
@@ -13,11 +13,23 @@ import {
 } from "../../shared/auth/sessionGates";
 import {
   USERS_MGMT_ADD_LABEL,
+  USERS_MGMT_SEARCH_HINT,
   USERS_MGMT_TITLE,
   USERS_MGMT_TOOLTIP_BACK,
+  USERS_MGMT_TOOLTIP_FILTER,
   USERS_MGMT_TOOLTIP_REFRESH,
   USERS_MGMT_TOOLTIP_SELECT,
 } from "./usersManagementCopy";
+import {
+  USER_LIST_PRIMARY_LABELS,
+  USER_LIST_PRIMARY_ORDER,
+  copyUserListFilter,
+  countForPrimaryFilter,
+  DEFAULT_USER_LIST_FILTER,
+  type UserListFilterState,
+  type UserListPrimaryFilter,
+  type UserListRow,
+} from "./userListFilters";
 import "./UserManagementPage.css";
 
 /** Inert icon chrome — handlers deferred to BUTTONS step. */
@@ -44,12 +56,27 @@ function InertIcon({
 
 export function UserManagementPage() {
   const session = readPrimaryBusiness();
+  const [filter, setFilter] = useState<UserListFilterState>(
+    DEFAULT_USER_LIST_FILTER,
+  );
+
+  /** Empty until WIRE — counts stay 0. */
+  const rows = useMemo<UserListRow[]>(() => [], []);
+
   if (!sessionCanManageUsers(session)) {
     return <Navigate to="/settings" replace />;
   }
 
   const canAdmin = sessionCanAdminUsers(session);
   const canCreate = sessionCanCreateUsers(session);
+
+  function setPrimary(primary: UserListPrimaryFilter) {
+    setFilter((prev) => copyUserListFilter(prev, { primary }));
+  }
+
+  function setSearch(search: string) {
+    setFilter((prev) => copyUserListFilter(prev, { search }));
+  }
 
   return (
     <div className="users-mgmt" data-testid="user-management-page">
@@ -117,16 +144,71 @@ export function UserManagementPage() {
           className="users-mgmt__search-filter"
           data-slot="searchFilter"
           data-testid="users-mgmt-search-chrome"
-          aria-hidden="true"
         >
-          <div className="users-mgmt__search-bar" />
+          <div className="users-mgmt__search-row">
+            <label className="users-mgmt__search-field">
+              <span className="users-mgmt__search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                  <path
+                    fill="currentColor"
+                    d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                  />
+                </svg>
+              </span>
+              <input
+                type="text"
+                className="users-mgmt__search-input"
+                placeholder={USERS_MGMT_SEARCH_HINT}
+                value={filter.search}
+                onChange={(e) => setSearch(e.target.value)}
+                data-testid="users-mgmt-search-input"
+                aria-label={USERS_MGMT_SEARCH_HINT}
+              />
+            </label>
+            <InertIcon
+              className="users-mgmt__icon--filter"
+              label={USERS_MGMT_TOOLTIP_FILTER}
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"
+                />
+              </svg>
+            </InertIcon>
+          </div>
         </div>
+
         <div
           className="users-mgmt__status-chips"
           data-slot="statusChips"
           data-testid="users-mgmt-chips-chrome"
-          aria-hidden="true"
-        />
+          role="tablist"
+          aria-label="User status filter"
+        >
+          {USER_LIST_PRIMARY_ORDER.map((key) => {
+            const selected = filter.primary === key;
+            const count = countForPrimaryFilter(rows, key);
+            const label = USER_LIST_PRIMARY_LABELS[key];
+            return (
+              <button
+                key={key}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                className={
+                  selected
+                    ? "users-mgmt__chip users-mgmt__chip--selected"
+                    : "users-mgmt__chip"
+                }
+                data-testid={`users-mgmt-chip-${key}`}
+                onClick={() => setPrimary(key)}
+              >
+                {label} ({count})
+              </button>
+            );
+          })}
+        </div>
 
         <div className="users-mgmt__split">
           <section

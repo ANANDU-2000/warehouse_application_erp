@@ -22,4 +22,4 @@
 
 **Rollback:** Revert LAYOUT commit; restore SCAFFOLD page/CSS; remove this compare + check script; boards → ask before LAYOUT.
 
-**Next (ask first):** `/settings/users` FIELDS — search + status chips (still no API).
+**Next (ask first):** `/settings/users` FIELDS — done → [`users_management_fields_compare.md`](users_management_fields_compare.md). Ask before BUTTONS.

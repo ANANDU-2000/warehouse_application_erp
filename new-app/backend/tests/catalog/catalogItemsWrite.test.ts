@@ -129,6 +129,7 @@ function baseRepo(
   return {
     list: async () => [],
     getById: async () => sampleItem(),
+    getActiveById: async () => sampleItem(),
     categoryExists: async () => true,
     verifyTypeInCategory: async () => undefined,
     getOrCreateGeneralTypeId: async () => TYPE_ID,
@@ -151,6 +152,8 @@ function baseRepo(
     assertUniqueBarcode: async () => undefined,
     assertUniqueItemCode: async () => undefined,
     listFuzzyNamePairs: async () => [],
+    updateItemCode: async () => undefined,
+    updateBarcode: async () => undefined,
     ...overrides,
   };
 }

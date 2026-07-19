@@ -108,6 +108,11 @@ export type CatalogSmartFields = {
 export type CatalogItemsRepository = {
   list(opts: ListCatalogItemsOpts): Promise<CatalogItemEnriched[]>;
   getById(businessId: string, itemId: string): Promise<CatalogItemEnriched | null>;
+  /** Like getById but requires deleted_at IS NULL (item-code/barcode patches). */
+  getActiveById(
+    businessId: string,
+    itemId: string,
+  ): Promise<CatalogItemEnriched | null>;
   categoryExists(businessId: string, categoryId: string): Promise<boolean>;
   verifyTypeInCategory(
     businessId: string,
@@ -185,6 +190,17 @@ export type CatalogItemsRepository = {
     typeId?: string | null;
     supplierId?: string | null;
   }): Promise<Array<{ id: string; name: string }>>;
+  updateItemCode(
+    businessId: string,
+    itemId: string,
+    itemCode: string,
+    opts?: { requireActive?: boolean },
+  ): Promise<void>;
+  updateBarcode(
+    businessId: string,
+    itemId: string,
+    barcode: string,
+  ): Promise<void>;
 };
 
 const ITEM_SELECT = `
@@ -564,6 +580,25 @@ export function createCatalogItemsRepository(
          INNER JOIN item_categories ic ON ic.[id] = ci.[category_id]
          LEFT JOIN category_types ct ON ct.[id] = ci.[type_id]
          WHERE ci.[id] = @itemId AND ci.[business_id] = @businessId`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+        ],
+      );
+      if (!raw) return null;
+      const [one] = await enrich(db, businessId, [mapRow(raw)]);
+      return one ?? null;
+    },
+
+    async getActiveById(businessId, itemId) {
+      const raw = await queryOne<Record<string, unknown>>(
+        db,
+        `SELECT ${ITEM_SELECT}
+         FROM catalog_items ci
+         INNER JOIN item_categories ic ON ic.[id] = ci.[category_id]
+         LEFT JOIN category_types ct ON ct.[id] = ci.[type_id]
+         WHERE ci.[id] = @itemId AND ci.[business_id] = @businessId
+           AND ci.[deleted_at] IS NULL`,
         [
           { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
           { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
@@ -1255,6 +1290,35 @@ export function createCatalogItemsRepository(
         out.push({ id: String(r.id), name });
       }
       return out;
+    },
+
+    async updateItemCode(businessId, itemId, itemCode, opts) {
+      const requireActive = opts?.requireActive !== false;
+      await queryOne(
+        db,
+        `UPDATE catalog_items SET [item_code] = @itemCode
+         WHERE [id] = @itemId AND [business_id] = @businessId
+           ${requireActive ? "AND [deleted_at] IS NULL" : ""}`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+          { name: "itemCode", type: sql.NVarChar(64), value: itemCode },
+        ],
+      );
+    },
+
+    async updateBarcode(businessId, itemId, barcode) {
+      await queryOne(
+        db,
+        `UPDATE catalog_items SET [barcode] = @barcode
+         WHERE [id] = @itemId AND [business_id] = @businessId
+           AND [deleted_at] IS NULL`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+          { name: "barcode", type: sql.NVarChar(64), value: barcode },
+        ],
+      );
     },
   };
 }

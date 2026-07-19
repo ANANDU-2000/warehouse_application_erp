@@ -216,6 +216,7 @@ function unavailableCatalogItemsRepository(): CatalogItemsRepository {
   return {
     list: fail,
     getById: fail,
+    getActiveById: fail,
     categoryExists: fail,
     verifyTypeInCategory: fail,
     getOrCreateGeneralTypeId: fail,
@@ -238,6 +239,8 @@ function unavailableCatalogItemsRepository(): CatalogItemsRepository {
     assertUniqueBarcode: fail,
     assertUniqueItemCode: fail,
     listFuzzyNamePairs: fail,
+    updateItemCode: fail,
+    updateBarcode: fail,
   };
 }
 

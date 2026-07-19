@@ -1,6 +1,6 @@
 /**
- * Products Slice 3 — POST /catalog-items/batch + /from-scan
- * Formula source: catalog.py batch_create_catalog_items / create_catalog_item_from_scan
+ * Products Slice 5 — PATCH item-code / barcode · POST generate-code
+ * Formula source: catalog.py patch_catalog_item_code / patch_catalog_item_barcode / generate_catalog_item_code
  */
 import { describe, it, expect } from "vitest";
 import request from "supertest";
@@ -17,13 +17,13 @@ import {
   createAccessToken,
   getJwtSettings,
 } from "../../src/services/jwtTokens.service";
+import { HttpError } from "../../src/errors/httpError";
 
 const USER_ID = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee";
 const BIZ_ID = "11111111-2222-4333-8444-555555555555";
 const CAT_ID = "33333333-4444-4555-8666-777777777777";
 const TYPE_ID = "44444444-5555-4666-8777-888888888888";
 const ITEM_ID = "22222222-3333-4444-8555-666666666666";
-const SUP_ID = "66666666-7777-4888-8999-aaaaaaaaaaaa";
 
 function bearer(): string {
   return createAccessToken(USER_ID, getJwtSettings(), 0);
@@ -54,7 +54,7 @@ function makeUser(): UserRow {
   };
 }
 
-function makeMembership(role = "owner"): MembershipRow {
+function makeMembership(role = "staff"): MembershipRow {
   return {
     id: "99999999-8888-4777-8666-555555555555",
     user_id: USER_ID,
@@ -72,20 +72,20 @@ function sampleItem(overrides: Partial<CatalogItemEnriched> = {}): CatalogItemEn
     type_id: TYPE_ID,
     type_name: "General",
     category_name: "Grocery",
-    name: "BATCH RICE",
+    name: "SUGAR",
     default_unit: "kg",
     default_kg_per_bag: null,
     default_items_per_box: null,
     default_weight_per_tin: null,
-    default_purchase_unit: "kg",
+    default_purchase_unit: null,
     default_sale_unit: null,
     hsn_code: null,
     item_code: null,
     barcode: null,
     public_token: "tok",
     tax_percent: null,
-    default_landing_cost: null,
-    default_selling_cost: null,
+    default_landing_cost: 10,
+    default_selling_cost: 12,
     last_purchase_price: null,
     last_selling_rate: null,
     last_supplier_id: null,
@@ -97,14 +97,14 @@ function sampleItem(overrides: Partial<CatalogItemEnriched> = {}): CatalogItemEn
     selling_unit: "KG",
     stock_unit: "KG",
     display_unit: "KG",
-    package_type: "LOOSE",
+    package_type: null,
     package_size: null,
     package_measurement: null,
     conversion_factor: null,
     unit_confidence: null,
     validation_status: null,
     smart_classification: null,
-    default_supplier_ids: [SUP_ID],
+    default_supplier_ids: [],
     default_broker_ids: [],
     last_supplier_name: null,
     last_broker_name: null,
@@ -117,15 +117,16 @@ function sampleItem(overrides: Partial<CatalogItemEnriched> = {}): CatalogItemEn
 function baseRepo(
   overrides: Partial<CatalogItemsRepository> = {},
 ): CatalogItemsRepository {
+  const item = sampleItem();
   return {
     list: async () => [],
-    getById: async () => sampleItem(),
-    getActiveById: async () => sampleItem(),
+    getById: async () => item,
+    getActiveById: async () => item,
     categoryExists: async () => true,
     verifyTypeInCategory: async () => undefined,
     getOrCreateGeneralTypeId: async () => TYPE_ID,
     findDupItemId: async () => null,
-    nextItemCode: async () => "ITM-0002",
+    nextItemCode: async () => "ITM-0003",
     assertSupplierIdsInBusiness: async () => undefined,
     assertBrokerIdsInBusiness: async () => undefined,
     getCategoryName: async () => "Grocery",
@@ -149,13 +150,13 @@ function baseRepo(
   };
 }
 
-function appWith(catalogItems: CatalogItemsRepository) {
+function appWith(catalogItems: CatalogItemsRepository, role = "staff") {
   return createApp({
     users: {
       findById: async () => makeUser(),
     } as unknown as UsersRepository,
     memberships: {
-      findByUserAndBusiness: async () => makeMembership("owner"),
+      findByUserAndBusiness: async () => makeMembership(role),
     } as unknown as MembershipsRepository,
     catalogItems,
     catalogWriteRunInTransaction: async <T>(
@@ -165,125 +166,95 @@ function appWith(catalogItems: CatalogItemsRepository) {
   });
 }
 
-describe("POST /catalog-items/batch", () => {
-  it("creates lines and returns created/skipped", async () => {
-    let inserts = 0;
+describe("PATCH /catalog-items/:id/item-code", () => {
+  it("updates item_code 200", async () => {
+    let code = "";
     const catalogItems = baseRepo({
-      insertItem: async () => {
-        inserts += 1;
+      updateItemCode: async (_b, _i, c) => {
+        code = c;
       },
-      getById: async () => sampleItem({ name: "BATCH RICE" }),
+      getActiveById: async () => sampleItem({ item_code: "MY-CODE" }),
     });
     const res = await request(appWith(catalogItems))
-      .post(`/v1/businesses/${BIZ_ID}/catalog-items/batch`)
+      .patch(`/v1/businesses/${BIZ_ID}/catalog-items/${ITEM_ID}/item-code`)
       .set("Authorization", `Bearer ${bearer()}`)
-      .send({
-        items: [
-          {
-            name: "BATCH RICE",
-            type_id: TYPE_ID,
-            default_unit: "kg",
-            default_supplier_ids: [SUP_ID],
-          },
-        ],
-      });
+      .send({ item_code: "my-code" });
     expect(res.status).toBe(200);
-    expect(res.body.created).toBe(1);
-    expect(res.body.skipped).toBe(0);
-    expect(res.body.items).toHaveLength(1);
-    expect(inserts).toBe(1);
+    expect(code).toBe("MY-CODE");
+    expect(res.body.item_code).toBe("MY-CODE");
   });
 
-  it("skips unknown type_id without failing whole batch", async () => {
+  it("409 when code already exists", async () => {
     const catalogItems = baseRepo({
-      findTypeInBusiness: async () => null,
-      insertItem: async () => {
-        throw new Error("should not insert");
+      assertUniqueItemCode: async () => {
+        throw new HttpError(409, "Item code already exists");
       },
     });
     const res = await request(appWith(catalogItems))
-      .post(`/v1/businesses/${BIZ_ID}/catalog-items/batch`)
+      .patch(`/v1/businesses/${BIZ_ID}/catalog-items/${ITEM_ID}/item-code`)
       .set("Authorization", `Bearer ${bearer()}`)
-      .send({
-        items: [
-          {
-            name: "SKIP ME",
-            type_id: TYPE_ID,
-            default_unit: "kg",
-            default_supplier_ids: [SUP_ID],
-          },
-        ],
-      });
-    expect(res.status).toBe(200);
-    expect(res.body.created).toBe(0);
-    expect(res.body.skipped).toBe(1);
-    expect(res.body.items).toEqual([]);
+      .send({ item_code: "TAKEN" });
+    expect(res.status).toBe(409);
+    expect(res.body.detail).toBe("Item code already exists");
   });
 });
 
-describe("POST /catalog-items/from-scan", () => {
-  it("creates 201 with barcode and item_code", async () => {
-    const created = sampleItem({
-      name: "SCAN TEA",
-      barcode: "890123",
-      item_code: "SCAN-TEA",
-    });
+describe("PATCH /catalog-items/:id/barcode", () => {
+  it("updates barcode when stock_edit allowed (staff)", async () => {
+    let bc = "";
     const catalogItems = baseRepo({
-      getById: async () => created,
+      updateBarcode: async (_b, _i, b) => {
+        bc = b;
+      },
+      getActiveById: async () => sampleItem({ barcode: "8901" }),
     });
-    const res = await request(appWith(catalogItems))
-      .post(`/v1/businesses/${BIZ_ID}/catalog-items/from-scan`)
+    const res = await request(appWith(catalogItems, "staff"))
+      .patch(`/v1/businesses/${BIZ_ID}/catalog-items/${ITEM_ID}/barcode`)
       .set("Authorization", `Bearer ${bearer()}`)
-      .send({
-        barcode: "890123",
-        item_code: "scan-tea",
-        name: "SCAN TEA",
-        type_id: TYPE_ID,
-        default_unit: "kg",
-      });
-    expect(res.status).toBe(201);
-    expect(res.body.barcode).toBe("890123");
-    expect(res.body.item_code).toBe("SCAN-TEA");
+      .send({ barcode: "8901" });
+    expect(res.status).toBe(200);
+    expect(bc).toBe("8901");
   });
+});
 
-  it("409 when barcode already exists", async () => {
-    const { HttpError } = await import("../../src/errors/httpError");
+describe("POST /catalog-items/:id/generate-code", () => {
+  it("assigns next ITM code", async () => {
+    let assigned = "";
     const catalogItems = baseRepo({
-      assertUniqueBarcode: async () => {
-        throw new HttpError(409, "Barcode already exists");
+      getById: async () => sampleItem({ item_code: null }),
+      nextItemCode: async () => "ITM-0009",
+      updateItemCode: async (_b, _i, c) => {
+        assigned = c;
       },
     });
-    const res = await request(appWith(catalogItems))
-      .post(`/v1/businesses/${BIZ_ID}/catalog-items/from-scan`)
-      .set("Authorization", `Bearer ${bearer()}`)
-      .send({
-        barcode: "890123",
-        item_code: "SCAN-TEA",
-        name: "SCAN TEA",
-        type_id: TYPE_ID,
-        default_unit: "kg",
+    // After update, getById returns new code
+    let calls = 0;
+    catalogItems.getById = async () => {
+      calls += 1;
+      return sampleItem({
+        item_code: calls === 1 ? null : "ITM-0009",
+        default_landing_cost: 10,
       });
-    expect(res.status).toBe(409);
-    expect(res.body.detail).toBe("Barcode already exists");
+    };
+    const res = await request(appWith(catalogItems, "owner"))
+      .post(`/v1/businesses/${BIZ_ID}/catalog-items/${ITEM_ID}/generate-code`)
+      .set("Authorization", `Bearer ${bearer()}`);
+    expect(res.status).toBe(200);
+    expect(assigned).toBe("ITM-0009");
+    expect(res.body.item_code).toBe("ITM-0009");
   });
 
-  it("409 on duplicate name for subcategory", async () => {
+  it("409 when item already has a code", async () => {
     const catalogItems = baseRepo({
-      findDupItemId: async () => ITEM_ID,
+      getById: async () => sampleItem({ item_code: "ITM-0001" }),
     });
     const res = await request(appWith(catalogItems))
-      .post(`/v1/businesses/${BIZ_ID}/catalog-items/from-scan`)
-      .set("Authorization", `Bearer ${bearer()}`)
-      .send({
-        barcode: "890999",
-        item_code: "OTHER",
-        name: "DUP",
-        type_id: TYPE_ID,
-        default_unit: "kg",
-      });
+      .post(`/v1/businesses/${BIZ_ID}/catalog-items/${ITEM_ID}/generate-code`)
+      .set("Authorization", `Bearer ${bearer()}`);
     expect(res.status).toBe(409);
-    expect(res.body.detail).toBe(
-      "An item with this name already exists for this subcategory",
-    );
+    expect(res.body.detail).toEqual({
+      message: "Item already has a code",
+      item_code: "ITM-0001",
+    });
   });
 });

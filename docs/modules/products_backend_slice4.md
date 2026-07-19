@@ -9,9 +9,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Slice 1–3 · **Slice 4 fuzzy-check** |
-| 🟡 Current | Products backend Slice 4 PASS — ask before Slice 5 (variants / item-code/barcode patches / bulk-archive) or catalog UI |
-| ⬜ Pending | variants · item-code/barcode patches · bulk-archive · catalog UI |
+| ✅ Completed | Slice 1–3 · **Slice 4 fuzzy-check** · Slice 5 (see slice5) |
+| 🟡 Current | See [`products_backend_slice5.md`](products_backend_slice5.md) |
+| ⬜ Pending | variants · bulk-archive · catalog UI |
 | ⏸ Deferred | purchase entry · barcode/print UI · receive · Settings · merge to `main` |
 
 ## Legacy vs New

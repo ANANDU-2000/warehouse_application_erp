@@ -1,5 +1,5 @@
 /**
- * Catalog items routes — GET/POST/PATCH/DELETE + batch + from-scan
+ * Catalog items routes — GET/POST/PATCH/DELETE + batch + from-scan + code patches
  * Source: catalog.py
  * Static paths (batch, from-scan) MUST register before /:itemId.
  */
@@ -35,6 +35,25 @@ export function createCatalogItemsRoutes(
     authz.requireAuth,
     authz.requireMembership,
     (req, res, next) => void catalog.createFromScan(req, res, next),
+  );
+  r.patch(
+    "/:itemId/item-code",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void catalog.patchItemCode(req, res, next),
+  );
+  r.patch(
+    "/:itemId/barcode",
+    authz.requireAuth,
+    authz.requireMembership,
+    authz.requirePermission("stock_edit"),
+    (req, res, next) => void catalog.patchBarcode(req, res, next),
+  );
+  r.post(
+    "/:itemId/generate-code",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void catalog.generateCode(req, res, next),
   );
   r.get(
     "/:itemId",

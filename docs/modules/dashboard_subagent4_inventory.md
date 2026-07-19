@@ -63,10 +63,10 @@
 
 ## Next (ask first)
 
-1. **Products Slice 5** — variants / item-code/barcode patches / bulk-archive (ask first), **or**  
+1. **Products Slice 6** — variants / bulk-archive (ask first), **or**  
 2. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11), **or**  
 3. Hold / merge review of `ops/dashboard-module` / `ops/products-module` → `main`.
 
 **Do not** invent purchase/barcode UI.
 
-*(Staff deliveries COMPARE — [`staff_deliveries_compare.md`](staff_deliveries_compare.md). Products Slice 4 — [`products_backend_slice4.md`](products_backend_slice4.md). `/staff/settings` skipped — Settings implement locked.)*
+*(Staff deliveries COMPARE — [`staff_deliveries_compare.md`](staff_deliveries_compare.md). Products Slice 5 — [`products_backend_slice5.md`](products_backend_slice5.md). `/staff/settings` skipped — Settings implement locked.)*

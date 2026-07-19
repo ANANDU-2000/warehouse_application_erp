@@ -173,6 +173,76 @@ export function createCatalogItemsController(deps: CatalogItemsControllerDeps) {
         next(e);
       }
     },
+
+    async patchItemCode(req: Request, res: Response, next: NextFunction) {
+      try {
+        if (!deps.write) {
+          sendDetail(res, 503, "Catalog writes unavailable");
+          return;
+        }
+        const businessId = req.params.businessId;
+        const itemId = req.params.itemId;
+        if (typeof businessId !== "string" || typeof itemId !== "string") {
+          sendDetail(res, 400, "businessId and itemId required");
+          return;
+        }
+        const role = req.membership?.role ?? null;
+        const out = await deps.write.patchItemCode(
+          businessId,
+          itemId,
+          req.body,
+          role,
+        );
+        res.json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async patchBarcode(req: Request, res: Response, next: NextFunction) {
+      try {
+        if (!deps.write) {
+          sendDetail(res, 503, "Catalog writes unavailable");
+          return;
+        }
+        const businessId = req.params.businessId;
+        const itemId = req.params.itemId;
+        if (typeof businessId !== "string" || typeof itemId !== "string") {
+          sendDetail(res, 400, "businessId and itemId required");
+          return;
+        }
+        const role = req.membership?.role ?? null;
+        const out = await deps.write.patchBarcode(
+          businessId,
+          itemId,
+          req.body,
+          role,
+        );
+        res.json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async generateCode(req: Request, res: Response, next: NextFunction) {
+      try {
+        if (!deps.write) {
+          sendDetail(res, 503, "Catalog writes unavailable");
+          return;
+        }
+        const businessId = req.params.businessId;
+        const itemId = req.params.itemId;
+        if (typeof businessId !== "string" || typeof itemId !== "string") {
+          sendDetail(res, 400, "businessId and itemId required");
+          return;
+        }
+        const role = req.membership?.role ?? null;
+        const out = await deps.write.generateCode(businessId, itemId, role);
+        res.json(out);
+      } catch (e) {
+        next(e);
+      }
+    },
   };
 }
 

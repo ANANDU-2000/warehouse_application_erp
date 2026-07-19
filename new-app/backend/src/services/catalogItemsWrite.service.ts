@@ -13,17 +13,21 @@ import type {
 import { createCatalogItemsRepository } from "../repositories/catalogItems.repository";
 import type { SqlClient } from "../repositories/sql";
 import {
+  barcodePatchSchema,
   catalogBatchCreateSchema,
   catalogItemCreateSchema,
   catalogItemFromScanSchema,
   catalogItemUpdateSchema,
   coerceBoxItemsPerBox,
   dedupePreserveOrder,
+  itemCodePatchSchema,
   normalizePackageType,
+  type BarcodePatchIn,
   type CatalogBatchCreateIn,
   type CatalogItemCreateIn,
   type CatalogItemFromScanIn,
   type CatalogItemUpdateIn,
+  type ItemCodePatchIn,
 } from "../validation/catalogItems.schemas";
 import { validateWithSchema } from "../validation/validate";
 import {
@@ -706,6 +710,81 @@ export function createCatalogItemsWriteService(deps: CatalogItemsWriteDeps) {
         const row = await repo.getById(businessId, id);
         if (!row) throw new HttpError(500, "Created item not found");
         return toCatalogItemOut(row);
+      });
+    },
+
+    /** Formula source: catalog.py:patch_catalog_item_code */
+    async patchItemCode(
+      businessId: string,
+      itemId: string,
+      body: unknown,
+      _role: string | null,
+    ): Promise<CatalogItemOut> {
+      const data = validateWithSchema(
+        itemCodePatchSchema,
+        body,
+        "Invalid item code",
+      ) as ItemCodePatchIn;
+      return runTx(async (tx) => {
+        const repo = repoOn(deps, tx);
+        const existing = await repo.getActiveById(businessId, itemId);
+        if (!existing) throw new HttpError(404, "Item not found");
+        await repo.assertUniqueItemCode(businessId, data.item_code, itemId);
+        await repo.updateItemCode(businessId, itemId, data.item_code);
+        const row = await repo.getActiveById(businessId, itemId);
+        if (!row) throw new HttpError(404, "Item not found");
+        return toCatalogItemOut(row);
+      });
+    },
+
+    /** Formula source: catalog.py:patch_catalog_item_barcode */
+    async patchBarcode(
+      businessId: string,
+      itemId: string,
+      body: unknown,
+      _role: string | null,
+    ): Promise<CatalogItemOut> {
+      const data = validateWithSchema(
+        barcodePatchSchema,
+        body,
+        "Invalid barcode",
+      ) as BarcodePatchIn;
+      return runTx(async (tx) => {
+        const repo = repoOn(deps, tx);
+        const existing = await repo.getActiveById(businessId, itemId);
+        if (!existing) throw new HttpError(404, "Item not found");
+        await repo.assertUniqueBarcode(businessId, data.barcode, itemId);
+        await repo.updateBarcode(businessId, itemId, data.barcode);
+        const row = await repo.getActiveById(businessId, itemId);
+        if (!row) throw new HttpError(404, "Item not found");
+        return toCatalogItemOut(row);
+      });
+    },
+
+    /** Formula source: catalog.py:generate_catalog_item_code */
+    async generateCode(
+      businessId: string,
+      itemId: string,
+      role: string | null,
+    ): Promise<CatalogItemOut> {
+      return runTx(async (tx) => {
+        const repo = repoOn(deps, tx);
+        const existing = await repo.getById(businessId, itemId);
+        if (!existing) throw new HttpError(404, "Item not found");
+        const existingCode = (existing.item_code || "").trim();
+        if (existingCode) {
+          throw new HttpError(409, {
+            message: "Item already has a code",
+            item_code: existingCode,
+          });
+        }
+        const next = await repo.nextItemCode(businessId);
+        await repo.updateItemCode(businessId, itemId, next, {
+          requireActive: false,
+        });
+        const row = await repo.getById(businessId, itemId);
+        if (!row) throw new HttpError(404, "Item not found");
+        return maybeRedactCatalogOut(toCatalogItemOut(row), role);
       });
     },
   };

@@ -240,3 +240,42 @@ export const catalogItemFromScanSchema = z
 
 export type CatalogItemFromScanIn = z.infer<typeof catalogItemFromScanSchema>;
 
+/** Formula source: catalog.py ItemCodePatchIn */
+export const itemCodePatchSchema = z.object({
+  item_code: z
+    .string()
+    .min(1)
+    .max(64)
+    .transform((v, ctx) => {
+      const n = normalizeItemCode(v);
+      if (!ITEM_CODE_SLUG_RE.test(n)) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Item code: use A-Z, 0-9, hyphen, underscore only",
+        });
+        return z.NEVER;
+      }
+      return n;
+    }),
+});
+
+export type ItemCodePatchIn = z.infer<typeof itemCodePatchSchema>;
+
+/** Formula source: catalog.py BarcodePatchIn */
+export const barcodePatchSchema = z.object({
+  barcode: z
+    .string()
+    .min(1)
+    .max(64)
+    .transform((v, ctx) => {
+      const b = normalizeBarcode(v);
+      if (!b) {
+        ctx.addIssue({ code: "custom", message: "Barcode is required" });
+        return z.NEVER;
+      }
+      return b;
+    }),
+});
+
+export type BarcodePatchIn = z.infer<typeof barcodePatchSchema>;
+

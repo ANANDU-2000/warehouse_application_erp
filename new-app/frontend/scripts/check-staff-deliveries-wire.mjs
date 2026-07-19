@@ -39,13 +39,16 @@ const pending = readFileSync(pendingPath, "utf8");
 const api = readFileSync(apiPath, "utf8");
 const pkg = readFileSync(pkgPath, "utf8");
 
-assert(page.includes("WIRE"), "WIRE header");
+assert(page.includes("WIRE") || page.includes("STATES"), "WIRE+ header");
 assert(page.includes("fetchTradePurchasesRecent"), "fetch recent");
 assert(page.includes("staffDeliverySectionsFromRows"), "group helper");
 assert(page.includes('data-slot="loading"'), "loading");
 assert(page.includes('data-slot="error"'), "error");
 assert(page.includes("retryLoad"), "retry");
-assert(page.includes("STAFF_DEL_LOAD_FAILED"), "load failed");
+assert(
+  page.includes("STAFF_DEL_LOAD_FAILED") || page.includes("mapStaffDelLoadTitle"),
+  "load failed",
+);
 assert(page.includes("onOpenReceive"), "receive still BUTTONS");
 assert(page.includes("onScan"), "scan still BUTTONS");
 assert(!page.includes('data-sample="buttons"'), "no buttons sample");

@@ -42,7 +42,7 @@ assert(copy.includes("staffDelReceivePath"), "receive path helper");
 assert(copy.includes("/staff/receive/"), "receive base");
 
 assert(
-  page.includes("BUTTONS") || page.includes("WIRE"),
+  page.includes("BUTTONS") || page.includes("WIRE") || page.includes("STATES"),
   "BUTTONS+ header",
 );
 assert(page.includes("onBack"), "onBack");

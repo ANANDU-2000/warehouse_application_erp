@@ -35,5 +35,13 @@ export const STAFF_DEL_EMPTY_ALL = "No pending deliveries right now.";
 /** Tile fallback supplier */
 export const STAFF_DEL_SUPPLIER_FALLBACK = "Supplier";
 
-/** Error — FriendlyLoadError (STATES) */
+/** Error — FriendlyLoadError message (staff_pending_deliveries_page.dart) */
 export const STAFF_DEL_LOAD_FAILED = "Could not load pending deliveries";
+
+/** kFriendlyLoadNetworkSubtitle — friendly_load_error.dart default */
+export const STAFF_DEL_RETRY_SUBTITLE = "Tap to retry.";
+export const STAFF_DEL_RETRY = "Retry";
+
+/** ListSkeleton(rowCount: 6) — list_skeleton.dart defaults rowHeight 84 */
+export const STAFF_DEL_SKELETON_ROWS = 6;
+export const STAFF_DEL_SKELETON_HEIGHT_PX = 84;

@@ -36,7 +36,8 @@ assert(
     page.includes("SCAFFOLD") ||
     page.includes("FIELDS") ||
     page.includes("BUTTONS") ||
-    page.includes("WIRE"),
+    page.includes("WIRE") ||
+    page.includes("STATES"),
   "step header",
 );
 assert(page.includes('data-slot="appBar"'), "appBar");

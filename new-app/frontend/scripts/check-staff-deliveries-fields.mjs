@@ -49,7 +49,8 @@ assert(copy.includes("STAFF_DEL_TITLE_COUNTED"), "counted title");
 assert(
   page.includes("FIELDS") ||
     page.includes("BUTTONS") ||
-    page.includes("WIRE"),
+    page.includes("WIRE") ||
+    page.includes("STATES"),
   "FIELDS+ header",
 );
 assert(page.includes("useState"), "useState");
@@ -61,7 +62,8 @@ assert(page.includes('data-total={total}'), "data-total");
 assert(
   page.includes('data-step="fields"') ||
     page.includes('data-step="buttons"') ||
-    page.includes('data-step="wire"'),
+    page.includes('data-step="wire"') ||
+    page.includes('data-step="states"'),
   "fields+ step",
 );
 assert(!page.includes('type="search"'), "no search input on page");

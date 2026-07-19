@@ -210,7 +210,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 3 FIELDS | ✅ | title/count/empty gates (no inputs) — [`staff_deliveries_fields_compare.md`](modules/staff_deliveries_fields_compare.md) |
 | 4 BUTTONS | ✅ | back + scan + row→receive stubs — [`staff_deliveries_buttons_compare.md`](modules/staff_deliveries_buttons_compare.md) |
 | 5 WIRE | ✅ | trade-purchases + groupStaffDeliverySections — [`staff_deliveries_wire_compare.md`](modules/staff_deliveries_wire_compare.md) |
-| 6 STATES | ⬜ | — |
+| 6 STATES | ✅ | ListSkeleton 6 + FriendlyLoadError — [`staff_deliveries_states_compare.md`](modules/staff_deliveries_states_compare.md) |
 | 7 COMPARE | ⬜ | — |
 
 ### Prompt template (copy per page)

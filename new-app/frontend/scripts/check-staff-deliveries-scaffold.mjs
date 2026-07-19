@@ -77,7 +77,8 @@ assert(
     page.includes("LAYOUT") ||
     page.includes("FIELDS") ||
     page.includes("BUTTONS") ||
-    page.includes("WIRE"),
+    page.includes("WIRE") ||
+    page.includes("STATES"),
   "SCAFFOLD+ header",
 );
 assert(page.includes('data-slot="appBar"'), "appBar");

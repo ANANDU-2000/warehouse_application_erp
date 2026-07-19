@@ -1,10 +1,10 @@
 /**
- * Staff deliveries `/staff/deliveries` — WIRE (Step 5).
- * Source: staffTradePurchasesForAlertsProvider → tradePurchasesRecentSnapshot
- * (listTradePurchases limit 50); groupStaffDeliverySections.
- * Deferred: ListSkeleton / FriendlyLoadError polish → STATES.
+ * Staff deliveries `/staff/deliveries` — STATES (Step 6).
+ * Source: staff_pending_deliveries_page.dart —
+ * ListSkeleton(rowCount: 6); FriendlyLoadError message fixed + Tap to retry.
+ * Deferred: snapshot keepAlive 2m (api_read_snapshots) — page remount refetch OK.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { readPrimaryBusiness } from "../../../shared/auth/sessionStore";
 import { fetchTradePurchasesRecent } from "../staffHomeApi";
@@ -20,9 +20,11 @@ import {
   STAFF_DEL_EMPTY_ARRIVED,
   STAFF_DEL_EMPTY_DISPATCHED,
   STAFF_DEL_EMPTY_PENDING_VERIFY,
-  STAFF_DEL_LOAD_FAILED,
+  STAFF_DEL_RETRY,
   STAFF_DEL_SCAN_PATH,
   STAFF_DEL_SCAN_TOOLTIP,
+  STAFF_DEL_SKELETON_HEIGHT_PX,
+  STAFF_DEL_SKELETON_ROWS,
   staffDelReceivePath,
 } from "./staffDeliveriesCopy";
 import {
@@ -41,6 +43,10 @@ import {
   staffDelRowSubtitle,
   staffDelSupplierTitle,
 } from "./staffDeliveriesFormat";
+import {
+  mapStaffDelLoadSubtitle,
+  mapStaffDelLoadTitle,
+} from "./staffDeliveriesLoadSubtitle";
 import "./StaffDeliveriesPage.css";
 
 const SECTION_EMPTY: Record<StaffDelSectionKey, string> = {
@@ -95,11 +101,23 @@ export function StaffDeliveriesPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<unknown | null>(null);
   const [retryTick, setRetryTick] = useState(0);
+  /** Flutter: sections == null until first success — gate skeleton/error */
+  const [hasData, setHasData] = useState(false);
+  const hasDataRef = useRef(false);
+
+  useEffect(() => {
+    hasDataRef.current = false;
+    setHasData(false);
+    setSections(EMPTY_SECTIONS);
+    setLoadError(null);
+  }, [businessId]);
 
   useEffect(() => {
     if (!businessId) {
       setLoading(false);
       setSections(EMPTY_SECTIONS);
+      hasDataRef.current = false;
+      setHasData(false);
       setLoadError("Not signed in");
       return;
     }
@@ -111,12 +129,16 @@ export function StaffDeliveriesPage() {
         if (cancelled) return;
         const mapped = rows.map((r) => r as TradePurchaseListRow);
         setSections(staffDeliverySectionsFromRows(mapped));
+        hasDataRef.current = true;
+        setHasData(true);
         setLoadError(null);
         setLoading(false);
       })
       .catch((e: unknown) => {
         if (cancelled) return;
-        setSections(EMPTY_SECTIONS);
+        if (!hasDataRef.current) {
+          setSections(EMPTY_SECTIONS);
+        }
         setLoadError(e);
         setLoading(false);
       });
@@ -128,9 +150,14 @@ export function StaffDeliveriesPage() {
   const sectionCounts = countsFromSections(sections);
   const total = staffDelTotal(sectionCounts);
   const title = staffDelAppBarTitle(total);
-  const showEmptyAll = !loading && loadError == null && staffDelShowEmptyAll(total);
-  const showLoading = loading;
-  const showError = !loading && loadError != null;
+  /** Flutter: sections == null && fetch.isLoading */
+  const showInitialSkeleton = loading && !hasData;
+  /** Flutter: fetch.hasError && sections == null */
+  const showError = !loading && loadError != null && !hasData;
+  const showBody = !showInitialSkeleton && !showError;
+  const showEmptyAll = showBody && staffDelShowEmptyAll(total);
+  const errorTitle = mapStaffDelLoadTitle(loadError);
+  const errorSubtitle = mapStaffDelLoadSubtitle(loadError);
 
   function onBack(): void {
     popOrGo(navigate, STAFF_DEL_BACK_FALLBACK);
@@ -152,7 +179,7 @@ export function StaffDeliveriesPage() {
     <div
       className="staff-del-page"
       data-page="staff-deliveries"
-      data-step="wire"
+      data-step="states"
       data-total={total}
       data-back-fallback={STAFF_DEL_BACK_FALLBACK}
     >
@@ -184,28 +211,46 @@ export function StaffDeliveriesPage() {
       </header>
 
       <main className="staff-del-body" data-slot="body">
-        {showLoading ? (
-          <div className="staff-del-loading" data-slot="loading" role="status">
-            Loading…
+        {showInitialSkeleton ? (
+          <div
+            className="staff-del-skeleton"
+            data-slot="loading"
+            data-testid="staff-del-loading"
+            aria-busy="true"
+            aria-label="ListSkeleton"
+          >
+            {Array.from({ length: STAFF_DEL_SKELETON_ROWS }, (_, i) => (
+              <div
+                key={i}
+                className="staff-del-skeleton__row"
+                style={{ height: STAFF_DEL_SKELETON_HEIGHT_PX }}
+              />
+            ))}
           </div>
         ) : null}
 
         {showError ? (
-          <div className="staff-del-error" data-slot="error" role="alert">
-            <p className="staff-del-error__title">{STAFF_DEL_LOAD_FAILED}</p>
+          <div
+            className="staff-del-friendly-error"
+            data-slot="error"
+            data-testid="staff-del-error"
+            role="alert"
+          >
+            <p className="staff-del-friendly-error__title">{errorTitle}</p>
+            <p className="staff-del-friendly-error__sub">{errorSubtitle}</p>
             <button
               type="button"
-              className="staff-del-error__retry"
+              className="staff-del-friendly-error__retry"
               data-action="retry"
               data-testid="staff-del-retry"
               onClick={retryLoad}
             >
-              Retry
+              {STAFF_DEL_RETRY}
             </button>
           </div>
         ) : null}
 
-        {!showLoading && !showError
+        {showBody
           ? STAFF_DEL_SECTION_ORDER.map((key) => {
               const purchases = purchasesForKey(sections, key);
               const count = purchases.length;

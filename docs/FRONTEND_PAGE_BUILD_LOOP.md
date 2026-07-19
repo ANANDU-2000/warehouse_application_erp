@@ -129,6 +129,18 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 6 STATES | ✅ | progress/error map/empty gate/pull — [`notifications_states_compare.md`](modules/notifications_states_compare.md) |
 | 7 COMPARE | ✅ | in-scope PASS — [`notifications_compare.md`](modules/notifications_compare.md) |
 
+### Staff search (`/staff/search`) — Subagent 4
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | search/filters/results (no AppBar) — [`staff_search_scaffold_compare.md`](modules/staff_search_scaffold_compare.md) |
+| 2 LAYOUT | ⬜ | — |
+| 3 FIELDS | ⬜ | — |
+| 4 BUTTONS | ⬜ | — |
+| 5 WIRE | ⬜ | — |
+| 6 STATES | ⬜ | — |
+| 7 COMPARE | ⬜ | — |
+
 ### Prompt template (copy per page)
 
 ```

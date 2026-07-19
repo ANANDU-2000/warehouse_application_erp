@@ -72,7 +72,8 @@
     "test:notifications-buttons": "node scripts/check-notifications-buttons.mjs",
     "test:notifications-wire": "node scripts/check-notifications-wire.mjs",
     "test:notifications-states": "node scripts/check-notifications-states.mjs",
-    "test:notifications-compare": "node scripts/check-notifications-compare.mjs"
+    "test:notifications-compare": "node scripts/check-notifications-compare.mjs",
+    "test:staff-search-scaffold": "node scripts/check-staff-search-scaffold.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

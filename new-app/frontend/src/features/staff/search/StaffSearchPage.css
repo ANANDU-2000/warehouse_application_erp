@@ -1,0 +1,101 @@
+/**
+ * Staff search SCAFFOLD — Hexa-ish chrome shells (no live fields/API).
+ * Tokens aligned with staff home / notifications brand.
+ * Flutter staffShellEmbedded: no AppBar — search + chips + results only.
+ */
+.staff-search-page {
+  --ss-brand: #0e4f46;
+  --ss-accent: #159a8a;
+  --ss-bg: #f7f9f6;
+  --ss-text: #0f172a;
+  --ss-muted: #5c6578;
+  --ss-border: #e2e8e6;
+  --ss-surface: #ffffff;
+  --ss-chip-idle: #eff2f1;
+  --ss-hint: #9ca3af;
+
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  background: var(--ss-bg);
+  color: var(--ss-text);
+}
+
+.staff-search-page__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.staff-search-page__search {
+  position: relative;
+  padding: 12px 16px 0;
+  box-sizing: border-box;
+}
+
+.staff-search-page__search-icon {
+  position: absolute;
+  left: 28px;
+  top: 50%;
+  transform: translateY(-20%);
+  color: var(--ss-muted);
+  pointer-events: none;
+}
+
+.staff-search-page__search-input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 48px;
+  padding: 14px 12px 14px 44px;
+  border: none;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 14px;
+  background: var(--ss-surface);
+  color: var(--ss-text);
+  pointer-events: none;
+}
+
+.staff-search-page__search-input::placeholder {
+  color: var(--ss-hint);
+}
+
+.staff-search-page__filters {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 16px;
+  box-sizing: border-box;
+  min-height: 52px;
+  align-items: center;
+}
+
+.staff-search-page__chip {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: none;
+  background: var(--ss-chip-idle);
+  color: var(--ss-muted);
+  cursor: default;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.staff-search-page__chip--selected {
+  background: var(--ss-accent);
+  color: #ffffff;
+}
+
+.staff-search-page__results {
+  flex: 1;
+  min-height: 120px;
+  padding: 8px 16px 24px;
+  box-sizing: border-box;
+  background: var(--ss-bg);
+}

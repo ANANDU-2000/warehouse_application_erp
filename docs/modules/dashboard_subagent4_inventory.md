@@ -22,7 +22,7 @@
 | Path | Stub title |
 |---|---|
 | `/staff/settings` | Staff settings (**implement locked** — Settings backend) |
-| `/staff/search` | Staff search |
+| `/staff/search` | **SCAFFOLD PASS** — [`staff_search_scaffold_compare.md`](staff_search_scaffold_compare.md); ask before LAYOUT |
 | `/staff/items` | Staff gallery |
 | `/staff/stock` | Staff stock |
 | `/staff/purchase-history` | Purchase history |
@@ -63,7 +63,7 @@
 
 ## Next (ask first)
 
-1. **Next unlockable Subagent 4 stub** (not Settings hub) from the list above, **or**  
+1. **`/staff/search` LAYOUT** (SCAFFOLD done), **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Notifications COMPARE done — see [`notifications_compare.md`](notifications_compare.md). `/staff/settings` skipped — Settings implement locked.)*
+*(Notifications COMPARE done — [`notifications_compare.md`](notifications_compare.md). Staff search SCAFFOLD — [`staff_search_scaffold_compare.md`](staff_search_scaffold_compare.md). `/staff/settings` skipped — Settings implement locked.)*

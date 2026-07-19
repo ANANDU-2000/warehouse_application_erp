@@ -22,23 +22,23 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: Subagent 4 **Notifications COMPARE PASS** on `ops/dashboard-module` — ask before next stub.
+**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: Subagent 4 **Staff search SCAFFOLD** on `ops/dashboard-module` — ask before LAYOUT.
 
 ### Task board (Dashboard staff WIRE-2)
 
 | State | Step |
 |---|---|
-| ✅ Completed | Login/Splash/home/staff COMPARE · WIRE-2a–2f · Users COMPARE · Activity WIRE · Notifications **SCAFFOLD·LAYOUT** |
-| 🟡 Current | `/notifications` **COMPARE PASS** — ask before next Subagent 4 stub |
-| ⬜ Pending | Other Subagent 4 stubs — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
-| ⏸ Deferred | Merge to `main`; full Dashboard Subagent 4 sign-off |
+| ✅ Completed | Login/Splash/home/staff COMPARE · WIRE-2a–2f · Users COMPARE · Activity WIRE · Notifications COMPARE · Staff search **SCAFFOLD** |
+| 🟡 Current | `/staff/search` **SCAFFOLD PASS** — ask before LAYOUT |
+| ⬜ Pending | Staff search LAYOUT→COMPARE · other Subagent 4 stubs — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
+| ⏸ Deferred | `/staff/settings` · `/settings`; merge to `main`; full Dashboard Subagent 4 sign-off |
 
 ### Phase 1 module analysis queue (strict — one at a time)
 
 | # | Module | Status | Evidence |
 |---|---|---|---|
 | 1 | Login | ✅ UI COMPARE PASS | COMPARE [`login_compare.md`](modules/login_compare.md) · Splash [`splash_compare.md`](modules/splash_compare.md) |
-| 2 | Dashboard | 🟡 WIRE-2 · Notifications COMPARE | [`notifications_compare.md`](modules/notifications_compare.md) · [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
+| 2 | Dashboard | 🟡 WIRE-2 · Staff search SCAFFOLD | [`staff_search_scaffold_compare.md`](modules/staff_search_scaffold_compare.md) · [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
 | 3 | Users & Roles | 🟡 Backend 1–14 · list+profile COMPARE · Activity WIRE | [`user_profile_activity_wire_compare.md`](modules/user_profile_activity_wire_compare.md) · [`user_profile_compare.md`](modules/user_profile_compare.md) |
 | 4 | Products | ✅ Analyze+Review PASS | `docs/modules/products.md`, `docs/matrix/products_traceability.md`, branch `phase1/products-analysis` |
 | 5 | Categories | ✅ Analyze+Review PASS | `docs/modules/categories.md`, `docs/matrix/categories_traceability.md`, branch `phase1/categories-analysis` |
@@ -111,7 +111,7 @@
 
 ## PHASE 4 — Frontend Migration (React + TypeScript) 🟡
 
-**Unlocked.** Phase 3 platform PASS. Subagent 4: `/notifications` **COMPARE PASS**. Next: ask next Subagent 4 stub.
+**Unlocked.** Phase 3 platform PASS. Subagent 4: `/staff/search` **SCAFFOLD PASS**. Next: ask before LAYOUT.
 
 | # | Task | Status |
 |---|---|---|
@@ -125,8 +125,8 @@
 | 4.8 | Accessibility | 🔒 |
 | 4.9 | Phase 4 sign-off (per module) | 🔒 |
 
-**4.2 / 4.5 note:** Subagent 4 Notifications COMPARE PASS — [`notifications_compare.md`](modules/notifications_compare.md). Ask before next stub. Settings hub skipped (implement locked).
-
+**4.2 / 4.5 note:** Subagent 4 Staff search SCAFFOLD PASS — [`staff_search_scaffold_compare.md`](modules/staff_search_scaffold_compare.md). Ask before LAYOUT. Settings hub skipped (implement locked).
+ 
 ---
 
 ## PHASE 5 — API Integration 🔒
@@ -203,4 +203,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-19 — Notifications COMPARE PASS ([`notifications_compare.md`](modules/notifications_compare.md)); ask before next Subagent 4 stub.*
+*Last updated: 2026-07-19 — Staff search SCAFFOLD PASS ([`staff_search_scaffold_compare.md`](modules/staff_search_scaffold_compare.md)); ask before LAYOUT.*

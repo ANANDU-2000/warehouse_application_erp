@@ -63,8 +63,10 @@
 
 ## Next (ask first)
 
-1. Hold — purchase entry / barcode / receive **bodies** need **backend modules** first (docs/06 Seq 7–8 / 11), **or**  
-2. Next unlocked stub from inventory (e.g. `/catalog/item/:id` if Catalog approved), **or**  
+1. **Products / Catalog Seq 4 backend** (docs/06 — `ops/products-module`; UI after backend PASS), **or**  
+2. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11), **or**  
 3. Hold / merge review of `ops/dashboard-module` → `main`.
+
+**Do not** start catalog / purchase / barcode / receive **frontend** while `Backend ready = ❌` in docs/06.
 
 *(Notifications COMPARE — [`notifications_compare.md`](notifications_compare.md). Staff search COMPARE — [`staff_search_compare.md`](staff_search_compare.md). Staff items COMPARE — [`staff_items_compare.md`](staff_items_compare.md). Staff stock COMPARE — [`staff_stock_compare.md`](staff_stock_compare.md). Staff purchase-history COMPARE — [`staff_purchase_history_compare.md`](staff_purchase_history_compare.md). Staff low-stock COMPARE — [`staff_low_stock_compare.md`](staff_low_stock_compare.md). Staff activity COMPARE — [`staff_activity_compare.md`](staff_activity_compare.md). Staff deliveries COMPARE — [`staff_deliveries_compare.md`](staff_deliveries_compare.md). `/staff/settings` skipped — Settings implement locked.)*

@@ -12,7 +12,7 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 · Staff deliveries COMPARE | Next: ask before next stub / hold — [`staff_deliveries_compare.md`](modules/staff_deliveries_compare.md) |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 Subagent 4 nest COMPLETE · HOLD | Next: Products Seq 4 **backend** (ask first) — [`staff_deliveries_compare.md`](modules/staff_deliveries_compare.md) |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list+profile COMPARE · Activity WIRE | Next: ask next Subagent 4 stub — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users list+profile **COMPARE PASS**. Profile Activity **WIRE PASS**. Subagent 4: `/notifications` **COMPARE PASS**. Staff search **COMPARE PASS**. Staff items **COMPARE PASS**. Staff stock **COMPARE PASS**. Staff purchase-history **COMPARE PASS**. Staff low-stock **COMPARE PASS**. Staff activity **COMPARE PASS**. Staff deliveries **COMPARE PASS**. Next: ask before **next stub / hold** (purchase / barcode / receive **backend-blocked** — docs/06 Seq 7–8 / 11).
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users list+profile **COMPARE PASS**. Profile Activity **WIRE PASS**. Subagent 4: `/notifications` **COMPARE PASS**. Staff search **COMPARE PASS**. Staff items **COMPARE PASS**. Staff stock **COMPARE PASS**. Staff purchase-history **COMPARE PASS**. Staff low-stock **COMPARE PASS**. Staff activity **COMPARE PASS**. Staff deliveries **COMPARE PASS**. **Dashboard nest COMPLETE · HOLD.** Purchase / barcode / receive / catalog **UI blocked** until backends (docs/06 Seq 4 / 7–8 / 11). Next (ask first): **Products Seq 4 backend** on `ops/products-module`.
 
 ---
 

@@ -14,8 +14,8 @@
 | State | Step |
 |---|---|
 | ✅ Completed | Staff activity COMPARE · Staff deliveries **SCAFFOLD→COMPARE** |
-| 🟡 Current | Staff deliveries **COMPARE PASS** — ask before next Subagent 4 stub / hold |
-| ⬜ Pending (ask first) | Next from [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md) · or hold for backends |
+| 🟡 Current | **HOLD** — nest done; ask before Products Seq 4 backend / merge |
+| ⬜ Pending | Products backend · purchase / barcode / receive after backends |
 | ⏸ Deferred | purchase entry · barcode/print · receive **bodies** · Settings · keepAlive 2m client cache · merge to `main` |
 
 ---
@@ -70,8 +70,8 @@ Docs/checklist + smoke script only: revert COMPARE commit. Application code unch
 
 ## 5. Next after Approve
 
-1. Ask before next Subagent 4 stub from [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md) — e.g. `/catalog/item/:id` (if unlocked), **or**  
-2. Hold — purchase entry / barcode / receive **bodies** need **backend modules** first (docs/06 Seq 7–8 / 11), **or**  
+1. **Products Seq 4 backend** (`ops/products-module` — ask first), **or**  
+2. Hold — purchase / barcode / receive need backends (docs/06 Seq 7–8 / 11), **or**  
 3. Hold / merge review of `ops/dashboard-module` → `main`.
 
-**Do not merge to `main` unless asked.**
+**Do not merge to `main` unless asked. Do not start blocked UI.**

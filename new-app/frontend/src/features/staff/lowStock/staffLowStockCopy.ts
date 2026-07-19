@@ -68,3 +68,34 @@ export const STAFF_LS_INFORM = "Inform";
 export const STAFF_LS_INFORM_OWNER = "Inform owner";
 export const STAFF_LS_OWNER_INFORMED = "Owner informed";
 export const STAFF_LS_SENT = "Sent";
+export const STAFF_LS_PLUS_STOCK = "+ Stock";
+export const STAFF_LS_RECEIVE = "Receive delivery";
+export const STAFF_LS_ITEM_PROFILE = "Item profile";
+export const STAFF_LS_SET_REORDER = "Set reorder level";
+export const STAFF_LS_UPDATE_SYSTEM = "Update system stock";
+export const STAFF_LS_MORE = "More";
+
+/** SnackBars — low_stock_dashboard_page.dart */
+export const STAFF_LS_EXPORT_EMPTY = "No items in this view to export";
+export const STAFF_LS_PDF_PREPARING = "Preparing low-stock PDF…";
+export function staffLsOwnerNotified(name: string): string {
+  return `Owner notified about ${name}`;
+}
+
+/** Staff receive — _receive(staffMode) */
+export const STAFF_LS_RECEIVE_PATH = "/staff/receive";
+export function staffLsReceivePath(humanId: string | null): string {
+  if (humanId && humanId.trim()) {
+    return `${STAFF_LS_RECEIVE_PATH}/${encodeURIComponent(humanId.trim())}`;
+  }
+  return STAFF_LS_RECEIVE_PATH;
+}
+
+/** Item profile — detail sheet */
+export function staffLsItemPath(itemId: string): string {
+  return `/catalog/item/${encodeURIComponent(itemId)}`;
+}
+
+/** Default unit — LowStockCompactItemRow / StockRowMetrics */
+export const STAFF_LS_DEFAULT_UNIT = "bag";
+export const STAFF_LS_DEFAULT_NAME = "Item";

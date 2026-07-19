@@ -1,8 +1,8 @@
 /**
- * Staff low stock `/staff/low-stock` — FIELDS (Step 3).
- * Source: low_stock_dashboard_page.dart debounce 200ms · TabController ·
- * filter sheet scopes · filterLowStockGrouped.
- * Forbidden: Inform/PDF/CSV/row handlers (BUTTONS) · operations API (WIRE).
+ * Staff low stock `/staff/low-stock` — BUTTONS (Step 4).
+ * Source: LowStockCompactItemRow · low_stock_item_detail_sheet ·
+ * _notifyOwner / _receive / _exportPdf empty snack · Item profile push.
+ * Deferred WIRE: notifyOwnerStockItem API · PDF/CSV bytes · + Stock / reorder sheets · ops list.
  */
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -10,6 +10,7 @@ import {
   STAFF_LS_BACK_FALLBACK,
   STAFF_LS_CSV_TOOLTIP,
   STAFF_LS_DEBOUNCE_MS,
+  STAFF_LS_EXPORT_EMPTY,
   STAFF_LS_FILTER_ALL_SUBS,
   STAFF_LS_FILTER_APPLY,
   STAFF_LS_FILTER_CLEAR,
@@ -19,8 +20,16 @@ import {
   STAFF_LS_FILTER_SUBCATEGORY,
   STAFF_LS_FILTER_TOOLTIP,
   STAFF_LS_INFORM,
+  STAFF_LS_INFORM_OWNER,
+  STAFF_LS_ITEM_PROFILE,
+  STAFF_LS_MORE,
+  STAFF_LS_OWNER_INFORMED,
   STAFF_LS_PDF_TOOLTIP,
+  STAFF_LS_PLUS_STOCK,
+  STAFF_LS_RECEIVE,
   STAFF_LS_SEARCH_HINT,
+  STAFF_LS_SENT,
+  STAFF_LS_SET_REORDER,
   STAFF_LS_TAB_ALL,
   STAFF_LS_TAB_BOUGHT,
   STAFF_LS_TAB_DELIVERY,
@@ -28,6 +37,9 @@ import {
   STAFF_LS_TAB_PENDING,
   STAFF_LS_TITLE,
   staffLsAttentionLine,
+  staffLsItemPath,
+  staffLsOwnerNotified,
+  staffLsReceivePath,
 } from "./staffLowStockCopy";
 import {
   STAFF_LS_DEFAULT_SCOPE,
@@ -38,12 +50,25 @@ import {
   countFilteredItems,
   countLowStockForTab,
   filterLowStockGrouped,
+  lowStockItemPendingDelivery,
   lowStockSubcategoryOptions,
   staffLsEmptyTitle,
   staffLsFiltersActive,
   STAFF_LS_SCOPE_LABEL,
   type StaffLsGrouped,
+  type StaffLsItem,
 } from "./staffLowStockLogic";
+import {
+  formatStaffLsQtyDisplay,
+  staffLsHumanId,
+  staffLsItemId,
+  staffLsItemName,
+  staffLsItemUnit,
+  staffLsStatusKind,
+  staffLsStatusLabel,
+  staffLsSubcategory,
+  staffLsSystemQty,
+} from "./staffLowStockRow";
 import {
   STAFF_LS_TAB_ORDER,
   staffLsTabFromFilter,
@@ -59,7 +84,7 @@ const TAB_LABEL: Record<StaffLsTab, string> = {
   pendingDelivery: STAFF_LS_TAB_DELIVERY,
 };
 
-/** FIELDS: empty catalog until WIRE — client filters still apply. */
+/** BUTTONS: empty until WIRE fills operations grouped. */
 const EMPTY_GROUPED: StaffLsGrouped = {};
 
 function popOrGo(
@@ -92,6 +117,14 @@ export function StaffLowStockPage() {
     STAFF_LS_DEFAULT_SCOPE,
   );
   const [draftSub, setDraftSub] = useState<string | null>(null);
+  const [informedOwnerIds, setInformedOwnerIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [detailItem, setDetailItem] = useState<StaffLsItem | null>(null);
+  const [collapsedCats, setCollapsedCats] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [toast, setToast] = useState<string | null>(null);
 
   const grouped = EMPTY_GROUPED;
 
@@ -101,6 +134,12 @@ export function StaffLowStockPage() {
     }, STAFF_LS_DEBOUNCE_MS);
     return () => window.clearTimeout(t);
   }, [query]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = window.setTimeout(() => setToast(null), 3200);
+    return () => window.clearTimeout(t);
+  }, [toast]);
 
   const filtered = filterLowStockGrouped({
     grouped,
@@ -149,6 +188,128 @@ export function StaffLowStockPage() {
     setFiltersOpen(false);
   }
 
+  /** Flutter empty export snack — PDF/CSV bytes deferred WIRE. */
+  function onExportPdf(): void {
+    if (itemCount === 0) {
+      setToast(STAFF_LS_EXPORT_EMPTY);
+      return;
+    }
+    setToast(STAFF_LS_EXPORT_EMPTY);
+  }
+
+  function onExportCsv(): void {
+    if (itemCount === 0) {
+      setToast(STAFF_LS_EXPORT_EMPTY);
+      return;
+    }
+    setToast(STAFF_LS_EXPORT_EMPTY);
+  }
+
+  /** Local informed mark; notifyOwnerStockItem API → WIRE. */
+  function onNotifyOwner(item: StaffLsItem): void {
+    const id = staffLsItemId(item);
+    const name = staffLsItemName(item);
+    if (!id) return;
+    setInformedOwnerIds((prev) => new Set(prev).add(id));
+    setDetailItem(null);
+    setToast(staffLsOwnerNotified(name));
+  }
+
+  function onReceive(item: StaffLsItem): void {
+    setDetailItem(null);
+    navigate(staffLsReceivePath(staffLsHumanId(item)));
+  }
+
+  function openItemProfile(item: StaffLsItem): void {
+    const id = staffLsItemId(item);
+    setDetailItem(null);
+    if (!id) return;
+    navigate(staffLsItemPath(id));
+  }
+
+  function openDetails(item: StaffLsItem): void {
+    setDetailItem(item);
+  }
+
+  function toggleCat(cat: string): void {
+    setCollapsedCats((prev) => {
+      const next = new Set(prev);
+      if (next.has(cat)) next.delete(cat);
+      else next.add(cat);
+      return next;
+    });
+  }
+
+  function renderCompactRow(item: StaffLsItem, serial: number) {
+    const id = staffLsItemId(item);
+    const kind = staffLsStatusKind(item);
+    const informed = id ? informedOwnerIds.has(id) : false;
+    const unit = staffLsItemUnit(item);
+    const qty = formatStaffLsQtyDisplay(unit, staffLsSystemQty(item));
+    const sub = staffLsSubcategory(item);
+    return (
+      <div
+        key={id || `row-${serial}`}
+        className="staff-ls-row"
+        data-slot="compactRow"
+        data-action="open-details"
+        role="button"
+        tabIndex={0}
+        onClick={() => openDetails(item)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            openDetails(item);
+          }
+        }}
+      >
+        <span className="staff-ls-row__serial">{serial}</span>
+        <span
+          className={`staff-ls-row__bar staff-ls-row__bar--${kind}`}
+          aria-hidden="true"
+        />
+        <div className="staff-ls-row__body">
+          <div className="staff-ls-row__name">{staffLsItemName(item)}</div>
+          <div className="staff-ls-row__meta">
+            <span className="staff-ls-row__qty">{qty}</span>
+            <span className={`staff-ls-status staff-ls-status--${kind}`}>
+              {staffLsStatusLabel(kind)}
+            </span>
+          </div>
+          {sub ? <div className="staff-ls-row__sub">{sub}</div> : null}
+        </div>
+        <button
+          type="button"
+          className={
+            informed
+              ? "staff-ls-row__inform staff-ls-row__inform--sent"
+              : "staff-ls-row__inform staff-ls-row__inform--active"
+          }
+          data-action="inform-owner"
+          disabled={informed}
+          onClick={(e) => {
+            e.stopPropagation();
+            onNotifyOwner(item);
+          }}
+        >
+          {informed ? STAFF_LS_SENT : STAFF_LS_INFORM}
+        </button>
+        <button
+          type="button"
+          className="staff-ls-row__more"
+          aria-label={STAFF_LS_MORE}
+          data-action="more-details"
+          onClick={(e) => {
+            e.stopPropagation();
+            openDetails(item);
+          }}
+        >
+          ⋮
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="staff-ls-page" data-page="staff-low-stock">
       <header className="staff-ls-appbar" data-slot="appBar">
@@ -163,29 +324,26 @@ export function StaffLowStockPage() {
             ←
           </button>
           <h1 className="staff-ls-appbar__title">{STAFF_LS_TITLE}</h1>
-          <div
-            className="staff-ls-appbar__actions staff-ls-export--inert"
-            data-slot="exportActions"
-          >
+          <div className="staff-ls-appbar__actions" data-slot="exportActions">
             <button
               type="button"
-              className="staff-ls-appbar__action"
+              className="staff-ls-appbar__action staff-ls-appbar__action--active"
               title={STAFF_LS_PDF_TOOLTIP}
               aria-label={STAFF_LS_PDF_TOOLTIP}
-              data-deferred="pdf-export"
-              tabIndex={-1}
-              disabled
+              data-action="export-pdf"
+              data-deferred="pdf-bytes"
+              onClick={onExportPdf}
             >
               PDF
             </button>
             <button
               type="button"
-              className="staff-ls-appbar__action"
+              className="staff-ls-appbar__action staff-ls-appbar__action--active"
               title={STAFF_LS_CSV_TOOLTIP}
               aria-label={STAFF_LS_CSV_TOOLTIP}
-              data-deferred="csv-export"
-              tabIndex={-1}
-              disabled
+              data-action="export-csv"
+              data-deferred="csv-bytes"
+              onClick={onExportCsv}
             >
               CSV
             </button>
@@ -286,93 +444,206 @@ export function StaffLowStockPage() {
             </div>
           ) : null}
 
-          <div
-            className="staff-ls-tree staff-ls-tree--layout"
-            data-slot="tree"
-            data-deferred="category-tree"
-            aria-hidden="true"
-            hidden
-          >
-            <div className="staff-ls-category" data-slot="categoryCard">
-              <div className="staff-ls-category__header">
-                <span className="staff-ls-category__title">Category</span>
-                <span className="staff-ls-category__count staff-ls-category__count--critical">
-                  0
-                </span>
-              </div>
-              <div
-                className="staff-ls-subtabs"
-                data-slot="subcategoryTabs"
-                data-deferred="subcategory-tabs"
-              >
-                <span className="staff-ls-subtab staff-ls-subtab--selected">
-                  All
-                </span>
-                <span className="staff-ls-subtab">Sub</span>
-              </div>
-              <div
-                className="staff-ls-row"
-                data-slot="compactRow"
-                data-deferred="item-rows"
-              >
-                <span className="staff-ls-row__serial">1</span>
-                <span
-                  className="staff-ls-row__bar staff-ls-row__bar--out"
-                  aria-hidden="true"
-                />
-                <div className="staff-ls-row__body">
-                  <div className="staff-ls-row__name">Item</div>
-                  <div className="staff-ls-row__meta">
-                    <span className="staff-ls-row__qty">0 bag</span>
-                    <span className="staff-ls-status staff-ls-status--out">
-                      OUT
-                    </span>
+          {itemCount > 0 ? (
+            <div className="staff-ls-tree" data-slot="tree">
+              {Object.entries(filtered).map(([cat, subMap]) => {
+                const catItems = Object.values(subMap).flat();
+                const open = !collapsedCats.has(cat);
+                return (
+                  <div
+                    key={cat}
+                    className="staff-ls-category"
+                    data-slot="categoryCard"
+                  >
+                    <button
+                      type="button"
+                      className="staff-ls-category__header"
+                      data-action="toggle-category"
+                      onClick={() => toggleCat(cat)}
+                    >
+                      <span className="staff-ls-category__title">{cat}</span>
+                      <span className="staff-ls-category__count staff-ls-category__count--critical">
+                        {catItems.length}
+                      </span>
+                    </button>
+                    {open
+                      ? catItems.map((item, i) =>
+                          renderCompactRow(item, i + 1),
+                        )
+                      : null}
                   </div>
-                  <div className="staff-ls-row__sub">Subcategory</div>
+                );
+              })}
+            </div>
+          ) : (
+            <div
+              className="staff-ls-tree staff-ls-tree--layout"
+              data-slot="tree"
+              data-deferred="category-tree"
+              aria-hidden="true"
+              hidden
+            >
+              <div className="staff-ls-category" data-slot="categoryCard">
+                <div className="staff-ls-category__header">
+                  <span className="staff-ls-category__title">Category</span>
+                  <span className="staff-ls-category__count staff-ls-category__count--critical">
+                    0
+                  </span>
                 </div>
-                <button
-                  type="button"
-                  className="staff-ls-row__inform"
-                  data-deferred="inform-owner"
-                  tabIndex={-1}
-                  disabled
+                <div
+                  className="staff-ls-row"
+                  data-slot="compactRow"
+                  data-deferred="item-rows"
                 >
-                  {STAFF_LS_INFORM}
-                </button>
-              </div>
-              <div
-                className="staff-ls-row"
-                data-slot="compactRow"
-                data-deferred="item-rows"
-              >
-                <span className="staff-ls-row__serial">2</span>
-                <span
-                  className="staff-ls-row__bar staff-ls-row__bar--low"
-                  aria-hidden="true"
-                />
-                <div className="staff-ls-row__body">
-                  <div className="staff-ls-row__name">Item</div>
-                  <div className="staff-ls-row__meta">
-                    <span className="staff-ls-row__qty">2 bag</span>
-                    <span className="staff-ls-status staff-ls-status--low">
-                      LOW
-                    </span>
+                  <span className="staff-ls-row__serial">1</span>
+                  <span
+                    className="staff-ls-row__bar staff-ls-row__bar--out"
+                    aria-hidden="true"
+                  />
+                  <div className="staff-ls-row__body">
+                    <div className="staff-ls-row__name">Item</div>
+                    <div className="staff-ls-row__meta">
+                      <span className="staff-ls-row__qty">0 bag</span>
+                      <span className="staff-ls-status staff-ls-status--out">
+                        OUT
+                      </span>
+                    </div>
                   </div>
+                  <button
+                    type="button"
+                    className="staff-ls-row__inform"
+                    data-action="inform-owner"
+                    data-deferred="inform-owner-sample"
+                    disabled
+                  >
+                    {STAFF_LS_INFORM}
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  className="staff-ls-row__inform"
-                  data-deferred="inform-owner"
-                  tabIndex={-1}
-                  disabled
+                <div
+                  className="staff-ls-row"
+                  data-slot="compactRow"
+                  data-deferred="item-rows"
                 >
-                  {STAFF_LS_INFORM}
-                </button>
+                  <span className="staff-ls-row__serial">2</span>
+                  <span
+                    className="staff-ls-row__bar staff-ls-row__bar--low"
+                    aria-hidden="true"
+                  />
+                  <div className="staff-ls-row__body">
+                    <div className="staff-ls-row__name">Item</div>
+                    <div className="staff-ls-row__meta">
+                      <span className="staff-ls-row__qty">2 bag</span>
+                      <span className="staff-ls-status staff-ls-status--low">
+                        LOW
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="staff-ls-row__inform"
+                    data-action="inform-owner"
+                    data-deferred="inform-owner-sample"
+                    disabled
+                  >
+                    {STAFF_LS_INFORM}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
+
+      {toast ? (
+        <div className="staff-ls-toast" data-slot="toast" role="status">
+          {toast}
+        </div>
+      ) : null}
+
+      {detailItem ? (
+        <div
+          className="staff-ls-detail"
+          data-slot="detailSheet"
+          role="dialog"
+          aria-label={staffLsItemName(detailItem)}
+        >
+          <div className="staff-ls-detail__panel">
+            <h2 className="staff-ls-detail__title">
+              {staffLsItemName(detailItem)}
+            </h2>
+            <p className="staff-ls-detail__meta">
+              {formatStaffLsQtyDisplay(
+                staffLsItemUnit(detailItem),
+                staffLsSystemQty(detailItem),
+              )}{" "}
+              · {staffLsStatusLabel(staffLsStatusKind(detailItem))}
+            </p>
+            <button
+              type="button"
+              className="staff-ls-detail__primary"
+              data-action="inform-owner"
+              data-deferred="notify-owner-api"
+              disabled={
+                !!staffLsItemId(detailItem) &&
+                informedOwnerIds.has(staffLsItemId(detailItem))
+              }
+              onClick={() => onNotifyOwner(detailItem)}
+            >
+              {staffLsItemId(detailItem) &&
+              informedOwnerIds.has(staffLsItemId(detailItem))
+                ? STAFF_LS_OWNER_INFORMED
+                : STAFF_LS_INFORM_OWNER}
+            </button>
+            {lowStockItemPendingDelivery(detailItem) ? (
+              <button
+                type="button"
+                className="staff-ls-detail__link"
+                data-action="receive"
+                onClick={() => onReceive(detailItem)}
+              >
+                {STAFF_LS_RECEIVE}
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className="staff-ls-detail__link"
+              data-action="item-profile"
+              onClick={() => openItemProfile(detailItem)}
+            >
+              {STAFF_LS_ITEM_PROFILE}
+            </button>
+            <button
+              type="button"
+              className="staff-ls-detail__link"
+              data-deferred="plus-stock"
+              disabled
+            >
+              {STAFF_LS_PLUS_STOCK}
+            </button>
+            <button
+              type="button"
+              className="staff-ls-detail__link"
+              data-deferred="set-reorder"
+              disabled
+            >
+              {STAFF_LS_SET_REORDER}
+            </button>
+            <button
+              type="button"
+              className="staff-ls-detail__close"
+              onClick={() => setDetailItem(null)}
+            >
+              Close
+            </button>
+          </div>
+          <button
+            type="button"
+            className="staff-ls-detail__backdrop"
+            aria-label="Close"
+            onClick={() => setDetailItem(null)}
+          />
+        </div>
+      ) : null}
 
       {filtersOpen ? (
         <div

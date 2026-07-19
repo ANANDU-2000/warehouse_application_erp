@@ -103,7 +103,8 @@
     "test:staff-purchase-history-compare": "node scripts/check-staff-purchase-history-compare.mjs",
     "test:staff-low-stock-scaffold": "node scripts/check-staff-low-stock-scaffold.mjs",
     "test:staff-low-stock-layout": "node scripts/check-staff-low-stock-layout.mjs",
-    "test:staff-low-stock-fields": "node scripts/check-staff-low-stock-fields.mjs"
+    "test:staff-low-stock-fields": "node scripts/check-staff-low-stock-fields.mjs",
+    "test:staff-low-stock-buttons": "node scripts/check-staff-low-stock-buttons.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

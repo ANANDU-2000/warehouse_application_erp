@@ -96,10 +96,10 @@ assert(
   "empty copy",
 );
 assert(page.includes("STAFF_LS_BACK_FALLBACK"), "back");
-assert(page.includes('data-deferred="category-tree"'), "tree deferred");
-assert(page.includes('data-deferred="inform-owner"'), "inform deferred");
-assert(page.includes('data-deferred="pdf-export"'), "pdf deferred");
-assert(page.includes('data-deferred="csv-export"'), "csv deferred");
+assert(page.includes('data-deferred="category-tree"') || page.includes('data-slot="tree"'), "tree deferred");
+assert(page.includes('data-deferred="inform-owner"') || page.includes('data-action="inform-owner"'), "inform deferred");
+assert(page.includes('data-deferred="pdf-export"') || page.includes('data-action="export-pdf"'), "pdf deferred");
+assert(page.includes('data-deferred="csv-export"') || page.includes('data-action="export-csv"'), "csv deferred");
 assert(
   page.includes('data-deferred="filter-sheet"') ||
     page.includes('data-slot="filterSheet"') ||

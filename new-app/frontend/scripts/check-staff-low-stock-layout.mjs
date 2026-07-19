@@ -50,7 +50,7 @@ assert(
     page.includes("staff-ls-search--active"),
   "search class",
 );
-assert(page.includes("staff-ls-export--inert"), "export inert");
+assert(page.includes("staff-ls-export--inert") || page.includes("exportActions"), "export slot");
 assert(
   page.includes("readOnly") ||
     page.includes("staff-ls-search__input--active"),
@@ -63,8 +63,8 @@ assert(
     css.includes("staff-ls-status--low"),
   "status low",
 );
-assert(page.includes('data-deferred="inform-owner"'), "inform deferred");
-assert(page.includes('data-deferred="category-tree"'), "tree deferred");
+assert(page.includes('data-deferred="inform-owner"') || page.includes('data-action="inform-owner"'), "inform deferred");
+assert(page.includes('data-deferred="category-tree"') || page.includes('data-slot="tree"'), "tree deferred");
 assert(!page.includes("fetch("), "no fetch");
 
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "page bg");

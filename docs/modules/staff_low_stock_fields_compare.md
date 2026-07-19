@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff purchase-history COMPARE · Staff low-stock SCAFFOLD → **FIELDS** |
-| 🟡 Current | `/staff/low-stock` **FIELDS PASS** — ask before BUTTONS |
-| ⬜ Pending | BUTTONS → COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | Inform/PDF/CSV/row handlers · operations API · owner `/stock/low-stock` · purchase entry · barcode/print · Settings · merge to `main` |
+| ✅ Completed | Staff purchase-history COMPARE · Staff low-stock SCAFFOLD → **BUTTONS** |
+| 🟡 Current | `/staff/low-stock` **BUTTONS PASS** — ask before WIRE |
+| ⬜ Pending | WIRE → COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | notifyOwnerStockItem API · PDF/CSV bytes · + Stock / reorder · ops list API · owner `/stock/low-stock` · purchase entry · barcode/print · Settings · merge to `main` |
 
 ## Legacy vs New
 
@@ -36,4 +36,4 @@
 
 **Rollback:** Revert FIELDS commit; restore LAYOUT inert search/tabs; remove `staffLowStockLogic.ts` / `staffLowStockFilters.ts` + this compare + fields script; boards → ask before FIELDS.
 
-**Next (ask first):** BUTTONS — do not start until approved.
+**Next (ask first):** BUTTONS done — [`staff_low_stock_buttons_compare.md`](staff_low_stock_buttons_compare.md). Ask before WIRE.

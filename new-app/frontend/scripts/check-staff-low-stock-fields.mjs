@@ -86,9 +86,12 @@ assert(page.includes("clearFilters"), "clear filters");
 assert(page.includes('data-slot="filterSheet"'), "filter sheet");
 assert(page.includes('data-slot="searchScopes"'), "scopes");
 assert(
-  page.includes("data-deferred=\"pdf-export\"") &&
-    page.includes("data-deferred=\"inform-owner\""),
-  "export/inform still deferred",
+  (page.includes('data-deferred="pdf-export"') ||
+    page.includes('data-action="export-pdf"')) &&
+    (page.includes('data-deferred="inform-owner"') ||
+      page.includes('data-action="inform-owner"') ||
+      page.includes("data-deferred=\"notify-owner-api\"")),
+  "export/inform CTAs present",
 );
 assert(!page.includes("fetch("), "no fetch");
 

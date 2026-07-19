@@ -8,10 +8,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff purchase-history COMPARE · Staff low-stock **SCAFFOLD** |
-| 🟡 Current | `/staff/low-stock` **SCAFFOLD PASS** — ask before LAYOUT |
-| ⬜ Pending | LAYOUT → COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | category tree · Inform owner API · PDF/CSV · filter sheet · owner `/stock/low-stock` · purchase entry · barcode/print · Settings · merge to `main` |
+| ✅ Completed | Staff purchase-history COMPARE · Staff low-stock SCAFFOLD → **LAYOUT** |
+| 🟡 Current | `/staff/low-stock` **LAYOUT PASS** — ask before FIELDS |
+| ⬜ Pending | FIELDS → COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | category tree data · Inform owner API · PDF/CSV · filter sheet · owner `/stock/low-stock` · purchase entry · barcode/print · Settings · merge to `main` |
 
 ## Legacy vs New
 
@@ -39,4 +39,4 @@
 
 **Rollback:** Revert SCAFFOLD commit; restore route → `DashboardRouteStubPage` title “Staff low stock”; remove `features/staff/lowStock/*` + this compare + script; boards → ask before low-stock SCAFFOLD.
 
-**Next (ask first):** LAYOUT — do not start until approved.
+**Next (ask first):** LAYOUT done — [`staff_low_stock_layout_compare.md`](staff_low_stock_layout_compare.md). Ask before FIELDS.

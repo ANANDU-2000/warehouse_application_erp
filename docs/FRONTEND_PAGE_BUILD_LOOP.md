@@ -182,7 +182,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | Step | Status | Evidence |
 |---|---|---|
 | 1 SCAFFOLD | ✅ | AppBar + search/tabs/empty — [`staff_low_stock_scaffold_compare.md`](modules/staff_low_stock_scaffold_compare.md) |
-| 2 LAYOUT | ⬜ | — |
+| 2 LAYOUT | ✅ | Hexa tokens + category/row chrome — [`staff_low_stock_layout_compare.md`](modules/staff_low_stock_layout_compare.md) |
 | 3 FIELDS | ⬜ | — |
 | 4 BUTTONS | ⬜ | — |
 | 5 WIRE | ⬜ | — |

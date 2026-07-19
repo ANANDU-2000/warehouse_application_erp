@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Catalog SCAFFOLD → LAYOUT → FIELDS → BUTTONS → **WIRE** |
-| 🟡 Current | Catalog hub WIRE PASS — ask before **STATES** |
-| ⬜ Pending | STATES → COMPARE · other `/catalog/*` |
-| ⏸ Deferred | ListSkeleton / FriendlyLoadError polish · quick taxonomy sheet · purchase entry · barcode/print body · receive · Settings · merge to `main` |
+| ✅ Completed | Catalog SCAFFOLD → … → WIRE · **STATES** |
+| 🟡 Current | superseded — see [`catalog_states_compare.md`](catalog_states_compare.md) |
+| ⬜ Pending | COMPARE · other `/catalog/*` |
+| ⏸ Deferred | pull gesture · keepAlive · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
 
@@ -41,6 +41,4 @@ npm run build
 
 Revert WIRE commit; restore BUTTONS sample card; remove `catalogApi` / `catalogFuzzy` / `catalogTaxonomy` + wire script + this compare; boards → ask before WIRE.
 
-## Next (ask first)
-
-**STATES** — ListSkeleton + FriendlyLoadError parity. Do not start until approved.
+**Next (ask first):** STATES — done → [`catalog_states_compare.md`](catalog_states_compare.md). Ask before COMPARE.

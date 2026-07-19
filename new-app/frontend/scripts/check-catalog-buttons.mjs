@@ -42,7 +42,10 @@ assert(
 assert(copy.includes("catalogCategoryPath"), "category path helper");
 
 assert(
-  page.includes("BUTTONS") || page.includes("WIRE") || page.includes("STATES"),
+  page.includes("BUTTONS") ||
+    page.includes("WIRE") ||
+    page.includes("STATES") ||
+    page.includes("COMPARE"),
   "BUTTONS+ header",
 );
 assert(page.includes("onBack"), "onBack");

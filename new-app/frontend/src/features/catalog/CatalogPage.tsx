@@ -1,8 +1,7 @@
 /**
- * Catalog hub `/catalog` — WIRE (Step 5).
- * Source: catalog_page.dart + catalog_providers — list categories/items/types-index;
- * fuzzy display + suggestion chips; rename PATCH / delete DELETE.
- * Loading/error polish deferred to STATES.
+ * Catalog hub `/catalog` — STATES (Step 6).
+ * Source: catalog_page.dart ListSkeleton() · FriendlyLoadError defaults;
+ * RefreshIndicator soft refetch when hasData.
  * Staff: blocked → `/staff/home`.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -40,6 +39,8 @@ import {
   CATALOG_RETRY,
   CATALOG_SAVED_SNACK,
   CATALOG_SEARCH_HINT,
+  CATALOG_SKELETON_HEIGHT_PX,
+  CATALOG_SKELETON_ROWS,
   CATALOG_STAFF_REDIRECT,
   CATALOG_TITLE,
   CATALOG_TOOLTIP_BACK,
@@ -54,6 +55,10 @@ import {
   catalogEmptySub,
   catalogEmptyTitle,
 } from "./catalogFields";
+import {
+  mapCatalogLoadSubtitle,
+  mapCatalogLoadTitle,
+} from "./catalogLoadSubtitle";
 import {
   catalogCategoryMeta,
   catalogDisplayCategories,
@@ -88,10 +93,10 @@ export function CatalogPage() {
     return <Navigate to={CATALOG_STAFF_REDIRECT} replace />;
   }
 
-  return <CatalogPageWire />;
+  return <CatalogPageStates />;
 }
 
-function CatalogPageWire() {
+function CatalogPageStates() {
   const navigate = useNavigate();
   const session = readPrimaryBusiness();
   const businessId = session?.id ?? "";
@@ -197,6 +202,10 @@ function CatalogPageWire() {
   });
   const showClear = searchDraft.length > 0;
   const showSuggestions = searchQuery.trim().length > 0 && suggestions.length > 0;
+  const errorTitle = mapCatalogLoadTitle(loadError);
+  const errorSubtitle = mapCatalogLoadSubtitle(loadError);
+
+  const retryLoad = () => setRetryTick((n) => n + 1);
 
   const onBack = () => popOrGo(navigate, CATALOG_BACK_FALLBACK);
   const onQuickCategories = () => navigate(CATALOG_PATH_TAXONOMY);
@@ -250,7 +259,7 @@ function CatalogPageWire() {
   };
 
   return (
-    <div className="catalog-page" data-page="catalog-wire">
+    <div className="catalog-page" data-page="catalog-states">
       <header className="catalog-page__appbar" data-slot="appBar">
         <button
           type="button"
@@ -358,19 +367,38 @@ function CatalogPageWire() {
         </div>
 
         {showInitialSkeleton ? (
-          <div className="catalog-page__loading" data-slot="loading">
-            Loading…
+          <div
+            className="catalog-page__skeleton"
+            data-slot="loading"
+            data-testid="catalog-loading"
+            aria-busy="true"
+            aria-label="ListSkeleton"
+          >
+            {Array.from({ length: CATALOG_SKELETON_ROWS }, (_, i) => (
+              <div
+                key={i}
+                className="catalog-page__skeleton-row"
+                style={{ height: CATALOG_SKELETON_HEIGHT_PX }}
+              />
+            ))}
           </div>
         ) : null}
 
         {showError ? (
-          <div className="catalog-page__error" data-slot="error">
-            <p>{friendlyCatalogError(loadError) || CATALOG_LOAD_FAILED}</p>
+          <div
+            className="catalog-page__friendly-error"
+            data-slot="error"
+            data-testid="catalog-error"
+            role="alert"
+          >
+            <p className="catalog-page__friendly-error-title">{errorTitle}</p>
+            <p className="catalog-page__friendly-error-sub">{errorSubtitle}</p>
             <button
               type="button"
-              className="catalog-page__retry"
+              className="catalog-page__friendly-error-retry"
               data-action="retry"
-              onClick={() => setRetryTick((n) => n + 1)}
+              data-testid="catalog-retry"
+              onClick={retryLoad}
             >
               {CATALOG_RETRY}
             </button>

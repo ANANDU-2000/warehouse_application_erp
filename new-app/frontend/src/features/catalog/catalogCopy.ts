@@ -26,8 +26,14 @@ export const CATALOG_DELETE_CONFIRM = "Delete";
 export const CATALOG_DELETE_CANCEL = "Cancel";
 export const CATALOG_SAVED_SNACK = "Saved";
 export const CATALOG_DELETED_SNACK = "Category deleted";
-export const CATALOG_LOAD_FAILED = "Could not load catalog";
+/** FriendlyLoadError default message — friendly_load_error.dart */
+export const CATALOG_LOAD_FAILED = "Unable to load data";
+export const CATALOG_RETRY_SUBTITLE = "Tap to retry.";
 export const CATALOG_RETRY = "Retry";
+
+/** ListSkeleton defaults — list_skeleton.dart rowCount 6 · rowHeight 84 */
+export const CATALOG_SKELETON_ROWS = 6;
+export const CATALOG_SKELETON_HEIGHT_PX = 84;
 
 export const CATALOG_SEARCH_HINT = "Search categories (fuzzy)";
 

@@ -32,6 +32,7 @@ const tax = readFileSync(taxPath, "utf8");
 const pkg = readFileSync(pkgPath, "utf8");
 
 assert(page.includes("WIRE") || page.includes("STATES"), "WIRE+ header");
+assert(!page.includes("Loading…") || page.includes("STATES"), "plain Loading ok until STATES");
 assert(page.includes("listItemCategories"), "list categories");
 assert(page.includes("listCatalogItems"), "list items");
 assert(page.includes("listCategoryTypesIndex"), "types index");

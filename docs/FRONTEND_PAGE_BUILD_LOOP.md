@@ -222,7 +222,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 3 FIELDS | ✅ | Search + 150ms debounce + empty catalogs — [`catalog_fields_compare.md`](modules/catalog_fields_compare.md) |
 | 4 BUTTONS | ✅ | Back/taxonomy/stock/scan/FAB/card nav — [`catalog_buttons_compare.md`](modules/catalog_buttons_compare.md) |
 | 5 WIRE | ✅ | item-categories + items + types-index + fuzzy + rename/delete — [`catalog_wire_compare.md`](modules/catalog_wire_compare.md) |
-| 6 STATES | ⬜ | — |
+| 6 STATES | ✅ | ListSkeleton 6×84 + FriendlyLoadError — [`catalog_states_compare.md`](modules/catalog_states_compare.md) |
 | 7 COMPARE | ⬜ | — |
 
 ### Prompt template (copy per page)

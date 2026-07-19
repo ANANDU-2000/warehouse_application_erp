@@ -63,9 +63,9 @@
 
 ## Next (ask first)
 
-1. **Catalog STATES** — `/catalog` page loop step 6, **or**  
+1. **Catalog COMPARE** — `/catalog` page loop step 7, **or**  
 2. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11).
 
 **Do not** invent purchase/barcode UI.
 
-*(Catalog WIRE — [`catalog_wire_compare.md`](catalog_wire_compare.md). Categories Slice 2 — [`categories_backend_slice2.md`](categories_backend_slice2.md).)*
+*(Catalog STATES — [`catalog_states_compare.md`](catalog_states_compare.md). Categories Slice 2 — [`categories_backend_slice2.md`](categories_backend_slice2.md).)*

@@ -141,6 +141,7 @@ function baseRepo(
     findTypeInBusiness: async () => ({ typeId: TYPE_ID, categoryId: CAT_ID }),
     assertUniqueBarcode: async () => undefined,
     assertUniqueItemCode: async () => undefined,
+    listFuzzyNamePairs: async () => [],
     ...overrides,
   };
 }

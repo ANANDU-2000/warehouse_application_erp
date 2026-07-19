@@ -22,15 +22,15 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: Dashboard nest COMPLETE. **Products Seq 4 backend Slice 3** on `ops/products-module` — ask before Slice 4.
+**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: Dashboard nest COMPLETE. **Products Seq 4 backend Slice 4** on `ops/products-module` — ask before Slice 5.
 
 ### Task board (Dashboard staff WIRE-2)
 
 | State | Step |
 |---|---|
-| ✅ Completed | Login/Splash/home/staff COMPARE · WIRE-2a–2f · Users COMPARE · Notifications COMPARE · Staff search/items/stock/purchase-history/low-stock/activity/deliveries **COMPARE** · **Products Slice 1–3** (GET + CRUD + batch/from-scan) |
-| 🟡 Current | Products backend **Slice 3 PASS** — ask before Slice 4 (fuzzy/variants) or catalog UI |
-| ⬜ Pending | Catalog fuzzy/variants/patches · frontend · Seq 7–8 / 11 purchase/receive/barcode — [`products_backend_slice3.md`](modules/products_backend_slice3.md) |
+| ✅ Completed | Login/Splash/home/staff COMPARE · WIRE-2a–2f · Users COMPARE · Notifications COMPARE · Staff search/items/stock/purchase-history/low-stock/activity/deliveries **COMPARE** · **Products Slice 1–4** (GET + CRUD + batch/from-scan + fuzzy-check) |
+| 🟡 Current | Products backend **Slice 4 PASS** — ask before Slice 5 (variants/patches) or catalog UI |
+| ⬜ Pending | Catalog variants/patches/bulk-archive · frontend · Seq 7–8 / 11 purchase/receive/barcode — [`products_backend_slice4.md`](modules/products_backend_slice4.md) |
 | ⏸ Deferred | `/staff/settings` · `/settings`; owner `/stock`; purchase entry (**backend blocked**); barcode/print (**blocked**); receive body (**blocked**); merge to `main` |
 
 ### Phase 1 module analysis queue (strict — one at a time)
@@ -38,9 +38,9 @@
 | # | Module | Status | Evidence |
 |---|---|---|---|
 | 1 | Login | ✅ UI COMPARE PASS | COMPARE [`login_compare.md`](modules/login_compare.md) · Splash [`splash_compare.md`](modules/splash_compare.md) |
-| 2 | Dashboard | 🟡 nest COMPLETE · Products Slice 3 | [`products_backend_slice3.md`](modules/products_backend_slice3.md) · [`staff_deliveries_compare.md`](modules/staff_deliveries_compare.md) |
+| 2 | Dashboard | 🟡 nest COMPLETE · Products Slice 4 | [`products_backend_slice4.md`](modules/products_backend_slice4.md) · [`staff_deliveries_compare.md`](modules/staff_deliveries_compare.md) |
 | 3 | Users & Roles | 🟡 Backend 1–14 · list+profile COMPARE · Activity WIRE | [`user_profile_activity_wire_compare.md`](modules/user_profile_activity_wire_compare.md) · [`user_profile_compare.md`](modules/user_profile_compare.md) |
-| 4 | Products | 🟡 Backend Slice 1–3 | [`products_backend_slice3.md`](modules/products_backend_slice3.md) · `docs/modules/products.md` |
+| 4 | Products | 🟡 Backend Slice 1–4 | [`products_backend_slice4.md`](modules/products_backend_slice4.md) · `docs/modules/products.md` |
 | 5 | Categories | ✅ Analyze+Review PASS | `docs/modules/categories.md`, `docs/matrix/categories_traceability.md`, branch `phase1/categories-analysis` |
 | 6 | Units | ✅ Analyze+Review PASS | `docs/modules/units.md`, `docs/matrix/units_traceability.md`, branch `phase1/units-analysis` |
 | 7 | Suppliers | ✅ Analyze+Review PASS | `docs/modules/suppliers.md`, `docs/matrix/suppliers_traceability.md`, branch `phase1/suppliers-analysis` |
@@ -53,7 +53,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). Products **Slice 3 PASS** ([`products_backend_slice3.md`](modules/products_backend_slice3.md)). Ask before Slice 4. Purchase / barcode / receive remain **backend-blocked**.
+**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). Products **Slice 4 PASS** ([`products_backend_slice4.md`](modules/products_backend_slice4.md)). Ask before Slice 5. Purchase / barcode / receive remain **backend-blocked**.
 
 ### Cursor operator setup (workspace)
 

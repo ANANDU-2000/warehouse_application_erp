@@ -50,6 +50,10 @@ import { createStaffHomeController } from "./controllers/staffHome.controller";
 import { createHomeActivityController } from "./controllers/homeActivity.controller";
 import { createSearchController } from "./controllers/search.controller";
 import { createCatalogItemsController } from "./controllers/catalogItems.controller";
+import {
+  createCatalogController,
+  createCatalogRoutes,
+} from "./controllers/catalog.controller";
 import { createCatalogItemsWriteService } from "./services/catalogItemsWrite.service";
 
 export type AppDeps = {
@@ -233,6 +237,7 @@ function unavailableCatalogItemsRepository(): CatalogItemsRepository {
     findTypeInBusiness: fail,
     assertUniqueBarcode: fail,
     assertUniqueItemCode: fail,
+    listFuzzyNamePairs: fail,
   };
 }
 
@@ -352,6 +357,13 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
         catalogItems,
         write: catalogWrite,
       }),
+      app.authz,
+    ),
+  );
+  app.use(
+    "/v1/businesses/:businessId/catalog",
+    createCatalogRoutes(
+      createCatalogController({ catalogItems }),
       app.authz,
     ),
   );

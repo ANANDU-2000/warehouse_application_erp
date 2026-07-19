@@ -178,6 +178,13 @@ export type CatalogItemsRepository = {
     itemCode: string,
     excludeId?: string,
   ): Promise<void>;
+  /** Formula source: catalog.py catalog_fuzzy_check candidate select */
+  listFuzzyNamePairs(opts: {
+    businessId: string;
+    categoryId?: string | null;
+    typeId?: string | null;
+    supplierId?: string | null;
+  }): Promise<Array<{ id: string; name: string }>>;
 };
 
 const ITEM_SELECT = `
@@ -1199,6 +1206,55 @@ export function createCatalogItemsRepository(
         const { HttpError } = await import("../errors/httpError");
         throw new HttpError(409, "Item code already exists");
       }
+    },
+
+    async listFuzzyNamePairs(opts) {
+      const params: SqlParam[] = [
+        {
+          name: "businessId",
+          type: sql.UniqueIdentifier,
+          value: opts.businessId,
+        },
+      ];
+      let sqlText = `SELECT ci.[id], ci.[name]
+        FROM catalog_items ci
+        WHERE ci.[business_id] = @businessId AND ci.[deleted_at] IS NULL`;
+      if (opts.categoryId) {
+        sqlText += ` AND ci.[category_id] = @categoryId`;
+        params.push({
+          name: "categoryId",
+          type: sql.UniqueIdentifier,
+          value: opts.categoryId,
+        });
+      }
+      if (opts.typeId) {
+        sqlText += ` AND ci.[type_id] = @typeId`;
+        params.push({
+          name: "typeId",
+          type: sql.UniqueIdentifier,
+          value: opts.typeId,
+        });
+      }
+      if (opts.supplierId) {
+        sqlText += ` AND EXISTS (
+          SELECT 1 FROM catalog_item_default_suppliers ds
+          WHERE ds.[catalog_item_id] = ci.[id]
+            AND ds.[supplier_id] = @supplierId
+        )`;
+        params.push({
+          name: "supplierId",
+          type: sql.UniqueIdentifier,
+          value: opts.supplierId,
+        });
+      }
+      const rows = await queryMany<Record<string, unknown>>(db, sqlText, params);
+      const out: Array<{ id: string; name: string }> = [];
+      for (const r of rows) {
+        const name = r.name != null ? String(r.name).trim() : "";
+        if (!name) continue;
+        out.push({ id: String(r.id), name });
+      }
+      return out;
     },
   };
 }

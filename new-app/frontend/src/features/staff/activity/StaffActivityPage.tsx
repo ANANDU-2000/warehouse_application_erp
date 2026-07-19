@@ -1,8 +1,8 @@
 /**
- * Staff activity `/staff/activity` — SCAFFOLD (Step 1).
- * Source: staff_activity_page.dart StaffActivityPage.
- * Deferred: period selection → FIELDS; listActivityLog → WIRE;
- * ListSkeleton / HexaErrorCard → STATES.
+ * Staff activity `/staff/activity` — LAYOUT (Step 2).
+ * Source: staff_activity_page.dart · HexaColors · HexaDsLayout pageGutter 24 /
+ * sectionGap · ListTile CircleAvatar brandPrimary@12% · Divider.
+ * Forbidden: period handlers, API, skeleton (FIELDS/WIRE/STATES).
  */
 import { useNavigate } from "react-router-dom";
 import {
@@ -30,7 +30,7 @@ function popOrGo(
 
 export function StaffActivityPage() {
   const navigate = useNavigate();
-  /** SCAFFOLD: fixed today; FIELDS activates SegmentedButton. */
+  /** LAYOUT: fixed today; FIELDS activates SegmentedButton. */
   const period: StaffActPeriod = STAFF_ACT_DEFAULT_PERIOD;
 
   return (
@@ -50,7 +50,7 @@ export function StaffActivityPage() {
 
       <main className="staff-act-body" data-slot="body">
         <div
-          className="staff-act-periods"
+          className="staff-act-periods staff-act-periods--inert"
           data-slot="periods"
           data-deferred="period-select"
           role="tablist"
@@ -77,14 +77,16 @@ export function StaffActivityPage() {
 
         <div className="staff-act-results" data-slot="results">
           <div className="staff-act-empty" data-slot="empty">
-            <div className="staff-act-empty__icon" aria-hidden="true">
-              ⏱
-            </div>
+            <div
+              className="staff-act-empty__icon"
+              data-slot="emptyIcon"
+              aria-hidden="true"
+            />
             <p className="staff-act-empty__title">{STAFF_ACT_EMPTY}</p>
             <p className="staff-act-empty__sub">{STAFF_ACT_EMPTY_SUB}</p>
           </div>
 
-          {/* LAYOUT/WIRE sample row chrome — hidden until WIRE */}
+          {/* Row chrome sample — hidden until WIRE fills list */}
           <ul
             className="staff-act-list"
             data-slot="list"
@@ -92,14 +94,39 @@ export function StaffActivityPage() {
             aria-hidden="true"
             hidden
           >
-            <li className="staff-act-row" data-slot="row">
-              <span className="staff-act-row__avatar" aria-hidden="true" />
+            <li
+              className="staff-act-row"
+              data-slot="row"
+              data-kind="history"
+            >
+              <span
+                className="staff-act-row__avatar staff-act-row__avatar--history"
+                aria-hidden="true"
+              />
               <div className="staff-act-row__body">
                 <div className="staff-act-row__title">Signed in</div>
                 <div className="staff-act-row__sub" />
               </div>
               <div className="staff-act-row__meta">
                 <span className="staff-act-row__ago">just now</span>
+                <span className="staff-act-row__when">Jan 1 00:00</span>
+              </div>
+            </li>
+            <li
+              className="staff-act-row"
+              data-slot="row"
+              data-kind="purchase"
+            >
+              <span
+                className="staff-act-row__avatar staff-act-row__avatar--purchase"
+                aria-hidden="true"
+              />
+              <div className="staff-act-row__body">
+                <div className="staff-act-row__title">Purchase saved</div>
+                <div className="staff-act-row__sub">Item</div>
+              </div>
+              <div className="staff-act-row__meta">
+                <span className="staff-act-row__ago">1h ago</span>
                 <span className="staff-act-row__when">Jan 1 00:00</span>
               </div>
             </li>

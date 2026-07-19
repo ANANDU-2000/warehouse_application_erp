@@ -108,7 +108,8 @@
     "test:staff-low-stock-wire": "node scripts/check-staff-low-stock-wire.mjs",
     "test:staff-low-stock-states": "node scripts/check-staff-low-stock-states.mjs",
     "test:staff-low-stock-compare": "node scripts/check-staff-low-stock-compare.mjs",
-    "test:staff-activity-scaffold": "node scripts/check-staff-activity-scaffold.mjs"
+    "test:staff-activity-scaffold": "node scripts/check-staff-activity-scaffold.mjs",
+    "test:staff-activity-layout": "node scripts/check-staff-activity-layout.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

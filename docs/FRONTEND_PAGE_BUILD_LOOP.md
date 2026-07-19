@@ -194,7 +194,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | Step | Status | Evidence |
 |---|---|---|
 | 1 SCAFFOLD | ✅ | AppBar + period chips + empty — [`staff_activity_scaffold_compare.md`](modules/staff_activity_scaffold_compare.md) |
-| 2 LAYOUT | ⬜ | — |
+| 2 LAYOUT | ✅ | Hexa tokens + avatar/row chrome — [`staff_activity_layout_compare.md`](modules/staff_activity_layout_compare.md) |
 | 3 FIELDS | ⬜ | — |
 | 4 BUTTONS | ⬜ | — |
 | 5 WIRE | ⬜ | — |

@@ -8,9 +8,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff low-stock COMPARE · Staff activity **SCAFFOLD** |
-| 🟡 Current | `/staff/activity` **SCAFFOLD PASS** — ask before LAYOUT |
-| ⬜ Pending | LAYOUT → COMPARE · other Subagent 4 stubs |
+| ✅ Completed | Staff low-stock COMPARE · Staff activity SCAFFOLD → **LAYOUT** |
+| 🟡 Current | `/staff/activity` **LAYOUT PASS** — ask before FIELDS |
+| ⬜ Pending | FIELDS → COMPARE · other Subagent 4 stubs |
 | ⏸ Deferred | period selection · activity-log fetch · ListSkeleton / HexaErrorCard · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -34,4 +34,4 @@
 
 **Rollback:** Revert SCAFFOLD commit; restore route → `DashboardRouteStubPage` title “Staff activity”; remove `features/staff/activity/*` + this compare + script; boards → ask before activity SCAFFOLD.
 
-**Next (ask first):** LAYOUT — do not start until approved.
+**Next (ask first):** LAYOUT done — [`staff_activity_layout_compare.md`](staff_activity_layout_compare.md). Ask before FIELDS.

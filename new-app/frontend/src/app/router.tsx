@@ -18,6 +18,7 @@ import { StaffLowStockPage } from "../features/staff/lowStock/StaffLowStockPage"
 import { StaffActivityPage } from "../features/staff/activity/StaffActivityPage";
 import { StaffDeliveriesPage } from "../features/staff/deliveries/StaffDeliveriesPage";
 import { CatalogPage } from "../features/catalog/CatalogPage";
+import { CatalogTaxonomyHubPage } from "../features/catalog/CatalogTaxonomyHubPage";
 
 /**
  * Splash + Login + owner /home + activity + breakdown-more + staff /staff/home +
@@ -75,10 +76,7 @@ export function AppRouter() {
           element={<DashboardRouteStubPage title="Staff scan" />}
         />
         <Route path="/catalog" element={<CatalogPage />} />
-        <Route
-          path="/catalog/taxonomy"
-          element={<DashboardRouteStubPage title="Categories" />}
-        />
+        <Route path="/catalog/taxonomy" element={<CatalogTaxonomyHubPage />} />
         <Route
           path="/catalog/new-category"
           element={<DashboardRouteStubPage title="New category" />}

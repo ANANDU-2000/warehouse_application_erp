@@ -1,0 +1,53 @@
+/**
+ * Catalog taxonomy hub SCAFFOLD chrome — HexaOp scaffold bg parity.
+ * Formula source: catalog_taxonomy_hub_page.dart Scaffold body.
+ */
+.taxonomy-hub-page {
+  --tax-bg: #f7f9f6;
+  min-height: 100%;
+  background: var(--tax-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.taxonomy-hub-page__appbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.taxonomy-hub-page__title {
+  flex: 1;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.taxonomy-hub-page__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.taxonomy-hub-page__slot {
+  padding: 8px 16px;
+}
+
+.taxonomy-hub-page__slot[data-slot="categoryList"],
+.taxonomy-hub-page__slot[data-slot="empty"] {
+  flex: 1;
+}
+
+.taxonomy-hub-page__fab-slot {
+  position: sticky;
+  bottom: 16px;
+  align-self: flex-end;
+  margin: 0 16px 16px;
+  padding: 12px 16px;
+  border-radius: 28px;
+  background: rgba(0, 0, 0, 0.04);
+  font-size: 0.875rem;
+}

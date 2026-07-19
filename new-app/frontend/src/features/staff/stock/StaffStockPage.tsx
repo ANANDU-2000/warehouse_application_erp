@@ -1,16 +1,17 @@
 /**
- * Staff stock `/staff/stock` — BUTTONS (Step 4).
- * Source: StockOperationalTopBar actions · `_StockPeriodSheet` ·
- * showOperationalStockFilter toggles · Scan menu (staff).
- * Forbidden: listStock / delivery counts / row actions API (WIRE).
+ * Staff stock `/staff/stock` — WIRE (Step 5).
+ * Source: stockListProvider / hexa_api.listStock · StockWarehouseRow SYS/PHYS/DIFF.
+ * Deferred: delivery-indicator-counts · Activity feed · period purchased · shell-bundle.
  */
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { readPrimaryBusiness } from "../../../shared/auth/sessionStore";
 import type { HomePeriod } from "../../home/homePeriod";
 import {
   STAFF_STOCK_ACTIVITY_EMPTY,
   STAFF_STOCK_BACK_HOME,
   STAFF_STOCK_DEBOUNCE_MS,
+  STAFF_STOCK_DEFAULT_SORT,
   STAFF_STOCK_FILTER_APPLY,
   STAFF_STOCK_FILTER_CLEAR,
   STAFF_STOCK_FILTER_MISSING_BARCODE,
@@ -22,8 +23,12 @@ import {
   STAFF_STOCK_HDR_ITEM,
   STAFF_STOCK_HDR_PHYS,
   STAFF_STOCK_HDR_SYS,
+  STAFF_STOCK_LOAD_FAILED,
+  STAFF_STOCK_LOAD_MORE,
+  STAFF_STOCK_LOADING,
   STAFF_STOCK_MENU_SCAN,
   STAFF_STOCK_PERIOD_SHEET_TITLE,
+  STAFF_STOCK_RETRY,
   STAFF_STOCK_SCAN_PATH,
   STAFF_STOCK_SEARCH_HINT,
   STAFF_STOCK_STATUS_ALL,
@@ -37,6 +42,12 @@ import {
   STAFF_STOCK_TOOLTIP_PERIOD,
   STAFF_STOCK_TOOLTIP_SEARCH,
 } from "./staffStockCopy";
+import {
+  fetchStaffStockListPage,
+  STAFF_STOCK_PER_PAGE,
+  StaffStockApiError,
+  StaffStockNetworkError,
+} from "./staffStockApi";
 import {
   countWarehouseActiveFilters,
   STAFF_STOCK_OP_FILTERS_EMPTY,
@@ -54,6 +65,13 @@ import {
   STAFF_STOCK_PERIOD_SHEET_ORDER,
   STAFF_STOCK_PERIOD_SHEET_SUB,
 } from "./staffStockPeriod";
+import {
+  stockRowDiffLabel,
+  stockRowIsLowOrCritical,
+  stockRowMetaLine,
+  stockRowPhysicalLabel,
+  stockRowSystemLabel,
+} from "./staffStockRowMetrics";
 import {
   STAFF_STOCK_STATUS_ORDER,
   staffStockStatusFromQuery,
@@ -88,9 +106,15 @@ function goStaffHome(navigate: ReturnType<typeof useNavigate>): void {
   navigate(STAFF_STOCK_BACK_HOME);
 }
 
+function itemId(row: StaffStockRow): string {
+  return String(row.id ?? "");
+}
+
 export function StaffStockPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const session = readPrimaryBusiness();
+  const businessId = session?.id ?? "";
   const [tab, setTab] = useState<StaffStockTab>(() =>
     staffStockTabFromQuery(searchParams.get("tab")),
   );
@@ -99,7 +123,6 @@ export function StaffStockPage() {
   );
   const [query, setQuery] = useState("");
   const [debounced, setDebounced] = useState("");
-  /** Flutter `_searchExpanded` default false. */
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [period, setPeriod] = useState<HomePeriod>(STAFF_STOCK_DEFAULT_PERIOD);
   const [periodOpen, setPeriodOpen] = useState(false);
@@ -109,8 +132,13 @@ export function StaffStockPage() {
   const [draftOp, setDraftOp] = useState<StaffStockOpFilters>(
     STAFF_STOCK_OP_FILTERS_EMPTY,
   );
-  /** Local catalog — WIRE fills. */
-  const [allItems] = useState<StaffStockRow[]>([]);
+  const [allItems, setAllItems] = useState<StaffStockRow[]>([]);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryTick, setRetryTick] = useState(0);
 
   useEffect(() => {
     const t = window.setTimeout(() => {
@@ -119,18 +147,83 @@ export function StaffStockPage() {
     return () => window.clearTimeout(t);
   }, [query]);
 
+  useEffect(() => {
+    setPage(1);
+    setAllItems([]);
+  }, [debounced, status, op, retryTick]);
+
+  useEffect(() => {
+    if (!businessId) {
+      setLoading(false);
+      setLoadError("Not signed in");
+      return;
+    }
+    let cancelled = false;
+    const isFirst = page <= 1;
+    if (isFirst) setLoading(true);
+    else setLoadingMore(true);
+    setLoadError(null);
+
+    void fetchStaffStockListPage(businessId, {
+      page,
+      perPage: STAFF_STOCK_PER_PAGE,
+      status,
+      q: debounced,
+      sort: STAFF_STOCK_DEFAULT_SORT,
+      op,
+    })
+      .then((res) => {
+        if (cancelled) return;
+        setTotal(res.total);
+        setAllItems((prev) =>
+          page <= 1 ? res.items : [...prev, ...res.items],
+        );
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        if (err instanceof StaffStockNetworkError) {
+          setLoadError(err.message);
+        } else if (err instanceof StaffStockApiError) {
+          setLoadError(err.detail);
+        } else {
+          setLoadError(STAFF_STOCK_LOAD_FAILED);
+        }
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setLoading(false);
+        setLoadingMore(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [businessId, page, debounced, status, op, retryTick]);
+
   const filterCount = countWarehouseActiveFilters(status, op);
-  const filtered = filterStaffStockRows(allItems, {
-    status,
-    query: debounced,
-    op,
+  const displayRows = filterStaffStockRows(allItems, {
+    status: "all",
+    query: "",
+    op: {
+      ...STAFF_STOCK_OP_FILTERS_EMPTY,
+      purchasedInPeriodOnly: op.purchasedInPeriodOnly,
+    },
   });
-  const emptyTitle = staffStockListEmptyTitle({
-    itemCount: filtered.length,
-    status,
-    query: debounced,
-    advancedFilterCount: filterCount,
-  });
+  const emptyTitle =
+    !loading && !loadError
+      ? staffStockListEmptyTitle({
+          itemCount: displayRows.length,
+          status,
+          query: debounced,
+          advancedFilterCount: filterCount,
+        })
+      : null;
+  const canLoadMore =
+    !loading &&
+    !loadingMore &&
+    !loadError &&
+    allItems.length < total &&
+    allItems.length > 0;
 
   function openFilters(): void {
     setDraftOp(op);
@@ -159,6 +252,16 @@ export function StaffStockPage() {
   function openScan(): void {
     setMoreOpen(false);
     navigate(STAFF_STOCK_SCAN_PATH);
+  }
+
+  function openItem(row: StaffStockRow): void {
+    const id = itemId(row);
+    if (!id) return;
+    navigate(`/catalog/item/${encodeURIComponent(id)}`);
+  }
+
+  function retryLoad(): void {
+    setRetryTick((n) => n + 1);
   }
 
   return (
@@ -475,16 +578,91 @@ export function StaffStockPage() {
               </div>
             </div>
             <div className="staff-stock-results" data-slot="results">
-              {emptyTitle ? (
+              {loading ? (
+                <div className="staff-stock-results__empty" data-slot="loading">
+                  {STAFF_STOCK_LOADING}
+                </div>
+              ) : null}
+              {loadError && !loading ? (
+                <div className="staff-stock-results__error" data-slot="error">
+                  <div>{STAFF_STOCK_LOAD_FAILED}</div>
+                  <div className="staff-stock-results__error-detail">
+                    {loadError}
+                  </div>
+                  <button type="button" onClick={retryLoad}>
+                    {STAFF_STOCK_RETRY}
+                  </button>
+                </div>
+              ) : null}
+              {!loading && !loadError && emptyTitle ? (
                 <div className="staff-stock-results__empty" data-slot="empty">
                   {emptyTitle}
                 </div>
               ) : null}
-              <div className="staff-stock-list" data-slot="list" hidden />
+              {!loading && !loadError && displayRows.length > 0 ? (
+                <div className="staff-stock-list" data-slot="list">
+                  {displayRows.map((row, i) => {
+                    const id = itemId(row);
+                    const name = String(row.name ?? "").trim() || "—";
+                    const low = stockRowIsLowOrCritical(row);
+                    const diff = stockRowDiffLabel(row);
+                    return (
+                      <button
+                        key={id || `row-${i}`}
+                        type="button"
+                        className={
+                          low
+                            ? "staff-stock-row staff-stock-row--low"
+                            : "staff-stock-row"
+                        }
+                        data-slot="itemRow"
+                        onClick={() => openItem(row)}
+                      >
+                        <div className="staff-stock-row__item">
+                          <div className="staff-stock-row__name">{name}</div>
+                          <div className="staff-stock-row__meta">
+                            {stockRowMetaLine(row)}
+                          </div>
+                        </div>
+                        <div className="staff-stock-row__metric">
+                          {stockRowSystemLabel(row)}
+                        </div>
+                        <div className="staff-stock-row__metric">
+                          {stockRowPhysicalLabel(row)}
+                        </div>
+                        <div
+                          className={
+                            diff.startsWith("-")
+                              ? "staff-stock-row__metric staff-stock-row__metric--diff-neg"
+                              : "staff-stock-row__metric"
+                          }
+                        >
+                          {diff}
+                        </div>
+                      </button>
+                    );
+                  })}
+                  {canLoadMore ? (
+                    <button
+                      type="button"
+                      className="staff-stock-load-more"
+                      data-action="load-more"
+                      disabled={loadingMore}
+                      onClick={() => setPage((p) => p + 1)}
+                    >
+                      {loadingMore ? STAFF_STOCK_LOADING : STAFF_STOCK_LOAD_MORE}
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
           </>
         ) : (
-          <div className="staff-stock-activity" data-slot="activity">
+          <div
+            className="staff-stock-activity"
+            data-slot="activity"
+            data-deferred="activity-feed"
+          >
             {STAFF_STOCK_ACTIVITY_EMPTY}
           </div>
         )}

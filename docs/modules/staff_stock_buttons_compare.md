@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff items COMPARE · Staff stock SCAFFOLD · LAYOUT · FIELDS · **BUTTONS** |
-| 🟡 Current | Staff stock **BUTTONS PASS** — ask before WIRE |
-| ⬜ Pending | Staff stock WIRE → COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | listStock / delivery counts / row actions (WIRE); subcategory/supplier pickers (catalog API); owner PDF/Excel/Add/movement |
+| ✅ Completed | Staff items COMPARE · Staff stock SCAFFOLD · LAYOUT · FIELDS · **BUTTONS** · WIRE |
+| 🟡 Current | Staff stock **WIRE PASS** — ask before STATES |
+| ⬜ Pending | Staff stock STATES → COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | listStock done; delivery counts · Activity feed · period purchased (STATES/later) |
 
 ## Legacy vs New
 
@@ -36,4 +36,4 @@
 
 **Rollback:** Revert BUTTONS commit; restore FIELDS inert AppBar slots; remove period/filters modules + this compare + script; boards → ask before BUTTONS.
 
-**Next (ask first):** `/staff/stock` WIRE — do not start until approved.
+**Next (ask first):** WIRE → [`staff_stock_wire_compare.md`](staff_stock_wire_compare.md). Ask before STATES.

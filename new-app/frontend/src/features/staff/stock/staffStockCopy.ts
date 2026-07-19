@@ -38,6 +38,11 @@ export const STAFF_STOCK_DEBOUNCE_MS = 180;
 /** Bootstrap list query sort — stock_page `_bootstrapStockListQueryOnce` */
 export const STAFF_STOCK_DEFAULT_SORT = "recent";
 
+export const STAFF_STOCK_LOAD_FAILED = "Stock list did not load";
+export const STAFF_STOCK_RETRY = "Retry";
+export const STAFF_STOCK_LOADING = "Loading stock…";
+export const STAFF_STOCK_LOAD_MORE = "Load more";
+
 /** StockOperationalTopBar tooltips / menu */
 export const STAFF_STOCK_TOOLTIP_PERIOD = "Filter by period";
 export const STAFF_STOCK_TOOLTIP_FILTERS = "Filters";

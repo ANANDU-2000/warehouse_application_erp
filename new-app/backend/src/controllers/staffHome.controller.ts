@@ -65,9 +65,20 @@ export function createStaffHomeController(deps: StaffHomeControllerDeps) {
           typeof req.query.status === "string" ? req.query.status : "all";
         const sort =
           typeof req.query.sort === "string" ? req.query.sort : "name";
+        const q = typeof req.query.q === "string" ? req.query.q : "";
+        const subcategory =
+          typeof req.query.subcategory === "string"
+            ? req.query.subcategory
+            : "";
+        const unit = typeof req.query.unit === "string" ? req.query.unit : "";
         const missingItemCode =
           req.query.missing_item_code === "true" ||
           req.query.missing_item_code === "1";
+        const missingBarcode =
+          req.query.missing_barcode === "true" ||
+          req.query.missing_barcode === "1";
+        const reorderOnly =
+          req.query.reorder_only === "true" || req.query.reorder_only === "1";
         res.json(
           await deps.staffHome.listStock({
             businessId,
@@ -75,7 +86,12 @@ export function createStaffHomeController(deps: StaffHomeControllerDeps) {
             perPage,
             status,
             sort,
+            q,
+            subcategory,
+            unit,
             missingItemCode,
+            missingBarcode,
+            reorderOnly,
           }),
         );
       } catch (e) {

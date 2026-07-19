@@ -46,6 +46,10 @@ export type StockListItemOut = {
   missing_item_code?: boolean;
   opening_stock_set_at?: string | null;
   opening_stock_qty?: number | null;
+  /** Latest physical count — stock_physical_counts.counted_qty */
+  physical_stock_qty?: number | null;
+  physical_stock_difference_qty?: number | null;
+  last_stock_updated_at?: string | null;
 };
 
 export type StockListOut = {
@@ -139,6 +143,9 @@ type CatalogRow = {
   subcategory_name?: string | null;
   opening_stock_set_at?: Date | string | null;
   opening_stock_qty?: number | null;
+  physical_stock_qty?: number | null;
+  physical_stock_difference_qty?: number | null;
+  last_stock_updated_at?: Date | string | null;
 };
 type NotifRow = {
   payload: string | null;
@@ -283,6 +290,18 @@ function itemOut(r: CatalogRow): StockListItemOut {
     opening_stock_set_at: setAtIso,
     opening_stock_qty:
       r.opening_stock_qty == null ? null : Number(r.opening_stock_qty),
+    physical_stock_qty:
+      r.physical_stock_qty == null ? null : Number(r.physical_stock_qty),
+    physical_stock_difference_qty:
+      r.physical_stock_difference_qty == null
+        ? null
+        : Number(r.physical_stock_difference_qty),
+    last_stock_updated_at:
+      r.last_stock_updated_at == null
+        ? null
+        : r.last_stock_updated_at instanceof Date
+          ? r.last_stock_updated_at.toISOString()
+          : String(r.last_stock_updated_at),
   };
 }
 
@@ -302,6 +321,40 @@ const LOW_STOCK_SQL = `
   )
 `;
 
+/** Critical — stock_helpers._stock_status_sql_filter("critical") */
+const CRITICAL_STOCK_SQL = `
+  (
+    COALESCE(ci.[reorder_level], 0) > 0
+    AND COALESCE(ci.[current_stock], 0) > 0
+    AND COALESCE(ci.[current_stock], 0) <= COALESCE(ci.[reorder_level], 0) * 0.5
+  )
+`;
+
+/** Out — current_stock <= 0 */
+const OUT_STOCK_SQL = `COALESCE(ci.[current_stock], 0) <= 0`;
+
+/**
+ * stock_helpers._stock_status_sql_filter — returns WHERE fragment or null.
+ * Source: StatusFilter all|low|critical|out|shortage
+ */
+export function stockStatusWhereSql(statusVal: string): string | null {
+  const s = statusVal.trim().toLowerCase();
+  switch (s) {
+    case "all":
+    case "":
+      return null;
+    case "out":
+      return OUT_STOCK_SQL;
+    case "critical":
+      return CRITICAL_STOCK_SQL;
+    case "low":
+      return LOW_STOCK_SQL;
+    case "shortage":
+      return `(${OUT_STOCK_SQL} OR ${CRITICAL_STOCK_SQL} OR ${LOW_STOCK_SQL})`;
+    default:
+      return null;
+  }
+}
 export class StaffHomeRepository {
   constructor(private readonly client: SqlClient) {}
 
@@ -349,20 +402,75 @@ export class StaffHomeRepository {
     perPage: number;
     status: string;
     sort: string;
+    q?: string;
+    subcategory?: string;
     missingItemCode?: boolean;
+    missingBarcode?: boolean;
+    reorderOnly?: boolean;
+    unit?: string;
   }): Promise<StockListOut> {
     const where: string[] = [
       "ci.[business_id] = @businessId",
       "ci.[deleted_at] IS NULL",
     ];
-    if (opts.status === "low") {
-      where.push(LOW_STOCK_SQL);
+    const params: SqlParam[] = [
+      { name: "businessId", type: sql.UniqueIdentifier, value: opts.businessId },
+    ];
+
+    const statusSql = stockStatusWhereSql(opts.status);
+    if (statusSql) {
+      where.push(statusSql);
     }
+
+    const q = (opts.q ?? "").trim().toLowerCase();
+    if (q) {
+      where.push(
+        `(
+          LOWER(ci.[name]) LIKE @qLike
+          OR LOWER(COALESCE(ci.[item_code], N'')) LIKE @qLike
+          OR LOWER(COALESCE(ci.[barcode], N'')) LIKE @qLike
+        )`,
+      );
+      params.push({
+        name: "qLike",
+        type: sql.NVarChar(255),
+        value: `%${q}%`,
+      });
+    }
+
+    const sub = (opts.subcategory ?? "").trim().toLowerCase();
+    if (sub) {
+      where.push(`LOWER(COALESCE(ct.[name], N'')) = @subcategory`);
+      params.push({
+        name: "subcategory",
+        type: sql.NVarChar(255),
+        value: sub,
+      });
+    }
+
     if (opts.missingItemCode) {
       where.push(
         `(ci.[item_code] IS NULL OR LTRIM(RTRIM(COALESCE(ci.[item_code], N''))) = N'')`,
       );
     }
+    if (opts.missingBarcode) {
+      where.push(
+        `(ci.[barcode] IS NULL OR LTRIM(RTRIM(COALESCE(ci.[barcode], N''))) = N'')`,
+      );
+    }
+    if (opts.reorderOnly) {
+      where.push(
+        `(COALESCE(ci.[reorder_level], 0) > 0 AND COALESCE(ci.[current_stock], 0) <= COALESCE(ci.[reorder_level], 0))`,
+      );
+    }
+    const unit = (opts.unit ?? "").trim().toLowerCase();
+    if (unit) {
+      where.push(
+        `LOWER(COALESCE(ci.[stock_unit], ci.[default_unit], N'')) = @unit`,
+      );
+      params.push({ name: "unit", type: sql.NVarChar(64), value: unit });
+    }
+
     const whereSql = where.join(" AND ");
 
     let orderSql = "LOWER(ci.[name]) ASC";
@@ -370,18 +478,22 @@ export class StaffHomeRepository {
       orderSql = "COALESCE(ci.[current_stock], 0) ASC";
     } else if (opts.sort === "stock_desc") {
       orderSql = "COALESCE(ci.[current_stock], 0) DESC";
+    } else if (opts.sort === "recent") {
+      orderSql =
+        "CASE WHEN ci.[last_stock_updated_at] IS NULL THEN 1 ELSE 0 END ASC, ci.[last_stock_updated_at] DESC, LOWER(ci.[name]) ASC";
     }
 
     const totalRow = await queryOne<CountRow>(
       this.client,
       `SELECT COUNT(ci.[id]) AS c
        FROM catalog_items ci
+       LEFT JOIN category_types ct ON ct.[id] = ci.[type_id]
        WHERE ${whereSql}`,
-      [{ name: "businessId", type: sql.UniqueIdentifier, value: opts.businessId }],
+      params,
     );
     const total = Number(totalRow?.c ?? 0);
     const page = Math.max(1, opts.page);
-    /** FastAPI Query le=2000; Flutter gallery uses per_page=500 */
+    /** FastAPI Query le=2000; Flutter stock list perPage=50 */
     const perPage = Math.min(2000, Math.max(1, opts.perPage));
     const offset = (page - 1) * perPage;
 
@@ -394,16 +506,26 @@ export class StaffHomeRepository {
       `SELECT ci.[id], ci.[name], ci.[item_code], ci.[current_stock],
               ci.[reorder_level], ci.[stock_unit], ci.[default_unit],
               ci.[barcode], ci.[opening_stock_set_at], ci.[opening_stock_qty],
+              ci.[last_stock_updated_at],
               ic.[name] AS category_name,
-              ct.[name] AS subcategory_name
+              ct.[name] AS subcategory_name,
+              pc.[counted_qty] AS physical_stock_qty,
+              pc.[difference_qty] AS physical_stock_difference_qty
        FROM catalog_items ci
        LEFT JOIN item_categories ic ON ic.[id] = ci.[category_id]
        LEFT JOIN category_types ct ON ct.[id] = ci.[type_id]
+       OUTER APPLY (
+         SELECT TOP (1) spc.[counted_qty], spc.[difference_qty]
+         FROM stock_physical_counts spc
+         WHERE spc.[business_id] = ci.[business_id]
+           AND spc.[item_id] = ci.[id]
+         ORDER BY spc.[counted_at] DESC
+       ) pc
        WHERE ${whereSql}
        ORDER BY ${orderSql}
        OFFSET @offset ROWS FETCH NEXT @perPage ROWS ONLY`,
       [
-        { name: "businessId", type: sql.UniqueIdentifier, value: opts.businessId },
+        ...params,
         { name: "offset", type: sql.Int, value: offset },
         { name: "perPage", type: sql.Int, value: perPage },
       ],

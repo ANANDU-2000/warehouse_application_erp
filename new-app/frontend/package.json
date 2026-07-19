@@ -90,7 +90,8 @@
     "test:staff-stock-scaffold": "node scripts/check-staff-stock-scaffold.mjs",
     "test:staff-stock-layout": "node scripts/check-staff-stock-layout.mjs",
     "test:staff-stock-fields": "node scripts/check-staff-stock-fields.mjs",
-    "test:staff-stock-buttons": "node scripts/check-staff-stock-buttons.mjs"
+    "test:staff-stock-buttons": "node scripts/check-staff-stock-buttons.mjs",
+    "test:staff-stock-wire": "node scripts/check-staff-stock-wire.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

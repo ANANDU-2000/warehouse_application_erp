@@ -460,20 +460,89 @@
   text-align: center;
 }
 
-/* Row chrome ready for WIRE — StockTableLayout.rowMinHeight 72 */
+.staff-stock-row__name {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ss-fg);
+}
+
+.staff-stock-row__meta {
+  font-size: 11px;
+  color: var(--ss-sub);
+  margin-top: 2px;
+}
+
+.staff-stock-row--low {
+  border-left: 3px solid var(--ss-chip-out);
+}
+
 .staff-stock-row {
   display: flex;
+  width: 100%;
   min-height: 72px;
   background: var(--ss-surface);
   border: 1px solid var(--ss-border);
   border-top: 0;
   box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+}
+
+.staff-stock-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0 var(--ss-gutter);
+}
+
+.staff-stock-results__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 16px;
+  color: var(--ss-muted);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.staff-stock-results__error-detail {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.staff-stock-results__error button {
+  margin-top: 4px;
+  padding: 8px 16px;
+  border: 1px solid var(--ss-border);
+  border-radius: 8px;
+  background: var(--ss-surface);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.staff-stock-load-more {
+  margin: 12px 0 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--ss-border);
+  border-radius: 8px;
+  background: var(--ss-bg);
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .staff-stock-row__item {
   flex: 1;
   padding: 6px;
   border-right: 1px solid var(--ss-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
 }
 
 .staff-stock-row__metric {

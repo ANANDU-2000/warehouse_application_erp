@@ -1,7 +1,7 @@
 /**
- * Staff item gallery `/staff/items` — SCAFFOLD (Step 1).
- * Source: staff_item_gallery_page.dart — AppBar + search + filter chips + summary + results
- * Inert: typing, chip select, stock list API, category expand, row menus (FIELDS/BUTTONS/WIRE).
+ * Staff item gallery `/staff/items` — LAYOUT (Step 2).
+ * Source: staff_item_gallery_page.dart + app_theme chipTheme / HexaColors
+ * Inert: typing, chip select, stock list API, expand, row menus (FIELDS/BUTTONS/WIRE).
  */
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
@@ -129,12 +129,15 @@ export function StaffItemGalleryPage() {
         </p>
 
         <div className="staff-gallery-page__results" data-slot="results">
-          <p
-            className="staff-gallery-page__empty"
-            data-testid="staff-gallery-empty"
-          >
-            {STAFF_GALLERY_EMPTY}
-          </p>
+          <div className="staff-gallery-page__list" data-slot="list">
+            <p
+              className="staff-gallery-page__empty"
+              data-slot="empty"
+              data-testid="staff-gallery-empty"
+            >
+              {STAFF_GALLERY_EMPTY}
+            </p>
+          </div>
         </div>
       </div>
     </div>

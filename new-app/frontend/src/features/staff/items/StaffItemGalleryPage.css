@@ -1,17 +1,22 @@
 /**
- * Staff item gallery SCAFFOLD chrome.
- * Tokens: HexaColors brandBackground / brandPrimary (match notifications).
+ * Staff item gallery LAYOUT — Hexa chrome (no live fields/API).
+ * Tokens: HexaColors brandBackground / brandPrimary / neutral /
+ * chipTheme primaryContainer + outlineVariant (app_theme.dart);
+ * staff_item_gallery_page.dart paddings + Card border.
  */
 .staff-gallery-page {
   --sg-brand: #0e4f46;
   --sg-bg: #f7f9f6;
   --sg-text: #0f172a;
-  --sg-muted: #5c6578;
+  --sg-muted: #64748b;
+  --sg-sub: #94a3b8;
   --sg-border: #e2e8e6;
+  --sg-input-border: #e5e7eb;
+  --sg-outline-variant: #d7e7e3;
   --sg-hint: #9ca3af;
   --sg-surface: #ffffff;
-  --sg-chip-idle: #eff2f1;
   --sg-chip-selected: #d8ece8;
+  --sg-low: #dc2626;
 
   min-height: 100dvh;
   display: flex;
@@ -70,8 +75,10 @@
   min-height: 0;
 }
 
+/* Padding HexaOp.pageGutter 16, bottom 4 — OutlineInputBorder radius 10 */
 .staff-gallery-page__search {
   padding: 0 16px 4px;
+  box-sizing: border-box;
 }
 
 .staff-gallery-page__search-field {
@@ -79,11 +86,12 @@
   align-items: center;
   gap: 4px;
   background: var(--sg-surface);
-  border: 1px solid var(--sg-border);
+  border: 1px solid var(--sg-input-border);
   border-radius: 10px;
   padding: 0 8px;
   min-height: 40px;
   box-sizing: border-box;
+  pointer-events: none;
 }
 
 .staff-gallery-page__search-icon {
@@ -102,13 +110,20 @@
   color: var(--sg-text);
   min-width: 0;
   padding: 8px 4px;
+  pointer-events: none;
+}
+
+.staff-gallery-page__search-input--active {
+  pointer-events: auto;
 }
 
 .staff-gallery-page__search-input::placeholder {
   color: var(--sg-hint);
 }
 
+/* SizedBox height 44; ListView pad horizontal 12; chip gap 6 */
 .staff-gallery-page__filters {
+  min-height: 44px;
   height: 44px;
   display: flex;
   align-items: center;
@@ -122,27 +137,36 @@
   padding: 0 12px;
   width: 100%;
   box-sizing: border-box;
+  pointer-events: none;
 }
 
+.staff-gallery-page__filter-row--active {
+  pointer-events: auto;
+}
+
+/* ChoiceChip + chipTheme: radius 12, outlineVariant side, primaryContainer selected */
 .staff-gallery-page__chip {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
-  border-radius: 16px;
+  padding: 6px 10px;
+  border-radius: 12px;
   font-size: 11px;
-  font-weight: 600;
-  background: var(--sg-chip-idle);
+  font-weight: 500;
+  background: var(--sg-surface);
   color: var(--sg-text);
-  border: 1px solid transparent;
+  border: 1px solid var(--sg-outline-variant);
   white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .staff-gallery-page__chip--selected {
   background: var(--sg-chip-selected);
   color: var(--sg-brand);
+  border-color: transparent;
 }
 
+/* Padding fromLTRB(16, 4, 16, 8); HexaDsType.label 11 textMuted */
 .staff-gallery-page__summary {
   margin: 0;
   padding: 4px 16px 8px;
@@ -150,18 +174,82 @@
   color: var(--sg-muted);
 }
 
+/* ListView padding fromLTRB(12, 0, 12, 88) */
 .staff-gallery-page__results {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px;
-  min-height: 120px;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 12px 88px;
+  box-sizing: border-box;
+  overflow: auto;
 }
 
 .staff-gallery-page__empty {
-  margin: 0;
+  margin: auto;
+  padding: 24px 12px;
   font-size: 14px;
   color: var(--sg-muted);
   text-align: center;
+}
+
+/* Category Card chrome — elevation 0, radius 10, border #E2E8E6 (WIRE fills) */
+.staff-gallery-page__category-card {
+  margin: 0 0 6px;
+  background: var(--sg-surface);
+  border: 1px solid var(--sg-border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.staff-gallery-page__category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  min-height: 40px;
+  box-sizing: border-box;
+}
+
+.staff-gallery-page__category-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--sg-text);
+}
+
+.staff-gallery-page__category-chevron {
+  color: var(--sg-muted);
+  display: inline-flex;
+}
+
+/* Item row stock line — normal #64748B / low #DC2626; sub #94A3B8 */
+.staff-gallery-page__item-row {
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+.staff-gallery-page__item-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.staff-gallery-page__item-sub {
+  margin: 0;
+  font-size: 11px;
+  color: var(--sg-sub);
+}
+
+.staff-gallery-page__item-stock {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--sg-muted);
+}
+
+.staff-gallery-page__item-stock--low {
+  color: var(--sg-low);
+  font-weight: 700;
 }

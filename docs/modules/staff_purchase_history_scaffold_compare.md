@@ -8,9 +8,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff stock COMPARE · Staff purchase-history SCAFFOLD · LAYOUT · **FIELDS** |
-| 🟡 Current | `/staff/purchase-history` **FIELDS PASS** — ask before BUTTONS |
-| ⬜ Pending | BUTTONS → COMPARE · other Subagent 4 stubs |
+| ✅ Completed | Staff stock COMPARE · Staff purchase-history SCAFFOLD → **BUTTONS** |
+| 🟡 Current | `/staff/purchase-history` **BUTTONS PASS** — ask before WIRE |
+| ⬜ Pending | WIRE → COMPARE · other Subagent 4 stubs |
 | ⏸ Deferred | `/staff/purchase-history/:purchaseId` detail page · trade-purchases API · Inform owner · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -39,4 +39,4 @@
 
 **Rollback:** Revert SCAFFOLD commit; restore list route → `DashboardRouteStubPage` title “Purchase history”; remove `features/staff/purchaseHistory/*` + this compare + script; boards → ask before purchase-history SCAFFOLD.
 
-**Next (ask first):** FIELDS done — [`staff_purchase_history_fields_compare.md`](staff_purchase_history_fields_compare.md). Ask before BUTTONS.
+**Next (ask first):** BUTTONS done — [`staff_purchase_history_buttons_compare.md`](staff_purchase_history_buttons_compare.md). Ask before WIRE.

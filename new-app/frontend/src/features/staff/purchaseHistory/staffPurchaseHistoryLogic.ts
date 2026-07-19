@@ -139,3 +139,24 @@ export function staffPhLowEmptyTitle(opts: {
     ? STAFF_PH_EMPTY_LOW_SEARCH
     : STAFF_PH_EMPTY_LOW;
 }
+
+/** formatStockQtyNumber — unit_utils.dart (low-stock meta line) */
+export function formatStaffPhQtyNumber(n: number): string {
+  const rounded = Math.round(n);
+  if (Math.abs(n - rounded) < 0.001) {
+    return String(rounded).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+  const s = n.toFixed(2);
+  return s.endsWith("0") ? s.slice(0, -1) : s;
+}
+
+export function lowStockMetaLine(item: StaffPhLowStockRow): string {
+  const cur = asNum(item.current_stock);
+  const reorder = asNum(item.reorder_level);
+  const unit = asStr(item.unit);
+  return `${formatStaffPhQtyNumber(cur)} / ${formatStaffPhQtyNumber(reorder)}${unit ? ` ${unit}` : ""}`;
+}
+
+export function lowStockName(item: StaffPhLowStockRow): string {
+  return asStr(item.name) || "—";
+}

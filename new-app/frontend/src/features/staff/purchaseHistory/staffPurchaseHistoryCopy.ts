@@ -36,5 +36,13 @@ export const STAFF_PH_EMPTY_SEARCH = "No orders match your search";
 export const STAFF_PH_EMPTY_LOW = "No low stock items";
 export const STAFF_PH_EMPTY_LOW_SEARCH = "No items match your search";
 
-/** Low-stock row CTA — _StaffLowStockRow (BUTTONS/WIRE) */
+/** Low-stock row CTA — _StaffLowStockRow */
 export const STAFF_PH_INFORM_OWNER = "Inform owner";
+
+/** Low-stock row / Inform owner → staff_purchase_history_page.dart */
+export const STAFF_PH_LOW_STOCK_PATH = "/staff/low-stock";
+
+/** Detail push — `/staff/purchase-history/${purchase.id}` */
+export function staffPhDetailPath(purchaseId: string): string {
+  return `/staff/purchase-history/${encodeURIComponent(purchaseId)}`;
+}

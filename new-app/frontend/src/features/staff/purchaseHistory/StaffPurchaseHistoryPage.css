@@ -364,15 +364,25 @@
   background: var(--sph-surface);
   border-bottom: 1px solid var(--sph-border);
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 .staff-ph-low-row__icon {
   flex-shrink: 0;
   color: var(--sph-warning);
+  font-size: 20px;
+  font-weight: 800;
+  width: 24px;
+  text-align: center;
 }
 
 .staff-ph-low-row__icon--critical {
   color: var(--sph-critical);
+}
+
+.staff-ph-low-row__body {
+  flex: 1;
+  min-width: 0;
 }
 
 .staff-ph-low-row__name {
@@ -384,4 +394,17 @@
 .staff-ph-low-row__meta {
   font-size: 12px;
   color: var(--sph-muted);
+}
+
+.staff-ph-low-row__inform {
+  flex-shrink: 0;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sph-brand);
+  cursor: pointer;
 }

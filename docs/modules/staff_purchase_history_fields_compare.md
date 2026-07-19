@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff stock COMPARE · Staff purchase-history SCAFFOLD · LAYOUT · **FIELDS** |
-| 🟡 Current | `/staff/purchase-history` **FIELDS PASS** — ask before BUTTONS |
-| ⬜ Pending | BUTTONS → COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | Detail `:purchaseId` · trade-purchases API · Inform owner · Settings · merge to `main` |
+| ✅ Completed | Staff stock COMPARE · Staff purchase-history SCAFFOLD → FIELDS · **BUTTONS** |
+| 🟡 Current | `/staff/purchase-history` **BUTTONS PASS** — ask before WIRE |
+| ⬜ Pending | WIRE → COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | Detail `:purchaseId` · trade-purchases API · full pack · Settings · merge to `main` |
 
 ## Legacy vs New
 
@@ -39,4 +39,4 @@
 
 **Rollback:** Revert FIELDS commit; restore LAYOUT inert search/chips/tabs; remove `staffPurchaseHistoryLogic.ts` + this compare + fields script; boards → ask before FIELDS.
 
-**Next (ask first):** BUTTONS — do not start until approved.
+**Next (ask first):** BUTTONS done — [`staff_purchase_history_buttons_compare.md`](staff_purchase_history_buttons_compare.md). Ask before WIRE.

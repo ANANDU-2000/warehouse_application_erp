@@ -11,10 +11,11 @@ import { UserManagementPage } from "../features/users/UserManagementPage";
 import { UserProfilePage } from "../features/users/UserProfilePage";
 import { NotificationsPage } from "../features/notifications/NotificationsPage";
 import { StaffSearchPage } from "../features/staff/search/StaffSearchPage";
+import { StaffItemGalleryPage } from "../features/staff/items/StaffItemGalleryPage";
 
 /**
  * Splash + Login + owner /home + activity + breakdown-more + staff /staff/home +
- * users + notifications + staff search SCAFFOLD + stubs.
+ * users + notifications + staff search + staff items SCAFFOLD + stubs.
  * Source: docs/05_Navigation_Map.md; dashboard.md
  */
 export function AppRouter() {
@@ -36,10 +37,7 @@ export function AppRouter() {
           element={<DashboardRouteStubPage title="Staff settings" />}
         />
         <Route path="/staff/search" element={<StaffSearchPage />} />
-        <Route
-          path="/staff/items"
-          element={<DashboardRouteStubPage title="Staff gallery" />}
-        />
+        <Route path="/staff/items" element={<StaffItemGalleryPage />} />
         <Route
           path="/staff/stock"
           element={<DashboardRouteStubPage title="Staff stock" />}

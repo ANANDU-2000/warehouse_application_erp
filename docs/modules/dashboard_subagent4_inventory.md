@@ -22,8 +22,8 @@
 | Path | Stub title |
 |---|---|
 | `/staff/settings` | Staff settings (**implement locked** — Settings backend) |
-| `/staff/search` | **COMPARE PASS** — [`staff_search_compare.md`](staff_search_compare.md); ask next stub |
-| `/staff/items` | Staff gallery |
+| `/staff/search` | **COMPARE PASS** — [`staff_search_compare.md`](staff_search_compare.md) |
+| `/staff/items` | **SCAFFOLD PASS** — [`staff_items_scaffold_compare.md`](staff_items_scaffold_compare.md); ask before LAYOUT |
 | `/staff/stock` | Staff stock |
 | `/staff/purchase-history` | Purchase history |
 | `/staff/low-stock` | Staff low stock |
@@ -63,7 +63,7 @@
 
 ## Next (ask first)
 
-1. **Next unlockable Subagent 4 stub** (e.g. `/staff/items`, `/staff/stock`, … — not Settings), **or**  
+1. **`/staff/items` LAYOUT** (SCAFFOLD done), **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Notifications COMPARE done — [`notifications_compare.md`](notifications_compare.md). Staff search COMPARE — [`staff_search_compare.md`](staff_search_compare.md). `/staff/settings` skipped — Settings implement locked.)*
+*(Notifications COMPARE — [`notifications_compare.md`](notifications_compare.md). Staff search COMPARE — [`staff_search_compare.md`](staff_search_compare.md). Staff items SCAFFOLD — [`staff_items_scaffold_compare.md`](staff_items_scaffold_compare.md). `/staff/settings` skipped — Settings implement locked.)*

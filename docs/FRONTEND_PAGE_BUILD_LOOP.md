@@ -141,6 +141,18 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 6 STATES | ✅ | FriendlyLoadError + reload/cold gates + TTL — [`staff_search_states_compare.md`](modules/staff_search_states_compare.md) |
 | 7 COMPARE | ✅ | in-scope PASS — [`staff_search_compare.md`](modules/staff_search_compare.md) |
 
+### Staff item gallery (`/staff/items`) — Subagent 4
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | AppBar + search/filters/summary/results — [`staff_items_scaffold_compare.md`](modules/staff_items_scaffold_compare.md) |
+| 2 LAYOUT | ⬜ | — |
+| 3 FIELDS | ⬜ | — |
+| 4 BUTTONS | ⬜ | — |
+| 5 WIRE | ⬜ | — |
+| 6 STATES | ⬜ | — |
+| 7 COMPARE | ⬜ | — |
+
 ### Prompt template (copy per page)
 
 ```

@@ -14,8 +14,8 @@
 | State | Step |
 |---|---|
 | ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
-| 🟡 Current | Staff search COMPARE PASS — ask before next Subagent 4 stub |
-| ⬜ Pending (ask first) | Next unlockable stub — [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md) |
+| 🟡 Current | Staff items **SCAFFOLD PASS** — ask before LAYOUT |
+| ⬜ Pending (ask first) | Staff items LAYOUT → COMPARE — [`staff_items_scaffold_compare.md`](staff_items_scaffold_compare.md) |
 | ⏸ Deferred | Owner `/search`; `/staff/settings` · `/settings` (implement locked); desktop preview pane; TradeIntel fact-rich tile polish; merge to `main` |
 
 ---
@@ -80,7 +80,7 @@ Docs/checklist + smoke script only: revert COMPARE commit. Application code unch
 
 ## 5. Next after Approve
 
-1. Ask before: **next Subagent 4 satellite** from [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md) (not Settings hub; not owner `/search` unless approved), **or**  
+1. Ask before: **`/staff/items` LAYOUT** (SCAFFOLD done — [`staff_items_scaffold_compare.md`](staff_items_scaffold_compare.md)), **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
 **Do not merge to `main` unless asked.**

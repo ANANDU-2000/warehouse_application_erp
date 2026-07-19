@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff stock COMPARE · Staff purchase-history SCAFFOLD→**WIRE** · **STATES** |
-| 🟡 Current | `/staff/purchase-history` **STATES PASS** — ask before COMPARE |
-| ⬜ Pending | COMPARE · `/staff/low-stock` · other Subagent 4 stubs |
+| ✅ Completed | Staff stock COMPARE · Staff purchase-history SCAFFOLD→**WIRE** · **STATES** · **COMPARE** |
+| 🟡 Current | `/staff/purchase-history` **COMPARE PASS** — ask before next stub |
+| ⬜ Pending | `/staff/low-stock` · other Subagent 4 stubs |
 | ⏸ Deferred | full pack · delivery badge · detail body · staff ₹ redact · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -34,4 +34,4 @@
 
 **Rollback:** Revert STATES commit; restore WIRE string error + text loading; remove `staffPurchaseHistoryLoadSubtitle.ts` + this compare + `test:staff-purchase-history-states`; boards → ask before STATES.
 
-**Next (ask first):** COMPARE — do not start until approved.
+**Next (ask first):** COMPARE done — [`staff_purchase_history_compare.md`](staff_purchase_history_compare.md). Ask before next Subagent 4 stub.

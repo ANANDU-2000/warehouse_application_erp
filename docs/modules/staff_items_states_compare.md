@@ -7,8 +7,8 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff search COMPARE · Staff items SCAFFOLD→**COMPARE** |
-| 🟡 Current | Staff items **COMPARE PASS** — ask before next stub |
+| ✅ Completed | Staff search COMPARE · Staff items SCAFFOLD→**COMPARE** · Staff stock **COMPARE** |
+| 🟡 Current | Staff stock **COMPARE PASS** — ask before next Subagent 4 stub |
 | ⬜ Pending | Other Subagent 4 stubs |
 | ⏸ Deferred | `/staff/settings` · `/settings`; QuickStockActionSheet |
 

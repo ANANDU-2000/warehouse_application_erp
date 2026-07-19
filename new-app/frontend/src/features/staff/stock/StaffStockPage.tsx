@@ -1,15 +1,17 @@
 /**
- * Staff stock `/staff/stock` — WIRE (Step 5).
- * Source: stockListProvider / hexa_api.listStock · StockWarehouseRow SYS/PHYS/DIFF.
+ * Staff stock `/staff/stock` — STATES (Step 6).
+ * Source: stock_page.dart AsyncValue ListSkeleton / FriendlyLoadError;
+ * kStockListCacheTtl 3m; RefreshIndicator; StockOperationalTopBar isReloading.
  * Deferred: delivery-indicator-counts · Activity feed · period purchased · shell-bundle.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type TouchEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { readPrimaryBusiness } from "../../../shared/auth/sessionStore";
 import type { HomePeriod } from "../../home/homePeriod";
 import {
   STAFF_STOCK_ACTIVITY_EMPTY,
   STAFF_STOCK_BACK_HOME,
+  STAFF_STOCK_CACHE_TTL_MS,
   STAFF_STOCK_DEBOUNCE_MS,
   STAFF_STOCK_DEFAULT_SORT,
   STAFF_STOCK_FILTER_APPLY,
@@ -23,7 +25,6 @@ import {
   STAFF_STOCK_HDR_ITEM,
   STAFF_STOCK_HDR_PHYS,
   STAFF_STOCK_HDR_SYS,
-  STAFF_STOCK_LOAD_FAILED,
   STAFF_STOCK_LOAD_MORE,
   STAFF_STOCK_LOADING,
   STAFF_STOCK_MENU_SCAN,
@@ -58,6 +59,10 @@ import {
   staffStockListEmptyTitle,
   type StaffStockRow,
 } from "./staffStockLogic";
+import {
+  mapStaffStockLoadSubtitle,
+  mapStaffStockLoadTitle,
+} from "./staffStockLoadSubtitle";
 import {
   STAFF_STOCK_DEFAULT_PERIOD,
   STAFF_STOCK_PERIOD_BADGE,
@@ -101,6 +106,34 @@ const TAB_LABEL: Record<StaffStockTab, string> = {
   activity: STAFF_STOCK_TAB_ACTIVITY,
 };
 
+type StockListCacheEntry = {
+  at: number;
+  items: StaffStockRow[];
+  total: number;
+};
+
+/** Query-keyed RAM cache — stockListCachedDataForCurrentQuery / kStockListCacheTtl. */
+const stockListCache = new Map<string, StockListCacheEntry>();
+
+function stockCacheKey(
+  businessId: string,
+  status: StaffStockStatus,
+  q: string,
+  op: StaffStockOpFilters,
+): string {
+  return [
+    businessId,
+    status,
+    q,
+    op.reorderOnly ? "1" : "0",
+    op.purchasedInPeriodOnly ? "1" : "0",
+    op.missingBarcodeOnly ? "1" : "0",
+    op.missingItemCodeOnly ? "1" : "0",
+    op.unit.trim(),
+    op.subcategory.trim(),
+  ].join("|");
+}
+
 /** Flutter top bar: context.go(staff ? '/staff/home' : '/home'). */
 function goStaffHome(navigate: ReturnType<typeof useNavigate>): void {
   navigate(STAFF_STOCK_BACK_HOME);
@@ -137,8 +170,10 @@ export function StaffStockPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<unknown | null>(null);
   const [retryTick, setRetryTick] = useState(0);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const pullStartY = useRef<number | null>(null);
 
   useEffect(() => {
     const t = window.setTimeout(() => {
@@ -150,16 +185,37 @@ export function StaffStockPage() {
   useEffect(() => {
     setPage(1);
     setAllItems([]);
+    setHasLoadedOnce(false);
+    setLoadError(null);
+    setLoading(true);
   }, [debounced, status, op, retryTick]);
 
   useEffect(() => {
     if (!businessId) {
       setLoading(false);
+      setLoadingMore(false);
+      setAllItems([]);
       setLoadError("Not signed in");
+      setHasLoadedOnce(true);
       return;
     }
     let cancelled = false;
     const isFirst = page <= 1;
+    const key = stockCacheKey(businessId, status, debounced, op);
+
+    if (isFirst && retryTick === 0) {
+      const cached = stockListCache.get(key);
+      if (cached && Date.now() - cached.at < STAFF_STOCK_CACHE_TTL_MS) {
+        setAllItems(cached.items);
+        setTotal(cached.total);
+        setLoading(false);
+        setLoadingMore(false);
+        setLoadError(null);
+        setHasLoadedOnce(true);
+        return;
+      }
+    }
+
     if (isFirst) setLoading(true);
     else setLoadingMore(true);
     setLoadError(null);
@@ -178,16 +234,25 @@ export function StaffStockPage() {
         setAllItems((prev) =>
           page <= 1 ? res.items : [...prev, ...res.items],
         );
+        if (page <= 1) {
+          stockListCache.set(key, {
+            at: Date.now(),
+            items: res.items,
+            total: res.total,
+          });
+        }
+        setHasLoadedOnce(true);
       })
       .catch((err: unknown) => {
         if (cancelled) return;
-        if (err instanceof StaffStockNetworkError) {
-          setLoadError(err.message);
-        } else if (err instanceof StaffStockApiError) {
-          setLoadError(err.detail);
-        } else {
-          setLoadError(STAFF_STOCK_LOAD_FAILED);
-        }
+        if (page <= 1) setAllItems([]);
+        setLoadError(
+          err instanceof StaffStockNetworkError ||
+            err instanceof StaffStockApiError
+            ? err
+            : err,
+        );
+        setHasLoadedOnce(true);
       })
       .finally(() => {
         if (cancelled) return;
@@ -209,8 +274,25 @@ export function StaffStockPage() {
       purchasedInPeriodOnly: op.purchasedInPeriodOnly,
     },
   });
+
+  /** Flutter: data != null → list; data == null + loading → skeleton; error → FriendlyLoadError */
+  const hasListData = allItems.length > 0 || (hasLoadedOnce && loadError == null);
+  const isReloading = loading && allItems.length > 0;
+  const showInitialSkeleton =
+    tab === "stock" &&
+    loading &&
+    allItems.length === 0 &&
+    loadError == null;
+  const showError =
+    tab === "stock" && loadError != null && allItems.length === 0;
+  const showListChrome =
+    tab === "stock" && !showInitialSkeleton && !showError && hasListData;
+  const showDebounceProgress = query.trim() !== debounced;
+  const errorTitle = mapStaffStockLoadTitle(loadError);
+  const errorSubtitle = mapStaffStockLoadSubtitle(loadError);
+
   const emptyTitle =
-    !loading && !loadError
+    showListChrome && !loading && !loadError
       ? staffStockListEmptyTitle({
           itemCount: displayRows.length,
           status,
@@ -219,6 +301,7 @@ export function StaffStockPage() {
         })
       : null;
   const canLoadMore =
+    showListChrome &&
     !loading &&
     !loadingMore &&
     !loadError &&
@@ -261,11 +344,33 @@ export function StaffStockPage() {
   }
 
   function retryLoad(): void {
+    if (businessId) {
+      stockListCache.delete(stockCacheKey(businessId, status, debounced, op));
+    }
     setRetryTick((n) => n + 1);
   }
 
+  function onPullTouchStart(e: TouchEvent): void {
+    pullStartY.current = e.touches[0]?.clientY ?? null;
+  }
+
+  function onPullTouchEnd(e: TouchEvent): void {
+    const start = pullStartY.current;
+    pullStartY.current = null;
+    if (start == null) return;
+    const end = e.changedTouches[0]?.clientY ?? start;
+    if (end - start > 70) retryLoad();
+  }
+
   return (
-    <div className="staff-stock-page" data-page="staff-stock">
+    <div
+      className="staff-stock-page"
+      data-page="staff-stock"
+      data-loading={loading ? "true" : "false"}
+      data-load-error={loadError != null ? "true" : "false"}
+      data-show-list={showListChrome ? "true" : "false"}
+      data-reloading={isReloading ? "true" : "false"}
+    >
       <header className="staff-stock-appbar" data-slot="appBar">
         <div className="staff-stock-appbar__row">
           <button
@@ -366,6 +471,14 @@ export function StaffStockPage() {
             </div>
           </div>
         </div>
+        {isReloading ? (
+          <div
+            className="staff-stock-appbar__reload"
+            data-slot="reloading"
+            role="progressbar"
+            aria-label="Reloading"
+          />
+        ) : null}
         <div
           className="staff-stock-tabs staff-stock-tabs--active"
           data-slot="tabs"
@@ -507,155 +620,211 @@ export function StaffStockPage() {
         </div>
       ) : null}
 
-      <main className="staff-stock-body" data-slot="body">
+      <main
+        className="staff-stock-body"
+        data-slot="body"
+        onTouchStart={onPullTouchStart}
+        onTouchEnd={onPullTouchEnd}
+      >
         {tab === "stock" ? (
           <>
-            <div
-              className="staff-stock-status-chips staff-stock-status-chips--active"
-              data-slot="statusChips"
-            >
-              {STAFF_STOCK_STATUS_ORDER.map((key) => (
-                <button
-                  key={key}
-                  type="button"
-                  className={[
-                    "staff-stock-chip",
-                    STATUS_CHIP_MOD[key],
-                    status === key ? "staff-stock-chip--active" : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  onClick={() => setStatus(key)}
-                >
-                  {STATUS_LABEL[key]}
-                </button>
-              ))}
-            </div>
-            {searchExpanded ? (
+            {showDebounceProgress ? (
               <div
-                className="staff-stock-search staff-stock-search--active"
-                data-slot="search"
+                className="staff-stock-debounce-progress"
+                data-slot="debounceProgress"
+                role="progressbar"
+                aria-label="Updating search"
+              />
+            ) : null}
+            {showInitialSkeleton ? (
+              <div
+                className="staff-stock-skeleton"
+                data-slot="loading"
+                data-testid="staff-stock-loading"
+                role="status"
+                aria-label={STAFF_STOCK_LOADING}
               >
-                <input
-                  className="staff-stock-search__input staff-stock-search__input--active"
-                  type="search"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={STAFF_STOCK_SEARCH_HINT}
-                  aria-label={STAFF_STOCK_SEARCH_HINT}
-                />
-                {query.trim().length > 0 ? (
-                  <button
-                    type="button"
-                    className="staff-stock-search__clear"
-                    aria-label="Clear"
-                    onClick={() => setQuery("")}
-                  >
-                    ×
-                  </button>
-                ) : null}
+                {Array.from({ length: 12 }, (_, i) => (
+                  <div
+                    key={i}
+                    className="staff-stock-skeleton__row"
+                    aria-hidden="true"
+                  />
+                ))}
               </div>
-            ) : (
-              <div data-slot="search" hidden />
-            )}
-            <div
-              className="staff-stock-delivery"
-              data-slot="deliveryChips"
-              data-deferred="delivery-counts"
-            />
-            <div className="staff-stock-table-header" data-slot="tableHeader">
-              <div className="staff-stock-table-header__item">
-                {STAFF_STOCK_HDR_ITEM}
+            ) : null}
+            {showError ? (
+              <div
+                className="staff-stock-friendly-error"
+                data-slot="error"
+                data-testid="staff-stock-error"
+              >
+                <span
+                  className="staff-stock-friendly-error__icon"
+                  aria-hidden="true"
+                >
+                  ☁
+                </span>
+                <p className="staff-stock-friendly-error__title friendly-error">
+                  {errorTitle}
+                </p>
+                <p className="staff-stock-friendly-error__sub">
+                  {errorSubtitle}
+                </p>
+                <button
+                  type="button"
+                  className="staff-stock-friendly-error__retry"
+                  data-testid="staff-stock-retry"
+                  onClick={retryLoad}
+                >
+                  {STAFF_STOCK_RETRY}
+                </button>
               </div>
-              <div className="staff-stock-table-header__metric">
-                {STAFF_STOCK_HDR_SYS}
-              </div>
-              <div className="staff-stock-table-header__metric">
-                {STAFF_STOCK_HDR_PHYS}
-              </div>
-              <div className="staff-stock-table-header__metric">
-                {STAFF_STOCK_HDR_DIFF}
-              </div>
-            </div>
-            <div className="staff-stock-results" data-slot="results">
-              {loading ? (
-                <div className="staff-stock-results__empty" data-slot="loading">
-                  {STAFF_STOCK_LOADING}
-                </div>
-              ) : null}
-              {loadError && !loading ? (
-                <div className="staff-stock-results__error" data-slot="error">
-                  <div>{STAFF_STOCK_LOAD_FAILED}</div>
-                  <div className="staff-stock-results__error-detail">
-                    {loadError}
-                  </div>
-                  <button type="button" onClick={retryLoad}>
-                    {STAFF_STOCK_RETRY}
-                  </button>
-                </div>
-              ) : null}
-              {!loading && !loadError && emptyTitle ? (
-                <div className="staff-stock-results__empty" data-slot="empty">
-                  {emptyTitle}
-                </div>
-              ) : null}
-              {!loading && !loadError && displayRows.length > 0 ? (
-                <div className="staff-stock-list" data-slot="list">
-                  {displayRows.map((row, i) => {
-                    const id = itemId(row);
-                    const name = String(row.name ?? "").trim() || "—";
-                    const low = stockRowIsLowOrCritical(row);
-                    const diff = stockRowDiffLabel(row);
-                    return (
-                      <button
-                        key={id || `row-${i}`}
-                        type="button"
-                        className={
-                          low
-                            ? "staff-stock-row staff-stock-row--low"
-                            : "staff-stock-row"
-                        }
-                        data-slot="itemRow"
-                        onClick={() => openItem(row)}
-                      >
-                        <div className="staff-stock-row__item">
-                          <div className="staff-stock-row__name">{name}</div>
-                          <div className="staff-stock-row__meta">
-                            {stockRowMetaLine(row)}
-                          </div>
-                        </div>
-                        <div className="staff-stock-row__metric">
-                          {stockRowSystemLabel(row)}
-                        </div>
-                        <div className="staff-stock-row__metric">
-                          {stockRowPhysicalLabel(row)}
-                        </div>
-                        <div
-                          className={
-                            diff.startsWith("-")
-                              ? "staff-stock-row__metric staff-stock-row__metric--diff-neg"
-                              : "staff-stock-row__metric"
-                          }
-                        >
-                          {diff}
-                        </div>
-                      </button>
-                    );
-                  })}
-                  {canLoadMore ? (
+            ) : null}
+            {showListChrome ? (
+              <>
+                <div
+                  className="staff-stock-status-chips staff-stock-status-chips--active"
+                  data-slot="statusChips"
+                >
+                  {STAFF_STOCK_STATUS_ORDER.map((key) => (
                     <button
+                      key={key}
                       type="button"
-                      className="staff-stock-load-more"
-                      data-action="load-more"
-                      disabled={loadingMore}
-                      onClick={() => setPage((p) => p + 1)}
+                      className={[
+                        "staff-stock-chip",
+                        STATUS_CHIP_MOD[key],
+                        status === key ? "staff-stock-chip--active" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      onClick={() => setStatus(key)}
                     >
-                      {loadingMore ? STAFF_STOCK_LOADING : STAFF_STOCK_LOAD_MORE}
+                      {STATUS_LABEL[key]}
                     </button>
+                  ))}
+                </div>
+                {searchExpanded ? (
+                  <div
+                    className="staff-stock-search staff-stock-search--active"
+                    data-slot="search"
+                  >
+                    <input
+                      className="staff-stock-search__input staff-stock-search__input--active"
+                      type="search"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder={STAFF_STOCK_SEARCH_HINT}
+                      aria-label={STAFF_STOCK_SEARCH_HINT}
+                    />
+                    {query.trim().length > 0 ? (
+                      <button
+                        type="button"
+                        className="staff-stock-search__clear"
+                        aria-label="Clear"
+                        onClick={() => setQuery("")}
+                      >
+                        ×
+                      </button>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div data-slot="search" hidden />
+                )}
+                <div
+                  className="staff-stock-delivery"
+                  data-slot="deliveryChips"
+                  data-deferred="delivery-counts"
+                />
+                <div
+                  className="staff-stock-table-header"
+                  data-slot="tableHeader"
+                >
+                  <div className="staff-stock-table-header__item">
+                    {STAFF_STOCK_HDR_ITEM}
+                  </div>
+                  <div className="staff-stock-table-header__metric">
+                    {STAFF_STOCK_HDR_SYS}
+                  </div>
+                  <div className="staff-stock-table-header__metric">
+                    {STAFF_STOCK_HDR_PHYS}
+                  </div>
+                  <div className="staff-stock-table-header__metric">
+                    {STAFF_STOCK_HDR_DIFF}
+                  </div>
+                </div>
+                <div className="staff-stock-results" data-slot="results">
+                  {emptyTitle ? (
+                    <div
+                      className="staff-stock-results__empty"
+                      data-slot="empty"
+                    >
+                      {emptyTitle}
+                    </div>
+                  ) : null}
+                  {displayRows.length > 0 ? (
+                    <div className="staff-stock-list" data-slot="list">
+                      {displayRows.map((row, i) => {
+                        const id = itemId(row);
+                        const name = String(row.name ?? "").trim() || "—";
+                        const low = stockRowIsLowOrCritical(row);
+                        const diff = stockRowDiffLabel(row);
+                        return (
+                          <button
+                            key={id || `row-${i}`}
+                            type="button"
+                            className={
+                              low
+                                ? "staff-stock-row staff-stock-row--low"
+                                : "staff-stock-row"
+                            }
+                            data-slot="itemRow"
+                            onClick={() => openItem(row)}
+                          >
+                            <div className="staff-stock-row__item">
+                              <div className="staff-stock-row__name">
+                                {name}
+                              </div>
+                              <div className="staff-stock-row__meta">
+                                {stockRowMetaLine(row)}
+                              </div>
+                            </div>
+                            <div className="staff-stock-row__metric">
+                              {stockRowSystemLabel(row)}
+                            </div>
+                            <div className="staff-stock-row__metric">
+                              {stockRowPhysicalLabel(row)}
+                            </div>
+                            <div
+                              className={
+                                diff.startsWith("-")
+                                  ? "staff-stock-row__metric staff-stock-row__metric--diff-neg"
+                                  : "staff-stock-row__metric"
+                              }
+                            >
+                              {diff}
+                            </div>
+                          </button>
+                        );
+                      })}
+                      {canLoadMore ? (
+                        <button
+                          type="button"
+                          className="staff-stock-load-more"
+                          data-action="load-more"
+                          disabled={loadingMore}
+                          onClick={() => setPage((p) => p + 1)}
+                        >
+                          {loadingMore
+                            ? STAFF_STOCK_LOADING
+                            : STAFF_STOCK_LOAD_MORE}
+                        </button>
+                      ) : null}
+                    </div>
                   ) : null}
                 </div>
-              ) : null}
-            </div>
+              </>
+            ) : null}
           </>
         ) : (
           <div

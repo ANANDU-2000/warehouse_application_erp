@@ -24,7 +24,7 @@
 | `/staff/settings` | Staff settings (**implement locked** — Settings backend) |
 | `/staff/search` | **COMPARE PASS** — [`staff_search_compare.md`](staff_search_compare.md) |
 | `/staff/items` | **COMPARE PASS** — [`staff_items_compare.md`](staff_items_compare.md) |
-| `/staff/stock` | **WIRE PASS** — [`staff_stock_wire_compare.md`](staff_stock_wire_compare.md); ask before STATES |
+| `/staff/stock` | **COMPARE PASS** — [`staff_stock_compare.md`](staff_stock_compare.md); ask before next stub |
 | `/staff/purchase-history` | Purchase history |
 | `/staff/low-stock` | Staff low stock |
 | `/staff/activity` | Staff activity (full log) |
@@ -63,7 +63,8 @@
 
 ## Next (ask first)
 
-1. **`/staff/stock` STATES** (WIRE done), **or**  
-2. Hold / merge review of `ops/dashboard-module` → `main`.
+1. **`/staff/purchase-history`** (next staff nest stub), **or**  
+2. Another Subagent 4 stub from this inventory, **or**  
+3. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Notifications COMPARE — [`notifications_compare.md`](notifications_compare.md). Staff search COMPARE — [`staff_search_compare.md`](staff_search_compare.md). Staff items COMPARE — [`staff_items_compare.md`](staff_items_compare.md). Staff stock WIRE — [`staff_stock_wire_compare.md`](staff_stock_wire_compare.md). `/staff/settings` skipped — Settings implement locked.)*
+*(Notifications COMPARE — [`notifications_compare.md`](notifications_compare.md). Staff search COMPARE — [`staff_search_compare.md`](staff_search_compare.md). Staff items COMPARE — [`staff_items_compare.md`](staff_items_compare.md). Staff stock COMPARE — [`staff_stock_compare.md`](staff_stock_compare.md). `/staff/settings` skipped — Settings implement locked.)*

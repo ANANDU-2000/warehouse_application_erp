@@ -498,6 +498,126 @@
   margin: 0 var(--ss-gutter);
 }
 
+.staff-stock-appbar__reload {
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--ss-brand),
+    transparent
+  );
+  animation: staff-stock-reload-slide 1s linear infinite;
+}
+
+@keyframes staff-stock-reload-slide {
+  0% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.35;
+  }
+}
+
+.staff-stock-debounce-progress {
+  height: 2px;
+  width: 100%;
+  flex-shrink: 0;
+  background: var(--ss-brand);
+  opacity: 0.85;
+}
+
+.staff-stock-skeleton {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px var(--ss-gutter) 24px;
+  box-sizing: border-box;
+}
+
+.staff-stock-skeleton__row {
+  height: 56px;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    #ebe8e2 0%,
+    #f5f3ee 40%,
+    #ebe8e2 80%
+  );
+  background-size: 200% 100%;
+  animation: staff-stock-skeleton-shine 1.2s ease-in-out infinite;
+}
+
+@keyframes staff-stock-skeleton-shine {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.staff-stock-friendly-error {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  max-width: 400px;
+  margin: auto;
+  padding: 22px 20px 20px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  background: rgba(239, 242, 241, 0.65);
+  border: 1px solid rgba(215, 231, 227, 0.5);
+  gap: 10px;
+}
+
+.staff-stock-friendly-error__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(216, 236, 232, 0.55);
+  color: var(--ss-brand);
+  font-size: 28px;
+  line-height: 1;
+}
+
+.staff-stock-friendly-error__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ss-fg);
+}
+
+.staff-stock-friendly-error__sub {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ss-muted);
+}
+
+.staff-stock-friendly-error__retry {
+  margin-top: 4px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  background: var(--ss-brand);
+  color: #ffffff;
+  cursor: pointer;
+}
+
 .staff-stock-results__error {
   display: flex;
   flex-direction: column;

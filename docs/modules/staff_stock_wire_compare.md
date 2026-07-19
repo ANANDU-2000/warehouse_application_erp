@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff items COMPARE · Staff stock SCAFFOLD → BUTTONS · **WIRE** |
-| 🟡 Current | Staff stock **WIRE PASS** — ask before STATES |
-| ⬜ Pending | Staff stock STATES → COMPARE · other Subagent 4 stubs |
+| ✅ Completed | Staff items COMPARE · Staff stock SCAFFOLD→**WIRE** · STATES · **COMPARE** |
+| 🟡 Current | Staff stock **COMPARE PASS** — ask before next stub |
+| ⬜ Pending | `/staff/purchase-history` · other Subagent 4 stubs |
 | ⏸ Deferred | delivery-indicator-counts · Activity feed · period purchased totals · shell-bundle · subcategory/supplier pickers |
 
 ## Legacy vs New
@@ -38,4 +38,4 @@
 
 **Rollback:** Revert WIRE commit; restore BUTTONS empty catalog; remove `staffStockApi.ts` / row metrics; roll back listStock query extensions if needed; boards → ask before WIRE.
 
-**Next (ask first):** `/staff/stock` STATES — do not start until approved.
+**Next (ask first):** COMPARE done — [`staff_stock_compare.md`](staff_stock_compare.md). Ask before next Subagent 4 stub.

@@ -13,9 +13,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
-| 🟡 Current | Staff stock **WIRE PASS** — ask before STATES |
-| ⬜ Pending (ask first) | Staff stock STATES → COMPARE · other Subagent 4 stubs |
+| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** · Staff stock **COMPARE** |
+| 🟡 Current | Staff stock **COMPARE PASS** — ask before next Subagent 4 stub |
+| ⬜ Pending (ask first) | `/staff/purchase-history` · other Subagent 4 stubs |
 | ⏸ Deferred | `/staff/settings` · `/settings` (implement locked); QuickStockActionSheet; full StockListItemOut trade/period meta; merge to `main` |
 
 ---
@@ -79,7 +79,7 @@ Docs/checklist + smoke script only: revert COMPARE commit. Application code unch
 
 ## 5. Next after Approve
 
-1. Ask before: **`/staff/stock` STATES** (WIRE done — [`staff_stock_wire_compare.md`](staff_stock_wire_compare.md)), **or**  
+1. Ask before: **`/staff/purchase-history`** (or other inventory stub — [`dashboard_subagent4_inventory.md`](dashboard_subagent4_inventory.md)), **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
 **Do not merge to `main` unless asked.**

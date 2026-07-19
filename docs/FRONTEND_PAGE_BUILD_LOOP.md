@@ -102,7 +102,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 4 BUTTONS | ✅ | back/select/Add/drawer/bulk — [`users_management_buttons_compare.md`](modules/users_management_buttons_compare.md) |
 | 5 WIRE | ✅ | list/create/bulk + cards — [`users_management_wire_compare.md`](modules/users_management_wire_compare.md) |
 | 6 STATES | ✅ | ListSkeleton + HexaErrorCard — [`users_management_states_compare.md`](modules/users_management_states_compare.md) |
-| 7 COMPARE | ⬜ | Ask before next |
+| 7 COMPARE | ✅ | Master PASS — [`users_management_compare.md`](modules/users_management_compare.md) |
 
 ### Prompt template (copy per page)
 

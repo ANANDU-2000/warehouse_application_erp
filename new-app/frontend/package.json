@@ -56,7 +56,8 @@
     "test:users-management-fields": "node scripts/check-users-management-fields.mjs",
     "test:users-management-buttons": "node scripts/check-users-management-buttons.mjs",
     "test:users-management-wire": "node scripts/check-users-management-wire.mjs",
-    "test:users-management-states": "node scripts/check-users-management-states.mjs"
+    "test:users-management-states": "node scripts/check-users-management-states.mjs",
+    "test:users-management-compare": "node scripts/check-users-management-compare.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

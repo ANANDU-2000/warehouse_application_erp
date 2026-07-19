@@ -8,9 +8,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · **STATES** |
-| 🟡 Current | STATES done — ask before **COMPARE** |
-| ⬜ Pending | **COMPARE** · profile page · Subagent 4 |
+| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · STATES · **COMPARE** |
+| 🟡 Current | COMPARE done — ask before profile SCAFFOLD **or** Subagent 4 |
+| ⬜ Pending | Profile `/settings/users/:userId` · Subagent 4 |
 | ⏸ Deferred | Pull-to-refresh gesture; card overflow menus; desktop detail panel |
 
 ## Legacy vs New
@@ -32,4 +32,4 @@
 
 **Rollback:** Revert STATES commit; restore WIRE minimal loading/error in list slot; remove states compare + script; boards → ask before STATES.
 
-**Next (ask first):** `/settings/users` COMPARE — full Legacy vs New PASS/FAIL.
+**Next (ask first):** `/settings/users` COMPARE — done → [`users_management_compare.md`](users_management_compare.md). Ask before profile SCAFFOLD or Subagent 4.

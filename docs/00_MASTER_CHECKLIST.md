@@ -53,7 +53,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). Products **Slice 5 PASS** ([`products_backend_slice5.md`](modules/products_backend_slice5.md)). Ask before Slice 6. Purchase / barcode / receive remain **backend-blocked**.
+**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). Products **Slice 6 PASS** ([`products_backend_slice6.md`](modules/products_backend_slice6.md)). Ask before Slice 7. Purchase / barcode / receive remain **backend-blocked**.
 
 ### Cursor operator setup (workspace)
 
@@ -111,7 +111,7 @@
 
 ## PHASE 4 — Frontend Migration (React + TypeScript) 🟡
 
-**Unlocked.** Phase 3 platform PASS. Dashboard nest COMPLETE. Products Slice 5 PASS. Ask before Products Slice 6.
+**Unlocked.** Phase 3 platform PASS. Dashboard nest COMPLETE. Products Slice 6 PASS. Ask before Products Slice 7.
 
 | # | Task | Status |
 |---|---|---|
@@ -125,7 +125,7 @@
 | 4.8 | Accessibility | 🔒 |
 | 4.9 | Phase 4 sign-off (per module) | 🔒 |
 
-**4.2 / 4.5 note:** Dashboard nest COMPLETE. Products backend Slice 5 — [`products_backend_slice5.md`](modules/products_backend_slice5.md). Ask before Slice 6 / catalog UI. Settings hub skipped (implement locked).
+**4.2 / 4.5 note:** Dashboard nest COMPLETE. Products backend Slice 6 — [`products_backend_slice6.md`](modules/products_backend_slice6.md). Ask before Slice 7 / catalog UI. Settings hub skipped (implement locked).
  
 ---
 
@@ -203,4 +203,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-19 — Products backend Slice 5 PASS ([`products_backend_slice5.md`](modules/products_backend_slice5.md)); ask before Slice 6.*
+*Last updated: 2026-07-19 — Products backend Slice 6 PASS ([`products_backend_slice6.md`](modules/products_backend_slice6.md)); ask before Slice 7.*

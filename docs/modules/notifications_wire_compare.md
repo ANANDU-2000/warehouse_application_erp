@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · **WIRE** |
-| 🟡 Current | WIRE PASS — ask before **STATES** |
-| ⬜ Pending | STATES→COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | Purchase-due synthetics (trade list lacks `remaining`/`due_date`); Approve/Review actions; pull-to-refresh polish |
+| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · WIRE · **STATES** |
+| 🟡 Current | STATES PASS — ask before **COMPARE** |
+| ⬜ Pending | COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | Purchase-due synthetics (trade list lacks `remaining`/`due_date`); Approve/Review actions |
 
 ## Legacy vs New
 
@@ -36,4 +36,4 @@
 
 **Rollback:** Revert WIRE commit; restore BUTTONS stubs (no fetch); remove mark-all/clear/patch backend routes + feed/api/card; remove this compare + script; boards → ask before WIRE.
 
-**Next (ask first):** `/notifications` STATES.
+**Next (ask first):** `/notifications` STATES — done → [`notifications_states_compare.md`](notifications_states_compare.md). Ask before COMPARE.

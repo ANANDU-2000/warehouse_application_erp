@@ -16,6 +16,30 @@ export const NOTIFICATIONS_CLEAR_TOOLTIP = "Clear server notifications";
 export const NOTIFICATIONS_LOAD_ERROR =
   "Could not refresh server notifications";
 export const NOTIFICATIONS_RETRY = "Retry";
+/** friendly_load_error.dart kFriendlyLoadNetworkSubtitle */
+export const NOTIFICATIONS_RETRY_SUBTITLE = "Tap to retry.";
+/** load_state_error.dart status subtitles */
+export const NOTIFICATIONS_SUBTITLE_400 =
+  "Invalid request. Please check your input.";
+export const NOTIFICATIONS_SUBTITLE_401 =
+  "Session expired. Please log in again.";
+export const NOTIFICATIONS_SUBTITLE_402 =
+  "Monthly AI usage limit reached. Contact your owner or try again next month.";
+export const NOTIFICATIONS_SUBTITLE_403 =
+  "You don't have permission for this.";
+export const NOTIFICATIONS_SUBTITLE_404 = "Not found.";
+export const NOTIFICATIONS_SUBTITLE_408 =
+  "Request timed out. Please try again.";
+export const NOTIFICATIONS_SUBTITLE_409 =
+  "That conflicts with existing data. Try again.";
+export const NOTIFICATIONS_SUBTITLE_429 =
+  "Too many requests. Wait a moment and try again.";
+export const NOTIFICATIONS_SUBTITLE_503 =
+  "Server is starting up — wait about 30 seconds, then tap Retry.";
+export const NOTIFICATIONS_SUBTITLE_5XX =
+  "Server error. Please try again shortly.";
+export const NOTIFICATIONS_SUBTITLE_NO_CONNECTION =
+  "No connection. Check your network and try again.";
 export const NOTIFICATIONS_SECTION_TODAY = "Today";
 export const NOTIFICATIONS_SECTION_YESTERDAY = "Yesterday";
 export const NOTIFICATIONS_SECTION_EARLIER = "Earlier";

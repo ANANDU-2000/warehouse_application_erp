@@ -32,4 +32,4 @@
 
 **Rollback:** Revert BUTTONS commit; restore FIELDS inert AppBar + aria-disabled CTA; remove clear dialog CSS/copy + this compare + script; boards → ask before BUTTONS.
 
-**Next (ask first):** `/notifications` WIRE — done → [`notifications_wire_compare.md`](notifications_wire_compare.md). Ask before STATES.
+**Next (ask first):** `/notifications` WIRE — done → [`notifications_wire_compare.md`](notifications_wire_compare.md). Ask before COMPARE.

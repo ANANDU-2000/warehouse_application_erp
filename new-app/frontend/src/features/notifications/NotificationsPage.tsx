@@ -1,9 +1,9 @@
 /**
- * Notifications `/notifications` — WIRE (Step 5).
- * Source: notifications_page.dart + mergedNotificationFeedProvider;
+ * Notifications `/notifications` — STATES (Step 6).
+ * Source: notifications_page.dart loading/error/empty + RefreshIndicator;
  * purchase-due alerts deferred (trade list lacks remaining/due_date).
  */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import {
@@ -21,8 +21,6 @@ import {
   clearAllAppNotifications,
   listAppNotifications,
   markAllAppNotificationsRead,
-  NotificationsApiError,
-  NotificationsNetworkError,
   patchAppNotificationRead,
 } from "./notificationsApi";
 import {
@@ -65,6 +63,7 @@ import {
   NOTIFICATIONS_FILTER_ORDER_STAFF,
   type NotificationCategoryFilter,
 } from "./notificationsFilters";
+import { mapNotificationsLoadSubtitle } from "./notificationsLoadSubtitle";
 import "./NotificationsPage.css";
 
 /** Flutter navigation_ext.popOrGo — pop when stack allows, else go fallback. */
@@ -89,13 +88,6 @@ function day0(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
-function loadErrorMessage(error: unknown): string {
-  if (error instanceof NotificationsApiError) return error.detail;
-  if (error instanceof NotificationsNetworkError) return error.message;
-  if (error instanceof Error) return error.message;
-  return "Something went wrong. Please try again.";
-}
-
 export function NotificationsPage() {
   const navigate = useNavigate();
   const session = readPrimaryBusiness();
@@ -109,8 +101,11 @@ export function NotificationsPage() {
   const [filter, setFilter] = useState<NotificationCategoryFilter>("all");
   const [search, setSearch] = useState("");
   const [clearOpen, setClearOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [serverError, setServerError] = useState<string | null>(null);
+  /** serverAsync.isLoading — LinearProgressIndicator */
+  const [serverLoading, setServerLoading] = useState(true);
+  /** stockStatusCountsProvider.isLoading — gates empty HexaEmptyState */
+  const [stockLoading, setStockLoading] = useState(true);
+  const [serverError, setServerError] = useState<unknown>(null);
   const [serverRows, setServerRows] = useState<Record<string, unknown>[]>([]);
   const [alerts, setAlerts] = useState<StockAlertsSummaryOut | null>(null);
   const [openingCount, setOpeningCount] = useState(0);
@@ -124,20 +119,32 @@ export function NotificationsPage() {
     () => new Set(),
   );
   const [retryTick, setRetryTick] = useState(0);
+  const listRef = useRef<HTMLElement | null>(null);
+  const pullStartY = useRef<number | null>(null);
 
   const load = useCallback(async () => {
     if (!businessId) {
-      setLoading(false);
-      setServerError("Not authenticated");
+      setServerLoading(false);
+      setStockLoading(false);
+      setServerError(new Error("Not authenticated"));
       return;
     }
-    setLoading(true);
-    setServerError(null);
+    setServerLoading(true);
+    setStockLoading(true);
+
     try {
-      const [rows, summary, opening, trades] = await Promise.all([
-        listAppNotifications(businessId).catch((e: unknown) => {
-          throw e;
-        }),
+      const rows = await listAppNotifications(businessId);
+      setServerRows(rows);
+      setServerError(null);
+    } catch (e) {
+      setServerError(e);
+      setServerRows([]);
+    } finally {
+      setServerLoading(false);
+    }
+
+    try {
+      const [summary, opening, trades] = await Promise.all([
         fetchStockAlertsSummary(businessId).catch(() => null),
         fetchOpeningMissing(businessId).catch(() => ({
           items: [],
@@ -147,7 +154,6 @@ export function NotificationsPage() {
           ? fetchTradePurchasesRecent(businessId).catch(() => [])
           : Promise.resolve([] as Record<string, unknown>[]),
       ]);
-      setServerRows(rows);
       setAlerts(summary);
       setOpeningCount(Number(opening.missing_count ?? 0));
       if (staff) {
@@ -173,11 +179,8 @@ export function NotificationsPage() {
       } else {
         setPending([]);
       }
-    } catch (e) {
-      setServerError(loadErrorMessage(e));
-      setServerRows([]);
     } finally {
-      setLoading(false);
+      setStockLoading(false);
     }
   }, [businessId, staff]);
 
@@ -225,9 +228,13 @@ export function NotificationsPage() {
   const filterEmptyButHasItems =
     items.length > 0 && filtered.length === 0 && q.length === 0;
   const showShowing = filter !== "all" || q.length > 0;
-  const showEmptyState = visible.length === 0;
-  const hasUnread = items.some((n) => !n.isRead);
+  /** Flutter showEmptyState — hide empty while server/stock loading */
+  const showEmptyState =
+    visible.length === 0 && !serverLoading && !stockLoading;
+  /** Flutter hasUnread = visible.any */
+  const hasUnread = visible.some((n) => !n.isRead);
   const clearDisabled = serverRows.length === 0;
+  const showProgress = serverLoading;
 
   const emptyTitle =
     q.length > 0
@@ -399,7 +406,7 @@ export function NotificationsPage() {
       </header>
 
       <div className="notifications-page__body" data-slot="body">
-        {loading ? (
+        {showProgress ? (
           <div
             className="notifications-page__progress"
             data-testid="notifications-loading"
@@ -407,16 +414,29 @@ export function NotificationsPage() {
             aria-label="Loading"
           />
         ) : null}
-        {serverError ? (
+        {serverError != null ? (
           <div
             className="notifications-page__error"
             data-testid="notifications-error"
           >
-            <div>
+            <span
+              className="notifications-page__error-icon"
+              aria-hidden="true"
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22">
+                <path
+                  fill="currentColor"
+                  d="M12 5.99 19.53 19H4.47L12 5.99M12 2 1 21h22L12 2zm1 14h-2v2h2v-2zm0-6h-2v4h2v-4z"
+                />
+              </svg>
+            </span>
+            <div className="notifications-page__error-text">
               <p className="notifications-page__error-title">
                 {NOTIFICATIONS_LOAD_ERROR}
               </p>
-              <p className="notifications-page__error-sub">{serverError}</p>
+              <p className="notifications-page__error-sub">
+                {mapNotificationsLoadSubtitle(serverError)}
+              </p>
             </div>
             <button
               type="button"
@@ -519,6 +539,24 @@ export function NotificationsPage() {
           data-slot="list"
           data-testid="notifications-list-chrome"
           aria-label="Notifications list"
+          ref={listRef}
+          onTouchStart={(e) => {
+            const el = listRef.current;
+            if (!el || el.scrollTop > 0) {
+              pullStartY.current = null;
+              return;
+            }
+            pullStartY.current = e.touches[0]?.clientY ?? null;
+          }}
+          onTouchEnd={(e) => {
+            const start = pullStartY.current;
+            pullStartY.current = null;
+            if (start == null) return;
+            const endY = e.changedTouches[0]?.clientY ?? start;
+            if (endY - start > 64 && !serverLoading && !stockLoading) {
+              setRetryTick((t) => t + 1);
+            }
+          }}
         >
           {showEmptyState ? (
             <div

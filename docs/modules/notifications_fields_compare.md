@@ -33,4 +33,4 @@
 
 **Rollback:** Revert FIELDS commit; restore LAYOUT inert search/chips + card shells; remove empty catalogs from copy/filters + this compare + script; boards → ask before FIELDS.
 
-**Next (ask first):** `/notifications` BUTTONS — done → [`notifications_buttons_compare.md`](notifications_buttons_compare.md). WIRE — done → [`notifications_wire_compare.md`](notifications_wire_compare.md). Ask before STATES.
+**Next (ask first):** `/notifications` BUTTONS — done → [`notifications_buttons_compare.md`](notifications_buttons_compare.md). WIRE — done → [`notifications_wire_compare.md`](notifications_wire_compare.md). Ask before COMPARE.

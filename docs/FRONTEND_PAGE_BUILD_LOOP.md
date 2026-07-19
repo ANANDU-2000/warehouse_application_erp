@@ -126,8 +126,8 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 3 FIELDS | ✅ | search/filter state + empty catalogs — [`notifications_fields_compare.md`](modules/notifications_fields_compare.md) |
 | 4 BUTTONS | ✅ | back/mark-all stub/clear dialog/CTA nav — [`notifications_buttons_compare.md`](modules/notifications_buttons_compare.md) |
 | 5 WIRE | ✅ | list/merge/mark-all/clear/patch — [`notifications_wire_compare.md`](modules/notifications_wire_compare.md) |
-| 6 STATES | ⬜ | Ask before next |
-| 7 COMPARE | ⬜ | |
+| 6 STATES | ✅ | progress/error map/empty gate/pull — [`notifications_states_compare.md`](modules/notifications_states_compare.md) |
+| 7 COMPARE | ⬜ | Ask before next |
 
 ### Prompt template (copy per page)
 

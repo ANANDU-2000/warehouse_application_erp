@@ -299,6 +299,17 @@
   box-sizing: border-box;
 }
 
+.notifications-page__error-icon {
+  flex-shrink: 0;
+  color: #dc2626;
+  margin-top: 2px;
+}
+
+.notifications-page__error-text {
+  flex: 1;
+  min-width: 0;
+}
+
 .notifications-page__error-title {
   margin: 0;
   font-size: 14px;
@@ -312,6 +323,9 @@
   color: var(--notif-muted);
   max-height: 3.6em;
   overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .notifications-page__section {

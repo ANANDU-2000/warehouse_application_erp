@@ -53,7 +53,8 @@
     "test:staff-home-states": "node scripts/check-staff-home-states.mjs",
     "test:staff-home-compare": "node scripts/check-staff-home-compare.mjs",
     "test:users-management-layout": "node scripts/check-users-management-layout.mjs",
-    "test:users-management-fields": "node scripts/check-users-management-fields.mjs"
+    "test:users-management-fields": "node scripts/check-users-management-fields.mjs",
+    "test:users-management-buttons": "node scripts/check-users-management-buttons.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

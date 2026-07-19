@@ -47,10 +47,8 @@ assert(page.includes('type="text"'), "search text input");
 assert(page.includes("USER_LIST_PRIMARY_ORDER"), "chip order");
 assert(page.includes("setPrimary"), "chip primary state");
 assert(page.includes("users-mgmt__icon--filter"), "tune icon present");
-assert(page.includes("pointer-events") || css.includes("pointer-events: none"), "filter still inert");
-assert(!page.includes("showUserListFilterDrawer"), "no role drawer");
 assert(!page.includes("fetch("), "no fetch");
-assert(!/\bnavigate\s*\(/.test(page), "no navigate handlers");
+assert(!page.includes("/v1/businesses"), "no users API in FIELDS layer");
 
 assert(css.includes("users-mgmt__chip--selected"), "selected chip class");
 assert(css.includes("#e2e8f0") || css.includes("#E2E8F0"), "chip border");

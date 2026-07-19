@@ -50,7 +50,7 @@
 
 | Path | Blocker |
 |---|---|
-| `/settings/users` · `/settings/users/:userId` | List FIELDS PASS; BUTTONS→profile still pending |
+| `/settings/users` · `/settings/users/:userId` | List BUTTONS PASS; WIRE→profile still pending |
 
 ## Other known gaps (not full pages)
 
@@ -62,8 +62,8 @@
 
 ## Next (ask first)
 
-1. **Users `/settings/users` BUTTONS** (page loop step 4), or  
+1. **Users `/settings/users` WIRE** (page loop step 5), or  
 2. One **satellite** from the stub tables above (start page loop), or  
 3. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Users UI FIELDS done — see [`users_management_fields_compare.md`](users_management_fields_compare.md).)*
+*(Users UI BUTTONS done — see [`users_management_buttons_compare.md`](users_management_buttons_compare.md).)*

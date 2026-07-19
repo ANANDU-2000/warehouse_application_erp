@@ -1,10 +1,10 @@
 # Module: Users & Roles
 
 **Queue:** 3 of 15  
-**Status:** Backend Slice 1–14 PASS · UI SCAFFOLD+LAYOUT+FIELDS PASS (2026-07-19) · BUTTONS pending  
-**Scope:** Analysis + users admin APIs + bulk; Users list UI page-loop through FIELDS  
+**Status:** Backend Slice 1–14 PASS · UI through BUTTONS PASS (2026-07-19) · WIRE pending  
+**Scope:** Analysis + users admin APIs + bulk; Users list UI page-loop through BUTTONS  
 **Source of truth:** `source-app/`  
-**Compare:** backend `users_roles_backend_*` · UI [`users_management_fields_compare.md`](users_management_fields_compare.md)
+**Compare:** backend `users_roles_backend_*` · UI [`users_management_buttons_compare.md`](users_management_buttons_compare.md)
 
 ## Definition
 

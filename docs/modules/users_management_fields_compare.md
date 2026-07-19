@@ -20,4 +20,4 @@
 
 **Rollback:** Revert FIELDS commit; restore LAYOUT search/chips chrome; remove this compare + check script; boards → ask before FIELDS.
 
-**Next (ask first):** `/settings/users` BUTTONS — back/refresh/select/Add + role filter drawer (still no API).
+**Next (ask first):** `/settings/users` BUTTONS — done → [`users_management_buttons_compare.md`](users_management_buttons_compare.md). Ask before WIRE.

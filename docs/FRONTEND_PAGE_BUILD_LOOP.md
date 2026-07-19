@@ -99,8 +99,8 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 1 SCAFFOLD | ✅ | empty chrome slots + manage gate — [`users_management_scaffold_compare.md`](modules/users_management_scaffold_compare.md) |
 | 2 LAYOUT | ✅ | AppBar + muted strips + cards — [`users_management_layout_compare.md`](modules/users_management_layout_compare.md) |
 | 3 FIELDS | ✅ | search + status chips — [`users_management_fields_compare.md`](modules/users_management_fields_compare.md) |
-| 4 BUTTONS | ⬜ | Ask before next |
-| 5 WIRE | ⬜ | |
+| 4 BUTTONS | ✅ | back/select/Add/drawer/bulk — [`users_management_buttons_compare.md`](modules/users_management_buttons_compare.md) |
+| 5 WIRE | ⬜ | Ask before next |
 | 6 STATES | ⬜ | |
 | 7 COMPARE | ⬜ | |
 

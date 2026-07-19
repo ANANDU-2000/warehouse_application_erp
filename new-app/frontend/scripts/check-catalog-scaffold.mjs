@@ -64,7 +64,7 @@ assert(page.includes('data-slot="appBar"'), "appBar");
 assert(page.includes('data-slot="search"'), "search");
 assert(page.includes('data-slot="suggestions"'), "suggestions");
 assert(page.includes('data-slot="categoryGrid"'), "grid");
-assert(page.includes('data-slot="empty"'), "empty");
+assert(page.includes('data-slot="empty"') || page.includes('data-slot="loading"'), "empty or WIRE loading");
 assert(page.includes('data-slot="fab"'), "fab");
 assert(page.includes('data-deferred="back"') || page.includes('data-action="back"'), "back deferred or BUTTONS");
 assert(page.includes('data-deferred="quick-categories"') || page.includes('data-action="quick-categories"'), "quick deferred or BUTTONS");
@@ -83,15 +83,22 @@ assert(
 assert(page.includes("Navigate"), "staff Navigate");
 assert(page.includes("CATALOG_STAFF_REDIRECT"), "staff gate");
 assert(page.includes('role === "staff"'), "staff role check");
-assert(!page.includes("fetch("), "no fetch");
+assert(!page.includes("fetch(") || page.includes("listItemCategories"), "no raw fetch unless WIRE");
 assert(
   page.includes("FIELDS") ||
+    page.includes("BUTTONS") ||
+    page.includes("WIRE") ||
+    page.includes("STATES") ||
     (!page.includes("onClick") && !page.includes("<input")),
-  "no click/input until FIELDS",
+  "no click/input until FIELDS+",
 );
 assert(
-  page.includes("FIELDS") || !page.includes("<button"),
-  "no button until FIELDS",
+  page.includes("FIELDS") ||
+    page.includes("BUTTONS") ||
+    page.includes("WIRE") ||
+    page.includes("STATES") ||
+    !page.includes("<button"),
+  "no button until FIELDS+",
 );
 
 assert(css.includes("catalog-page"), "page css");

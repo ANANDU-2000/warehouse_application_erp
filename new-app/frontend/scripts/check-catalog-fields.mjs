@@ -65,14 +65,14 @@ assert(page.includes('data-testid="catalog-empty"'), "empty testid");
 assert(page.includes("catalog-page__search--active"), "search active");
 assert(page.includes("catalogEmptyTitle"), "uses empty title");
 assert(page.includes("catalogEmptySub"), "uses empty sub");
-assert(!page.includes("fetch("), "no fetch");
+assert(!page.includes("fetch(") || page.includes("listItemCategories"), "no fetch unless WIRE");
 assert(page.includes('data-deferred="back"') || page.includes('data-action="back"'), "back still deferred or BUTTONS");
 assert(
   page.includes('data-deferred="add-category"') ||
     page.includes('data-action="add-category"'),
   "fab still deferred or BUTTONS",
 );
-assert(page.includes('data-deferred="suggestion-chips"'), "chips deferred");
+assert(page.includes('data-deferred="suggestion-chips"') || page.includes("catalogSuggestionCategories") || page.includes('data-action="suggestion-chip"'), "chips deferred or WIRE");
 
 assert(pkg.includes("test:catalog-fields"), "package script");
 

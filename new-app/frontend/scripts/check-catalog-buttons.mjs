@@ -62,12 +62,13 @@ assert(page.includes("useNavigate"), "navigate");
 assert(page.includes("CATALOG_PATH_TAXONOMY"), "uses taxonomy");
 assert(page.includes("CATALOG_PATH_NEW_CATEGORY"), "uses new category");
 assert(page.includes("catalogCategoryPath"), "uses category path");
-assert(!page.includes("fetch("), "no fetch");
-assert(page.includes('data-deferred="suggestion-chips"'), "chips deferred");
+assert(!page.includes("fetch(") || page.includes("listItemCategories"), "no fetch unless WIRE");
+assert(page.includes('data-deferred="suggestion-chips"') || page.includes("catalogSuggestionCategories") || page.includes('data-action="suggestion-chip"'), "chips deferred or WIRE");
 assert(
   page.includes('data-deferred="category-cards"') ||
-    page.includes("data-sample"),
-  "cards deferred or sample",
+    page.includes("data-sample") ||
+    page.includes("listItemCategories"),
+  "cards deferred or sample or WIRE",
 );
 
 assert(css.includes("catalog-page__icon-btn--active"), "icon active");

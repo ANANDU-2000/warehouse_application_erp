@@ -16,6 +16,19 @@ export const CATALOG_TOOLTIP_BACK = "Back";
 
 export const CATALOG_FAB_LABEL = "Add category";
 
+export const CATALOG_MENU_RENAME = "Rename";
+export const CATALOG_MENU_DELETE = "Delete";
+export const CATALOG_RENAME_TITLE = "Rename category";
+export const CATALOG_RENAME_SAVE = "Save";
+export const CATALOG_RENAME_CANCEL = "Cancel";
+export const CATALOG_DELETE_TITLE = "Delete category?";
+export const CATALOG_DELETE_CONFIRM = "Delete";
+export const CATALOG_DELETE_CANCEL = "Cancel";
+export const CATALOG_SAVED_SNACK = "Saved";
+export const CATALOG_DELETED_SNACK = "Category deleted";
+export const CATALOG_LOAD_FAILED = "Could not load catalog";
+export const CATALOG_RETRY = "Retry";
+
 export const CATALOG_SEARCH_HINT = "Search categories (fuzzy)";
 
 export const CATALOG_EMPTY_TITLE = "No categories yet";

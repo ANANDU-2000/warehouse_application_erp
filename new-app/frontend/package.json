@@ -120,6 +120,7 @@
     "test:catalog-layout": "node scripts/check-catalog-layout.mjs",
     "test:catalog-fields": "node scripts/check-catalog-fields.mjs",
     "test:catalog-buttons": "node scripts/check-catalog-buttons.mjs",
+    "test:catalog-wire": "node scripts/check-catalog-wire.mjs",
     "test:staff-deliveries-layout": "node scripts/check-staff-deliveries-layout.mjs",
     "test:staff-deliveries-fields": "node scripts/check-staff-deliveries-fields.mjs",
     "test:staff-deliveries-buttons": "node scripts/check-staff-deliveries-buttons.mjs",

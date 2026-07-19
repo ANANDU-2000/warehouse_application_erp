@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Catalog SCAFFOLD → LAYOUT → FIELDS → **BUTTONS** |
-| 🟡 Current | Catalog hub BUTTONS PASS — ask before **WIRE** |
-| ⬜ Pending | WIRE → STATES → COMPARE · other `/catalog/*` |
-| ⏸ Deferred | rename/delete API · quick taxonomy sheet · suggestion chips · purchase entry · barcode/print body · receive · Settings · merge to `main` |
+| ✅ Completed | Catalog SCAFFOLD → … → BUTTONS · **WIRE** |
+| 🟡 Current | superseded — see [`catalog_wire_compare.md`](catalog_wire_compare.md) |
+| ⬜ Pending | STATES → COMPARE · other `/catalog/*` |
+| ⏸ Deferred | ListSkeleton polish · quick sheet · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
 
@@ -40,6 +40,4 @@ npm run build
 
 Revert BUTTONS commit; restore FIELDS deferred AppBar/FAB; remove new-category/category stubs if unused; remove buttons script + this compare; boards → ask before BUTTONS.
 
-## Next (ask first)
-
-**WIRE** for `/catalog` — do not start until approved.
+**Next (ask first):** WIRE — done → [`catalog_wire_compare.md`](catalog_wire_compare.md). Ask before STATES.

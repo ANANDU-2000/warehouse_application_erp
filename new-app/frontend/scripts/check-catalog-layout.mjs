@@ -44,22 +44,34 @@ assert(
     page.includes("catalog-page__search-input"),
   "search hint or FIELDS input",
 );
-assert(page.includes('data-chrome="category-card"'), "card chrome");
+assert(page.includes('data-chrome="category-card"') || page.includes('data-action="open-category"'), "card chrome or WIRE cards");
 assert(page.includes("catalog-page__avatar"), "avatar");
 assert(page.includes("catalog-page__fab-label"), "fab label");
 assert(page.includes('role === "staff"'), "staff gate");
-assert(!page.includes("fetch("), "no fetch");
+assert(!page.includes("fetch(") || page.includes("listItemCategories"), "no raw fetch unless WIRE");
 assert(
-  page.includes("FIELDS") || !page.includes("onClick"),
-  "no onClick until FIELDS",
+  page.includes("FIELDS") ||
+    page.includes("BUTTONS") ||
+    page.includes("WIRE") ||
+    page.includes("STATES") ||
+    !page.includes("onClick"),
+  "no onClick until FIELDS+",
 );
 assert(
-  page.includes("FIELDS") || !page.includes("<input"),
-  "no input until FIELDS",
+  page.includes("FIELDS") ||
+    page.includes("BUTTONS") ||
+    page.includes("WIRE") ||
+    page.includes("STATES") ||
+    !page.includes("<input"),
+  "no input until FIELDS+",
 );
 assert(
-  page.includes("FIELDS") || !page.includes("<button"),
-  "no button until FIELDS",
+  page.includes("FIELDS") ||
+    page.includes("BUTTONS") ||
+    page.includes("WIRE") ||
+    page.includes("STATES") ||
+    !page.includes("<button"),
+  "no button until FIELDS+",
 );
 
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "brand bg");

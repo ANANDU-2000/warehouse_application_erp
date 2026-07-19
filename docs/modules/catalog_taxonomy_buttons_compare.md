@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy SCAFFOLD→…→**BUTTONS** |
-| 🟡 Current | `/catalog/taxonomy` **BUTTONS PASS** — ask before WIRE |
-| ⬜ Pending | WIRE → COMPARE · `/catalog/new-category` · category detail · item routes |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy SCAFFOLD→…→**WIRE** |
+| 🟡 Current | superseded — see [`catalog_taxonomy_wire_compare.md`](catalog_taxonomy_wire_compare.md) |
+| ⬜ Pending | STATES → COMPARE · `/catalog/new-category` · category detail · item routes |
 | ⏸ Deferred | quick taxonomy sheet body · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -43,4 +43,4 @@ npm run build
 
 Revert BUTTONS commit; restore FIELDS deferred AppBar/chips/FAB; remove new-subcategory stub if unused; remove buttons script + this compare; boards → ask before BUTTONS.
 
-**Next (ask first):** WIRE — `item-categories` + `category-types-index` list + sub counts; create still via stubs/sheet later. Stop after BUTTONS.
+**Next (ask first):** WIRE — done → [`catalog_taxonomy_wire_compare.md`](catalog_taxonomy_wire_compare.md). Ask before STATES.

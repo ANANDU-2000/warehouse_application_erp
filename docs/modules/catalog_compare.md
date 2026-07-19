@@ -13,9 +13,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub **SCAFFOLD→COMPARE** · taxonomy SCAFFOLD→…→**BUTTONS** |
-| 🟡 Current | `/catalog/taxonomy` **BUTTONS PASS** — ask before WIRE |
-| ⬜ Pending | taxonomy WIRE→COMPARE · `/catalog/new-category` · category detail · item routes · trade-summary |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub **SCAFFOLD→COMPARE** · taxonomy SCAFFOLD→…→**WIRE** |
+| 🟡 Current | `/catalog/taxonomy` **WIRE PASS** — ask before STATES |
+| ⬜ Pending | taxonomy STATES→COMPARE · `/catalog/new-category` · category detail · item routes · trade-summary |
 | ⏸ Deferred | purchase entry · barcode/print · receive **bodies** · Settings · pull gesture · keepAlive 3m · merge to `main` |
 
 ---
@@ -41,7 +41,7 @@
 
 | Item | Why deferred |
 |---|---|
-| `/catalog/taxonomy` body | **BUTTONS done** — WIRE next ([`catalog_taxonomy_buttons_compare.md`](catalog_taxonomy_buttons_compare.md)) |
+| `/catalog/taxonomy` body | **WIRE done** — STATES next ([`catalog_taxonomy_wire_compare.md`](catalog_taxonomy_wire_compare.md)) |
 | `/catalog/new-category` · category detail bodies | Next page-loop routes (stubs OK) |
 | Quick taxonomy sheet (FAB sheet) | FAB uses `/catalog/new-category` stub until sheet port |
 | Pull RefreshIndicator gesture | Retry covers; gesture polish deferred |

@@ -63,10 +63,10 @@
 
 ## Next (ask first)
 
-1. **`/catalog/taxonomy` WIRE** — page loop step 5, **or**  
+1. **`/catalog/taxonomy` STATES** — page loop step 6, **or**  
 2. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11), **or**  
 3. Hold / merge review of `ops/products-module` → `main`.
 
 **Do not** invent purchase/barcode UI.
 
-*(Taxonomy BUTTONS — [`catalog_taxonomy_buttons_compare.md`](catalog_taxonomy_buttons_compare.md).)*
+*(Taxonomy WIRE — [`catalog_taxonomy_wire_compare.md`](catalog_taxonomy_wire_compare.md).)*

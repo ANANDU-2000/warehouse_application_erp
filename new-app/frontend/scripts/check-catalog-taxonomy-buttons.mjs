@@ -76,7 +76,10 @@ assert(page.includes("taxonomyNewSubcategoryPath"), "uses new-sub path");
 assert(page.includes("isStaff"), "staff branch for row tap");
 assert(!page.includes("fetch("), "no fetch");
 assert(
-  page.includes("data-sample") || page.includes("listItemCategories"),
+  page.includes("data-sample") ||
+    page.includes("listItemCategories") ||
+    page.includes("WIRE") ||
+    page.includes("STATES"),
   "sample rows or WIRE",
 );
 

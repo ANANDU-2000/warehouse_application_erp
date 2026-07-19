@@ -1,12 +1,20 @@
 /**
- * Catalog taxonomy hub `/catalog/taxonomy` — BUTTONS (Step 4).
- * Formula source: catalog_taxonomy_hub_page.dart
- * Local nav only — quick sheets → full-screen stubs until sheet WIRE.
- * Staff: allowed. Forbidden: live item-categories / types-index API.
+ * Catalog taxonomy hub `/catalog/taxonomy` — WIRE (Step 5).
+ * Formula source: catalog_taxonomy_hub_page.dart · itemCategoriesListProvider ·
+ * categoryTypesIndexProvider · contains filter · row sub counts.
+ * Creates stay on stubs (quick sheet deferred). Loading/error basic until STATES.
  */
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
+import {
+  CatalogApiError,
+  CatalogNetworkError,
+  listCategoryTypesIndex,
+  listItemCategories,
+  type CatalogCategory,
+  type CategoryTypeIndexRow,
+} from "./catalogApi";
 import {
   TAXONOMY_BACK_FALLBACK_OWNER,
   TAXONOMY_BACK_FALLBACK_STAFF,
@@ -15,35 +23,28 @@ import {
   TAXONOMY_EMPTY_PRIMARY,
   TAXONOMY_EXPLAINER,
   TAXONOMY_FAB_TOOLTIP,
+  TAXONOMY_LOAD_FAILED,
   TAXONOMY_PATH_CATALOG,
   TAXONOMY_PATH_NEW_CATEGORY,
+  TAXONOMY_RETRY,
   TAXONOMY_ROW_ADD_SUB_TOOLTIP,
   TAXONOMY_ROW_NO_SUBS,
-  TAXONOMY_SAMPLE_CATEGORY_ID,
-  TAXONOMY_SAMPLE_CATEGORY_NAME,
   TAXONOMY_SEARCH_HINT,
   TAXONOMY_TITLE,
   TAXONOMY_TOOLTIP_BACK,
   TAXONOMY_TOOLTIP_FULL_CATALOG,
   taxonomyCategoryPath,
   taxonomyNewSubcategoryPath,
+  taxonomyRowSubtitle,
 } from "./catalogTaxonomyCopy";
 import {
   taxonomyEmptyMode,
   taxonomyEmptySub,
   taxonomyEmptyTitle,
   taxonomyFilterCategories,
-  type TaxonomyCategoryNameRow,
 } from "./catalogTaxonomyFields";
+import { typeCountForCategory } from "./catalogTaxonomy";
 import "./CatalogTaxonomyHubPage.css";
-
-/** BUTTONS sample row until WIRE (mirrors catalog hub sample card). */
-const BUTTONS_CATEGORIES: TaxonomyCategoryNameRow[] = [
-  {
-    id: TAXONOMY_SAMPLE_CATEGORY_ID,
-    name: TAXONOMY_SAMPLE_CATEGORY_NAME,
-  },
-];
 
 function popOrGo(
   navigate: ReturnType<typeof useNavigate>,
@@ -56,9 +57,17 @@ function popOrGo(
   navigate(fallback);
 }
 
+function friendlyTaxonomyError(e: unknown): string {
+  if (e instanceof CatalogApiError) return e.detail;
+  if (e instanceof CatalogNetworkError) return e.message;
+  if (e instanceof Error && e.message) return e.message;
+  return TAXONOMY_LOAD_FAILED;
+}
+
 export function CatalogTaxonomyHubPage() {
   const navigate = useNavigate();
   const session = readPrimaryBusiness();
+  const businessId = session?.id ?? "";
   const role = (session?.role ?? "").toLowerCase();
   const isStaff = role === "staff";
   const backFallback = isStaff
@@ -68,26 +77,99 @@ export function CatalogTaxonomyHubPage() {
   const [searchDraft, setSearchDraft] = useState("");
   const searchQuery = searchDraft.trim().toLowerCase();
 
+  const [categories, setCategories] = useState<CatalogCategory[]>([]);
+  const [typesIndex, setTypesIndex] = useState<CategoryTypeIndexRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<unknown | null>(null);
+  const [retryTick, setRetryTick] = useState(0);
+  const [hasData, setHasData] = useState(false);
+  const hasDataRef = useRef(false);
+
+  useEffect(() => {
+    hasDataRef.current = false;
+    setHasData(false);
+    setCategories([]);
+    setTypesIndex([]);
+    setLoadError(null);
+  }, [businessId]);
+
+  const reload = useCallback(async () => {
+    if (!businessId) {
+      setLoading(false);
+      setLoadError("Not signed in");
+      return;
+    }
+    setLoading(true);
+    setLoadError(null);
+    try {
+      const cats = await listItemCategories(businessId);
+      let types: CategoryTypeIndexRow[] = [];
+      try {
+        types = await listCategoryTypesIndex(businessId);
+      } catch {
+        /* Flutter: indexAsync.valueOrNull ?? [] — types soft-fail */
+        types = [];
+      }
+      setCategories(cats);
+      setTypesIndex(types);
+      hasDataRef.current = true;
+      setHasData(true);
+      setLoadError(null);
+    } catch (e: unknown) {
+      if (!hasDataRef.current) {
+        setCategories([]);
+        setTypesIndex([]);
+      }
+      setLoadError(e);
+    } finally {
+      setLoading(false);
+    }
+  }, [businessId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      if (cancelled) return;
+      await reload();
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [reload, retryTick]);
+
   const displayList = useMemo(
-    () => taxonomyFilterCategories(BUTTONS_CATEGORIES, searchQuery),
-    [searchQuery],
+    () => taxonomyFilterCategories(categories, searchQuery),
+    [categories, searchQuery],
   );
 
+  const showInitialLoad = loading && !hasData;
+  const showError = !loading && loadError != null && !hasData;
+  const showBody = !showInitialLoad && !showError;
+  const showEmpty = showBody && displayList.length === 0;
   const emptyMode = taxonomyEmptyMode({
     listLength: displayList.length,
     searchQuery,
   });
-  const showEmpty = displayList.length === 0;
   const showClear = searchDraft.length > 0;
+
+  const retryLoad = () => setRetryTick((n) => n + 1);
 
   const onBack = () => popOrGo(navigate, backFallback);
   const onFullCatalog = () => navigate(TAXONOMY_PATH_CATALOG);
-  /** Quick category sheet → full-screen create until sheet ported */
   const onAddCategory = () => navigate(TAXONOMY_PATH_NEW_CATEGORY);
-  /** Subcategory sheet without preselect → sample new-sub stub until sheet */
   const onAddSubcategory = (categoryId?: string) => {
-    const id = categoryId?.trim() || TAXONOMY_SAMPLE_CATEGORY_ID;
-    navigate(taxonomyNewSubcategoryPath(id));
+    const id = categoryId?.trim();
+    if (id) {
+      navigate(taxonomyNewSubcategoryPath(id));
+      return;
+    }
+    /* Sheet deferred: preselect first loaded category when available */
+    const first = categories.find((c) => c.id.trim().length > 0);
+    if (first) {
+      navigate(taxonomyNewSubcategoryPath(first.id));
+      return;
+    }
+    navigate(TAXONOMY_PATH_NEW_CATEGORY);
   };
   const onOpenCategory = (categoryId: string) => {
     if (!categoryId) return;
@@ -102,7 +184,7 @@ export function CatalogTaxonomyHubPage() {
     <div
       className="taxonomy-hub-page"
       data-page="catalog-taxonomy"
-      data-step="BUTTONS"
+      data-step="WIRE"
     >
       <header className="taxonomy-hub-page__appbar" data-slot="appBar">
         <button
@@ -179,6 +261,7 @@ export function CatalogTaxonomyHubPage() {
             aria-label={TAXONOMY_SEARCH_HINT}
             data-testid="taxonomy-search"
             autoComplete="off"
+            disabled={showInitialLoad}
           />
           {showClear ? (
             <button
@@ -193,56 +276,91 @@ export function CatalogTaxonomyHubPage() {
           ) : null}
         </div>
 
-        {!showEmpty ? (
+        {showInitialLoad ? (
+          <div
+            className="taxonomy-hub-page__loading"
+            data-slot="loading"
+            data-testid="taxonomy-loading"
+          >
+            Loading…
+          </div>
+        ) : null}
+
+        {showError ? (
+          <div
+            className="taxonomy-hub-page__error"
+            data-slot="error"
+            data-testid="taxonomy-error"
+          >
+            <p className="taxonomy-hub-page__error-title">
+              {friendlyTaxonomyError(loadError)}
+            </p>
+            <button
+              type="button"
+              className="taxonomy-hub-page__error-retry"
+              data-action="retry"
+              onClick={retryLoad}
+            >
+              {TAXONOMY_RETRY}
+            </button>
+          </div>
+        ) : null}
+
+        {showBody && !showEmpty ? (
           <div
             className="taxonomy-hub-page__list"
             data-slot="categoryList"
             data-row-no-subs={TAXONOMY_ROW_NO_SUBS}
             data-row-add-sub={TAXONOMY_ROW_ADD_SUB_TOOLTIP}
-            data-sample="category-rows"
           >
-            {displayList.map((c) => (
-              <div
-                key={c.id}
-                className="taxonomy-hub-page__row taxonomy-hub-page__row--hit"
-                data-chrome="category-row"
-                data-action="open-category"
-                role="button"
-                tabIndex={0}
-                onClick={() => onOpenCategory(c.id)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    onOpenCategory(c.id);
-                  }
-                }}
-              >
-                <span className="taxonomy-hub-page__avatar" aria-hidden>
-                  📁
-                </span>
-                <div className="taxonomy-hub-page__row-text">
-                  <p className="taxonomy-hub-page__row-name">{c.name}</p>
-                  <p className="taxonomy-hub-page__row-meta">
-                    {TAXONOMY_ROW_NO_SUBS}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="taxonomy-hub-page__row-add taxonomy-hub-page__row-add--active"
-                  data-action="add-subcategory"
-                  title={TAXONOMY_ROW_ADD_SUB_TOOLTIP}
-                  aria-label={TAXONOMY_ROW_ADD_SUB_TOOLTIP}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onAddSubcategory(c.id);
+            {displayList.map((c) => {
+              const subN = typeCountForCategory(typesIndex, c.id);
+              return (
+                <div
+                  key={c.id}
+                  className="taxonomy-hub-page__row taxonomy-hub-page__row--hit"
+                  data-chrome="category-row"
+                  data-action="open-category"
+                  data-sub-count={subN}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => onOpenCategory(c.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onOpenCategory(c.id);
+                    }
                   }}
                 >
-                  ⊕
-                </button>
-              </div>
-            ))}
+                  <span className="taxonomy-hub-page__avatar" aria-hidden>
+                    📁
+                  </span>
+                  <div className="taxonomy-hub-page__row-text">
+                    <p className="taxonomy-hub-page__row-name">{c.name}</p>
+                    <p className="taxonomy-hub-page__row-meta">
+                      {taxonomyRowSubtitle(subN)}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    className="taxonomy-hub-page__row-add taxonomy-hub-page__row-add--active"
+                    data-action="add-subcategory"
+                    title={TAXONOMY_ROW_ADD_SUB_TOOLTIP}
+                    aria-label={TAXONOMY_ROW_ADD_SUB_TOOLTIP}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAddSubcategory(c.id);
+                    }}
+                  >
+                    ⊕
+                  </button>
+                </div>
+              );
+            })}
           </div>
-        ) : (
+        ) : null}
+
+        {showEmpty ? (
           <div
             className="taxonomy-hub-page__empty"
             data-slot="empty"
@@ -268,7 +386,7 @@ export function CatalogTaxonomyHubPage() {
               {TAXONOMY_EMPTY_PRIMARY}
             </button>
           </div>
-        )}
+        ) : null}
 
         <button
           type="button"

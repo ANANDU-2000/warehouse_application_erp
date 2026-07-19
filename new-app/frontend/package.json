@@ -127,6 +127,7 @@
     "test:catalog-taxonomy-layout": "node scripts/check-catalog-taxonomy-layout.mjs",
     "test:catalog-taxonomy-fields": "node scripts/check-catalog-taxonomy-fields.mjs",
     "test:catalog-taxonomy-buttons": "node scripts/check-catalog-taxonomy-buttons.mjs",
+    "test:catalog-taxonomy-wire": "node scripts/check-catalog-taxonomy-wire.mjs",
     "test:staff-deliveries-layout": "node scripts/check-staff-deliveries-layout.mjs",
     "test:staff-deliveries-fields": "node scripts/check-staff-deliveries-fields.mjs",
     "test:staff-deliveries-buttons": "node scripts/check-staff-deliveries-buttons.mjs",

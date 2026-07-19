@@ -26,9 +26,19 @@ export const TAXONOMY_NO_MATCHES_TITLE = "No matches";
 export const TAXONOMY_EMPTY_SUB = "Tap Category to add your first one.";
 export const TAXONOMY_EMPTY_PRIMARY = "Add category";
 
+/** FriendlyLoadError default — polish in STATES */
+export const TAXONOMY_LOAD_FAILED = "Unable to load data";
+export const TAXONOMY_RETRY = "Retry";
+
 /** Row subtitle when subN == 0 */
 export const TAXONOMY_ROW_NO_SUBS =
   "No subcategories · General created automatically";
+
+/** Flutter: `'$subN subcategories'` when subN > 0 */
+export function taxonomyRowSubtitle(subCount: number): string {
+  if (subCount <= 0) return TAXONOMY_ROW_NO_SUBS;
+  return `${subCount} subcategories`;
+}
 
 export const TAXONOMY_FAB_TOOLTIP = "Quick add category";
 export const TAXONOMY_ROW_ADD_SUB_TOOLTIP = "Add subcategory";

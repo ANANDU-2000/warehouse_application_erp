@@ -184,13 +184,35 @@
   line-height: 1.3;
 }
 
-.taxonomy-hub-page__list {
+.taxonomy-hub-page__loading,
+.taxonomy-hub-page__error {
   flex: 1;
-  margin-top: 8px;
-  padding: 4px var(--tax-gutter) 24px;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px var(--tax-gutter);
+  text-align: center;
+  color: var(--tax-muted);
+  font-size: 14px;
+}
+
+.taxonomy-hub-page__error-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--tax-fg);
+}
+
+.taxonomy-hub-page__error-retry {
+  border: none;
+  background: var(--tax-accent);
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .taxonomy-hub-page__row {

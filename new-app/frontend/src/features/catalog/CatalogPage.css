@@ -69,6 +69,14 @@
   line-height: 1;
   pointer-events: none;
   user-select: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.catalog-page__icon-btn--active {
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .catalog-page__shell {
@@ -186,6 +194,15 @@
   border: 1px solid var(--cat-border);
   border-radius: 14px;
   pointer-events: none;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.catalog-page__card--hit {
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .catalog-page__avatar {
@@ -236,6 +253,7 @@
   gap: 8px;
   min-height: 48px;
   padding: 0 20px;
+  border: none;
   border-radius: 28px;
   background: var(--cat-accent);
   color: #ffffff;
@@ -244,6 +262,11 @@
   box-shadow: 0 2px 8px rgba(14, 79, 70, 0.25);
   pointer-events: none;
   user-select: none;
+}
+
+.catalog-page__fab--active {
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .catalog-page__fab-icon {

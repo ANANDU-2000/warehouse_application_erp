@@ -66,16 +66,20 @@ assert(page.includes('data-slot="suggestions"'), "suggestions");
 assert(page.includes('data-slot="categoryGrid"'), "grid");
 assert(page.includes('data-slot="empty"'), "empty");
 assert(page.includes('data-slot="fab"'), "fab");
-assert(page.includes('data-deferred="back"'), "back deferred");
-assert(page.includes('data-deferred="quick-categories"'), "quick deferred");
-assert(page.includes('data-deferred="stock-list"'), "stock deferred");
-assert(page.includes('data-deferred="scan-barcode"'), "scan deferred");
+assert(page.includes('data-deferred="back"') || page.includes('data-action="back"'), "back deferred or BUTTONS");
+assert(page.includes('data-deferred="quick-categories"') || page.includes('data-action="quick-categories"'), "quick deferred or BUTTONS");
+assert(page.includes('data-deferred="stock-list"') || page.includes('data-action="stock-list"'), "stock deferred or BUTTONS");
+assert(page.includes('data-deferred="scan-barcode"') || page.includes('data-action="scan-barcode"'), "scan deferred or BUTTONS");
 assert(
   page.includes('data-deferred="search-field"') ||
     page.includes('data-testid="catalog-search"'),
   "search deferred or FIELDS input",
 );
-assert(page.includes('data-deferred="add-category"'), "fab deferred");
+assert(
+  page.includes('data-deferred="add-category"') ||
+    page.includes('data-action="add-category"'),
+  "fab deferred or BUTTONS",
+);
 assert(page.includes("Navigate"), "staff Navigate");
 assert(page.includes("CATALOG_STAFF_REDIRECT"), "staff gate");
 assert(page.includes('role === "staff"'), "staff role check");

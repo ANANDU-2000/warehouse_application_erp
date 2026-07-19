@@ -48,7 +48,13 @@ assert(fields.includes("catalogEmptyMode"), "empty mode");
 assert(fields.includes("catalogEmptyTitle"), "empty title helper");
 assert(fields.includes("catalogEmptySub"), "empty sub helper");
 
-assert(page.includes("FIELDS"), "FIELDS header");
+assert(
+  page.includes("FIELDS") ||
+    page.includes("BUTTONS") ||
+    page.includes("WIRE") ||
+    page.includes("STATES"),
+  "FIELDS+ header",
+);
 assert(page.includes("useState"), "local state");
 assert(page.includes("setSearchDraft"), "search draft");
 assert(page.includes("setSearchQuery"), "search query");
@@ -60,8 +66,12 @@ assert(page.includes("catalog-page__search--active"), "search active");
 assert(page.includes("catalogEmptyTitle"), "uses empty title");
 assert(page.includes("catalogEmptySub"), "uses empty sub");
 assert(!page.includes("fetch("), "no fetch");
-assert(page.includes('data-deferred="back"'), "back still deferred");
-assert(page.includes('data-deferred="add-category"'), "fab still deferred");
+assert(page.includes('data-deferred="back"') || page.includes('data-action="back"'), "back still deferred or BUTTONS");
+assert(
+  page.includes('data-deferred="add-category"') ||
+    page.includes('data-action="add-category"'),
+  "fab still deferred or BUTTONS",
+);
 assert(page.includes('data-deferred="suggestion-chips"'), "chips deferred");
 
 assert(pkg.includes("test:catalog-fields"), "package script");

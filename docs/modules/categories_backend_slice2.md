@@ -9,9 +9,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog SCAFFOLD → LAYOUT → **FIELDS** |
-| 🟡 Current | See [`catalog_fields_compare.md`](catalog_fields_compare.md) |
-| ⬜ Pending | Catalog BUTTONS→COMPARE · trade-summary/insights · other catalog routes |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog SCAFFOLD → LAYOUT → FIELDS → **BUTTONS** |
+| 🟡 Current | See [`catalog_buttons_compare.md`](catalog_buttons_compare.md) |
+| ⬜ Pending | Catalog WIRE→COMPARE · trade-summary/insights · other catalog routes |
 | ⏸ Deferred | purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New

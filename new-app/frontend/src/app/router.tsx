@@ -80,6 +80,14 @@ export function AppRouter() {
           element={<DashboardRouteStubPage title="Categories" />}
         />
         <Route
+          path="/catalog/new-category"
+          element={<DashboardRouteStubPage title="New category" />}
+        />
+        <Route
+          path="/catalog/category/:categoryId"
+          element={<DashboardRouteStubPage title="Category detail" />}
+        />
+        <Route
           path="/barcode/bulk-print"
           element={<DashboardRouteStubPage title="Bulk print labels" />}
         />

@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Catalog SCAFFOLD → LAYOUT → **FIELDS** |
-| 🟡 Current | Catalog hub FIELDS PASS — ask before **BUTTONS** |
-| ⬜ Pending | BUTTONS → WIRE → STATES → COMPARE · other `/catalog/*` |
-| ⏸ Deferred | AppBar/FAB navigation · rename/delete · suggestion chips (need list API) · purchase entry · barcode/print · receive · Settings · merge to `main` |
+| ✅ Completed | Catalog SCAFFOLD → LAYOUT → FIELDS · **BUTTONS** |
+| 🟡 Current | superseded — see [`catalog_buttons_compare.md`](catalog_buttons_compare.md) |
+| ⬜ Pending | WIRE → COMPARE · other `/catalog/*` |
+| ⏸ Deferred | rename/delete API · quick sheet · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
 
@@ -38,6 +38,4 @@ npm run build
 
 Revert FIELDS commit; restore LAYOUT inert search; remove `catalogFields.ts` + fields script + this compare; boards → ask before FIELDS.
 
-## Next (ask first)
-
-**BUTTONS** for `/catalog` — do not start until approved.
+**Next (ask first):** BUTTONS — done → [`catalog_buttons_compare.md`](catalog_buttons_compare.md). Ask before WIRE.

@@ -1,6 +1,5 @@
 /**
  * Catalog hub `/catalog` copy — catalog_page.dart AppBar / empty / FAB strings.
- * SCAFFOLD: constants only; fields/buttons/API deferred.
  */
 export const CATALOG_TITLE = "Catalog";
 
@@ -13,6 +12,7 @@ export const CATALOG_STAFF_REDIRECT = "/staff/home";
 export const CATALOG_TOOLTIP_QUICK_CATEGORIES = "Quick categories";
 export const CATALOG_TOOLTIP_STOCK_LIST = "Stock list";
 export const CATALOG_TOOLTIP_SCAN = "Scan barcode";
+export const CATALOG_TOOLTIP_BACK = "Back";
 
 export const CATALOG_FAB_LABEL = "Add category";
 
@@ -28,3 +28,13 @@ export const CATALOG_NO_MATCHES_SUB =
 export const CATALOG_PATH_TAXONOMY = "/catalog/taxonomy";
 export const CATALOG_PATH_STOCK = "/stock";
 export const CATALOG_PATH_SCAN = "/barcode/scan";
+/** FAB → full-screen create until quick sheet WIRE */
+export const CATALOG_PATH_NEW_CATEGORY = "/catalog/new-category";
+
+/** Sample category id for BUTTONS card hit until WIRE */
+export const CATALOG_SAMPLE_CATEGORY_ID =
+  "00000000-0000-4000-8000-000000000001";
+
+export function catalogCategoryPath(categoryId: string): string {
+  return `/catalog/category/${encodeURIComponent(categoryId)}`;
+}

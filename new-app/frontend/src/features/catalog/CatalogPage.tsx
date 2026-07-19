@@ -1,21 +1,29 @@
 /**
- * Catalog hub `/catalog` — FIELDS (Step 3; SCAFFOLD/LAYOUT chrome retained).
- * Source: catalog_page.dart search TextField + 150ms debounce + clear suffix;
- * empty `No categories yet` / `No matches` client catalogs.
- * Forbidden: AppBar/FAB navigation, rename/delete, API / fuzzy over live list.
+ * Catalog hub `/catalog` — BUTTONS (Step 4; FIELDS search retained).
+ * Source: catalog_page.dart AppBar back/actions · FAB · card InkWell.
+ * Local navigation only — no item-categories API (WIRE).
+ * Rename/delete menus deferred (need PATCH/DELETE).
  * Staff: blocked → `/staff/home`.
  */
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import {
+  CATALOG_BACK_FALLBACK,
   CATALOG_FAB_LABEL,
+  CATALOG_PATH_NEW_CATEGORY,
+  CATALOG_PATH_SCAN,
+  CATALOG_PATH_STOCK,
+  CATALOG_PATH_TAXONOMY,
+  CATALOG_SAMPLE_CATEGORY_ID,
   CATALOG_SEARCH_HINT,
   CATALOG_STAFF_REDIRECT,
   CATALOG_TITLE,
+  CATALOG_TOOLTIP_BACK,
   CATALOG_TOOLTIP_QUICK_CATEGORIES,
   CATALOG_TOOLTIP_SCAN,
   CATALOG_TOOLTIP_STOCK_LIST,
+  catalogCategoryPath,
 } from "./catalogCopy";
 import {
   CATALOG_SEARCH_DEBOUNCE_MS,
@@ -29,6 +37,18 @@ import "./CatalogPage.css";
 /** Until WIRE — no catalog rows loaded. */
 const CLIENT_CATEGORY_COUNT = 0;
 
+/** Flutter navigation_ext.popOrGo */
+function popOrGo(
+  navigate: ReturnType<typeof useNavigate>,
+  fallback: string,
+): void {
+  if (window.history.length > 1) {
+    navigate(-1);
+    return;
+  }
+  navigate(fallback);
+}
+
 export function CatalogPage() {
   const session = readPrimaryBusiness();
   const role = (session?.role ?? "").toLowerCase();
@@ -36,10 +56,11 @@ export function CatalogPage() {
     return <Navigate to={CATALOG_STAFF_REDIRECT} replace />;
   }
 
-  return <CatalogPageFields />;
+  return <CatalogPageButtons />;
 }
 
-function CatalogPageFields() {
+function CatalogPageButtons() {
+  const navigate = useNavigate();
   const [searchDraft, setSearchDraft] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -61,47 +82,66 @@ function CatalogPageFields() {
   const showEmpty = displayLen === 0;
   const showClear = searchDraft.length > 0;
 
+  const onBack = () => popOrGo(navigate, CATALOG_BACK_FALLBACK);
+  const onQuickCategories = () => navigate(CATALOG_PATH_TAXONOMY);
+  const onStockList = () => navigate(CATALOG_PATH_STOCK);
+  const onScan = () => navigate(CATALOG_PATH_SCAN);
+  const onAddCategory = () => navigate(CATALOG_PATH_NEW_CATEGORY);
+  const onOpenCategory = (id: string) => navigate(catalogCategoryPath(id));
+
   return (
-    <div className="catalog-page" data-page="catalog-fields">
+    <div className="catalog-page" data-page="catalog-buttons">
       <header className="catalog-page__appbar" data-slot="appBar">
-        <div
-          className="catalog-page__icon-btn"
-          data-deferred="back"
-          aria-hidden
+        <button
+          type="button"
+          className="catalog-page__icon-btn catalog-page__icon-btn--active"
+          data-action="back"
+          title={CATALOG_TOOLTIP_BACK}
+          aria-label={CATALOG_TOOLTIP_BACK}
+          onClick={onBack}
         >
           ←
-        </div>
+        </button>
         <h1 className="catalog-page__title">{CATALOG_TITLE}</h1>
         <div className="catalog-page__appbar-actions" data-slot="appBarActions">
-          <div
-            className="catalog-page__icon-btn"
-            data-deferred="quick-categories"
+          <button
+            type="button"
+            className="catalog-page__icon-btn catalog-page__icon-btn--active"
+            data-action="quick-categories"
             title={CATALOG_TOOLTIP_QUICK_CATEGORIES}
-            aria-hidden
+            aria-label={CATALOG_TOOLTIP_QUICK_CATEGORIES}
+            onClick={onQuickCategories}
           >
             ▤
-          </div>
-          <div
-            className="catalog-page__icon-btn"
-            data-deferred="stock-list"
+          </button>
+          <button
+            type="button"
+            className="catalog-page__icon-btn catalog-page__icon-btn--active"
+            data-action="stock-list"
             title={CATALOG_TOOLTIP_STOCK_LIST}
-            aria-hidden
+            aria-label={CATALOG_TOOLTIP_STOCK_LIST}
+            onClick={onStockList}
           >
             ▦
-          </div>
-          <div
-            className="catalog-page__icon-btn"
-            data-deferred="scan-barcode"
+          </button>
+          <button
+            type="button"
+            className="catalog-page__icon-btn catalog-page__icon-btn--active"
+            data-action="scan-barcode"
             title={CATALOG_TOOLTIP_SCAN}
-            aria-hidden
+            aria-label={CATALOG_TOOLTIP_SCAN}
+            onClick={onScan}
           >
             ▣
-          </div>
+          </button>
         </div>
       </header>
 
       <div className="catalog-page__shell" data-slot="shell">
-        <div className="catalog-page__search catalog-page__search--active" data-slot="search">
+        <div
+          className="catalog-page__search catalog-page__search--active"
+          data-slot="search"
+        >
           <span className="catalog-page__search-icon" aria-hidden>
             ⌕
           </span>
@@ -158,12 +198,15 @@ function CatalogPageFields() {
             </div>
           ) : null}
 
-          {/* Card chrome retained for LAYOUT parity until WIRE fills rows */}
-          <div
-            className="catalog-page__card"
+          {/* Sample card hit target until WIRE fills rows */}
+          <button
+            type="button"
+            className="catalog-page__card catalog-page__card--hit"
             data-chrome="category-card"
+            data-action="open-category"
+            data-sample="buttons"
             data-deferred="category-cards"
-            aria-hidden
+            onClick={() => onOpenCategory(CATALOG_SAMPLE_CATEGORY_ID)}
           >
             <div className="catalog-page__avatar">A</div>
             <div className="catalog-page__card-body">
@@ -173,21 +216,24 @@ function CatalogPageFields() {
               </div>
             </div>
             <div className="catalog-page__card-trail">›</div>
-          </div>
+          </button>
         </div>
       </div>
 
-      <div
-        className="catalog-page__fab"
+      <button
+        type="button"
+        className="catalog-page__fab catalog-page__fab--active"
         data-slot="fab"
-        data-deferred="add-category"
+        data-action="add-category"
         data-label={CATALOG_FAB_LABEL}
+        aria-label={CATALOG_FAB_LABEL}
+        onClick={onAddCategory}
       >
         <span className="catalog-page__fab-icon" aria-hidden>
           +
         </span>
         <span className="catalog-page__fab-label">{CATALOG_FAB_LABEL}</span>
-      </div>
+      </button>
     </div>
   );
 }

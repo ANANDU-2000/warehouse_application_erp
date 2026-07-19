@@ -14,7 +14,7 @@
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
 | 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 nest COMPLETE · Products Slice 6 | Products Slice 6 — [`products_backend_slice6.md`](modules/products_backend_slice6.md) |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list+profile COMPARE · Activity WIRE | Next: ask next Subagent 4 stub — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
-| 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | 🟡 Slice 1–5 + code patches | Next: ask before Slice 6 — [`products_backend_slice5.md`](modules/products_backend_slice5.md) |
+| 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | 🟡 Slice 1–6 + variants | Next: ask before Slice 7 — [`products_backend_slice6.md`](modules/products_backend_slice6.md) |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
 | 6 | Suppliers/Brokers | 12 | ✅ `suppliers.md` | ❌ | Blocked |
 | 7 | Purchase Orders | 6 | ✅ `purchase-orders.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard nest **COMPLETE**. Products **Slice 5 item-code/barcode/generate-code PASS**. Next: ask before **Products Slice 6**. Purchase / barcode / receive **UI blocked** until their backends (docs/06 Seq 7–8 / 11).
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard nest **COMPLETE**. Products **Slice 6 variants PASS**. Next: ask before **Products Slice 7**. Purchase / barcode / receive **UI blocked** until their backends (docs/06 Seq 7–8 / 11).
 
 ---
 

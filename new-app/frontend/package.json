@@ -93,7 +93,8 @@
     "test:staff-stock-buttons": "node scripts/check-staff-stock-buttons.mjs",
     "test:staff-stock-wire": "node scripts/check-staff-stock-wire.mjs",
     "test:staff-stock-states": "node scripts/check-staff-stock-states.mjs",
-    "test:staff-stock-compare": "node scripts/check-staff-stock-compare.mjs"
+    "test:staff-stock-compare": "node scripts/check-staff-stock-compare.mjs",
+    "test:staff-purchase-history-scaffold": "node scripts/check-staff-purchase-history-scaffold.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

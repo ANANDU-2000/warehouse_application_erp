@@ -23,4 +23,4 @@
 
 **Rollback:** Revert FIELDS commit; restore LAYOUT header bars; remove `userProfileFields.ts` + this compare + script; boards → ask before FIELDS.
 
-**Next (ask first):** `/settings/users/:userId` BUTTONS — back popOrGo, Edit sheet, More menu actions (local / navigate; no live API yet if WIRE deferred).
+**Next (ask first):** `/settings/users/:userId` BUTTONS — done → [`user_profile_buttons_compare.md`](user_profile_buttons_compare.md). Ask before WIRE.

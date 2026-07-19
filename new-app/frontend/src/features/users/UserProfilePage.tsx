@@ -1,20 +1,42 @@
 /**
- * User profile — FIELDS (Step 3).
- * Source: user_profile_header.dart; user_overview_kpi_grid.dart;
- * user_activity_tab.dart; user_permission_groups.dart
- * Local tab/section/permission draft state only — no API (WIRE).
+ * User profile — BUTTONS (Step 4).
+ * Source: user_profile_page.dart AppBar/edit/more/permissions;
+ * user_profile_header.dart Edit user + PopupMenu
+ * Local CTAs only — no fetch (WIRE).
  */
-import { useMemo, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { useMemo, useState, type ReactNode } from "react";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import {
   sessionCanAdminUsers,
   sessionCanManageUsers,
 } from "../../shared/auth/sessionGates";
 import {
+  USER_PROFILE_BACK_FALLBACK,
+  USER_PROFILE_CANCEL,
+  USER_PROFILE_DELETE_BODY,
+  USER_PROFILE_DELETE_TITLE,
   USER_PROFILE_EDIT_USER,
+  USER_PROFILE_EMAIL_COPIED,
+  USER_PROFILE_FIELD_EMAIL,
+  USER_PROFILE_FIELD_FULL_NAME,
+  USER_PROFILE_FIELD_PHONE,
+  USER_PROFILE_FIELD_ROLE,
   USER_PROFILE_LAST_ACTIVE_PREFIX,
+  USER_PROFILE_MORE_ACTIVATE,
+  USER_PROFILE_MORE_BLOCK,
+  USER_PROFILE_MORE_COPY_EMAIL,
+  USER_PROFILE_MORE_DEACTIVATE,
+  USER_PROFILE_MORE_DELETE,
+  USER_PROFILE_MORE_RESET,
+  USER_PROFILE_MORE_UNBLOCK,
   USER_PROFILE_NAME_EMPTY,
+  USER_PROFILE_PERMISSIONS_SAVED,
+  USER_PROFILE_ROLE_ADMIN,
+  USER_PROFILE_ROLE_MANAGER,
+  USER_PROFILE_ROLE_STAFF,
+  USER_PROFILE_SAVE_CHANGES,
+  USER_PROFILE_SAVE_PERMISSIONS,
   USER_PROFILE_TAB_ACTIVITY,
   USER_PROFILE_TAB_OVERVIEW,
   USER_PROFILE_TAB_PERMISSIONS,
@@ -32,16 +54,63 @@ import {
   type UserActivitySection,
   type UserProfileTab,
 } from "./userProfileFields";
-import { displayUserRole, userLastActiveLabel, userStatusLabel } from "./userLastActive";
+import {
+  displayUserRole,
+  userLastActiveLabel,
+  userStatusLabel,
+} from "./userLastActive";
 import "./UserProfilePage.css";
+
+function popOrGo(
+  navigate: ReturnType<typeof useNavigate>,
+  fallback: string,
+): void {
+  const idx =
+    typeof window !== "undefined" &&
+    window.history.state &&
+    typeof (window.history.state as { idx?: unknown }).idx === "number"
+      ? (window.history.state as { idx: number }).idx
+      : 0;
+  if (idx > 0) {
+    navigate(-1);
+    return;
+  }
+  navigate(fallback, { replace: true });
+}
+
+type EditDraft = {
+  fullName: string;
+  email: string;
+  phone: string;
+  role: string;
+};
+
+const EMPTY_EDIT: EditDraft = {
+  fullName: "",
+  email: "",
+  phone: "",
+  role: "staff",
+};
 
 export function UserProfilePage() {
   const { userId } = useParams<{ userId: string }>();
+  const navigate = useNavigate();
   const session = readPrimaryBusiness();
   const [tab, setTab] = useState<UserProfileTab>("overview");
   const [activitySection, setActivitySection] =
     useState<UserActivitySection>("feed");
   const [permDraft, setPermDraft] = useState<Record<string, boolean>>({});
+  const [editOpen, setEditOpen] = useState(false);
+  const [editDraft, setEditDraft] = useState<EditDraft>(EMPTY_EDIT);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  /** Until WIRE: treat as non-owner inactive unblocked for menu labels. */
+  const profileRole: string = "staff";
+  const isBlocked = false;
+  const isActive = false;
+  const profileEmail = "";
 
   const permKeys = useMemo(() => {
     const keys: string[] = [];
@@ -61,6 +130,7 @@ export function UserProfilePage() {
   const statusLabel = userStatusLabel({ blocked: false, active: false });
   const lastActive = userLastActiveLabel(null, null);
   const initial = "?";
+  const showOwnerExtras = profileRole !== "owner";
 
   function togglePerm(key: string) {
     if (!canAdmin) return;
@@ -68,6 +138,52 @@ export function UserProfilePage() {
       ...prev,
       [key]: !(prev[key] ?? false),
     }));
+  }
+
+  function openEdit() {
+    setEditDraft({ ...EMPTY_EDIT });
+    setEditOpen(true);
+    setMoreOpen(false);
+  }
+
+  function onSaveChanges() {
+    /* PATCH user — WIRE */
+    setEditOpen(false);
+  }
+
+  function onSavePermissions() {
+    /* PATCH permissions — WIRE */
+    setToast(USER_PROFILE_PERMISSIONS_SAVED);
+  }
+
+  function onMoreAction(action: string) {
+    setMoreOpen(false);
+    switch (action) {
+      case "reset":
+        /* POST reset-password — WIRE */
+        break;
+      case "copy":
+        if (!profileEmail) return;
+        void navigator.clipboard.writeText(profileEmail).then(
+          () => setToast(USER_PROFILE_EMAIL_COPIED),
+          () => setToast(USER_PROFILE_EMAIL_COPIED),
+        );
+        break;
+      case "block":
+      case "toggle_active":
+        /* PATCH — WIRE */
+        break;
+      case "delete":
+        setDeleteOpen(true);
+        break;
+      default:
+        break;
+    }
+  }
+
+  function onConfirmDelete() {
+    setDeleteOpen(false);
+    /* DELETE — WIRE; then popOrGo list */
   }
 
   return (
@@ -81,19 +197,21 @@ export function UserProfilePage() {
           className="user-profile__appbar-leading"
           data-slot="appBar.leading"
         >
-          <span
-            className="user-profile__icon-btn"
+          <button
+            type="button"
+            className="user-profile__icon-btn user-profile__icon-btn--active"
             title={USER_PROFILE_TOOLTIP_BACK}
+            aria-label={USER_PROFILE_TOOLTIP_BACK}
             data-testid="user-profile-back"
-            aria-hidden="true"
+            onClick={() => popOrGo(navigate, USER_PROFILE_BACK_FALLBACK)}
           >
-            <svg viewBox="0 0 24 24" width="22" height="22">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
               <path
                 fill="currentColor"
                 d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
               />
             </svg>
-          </span>
+          </button>
         </div>
         <h1 className="user-profile__title">{USER_PROFILE_TITLE}</h1>
         <div
@@ -142,7 +260,6 @@ export function UserProfilePage() {
             {USER_PROFILE_LAST_ACTIVE_PREFIX}
             {lastActive}
           </p>
-          {/* Warehouse / email / phone appear when WIRE supplies values */}
           <span className="user-profile__warehouse-prefix" hidden>
             {USER_PROFILE_WAREHOUSE_PREFIX}
           </span>
@@ -151,21 +268,79 @@ export function UserProfilePage() {
               className="user-profile__admin-row"
               data-testid="user-profile-admin-chrome"
             >
-              <span className="user-profile__edit-chrome">
-                {USER_PROFILE_EDIT_USER}
-              </span>
-              <span
-                className="user-profile__more-chrome"
-                title={USER_PROFILE_TOOLTIP_MORE}
-                aria-hidden="true"
+              <button
+                type="button"
+                className="user-profile__edit-btn"
+                data-testid="user-profile-edit"
+                onClick={openEdit}
               >
-                <svg viewBox="0 0 24 24" width="22" height="22">
-                  <path
-                    fill="currentColor"
-                    d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                  />
-                </svg>
-              </span>
+                {USER_PROFILE_EDIT_USER}
+              </button>
+              <div className="user-profile__more-wrap">
+                <button
+                  type="button"
+                  className="user-profile__more-btn"
+                  title={USER_PROFILE_TOOLTIP_MORE}
+                  aria-label={USER_PROFILE_TOOLTIP_MORE}
+                  aria-expanded={moreOpen}
+                  data-testid="user-profile-more"
+                  onClick={() => setMoreOpen((v) => !v)}
+                >
+                  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                    <path
+                      fill="currentColor"
+                      d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                    />
+                  </svg>
+                </button>
+                {moreOpen ? (
+                  <div
+                    className="user-profile__more-menu"
+                    role="menu"
+                    data-testid="user-profile-more-menu"
+                  >
+                    <MenuItem
+                      testId="user-profile-more-reset"
+                      onClick={() => onMoreAction("reset")}
+                    >
+                      {USER_PROFILE_MORE_RESET}
+                    </MenuItem>
+                    <MenuItem
+                      testId="user-profile-more-copy"
+                      onClick={() => onMoreAction("copy")}
+                    >
+                      {USER_PROFILE_MORE_COPY_EMAIL}
+                    </MenuItem>
+                    {showOwnerExtras ? (
+                      <>
+                        <MenuItem
+                          testId="user-profile-more-block"
+                          onClick={() => onMoreAction("block")}
+                        >
+                          {isBlocked
+                            ? USER_PROFILE_MORE_UNBLOCK
+                            : USER_PROFILE_MORE_BLOCK}
+                        </MenuItem>
+                        <MenuItem
+                          testId="user-profile-more-active"
+                          onClick={() => onMoreAction("toggle_active")}
+                        >
+                          {isActive
+                            ? USER_PROFILE_MORE_DEACTIVATE
+                            : USER_PROFILE_MORE_ACTIVATE}
+                        </MenuItem>
+                        <MenuItem
+                          testId="user-profile-more-delete"
+                          danger
+                          onClick={() => onMoreAction("delete")}
+                        >
+                          {USER_PROFILE_MORE_DELETE}
+                        </MenuItem>
+                      </>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
             </div>
           ) : null}
         </section>
@@ -326,12 +501,173 @@ export function UserProfilePage() {
                   })}
                 </div>
               ))}
-              {/* ensure catalog keys reachable for smoke */}
+              {canAdmin ? (
+                <button
+                  type="button"
+                  className="user-profile__save-perms"
+                  data-testid="user-profile-save-permissions"
+                  onClick={onSavePermissions}
+                >
+                  {USER_PROFILE_SAVE_PERMISSIONS}
+                </button>
+              ) : null}
               <span hidden data-perm-keys={permKeys.join(",")} />
             </div>
           ) : null}
         </section>
       </div>
+
+      {editOpen ? (
+        <div
+          className="user-profile__overlay"
+          data-testid="user-profile-edit-sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-label={USER_PROFILE_EDIT_USER}
+        >
+          <button
+            type="button"
+            className="user-profile__overlay-scrim"
+            aria-label="Close"
+            onClick={() => setEditOpen(false)}
+          />
+          <div className="user-profile__drawer">
+            <h2 className="user-profile__drawer-title">{USER_PROFILE_EDIT_USER}</h2>
+            <label className="user-profile__field">
+              {USER_PROFILE_FIELD_FULL_NAME}
+              <input
+                value={editDraft.fullName}
+                onChange={(e) =>
+                  setEditDraft((d) => ({ ...d, fullName: e.target.value }))
+                }
+                data-testid="user-profile-edit-name"
+              />
+            </label>
+            <label className="user-profile__field">
+              {USER_PROFILE_FIELD_EMAIL}
+              <input
+                value={editDraft.email}
+                onChange={(e) =>
+                  setEditDraft((d) => ({ ...d, email: e.target.value }))
+                }
+                data-testid="user-profile-edit-email"
+              />
+            </label>
+            <label className="user-profile__field">
+              {USER_PROFILE_FIELD_PHONE}
+              <input
+                value={editDraft.phone}
+                onChange={(e) =>
+                  setEditDraft((d) => ({ ...d, phone: e.target.value }))
+                }
+                data-testid="user-profile-edit-phone"
+              />
+            </label>
+            {showOwnerExtras ? (
+              <label className="user-profile__field">
+                {USER_PROFILE_FIELD_ROLE}
+                <select
+                  value={editDraft.role}
+                  onChange={(e) =>
+                    setEditDraft((d) => ({ ...d, role: e.target.value }))
+                  }
+                  data-testid="user-profile-edit-role"
+                >
+                  <option value="staff">{USER_PROFILE_ROLE_STAFF}</option>
+                  <option value="manager">{USER_PROFILE_ROLE_MANAGER}</option>
+                  <option value="admin">{USER_PROFILE_ROLE_ADMIN}</option>
+                </select>
+              </label>
+            ) : null}
+            <button
+              type="button"
+              className="user-profile__drawer-btn user-profile__drawer-btn--filled"
+              data-testid="user-profile-save-changes"
+              onClick={onSaveChanges}
+            >
+              {USER_PROFILE_SAVE_CHANGES}
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {deleteOpen ? (
+        <div
+          className="user-profile__overlay"
+          data-testid="user-profile-delete-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-label={USER_PROFILE_DELETE_TITLE}
+        >
+          <button
+            type="button"
+            className="user-profile__overlay-scrim"
+            aria-label="Close"
+            onClick={() => setDeleteOpen(false)}
+          />
+          <div className="user-profile__drawer user-profile__drawer--dialog">
+            <h2 className="user-profile__drawer-title">
+              {USER_PROFILE_DELETE_TITLE}
+            </h2>
+            <p className="user-profile__dialog-body">{USER_PROFILE_DELETE_BODY}</p>
+            <div className="user-profile__drawer-actions">
+              <button
+                type="button"
+                className="user-profile__drawer-btn user-profile__drawer-btn--outline"
+                data-testid="user-profile-delete-cancel"
+                onClick={() => setDeleteOpen(false)}
+              >
+                {USER_PROFILE_CANCEL}
+              </button>
+              <button
+                type="button"
+                className="user-profile__drawer-btn user-profile__drawer-btn--danger"
+                data-testid="user-profile-delete-confirm"
+                onClick={onConfirmDelete}
+              >
+                {USER_PROFILE_MORE_DELETE}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {toast ? (
+        <div className="user-profile__toast" role="status">
+          {toast}
+          <button type="button" onClick={() => setToast(null)}>
+            ×
+          </button>
+        </div>
+      ) : null}
     </div>
+  );
+}
+
+function MenuItem({
+  children,
+  onClick,
+  testId,
+  danger,
+}: {
+  children: ReactNode;
+  onClick: () => void;
+  testId: string;
+  danger?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      role="menuitem"
+      className={
+        danger
+          ? "user-profile__menu-item user-profile__menu-item--danger"
+          : "user-profile__menu-item"
+      }
+      data-testid={testId}
+      onClick={onClick}
+    >
+      {children}
+    </button>
   );
 }

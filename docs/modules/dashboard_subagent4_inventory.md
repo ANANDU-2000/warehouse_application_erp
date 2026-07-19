@@ -50,7 +50,7 @@
 
 | Path | Blocker |
 |---|---|
-| `/settings/users` · `/settings/users/:userId` | List COMPARE PASS; profile **FIELDS PASS** — BUTTONS next |
+| `/settings/users` · `/settings/users/:userId` | List COMPARE PASS; profile **BUTTONS PASS** — WIRE next |
 
 ## Other known gaps (not full pages)
 
@@ -62,8 +62,8 @@
 
 ## Next (ask first)
 
-1. **User profile BUTTONS** (`/settings/users/:userId` page loop step 4), or  
+1. **User profile WIRE** (`/settings/users/:userId` page loop step 5), or  
 2. One **satellite** from the stub tables above (start page loop), or  
 3. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Profile FIELDS done — see [`user_profile_fields_compare.md`](user_profile_fields_compare.md).)*
+*(Profile BUTTONS done — see [`user_profile_buttons_compare.md`](user_profile_buttons_compare.md).)*

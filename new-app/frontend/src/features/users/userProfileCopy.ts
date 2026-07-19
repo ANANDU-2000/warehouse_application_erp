@@ -1,5 +1,5 @@
 /**
- * User profile copy — SCAFFOLD / LAYOUT / FIELDS labels.
+ * User profile copy — SCAFFOLD / LAYOUT / FIELDS / BUTTONS labels.
  * Source: user_profile_page.dart · user_profile_header.dart
  */
 export const USER_PROFILE_TITLE = "User profile";
@@ -14,3 +14,28 @@ export const USER_PROFILE_TOOLTIP_BACK = "Back";
 export const USER_PROFILE_NAME_EMPTY = "—";
 export const USER_PROFILE_WAREHOUSE_PREFIX = "Warehouse: ";
 export const USER_PROFILE_LAST_ACTIVE_PREFIX = "Last active: ";
+
+export const USER_PROFILE_FIELD_FULL_NAME = "Full name";
+export const USER_PROFILE_FIELD_EMAIL = "Email";
+export const USER_PROFILE_FIELD_PHONE = "Phone";
+export const USER_PROFILE_FIELD_ROLE = "Role";
+export const USER_PROFILE_ROLE_STAFF = "Staff";
+export const USER_PROFILE_ROLE_MANAGER = "Manager";
+export const USER_PROFILE_ROLE_ADMIN = "Admin";
+export const USER_PROFILE_SAVE_CHANGES = "Save changes";
+export const USER_PROFILE_SAVE_PERMISSIONS = "Save permissions";
+
+export const USER_PROFILE_MORE_RESET = "Reset password";
+export const USER_PROFILE_MORE_COPY_EMAIL = "Copy email";
+export const USER_PROFILE_MORE_BLOCK = "Block";
+export const USER_PROFILE_MORE_UNBLOCK = "Unblock";
+export const USER_PROFILE_MORE_ACTIVATE = "Activate";
+export const USER_PROFILE_MORE_DEACTIVATE = "Deactivate";
+export const USER_PROFILE_MORE_DELETE = "Delete";
+
+export const USER_PROFILE_DELETE_TITLE = "Delete user?";
+export const USER_PROFILE_DELETE_BODY =
+  "User will be deactivated. Audit history is kept.";
+export const USER_PROFILE_CANCEL = "Cancel";
+export const USER_PROFILE_EMAIL_COPIED = "Email copied";
+export const USER_PROFILE_PERMISSIONS_SAVED = "Permissions saved";

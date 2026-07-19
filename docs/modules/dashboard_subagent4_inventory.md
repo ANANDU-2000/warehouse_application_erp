@@ -50,7 +50,7 @@
 
 | Path | Blocker |
 |---|---|
-| `/settings/users` · `/settings/users/:userId` | List SCAFFOLD PASS; LAYOUT→profile still pending |
+| `/settings/users` · `/settings/users/:userId` | List LAYOUT PASS; FIELDS→profile still pending |
 
 ## Other known gaps (not full pages)
 
@@ -62,8 +62,8 @@
 
 ## Next (ask first)
 
-1. **Users `/settings/users` LAYOUT** (page loop step 2), or  
+1. **Users `/settings/users` FIELDS** (page loop step 3), or  
 2. One **satellite** from the stub tables above (start page loop), or  
 3. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Users POST bulk + Users UI SCAFFOLD done — see [`users_management_scaffold_compare.md`](users_management_scaffold_compare.md).)*
+*(Users UI LAYOUT done — see [`users_management_layout_compare.md`](users_management_layout_compare.md).)*

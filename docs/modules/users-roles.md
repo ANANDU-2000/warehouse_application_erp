@@ -1,10 +1,10 @@
 # Module: Users & Roles
 
 **Queue:** 3 of 15  
-**Status:** Backend Slice 1–14 PASS · UI SCAFFOLD PASS (2026-07-19) · LAYOUT pending  
-**Scope:** Analysis + users admin APIs + bulk; Users list UI page-loop started at SCAFFOLD  
+**Status:** Backend Slice 1–14 PASS · UI SCAFFOLD+LAYOUT PASS (2026-07-19) · FIELDS pending  
+**Scope:** Analysis + users admin APIs + bulk; Users list UI page-loop through LAYOUT  
 **Source of truth:** `source-app/`  
-**Compare:** backend `users_roles_backend_*` · UI [`users_management_scaffold_compare.md`](users_management_scaffold_compare.md)
+**Compare:** backend `users_roles_backend_*` · UI [`users_management_layout_compare.md`](users_management_layout_compare.md)
 
 ## Definition
 

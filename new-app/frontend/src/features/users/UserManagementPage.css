@@ -1,33 +1,82 @@
 /**
- * Users list SCAFFOLD — empty slot shell only.
- * LAYOUT owns chrome parity; this step is structure.
+ * Users list LAYOUT — brand chrome parity (no fields/API).
+ * Tokens: HexaColors brandBackground / brandPrimary / adaptiveElevated.
  */
 .users-mgmt {
+  --users-brand: #0e4f46;
+  --users-bg: #f7f9f6;
+  --users-text: #0f172a;
+  --users-muted: #64748b;
+  --users-border: #e5e7eb;
+  --users-elevated: #f2f2f7;
+  --users-card: #ffffff;
+  --users-gutter: 12px;
+
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  background: var(--users-bg);
+  color: var(--users-text);
 }
 
 .users-mgmt__appbar {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  min-height: 3.5rem;
-  padding: 0.5rem 0.75rem;
+  gap: 8px;
+  min-height: 56px;
+  padding: 8px var(--users-gutter);
+  background: var(--users-card);
+  border-bottom: 1px solid var(--users-border);
+  box-sizing: border-box;
 }
 
 .users-mgmt__appbar-leading,
 .users-mgmt__appbar-actions {
-  min-width: 2.5rem;
-  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 .users-mgmt__title {
   flex: 1;
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 24px;
   font-weight: 800;
+  line-height: 1.2;
+  color: var(--users-text);
+}
+
+.users-mgmt__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--users-muted);
+  pointer-events: none;
+  user-select: none;
+}
+
+.users-mgmt__add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  margin-left: 4px;
+  border-radius: 999px;
+  background: rgba(14, 79, 70, 0.1);
+  color: var(--users-brand);
+  font-size: 14px;
+  font-weight: 600;
+  pointer-events: none;
+  user-select: none;
+}
+
+.users-mgmt__add-label {
+  line-height: 1;
 }
 
 .users-mgmt__body {
@@ -35,20 +84,45 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  padding: 8px var(--users-gutter) 0;
+  box-sizing: border-box;
 }
 
-.users-mgmt__search-filter,
-.users-mgmt__status-chips,
-.users-mgmt__list,
-.users-mgmt__detail,
-.users-mgmt__bulk {
-  min-height: 2.5rem;
+.users-mgmt__search-filter {
+  padding: 4px 0 8px;
+}
+
+.users-mgmt__search-bar {
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--users-border);
+  background: var(--users-card);
+  box-sizing: border-box;
+}
+
+.users-mgmt__status-chips {
+  height: 40px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  background: var(--users-elevated);
+  box-sizing: border-box;
 }
 
 .users-mgmt__split {
   flex: 1;
   display: flex;
+  gap: 12px;
   min-height: 0;
+  padding-bottom: 8px;
+}
+
+.users-mgmt__list,
+.users-mgmt__detail {
+  min-height: 120px;
+  border-radius: 12px;
+  border: 1px solid var(--users-border);
+  background: var(--users-card);
+  box-sizing: border-box;
 }
 
 .users-mgmt__list {
@@ -69,5 +143,10 @@
 }
 
 .users-mgmt__bulk {
-  min-height: 3rem;
+  min-height: 48px;
+  margin: 0 var(--users-gutter) 12px;
+  border-radius: 10px;
+  background: var(--users-elevated);
+  border: 1px solid var(--users-border);
+  box-sizing: border-box;
 }

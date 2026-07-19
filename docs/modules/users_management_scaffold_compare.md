@@ -17,4 +17,4 @@
 
 **Rollback:** Revert this commit; restore `/settings/users` → `DashboardRouteStubPage`; remove `features/users/*` + this compare; restore boards to ask-before Users UI.
 
-**Next (ask first):** `/settings/users` LAYOUT — AppBar icons/colors (still no API).
+**Next (ask first):** `/settings/users` LAYOUT — done → [`users_management_layout_compare.md`](users_management_layout_compare.md). Ask before FIELDS.

@@ -9,10 +9,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · **BUTTONS** |
-| 🟡 Current | BUTTONS PASS — ask before **WIRE** |
-| ⬜ Pending | WIRE→COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | Settings hub; mark-read/clear WIRE; warehouse-alert merge |
+| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · **WIRE** |
+| 🟡 Current | WIRE PASS — ask before **STATES** |
+| ⬜ Pending | STATES→COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | Settings hub; purchase-due; STATES polish |
 
 ## Legacy vs New
 
@@ -32,4 +32,4 @@
 
 **Rollback:** Revert SCAFFOLD commit; restore route → `DashboardRouteStubPage` title “Notifications”; remove `NotificationsPage*` + copy + filters + this compare + script; boards → ask before notifications SCAFFOLD.
 
-**Next (ask first):** `/notifications` LAYOUT — done → [`notifications_layout_compare.md`](notifications_layout_compare.md). FIELDS — done → [`notifications_fields_compare.md`](notifications_fields_compare.md). BUTTONS — done → [`notifications_buttons_compare.md`](notifications_buttons_compare.md). Ask before WIRE.
+**Next (ask first):** `/notifications` LAYOUT — done → [`notifications_layout_compare.md`](notifications_layout_compare.md). FIELDS — done → [`notifications_fields_compare.md`](notifications_fields_compare.md). BUTTONS — done → [`notifications_buttons_compare.md`](notifications_buttons_compare.md). WIRE — done → [`notifications_wire_compare.md`](notifications_wire_compare.md). Ask before STATES.

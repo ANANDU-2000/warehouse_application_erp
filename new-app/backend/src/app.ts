@@ -159,6 +159,9 @@ function unavailableStaffHomeRepository(): StaffHomeRepository {
     listActivityLog: fail,
     listNotifications: fail,
     notificationsUnreadCount: fail,
+    markAllNotificationsRead: fail,
+    clearAllNotifications: fail,
+    patchNotificationRead: fail,
     stockAlertsSummary: fail,
   } as unknown as StaffHomeRepository;
 }

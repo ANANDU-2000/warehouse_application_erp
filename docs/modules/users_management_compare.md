@@ -73,9 +73,9 @@ Docs/checklist + smoke script only: revert COMPARE commit. Application code unch
 
 ## 5. Next after Approve
 
-1. Ask before: **`/notifications` WIRE** — [`notifications_buttons_compare.md`](notifications_buttons_compare.md), **or**  
+1. Ask before: **`/notifications` STATES** — [`notifications_wire_compare.md`](notifications_wire_compare.md), **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
 **Do not merge to `main` unless asked.**
 
-*(Notifications BUTTONS done — see [`notifications_buttons_compare.md`](notifications_buttons_compare.md).)*
+*(Notifications WIRE done — see [`notifications_wire_compare.md`](notifications_wire_compare.md).)*

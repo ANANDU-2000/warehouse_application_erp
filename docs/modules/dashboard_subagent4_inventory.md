@@ -36,7 +36,7 @@
 
 | Path | Stub title |
 |---|---|
-| `/notifications` | **BUTTONS PASS** — [`notifications_buttons_compare.md`](notifications_buttons_compare.md); WIRE next |
+| `/notifications` | **WIRE PASS** — [`notifications_wire_compare.md`](notifications_wire_compare.md); STATES next |
 | `/barcode/scan` | Barcode scan |
 | `/barcode/bulk-print` | Bulk print labels |
 | `/catalog/item/:itemId` | Catalog item |
@@ -63,7 +63,7 @@
 
 ## Next (ask first)
 
-1. **`/notifications` WIRE** (page loop step 5), **or**  
+1. **`/notifications` STATES** (page loop step 6), **or**  
 2. Hold / merge review of `ops/dashboard-module` → `main`.
 
-*(Notifications BUTTONS done — see [`notifications_buttons_compare.md`](notifications_buttons_compare.md). `/staff/settings` skipped — Settings implement locked.)*
+*(Notifications WIRE done — see [`notifications_wire_compare.md`](notifications_wire_compare.md). `/staff/settings` skipped — Settings implement locked.)*

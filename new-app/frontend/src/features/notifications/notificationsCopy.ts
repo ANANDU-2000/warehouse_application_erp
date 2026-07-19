@@ -3,6 +3,8 @@
  * Source: notifications_page.dart AppBar / search / filter chips / HexaEmptyState / clear dialog
  */
 export const NOTIFICATIONS_TITLE = "Notifications";
+/** Flutter HexaColors.appName — welcome seed */
+export const NOTIFICATIONS_APP_NAME = "Harisree Warehouse";
 /** Flutter popOrGo('/home') — staff uses history back when possible */
 export const NOTIFICATIONS_BACK_FALLBACK = "/home";
 /** Empty CTA — notifications_page.dart context.push */
@@ -11,6 +13,14 @@ export const NOTIFICATIONS_CTA_PATH_OWNER = "/purchase/new";
 export const NOTIFICATIONS_SEARCH_HINT = "Search alerts…";
 export const NOTIFICATIONS_MARK_ALL_READ = "Mark all read";
 export const NOTIFICATIONS_CLEAR_TOOLTIP = "Clear server notifications";
+export const NOTIFICATIONS_LOAD_ERROR =
+  "Could not refresh server notifications";
+export const NOTIFICATIONS_RETRY = "Retry";
+export const NOTIFICATIONS_SECTION_TODAY = "Today";
+export const NOTIFICATIONS_SECTION_YESTERDAY = "Yesterday";
+export const NOTIFICATIONS_SECTION_EARLIER = "Earlier";
+export const NOTIFICATIONS_ORDER_NOW = "Order now";
+export const NOTIFICATIONS_CARD_FALLBACK_TITLE = "Warehouse alert";
 
 /** Clear confirm — _clearServerNotifications AlertDialog */
 export const NOTIFICATIONS_CLEAR_DIALOG_TITLE = "Clear server notifications?";

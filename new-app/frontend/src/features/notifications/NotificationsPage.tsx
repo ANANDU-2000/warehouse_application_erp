@@ -1,11 +1,30 @@
 /**
- * Notifications `/notifications` — BUTTONS (Step 4).
- * Source: notifications_page.dart AppBar back/mark-all/clear + empty CTAs;
- * mark-all / clear API deferred WIRE; list rows deferred WIRE.
+ * Notifications `/notifications` — WIRE (Step 5).
+ * Source: notifications_page.dart + mergedNotificationFeedProvider;
+ * purchase-due alerts deferred (trade list lacks remaining/due_date).
  */
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
+import {
+  fetchOpeningMissing,
+  fetchStockAlertsSummary,
+  fetchTradePurchasesRecent,
+  type StockAlertsSummaryOut,
+} from "../staff/staffHomeApi";
+import {
+  staffPendingDeliveriesFromRows,
+  type TradePurchaseListRow,
+} from "../staff/staffPendingDeliveries";
+import { NotificationAlertCard } from "./NotificationAlertCard";
+import {
+  clearAllAppNotifications,
+  listAppNotifications,
+  markAllAppNotificationsRead,
+  NotificationsApiError,
+  NotificationsNetworkError,
+  patchAppNotificationRead,
+} from "./notificationsApi";
 import {
   NOTIFICATIONS_BACK_FALLBACK,
   NOTIFICATIONS_CLEAR_DIALOG_BODY,
@@ -20,14 +39,24 @@ import {
   NOTIFICATIONS_EMPTY_SUB_FILTER_HIDDEN,
   NOTIFICATIONS_EMPTY_SUB_SEARCH,
   NOTIFICATIONS_EMPTY_TITLE_SEARCH,
+  NOTIFICATIONS_LOAD_ERROR,
   NOTIFICATIONS_MARK_ALL_READ,
+  NOTIFICATIONS_RETRY,
   NOTIFICATIONS_SEARCH_HINT,
+  NOTIFICATIONS_SECTION_EARLIER,
+  NOTIFICATIONS_SECTION_TODAY,
+  NOTIFICATIONS_SECTION_YESTERDAY,
   NOTIFICATIONS_SHOW_ALL_ALERTS,
   NOTIFICATIONS_SHOWING_MID,
   NOTIFICATIONS_SHOWING_PREFIX,
   NOTIFICATIONS_SHOWING_SUFFIX,
   NOTIFICATIONS_TITLE,
 } from "./notificationsCopy";
+import {
+  mergeNotificationFeed,
+  notificationMatchesCategoryFilter,
+  type NotificationUiItem,
+} from "./notificationsFeed";
 import {
   NOTIFICATIONS_EMPTY_SUBTITLE,
   NOTIFICATIONS_EMPTY_TITLE,
@@ -56,17 +85,21 @@ function popOrGo(
   navigate(fallback, { replace: true });
 }
 
-type LocalNotification = {
-  title: string;
-  subtitle: string;
-  isRead: boolean;
-  /** Server-backed id — clear/mark-all WIRE */
-  serverNotificationId?: string | null;
-};
+function day0(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function loadErrorMessage(error: unknown): string {
+  if (error instanceof NotificationsApiError) return error.detail;
+  if (error instanceof NotificationsNetworkError) return error.message;
+  if (error instanceof Error) return error.message;
+  return "Something went wrong. Please try again.";
+}
 
 export function NotificationsPage() {
   const navigate = useNavigate();
   const session = readPrimaryBusiness();
+  const businessId = session?.id ?? "";
   /** sessionIsStaff — post_auth_route.dart (primary role === staff) */
   const staff = (session?.role ?? "").toLowerCase() === "staff";
   const filters = staff
@@ -76,25 +109,125 @@ export function NotificationsPage() {
   const [filter, setFilter] = useState<NotificationCategoryFilter>("all");
   const [search, setSearch] = useState("");
   const [clearOpen, setClearOpen] = useState(false);
-  /** Local feed until WIRE — empty matches cold empty HexaEmptyState. */
-  const items = useMemo(() => [] as LocalNotification[], []);
-  /** Server list until WIRE — empty disables clear (Flutter valueOrNull?.isEmpty). */
-  const serverItems = useMemo(() => [] as { id: string }[], []);
+  const [loading, setLoading] = useState(true);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [serverRows, setServerRows] = useState<Record<string, unknown>[]>([]);
+  const [alerts, setAlerts] = useState<StockAlertsSummaryOut | null>(null);
+  const [openingCount, setOpeningCount] = useState(0);
+  const [pending, setPending] = useState<
+    { supplierName: string | null; purchaseDate: Date }[]
+  >([]);
+  const [warehouseReadIds, setWarehouseReadIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [manualReadIds, setManualReadIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [retryTick, setRetryTick] = useState(0);
+
+  const load = useCallback(async () => {
+    if (!businessId) {
+      setLoading(false);
+      setServerError("Not authenticated");
+      return;
+    }
+    setLoading(true);
+    setServerError(null);
+    try {
+      const [rows, summary, opening, trades] = await Promise.all([
+        listAppNotifications(businessId).catch((e: unknown) => {
+          throw e;
+        }),
+        fetchStockAlertsSummary(businessId).catch(() => null),
+        fetchOpeningMissing(businessId).catch(() => ({
+          items: [],
+          missing_count: 0,
+        })),
+        staff
+          ? fetchTradePurchasesRecent(businessId).catch(() => [])
+          : Promise.resolve([] as Record<string, unknown>[]),
+      ]);
+      setServerRows(rows);
+      setAlerts(summary);
+      setOpeningCount(Number(opening.missing_count ?? 0));
+      if (staff) {
+        const pendingList = staffPendingDeliveriesFromRows(
+          trades as TradePurchaseListRow[],
+        );
+        const byId = new Map(
+          trades.map((r) => [String(r.id ?? ""), r] as const),
+        );
+        setPending(
+          pendingList.map((p) => {
+            const raw = byId.get(p.id);
+            const sn =
+              raw && raw.supplier_name != null
+                ? String(raw.supplier_name).trim()
+                : "";
+            return {
+              supplierName: sn.length > 0 ? sn : null,
+              purchaseDate: new Date(p.purchaseDate),
+            };
+          }),
+        );
+      } else {
+        setPending([]);
+      }
+    } catch (e) {
+      setServerError(loadErrorMessage(e));
+      setServerRows([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [businessId, staff]);
+
+  useEffect(() => {
+    void load();
+  }, [load, retryTick]);
+
+  const items = useMemo(
+    () =>
+      mergeNotificationFeed({
+        serverRows,
+        alerts,
+        openingCount,
+        pending,
+        staff,
+        warehouseReadIds,
+        manualReadIds,
+      }),
+    [
+      serverRows,
+      alerts,
+      openingCount,
+      pending,
+      staff,
+      warehouseReadIds,
+      manualReadIds,
+    ],
+  );
 
   const q = search.trim().toLowerCase();
-  const filtered = items;
-  const visible =
-    q.length === 0
-      ? filtered
-      : filtered.filter((n) =>
-          `${n.title} ${n.subtitle}`.toLowerCase().includes(q),
-        );
+  const filtered = useMemo(
+    () =>
+      items.filter((n) => notificationMatchesCategoryFilter(n, filter)),
+    [items, filter],
+  );
+  const visible = useMemo(
+    () =>
+      q.length === 0
+        ? filtered
+        : filtered.filter((n) =>
+            `${n.title} ${n.subtitle}`.toLowerCase().includes(q),
+          ),
+    [filtered, q],
+  );
   const filterEmptyButHasItems =
     items.length > 0 && filtered.length === 0 && q.length === 0;
   const showShowing = filter !== "all" || q.length > 0;
   const showEmptyState = visible.length === 0;
   const hasUnread = items.some((n) => !n.isRead);
-  const clearDisabled = serverItems.length === 0;
+  const clearDisabled = serverRows.length === 0;
 
   const emptyTitle =
     q.length > 0
@@ -107,15 +240,96 @@ export function NotificationsPage() {
         ? NOTIFICATIONS_EMPTY_SUB_FILTER_HIDDEN
         : NOTIFICATIONS_EMPTY_SUBTITLE[filter];
 
-  /** Mark-all — live server + local read sets deferred WIRE */
-  function markAllRead(): void {
-    /* WIRE: POST mark-all-read + warehouse/purchase dismiss */
+  const sections = useMemo(() => {
+    const today0 = day0(new Date());
+    const yest0 = new Date(today0);
+    yest0.setDate(yest0.getDate() - 1);
+    const today: NotificationUiItem[] = [];
+    const yesterday: NotificationUiItem[] = [];
+    const earlier: NotificationUiItem[] = [];
+    for (const n of visible) {
+      const d = day0(n.createdAt);
+      if (d.getTime() === today0.getTime()) today.push(n);
+      else if (d.getTime() === yest0.getTime()) yesterday.push(n);
+      else earlier.push(n);
+    }
+    return { today, yesterday, earlier };
+  }, [visible]);
+
+  async function markAllRead(): Promise<void> {
+    if (!businessId) return;
+    try {
+      await markAllAppNotificationsRead(businessId);
+    } catch {
+      /* Flutter swallows mark-all API errors */
+    }
+    const whIds = new Set(warehouseReadIds);
+    const manIds = new Set(manualReadIds);
+    for (const n of items) {
+      if (n.isRead) continue;
+      if (n.id.startsWith("wh_")) whIds.add(n.id);
+      else if (!n.serverNotificationId) manIds.add(n.id);
+    }
+    setWarehouseReadIds(whIds);
+    setManualReadIds(manIds);
+    setRetryTick((t) => t + 1);
   }
 
-  /** Clear confirm — live clear-all deferred WIRE */
-  function confirmClearServer(): void {
+  async function confirmClearServer(): Promise<void> {
     setClearOpen(false);
-    /* WIRE: DELETE/clear all server notifications */
+    if (!businessId) return;
+    try {
+      await clearAllAppNotifications(businessId);
+      setRetryTick((t) => t + 1);
+    } catch {
+      /* keep dialog closed; STATES expands errors */
+    }
+  }
+
+  async function handleCardTap(n: NotificationUiItem): Promise<void> {
+    const sid = n.serverNotificationId;
+    if (sid) {
+      if (businessId) {
+        try {
+          await patchAppNotificationRead({
+            businessId,
+            notificationId: sid,
+          });
+          setRetryTick((t) => t + 1);
+        } catch {
+          /* ignore */
+        }
+      }
+    } else if (n.id.startsWith("wh_")) {
+      setWarehouseReadIds((prev) => new Set([...prev, n.id]));
+    } else {
+      setManualReadIds((prev) => new Set([...prev, n.id]));
+    }
+    if (n.actionRoute) {
+      navigate(n.actionRoute);
+    }
+  }
+
+  function renderCard(n: NotificationUiItem) {
+    const isReorder = n.serverKind === "reorder_request";
+    return (
+      <NotificationAlertCard
+        key={n.id}
+        item={n}
+        onTap={() => {
+          void handleCardTap(n);
+        }}
+        onOrderNow={
+          isReorder
+            ? () => {
+                void handleCardTap(n).then(() => {
+                  navigate(NOTIFICATIONS_CTA_PATH_OWNER);
+                });
+              }
+            : undefined
+        }
+      />
+    );
   }
 
   return (
@@ -155,7 +369,9 @@ export function NotificationsPage() {
               type="button"
               className="notifications-page__text-btn"
               data-testid="notifications-mark-all-read"
-              onClick={markAllRead}
+              onClick={() => {
+                void markAllRead();
+              }}
             >
               {NOTIFICATIONS_MARK_ALL_READ}
             </button>
@@ -183,6 +399,42 @@ export function NotificationsPage() {
       </header>
 
       <div className="notifications-page__body" data-slot="body">
+        {loading ? (
+          <div
+            className="notifications-page__progress"
+            data-testid="notifications-loading"
+            role="progressbar"
+            aria-label="Loading"
+          />
+        ) : null}
+        {serverError ? (
+          <div
+            className="notifications-page__error"
+            data-testid="notifications-error"
+          >
+            <div>
+              <p className="notifications-page__error-title">
+                {NOTIFICATIONS_LOAD_ERROR}
+              </p>
+              <p className="notifications-page__error-sub">{serverError}</p>
+            </div>
+            <button
+              type="button"
+              className="notifications-page__icon-btn"
+              data-testid="notifications-retry"
+              aria-label={NOTIFICATIONS_RETRY}
+              onClick={() => setRetryTick((t) => t + 1)}
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M17.65 6.35A7.95 7.95 0 0 0 12 4V1L7 6l5 5V7c2.76 0 5 2.24 5 5a5 5 0 0 1-8.9 3.1L6.7 16.5A7.97 7.97 0 0 0 12 20c4.42 0 8-3.58 8-8 0-2.21-.9-4.21-2.35-5.65z"
+                />
+              </svg>
+            </button>
+          </div>
+        ) : null}
+
         <div
           className="notifications-page__search"
           data-slot="search"
@@ -317,7 +569,34 @@ export function NotificationsPage() {
                 ) : null}
               </div>
             </div>
-          ) : null}
+          ) : (
+            <div className="notifications-page__feed" data-testid="notifications-feed">
+              {sections.today.length > 0 ? (
+                <>
+                  <h3 className="notifications-page__section">
+                    {NOTIFICATIONS_SECTION_TODAY}
+                  </h3>
+                  {sections.today.map(renderCard)}
+                </>
+              ) : null}
+              {sections.yesterday.length > 0 ? (
+                <>
+                  <h3 className="notifications-page__section">
+                    {NOTIFICATIONS_SECTION_YESTERDAY}
+                  </h3>
+                  {sections.yesterday.map(renderCard)}
+                </>
+              ) : null}
+              {sections.earlier.length > 0 ? (
+                <>
+                  <h3 className="notifications-page__section">
+                    {NOTIFICATIONS_SECTION_EARLIER}
+                  </h3>
+                  {sections.earlier.map(renderCard)}
+                </>
+              ) : null}
+            </div>
+          )}
         </section>
       </div>
 
@@ -360,7 +639,9 @@ export function NotificationsPage() {
                 type="button"
                 className="notifications-page__dialog-confirm"
                 data-testid="notifications-clear-confirm"
-                onClick={confirmClearServer}
+                onClick={() => {
+                  void confirmClearServer();
+                }}
               >
                 {NOTIFICATIONS_CLEAR_DIALOG_CONFIRM}
               </button>

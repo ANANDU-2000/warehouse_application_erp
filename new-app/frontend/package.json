@@ -69,7 +69,8 @@
     "test:notifications-scaffold": "node scripts/check-notifications-scaffold.mjs",
     "test:notifications-layout": "node scripts/check-notifications-layout.mjs",
     "test:notifications-fields": "node scripts/check-notifications-fields.mjs",
-    "test:notifications-buttons": "node scripts/check-notifications-buttons.mjs"
+    "test:notifications-buttons": "node scripts/check-notifications-buttons.mjs",
+    "test:notifications-wire": "node scripts/check-notifications-wire.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

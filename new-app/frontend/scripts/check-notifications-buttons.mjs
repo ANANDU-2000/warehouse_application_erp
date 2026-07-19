@@ -63,10 +63,7 @@ assert(page.includes("NOTIFICATIONS_CTA_PATH_STAFF"), "navigate staff CTA");
 assert(page.includes("NOTIFICATIONS_CTA_PATH_OWNER"), "navigate owner CTA");
 assert(page.includes("hasUnread"), "hasUnread gate");
 assert(page.includes("clearDisabled"), "clear disabled gate");
-assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("/v1/businesses"), "no API path");
-assert(!page.includes("markAllAppNotifications"), "no mark-all API yet");
-assert(!page.includes("clearAllAppNotifications"), "no clear API yet");
+/* WIRE owns fetch + mark-all/clear API */
 
 assert(css.includes("notifications-page__dialog"), "dialog CSS");
 assert(router.includes('path="/staff/receive"'), "receive stub route");

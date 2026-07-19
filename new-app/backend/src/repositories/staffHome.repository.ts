@@ -705,6 +705,169 @@ export class StaffHomeRepository {
   }
 
   /**
+   * POST notifications/mark-all-read — notifications.py mark_all_read
+   */
+  async markAllNotificationsRead(opts: {
+    businessId: string;
+    userId: string;
+    kind: string | null;
+  }): Promise<number> {
+    const where = [
+      "[business_id] = @businessId",
+      "[user_id] = @userId",
+      "[read_at] IS NULL",
+    ];
+    const params: SqlParam[] = [
+      { name: "businessId", type: sql.UniqueIdentifier, value: opts.businessId },
+      { name: "userId", type: sql.UniqueIdentifier, value: opts.userId },
+    ];
+    if (opts.kind) {
+      where.push("[kind] = @kind");
+      params.push({ name: "kind", type: sql.NVarChar(64), value: opts.kind });
+    }
+    const request = this.client.request();
+    for (const p of params) {
+      request.input(p.name, p.type as never, p.value);
+    }
+    const result = await request.query(
+      `UPDATE [notifications]
+       SET [read_at] = SYSUTCDATETIME()
+       WHERE ${where.join(" AND ")}`,
+    );
+    return Number(result.rowsAffected?.[0] ?? 0);
+  }
+
+  /**
+   * DELETE notifications/clear-all — notifications.py clear_all
+   */
+  async clearAllNotifications(opts: {
+    businessId: string;
+    userId: string;
+    kind: string | null;
+  }): Promise<number> {
+    const where = ["[business_id] = @businessId", "[user_id] = @userId"];
+    const params: SqlParam[] = [
+      { name: "businessId", type: sql.UniqueIdentifier, value: opts.businessId },
+      { name: "userId", type: sql.UniqueIdentifier, value: opts.userId },
+    ];
+    if (opts.kind) {
+      where.push("[kind] = @kind");
+      params.push({ name: "kind", type: sql.NVarChar(64), value: opts.kind });
+    }
+    const request = this.client.request();
+    for (const p of params) {
+      request.input(p.name, p.type as never, p.value);
+    }
+    const result = await request.query(
+      `DELETE FROM [notifications] WHERE ${where.join(" AND ")}`,
+    );
+    return Number(result.rowsAffected?.[0] ?? 0);
+  }
+
+  /**
+   * PATCH notifications/{id} — notifications.py patch_notification
+   */
+  async patchNotificationRead(opts: {
+    businessId: string;
+    userId: string;
+    notificationId: string;
+    read: boolean;
+  }): Promise<NotificationOut | null> {
+    const existing = await queryOne<NotificationDbRow>(
+      this.client,
+      `SELECT n.[id], n.[kind], n.[title], n.[body], n.[priority], n.[category],
+              n.[action_route], n.[triggered_by_user_id], u.[name] AS triggered_by_name,
+              n.[related_item_id], n.[related_purchase_id], n.[related_supplier_id],
+              n.[payload], n.[metadata], n.[read_at], n.[created_at]
+       FROM notifications n
+       LEFT JOIN users u ON u.[id] = n.[triggered_by_user_id]
+       WHERE n.[id] = @notificationId
+         AND n.[business_id] = @businessId
+         AND n.[user_id] = @userId`,
+      [
+        {
+          name: "notificationId",
+          type: sql.UniqueIdentifier,
+          value: opts.notificationId,
+        },
+        { name: "businessId", type: sql.UniqueIdentifier, value: opts.businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: opts.userId },
+      ],
+    );
+    if (!existing) return null;
+
+    await queryMany(
+      this.client,
+      opts.read
+        ? `UPDATE [notifications]
+           SET [read_at] = SYSUTCDATETIME()
+           WHERE [id] = @notificationId
+             AND [business_id] = @businessId
+             AND [user_id] = @userId`
+        : `UPDATE [notifications]
+           SET [read_at] = NULL
+           WHERE [id] = @notificationId
+             AND [business_id] = @businessId
+             AND [user_id] = @userId`,
+      [
+        {
+          name: "notificationId",
+          type: sql.UniqueIdentifier,
+          value: opts.notificationId,
+        },
+        { name: "businessId", type: sql.UniqueIdentifier, value: opts.businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: opts.userId },
+      ],
+    );
+
+    const row = await queryOne<NotificationDbRow>(
+      this.client,
+      `SELECT n.[id], n.[kind], n.[title], n.[body], n.[priority], n.[category],
+              n.[action_route], n.[triggered_by_user_id], u.[name] AS triggered_by_name,
+              n.[related_item_id], n.[related_purchase_id], n.[related_supplier_id],
+              n.[payload], n.[metadata], n.[read_at], n.[created_at]
+       FROM notifications n
+       LEFT JOIN users u ON u.[id] = n.[triggered_by_user_id]
+       WHERE n.[id] = @notificationId
+         AND n.[business_id] = @businessId
+         AND n.[user_id] = @userId`,
+      [
+        {
+          name: "notificationId",
+          type: sql.UniqueIdentifier,
+          value: opts.notificationId,
+        },
+        { name: "businessId", type: sql.UniqueIdentifier, value: opts.businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: opts.userId },
+      ],
+    );
+    if (!row) return null;
+    const payload = parseJsonObject(row.payload);
+    const name = (row.triggered_by_name ?? "").trim();
+    return {
+      id: row.id,
+      kind: row.kind,
+      title: row.title,
+      body: row.body,
+      priority: row.priority || "medium",
+      category: row.category || "system",
+      action_route: row.action_route,
+      triggered_by_user_id: row.triggered_by_user_id,
+      triggered_by_name: name.length > 0 ? name : null,
+      related_item_id: row.related_item_id,
+      related_purchase_id: row.related_purchase_id,
+      related_supplier_id: row.related_supplier_id,
+      payload,
+      metadata: parseJsonObject(row.metadata),
+      read_at: isoOrNull(row.read_at),
+      created_at:
+        row.created_at instanceof Date
+          ? row.created_at.toISOString()
+          : String(row.created_at),
+    };
+  }
+
+  /**
    * GET stock/alerts/summary — compute_stock_alerts_summary
    */
   async stockAlertsSummary(

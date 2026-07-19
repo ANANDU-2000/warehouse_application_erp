@@ -77,9 +77,7 @@ assert(page.includes("NOTIFICATIONS_CTA_RECEIVE"), "receive CTA");
 assert(page.includes("NOTIFICATIONS_CTA_NEW_PURCHASE"), "purchase CTA");
 assert(page.includes("chip--active"), "chips interactive");
 assert(page.includes("search-input--active"), "search interactive");
-assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("/v1/businesses"), "no API path");
-/* BUTTONS owns popOrGo */
+/* WIRE owns fetch + API paths; BUTTONS owns popOrGo */
 
 assert(
   pkg.includes("test:notifications-fields"),

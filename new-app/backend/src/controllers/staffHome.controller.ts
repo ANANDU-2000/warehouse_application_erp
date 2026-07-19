@@ -274,6 +274,102 @@ export function createStaffHomeController(deps: StaffHomeControllerDeps) {
       }
     },
 
+    /** POST …/notifications/mark-all-read */
+    async markAllNotificationsRead(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ) {
+      try {
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string") {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        const user = req.user;
+        if (!user) {
+          sendDetail(res, 401, "Not authenticated");
+          return;
+        }
+        const kind =
+          typeof req.query.kind === "string" ? req.query.kind.trim() : null;
+        const updated = await deps.staffHome.markAllNotificationsRead({
+          businessId,
+          userId: user.id,
+          kind: kind && kind.length > 0 ? kind : null,
+        });
+        res.json({ updated });
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    /** DELETE …/notifications/clear-all */
+    async clearAllNotifications(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ) {
+      try {
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string") {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        const user = req.user;
+        if (!user) {
+          sendDetail(res, 401, "Not authenticated");
+          return;
+        }
+        const kind =
+          typeof req.query.kind === "string" ? req.query.kind.trim() : null;
+        const updated = await deps.staffHome.clearAllNotifications({
+          businessId,
+          userId: user.id,
+          kind: kind && kind.length > 0 ? kind : null,
+        });
+        res.json({ updated });
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    /** PATCH …/notifications/:notificationId */
+    async patchNotificationRead(
+      req: Request,
+      res: Response,
+      next: NextFunction,
+    ) {
+      try {
+        const businessId = req.params.businessId;
+        const notificationId = req.params.notificationId;
+        if (typeof businessId !== "string" || typeof notificationId !== "string") {
+          sendDetail(res, 400, "businessId and notificationId required");
+          return;
+        }
+        const user = req.user;
+        if (!user) {
+          sendDetail(res, 401, "Not authenticated");
+          return;
+        }
+        const body = req.body as { read?: unknown };
+        const read = body?.read !== false;
+        const row = await deps.staffHome.patchNotificationRead({
+          businessId,
+          userId: user.id,
+          notificationId,
+          read,
+        });
+        if (!row) {
+          sendDetail(res, 404, "Notification not found");
+          return;
+        }
+        res.json(row);
+      } catch (e) {
+        next(e);
+      }
+    },
+
     /** GET …/stock/alerts/summary */
     async stockAlertsSummary(req: Request, res: Response, next: NextFunction) {
       try {

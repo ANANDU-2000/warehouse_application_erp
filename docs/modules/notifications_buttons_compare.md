@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · **BUTTONS** |
-| 🟡 Current | BUTTONS PASS — ask before **WIRE** |
-| ⬜ Pending | WIRE→STATES→COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | Live list / mark-all API / clear API (WIRE) |
+| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · **WIRE** |
+| 🟡 Current | WIRE PASS — ask before **STATES** |
+| ⬜ Pending | STATES→COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | Purchase-due synthetics; Approve/Review; STATES polish |
 
 ## Legacy vs New
 
@@ -32,4 +32,4 @@
 
 **Rollback:** Revert BUTTONS commit; restore FIELDS inert AppBar + aria-disabled CTA; remove clear dialog CSS/copy + this compare + script; boards → ask before BUTTONS.
 
-**Next (ask first):** `/notifications` WIRE.
+**Next (ask first):** `/notifications` WIRE — done → [`notifications_wire_compare.md`](notifications_wire_compare.md). Ask before STATES.

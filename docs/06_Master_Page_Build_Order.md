@@ -12,8 +12,8 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 · Notifications BUTTONS | Next: ask notifications WIRE — [`notifications_buttons_compare.md`](modules/notifications_buttons_compare.md) |
-| 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list+profile COMPARE · Activity WIRE | Next: notifications WIRE — [`notifications_buttons_compare.md`](modules/notifications_buttons_compare.md) |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 WIRE-2 · Notifications WIRE | Next: ask notifications STATES — [`notifications_wire_compare.md`](modules/notifications_wire_compare.md) |
+| 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list+profile COMPARE · Activity WIRE | Next: notifications STATES — [`notifications_wire_compare.md`](modules/notifications_wire_compare.md) |
 | 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
 | 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
 | 6 | Suppliers/Brokers | 12 | ✅ `suppliers.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users list+profile **COMPARE PASS**. Profile Activity **WIRE PASS**. Subagent 4: `/notifications` **BUTTONS PASS**. Next: ask **notifications WIRE**.
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard `/home`+`/staff/home`+`/home/activity`+`/home/breakdown-more` COMPARE PASS. Staff **WIRE-2a–2f COMPLETE**. Users list+profile **COMPARE PASS**. Profile Activity **WIRE PASS**. Subagent 4: `/notifications` **WIRE PASS**. Next: ask **notifications STATES**.
 
 ---
 
@@ -245,7 +245,7 @@ Primarily via `/catalog/taxonomy`, `/catalog/new-category`, `/catalog/category/:
 
 | Path | Notes |
 |---|---|
-| `/notifications` | Notifications — **BUTTONS PASS** — [`notifications_buttons_compare.md`](modules/notifications_buttons_compare.md) |
+| `/notifications` | Notifications — **WIRE PASS** — [`notifications_wire_compare.md`](modules/notifications_wire_compare.md) |
 
 ### Seq 17 — Item public/history
 

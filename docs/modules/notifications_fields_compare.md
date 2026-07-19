@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · **BUTTONS** |
-| 🟡 Current | BUTTONS PASS — ask before **WIRE** |
-| ⬜ Pending | WIRE→COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | Live notification rows / mark-read / clear (WIRE) |
+| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · **WIRE** |
+| 🟡 Current | WIRE PASS — ask before **STATES** |
+| ⬜ Pending | STATES→COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | Purchase-due synthetics; Approve/Review; STATES polish |
 
 ## Legacy vs New
 
@@ -33,4 +33,4 @@
 
 **Rollback:** Revert FIELDS commit; restore LAYOUT inert search/chips + card shells; remove empty catalogs from copy/filters + this compare + script; boards → ask before FIELDS.
 
-**Next (ask first):** `/notifications` BUTTONS — done → [`notifications_buttons_compare.md`](notifications_buttons_compare.md). Ask before WIRE.
+**Next (ask first):** `/notifications` BUTTONS — done → [`notifications_buttons_compare.md`](notifications_buttons_compare.md). WIRE — done → [`notifications_wire_compare.md`](notifications_wire_compare.md). Ask before STATES.

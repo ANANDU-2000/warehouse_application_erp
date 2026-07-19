@@ -32,6 +32,24 @@ export function createNotificationsRoutes(
     (req, res, next) =>
       void staffHome.notificationsUnreadCount(req, res, next),
   );
+  r.post(
+    "/mark-all-read",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void staffHome.markAllNotificationsRead(req, res, next),
+  );
+  r.delete(
+    "/clear-all",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void staffHome.clearAllNotifications(req, res, next),
+  );
+  r.patch(
+    "/:notificationId",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void staffHome.patchNotificationRead(req, res, next),
+  );
   r.get(
     "/",
     authz.requireAuth,

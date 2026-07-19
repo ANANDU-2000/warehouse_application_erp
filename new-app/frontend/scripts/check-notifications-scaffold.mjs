@@ -65,9 +65,7 @@ assert(page.includes('data-slot="list"'), "list slot");
 assert(page.includes("NOTIFICATIONS_TITLE"), "uses title");
 assert(page.includes("NOTIFICATIONS_FILTER_ORDER_STAFF"), "staff filter set");
 assert(page.includes('role === "staff"') || page.includes("=== \"staff\""), "staff role");
-assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("/v1/businesses"), "no API path");
-/* BUTTONS owns popOrGo */
+/* WIRE owns fetch + API paths */
 
 assert(router.includes("NotificationsPage"), "router imports page");
 assert(router.includes('path="/notifications"'), "notifications route");

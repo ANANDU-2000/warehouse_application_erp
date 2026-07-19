@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · **BUTTONS** |
-| 🟡 Current | BUTTONS PASS — ask before **WIRE** |
-| ⬜ Pending | WIRE→COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | Settings hub; live list/API (WIRE) |
+| ✅ Completed | SCAFFOLD · LAYOUT · FIELDS · BUTTONS · **WIRE** |
+| 🟡 Current | WIRE PASS — ask before **STATES** |
+| ⬜ Pending | STATES→COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | Settings hub; purchase-due; STATES polish |
 
 ## Legacy vs New
 
@@ -32,4 +32,4 @@
 
 **Rollback:** Revert LAYOUT commit; restore SCAFFOLD page/CSS; remove this compare + script; boards → ask before LAYOUT.
 
-**Next (ask first):** `/notifications` FIELDS — done → [`notifications_fields_compare.md`](notifications_fields_compare.md). BUTTONS — done → [`notifications_buttons_compare.md`](notifications_buttons_compare.md). Ask before WIRE.
+**Next (ask first):** `/notifications` FIELDS — done → [`notifications_fields_compare.md`](notifications_fields_compare.md). BUTTONS — done → [`notifications_buttons_compare.md`](notifications_buttons_compare.md). WIRE — done → [`notifications_wire_compare.md`](notifications_wire_compare.md). Ask before STATES.

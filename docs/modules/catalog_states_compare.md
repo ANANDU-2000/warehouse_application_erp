@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Catalog SCAFFOLD → … → WIRE → **STATES** |
-| 🟡 Current | Catalog hub STATES PASS — ask before **COMPARE** |
-| ⬜ Pending | COMPARE · other `/catalog/*` |
-| ⏸ Deferred | pull RefreshIndicator gesture polish · keepAlive 3m · purchase entry · barcode/print · receive · Settings · merge to `main` |
+| ✅ Completed | Catalog SCAFFOLD → … → STATES · **COMPARE** |
+| 🟡 Current | superseded — see [`catalog_compare.md`](catalog_compare.md) |
+| ⬜ Pending | `/catalog/taxonomy` SCAFFOLD · other catalog routes |
+| ⏸ Deferred | pull gesture · keepAlive · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
 
@@ -40,6 +40,4 @@ npm run build
 
 Revert STATES commit; restore WIRE `Loading…` / plain error; remove `catalogLoadSubtitle.ts` + states script + this compare; boards → ask before STATES.
 
-## Next (ask first)
-
-**COMPARE** aggregator SCAFFOLD→STATES — do not start until approved.
+**Next (ask first):** COMPARE — done → [`catalog_compare.md`](catalog_compare.md). Ask before `/catalog/taxonomy` SCAFFOLD.

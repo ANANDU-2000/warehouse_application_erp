@@ -223,7 +223,14 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 4 BUTTONS | ✅ | Back/taxonomy/stock/scan/FAB/card nav — [`catalog_buttons_compare.md`](modules/catalog_buttons_compare.md) |
 | 5 WIRE | ✅ | item-categories + items + types-index + fuzzy + rename/delete — [`catalog_wire_compare.md`](modules/catalog_wire_compare.md) |
 | 6 STATES | ✅ | ListSkeleton 6×84 + FriendlyLoadError — [`catalog_states_compare.md`](modules/catalog_states_compare.md) |
-| 7 COMPARE | ⬜ | — |
+| 7 COMPARE | ✅ | Aggregator SCAFFOLD→STATES — [`catalog_compare.md`](modules/catalog_compare.md) |
+
+### Catalog taxonomy hub (`/catalog/taxonomy`) — Seq 5
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ⬜ | — |
+| 2–7 | ⬜ | Ask before start |
 
 ### Prompt template (copy per page)
 

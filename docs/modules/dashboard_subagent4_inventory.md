@@ -63,9 +63,10 @@
 
 ## Next (ask first)
 
-1. **Catalog COMPARE** — `/catalog` page loop step 7, **or**  
-2. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11).
+1. **`/catalog/taxonomy` SCAFFOLD** — page loop step 1, **or**  
+2. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11), **or**  
+3. Hold / merge review of `ops/products-module` → `main`.
 
 **Do not** invent purchase/barcode UI.
 
-*(Catalog STATES — [`catalog_states_compare.md`](catalog_states_compare.md). Categories Slice 2 — [`categories_backend_slice2.md`](categories_backend_slice2.md).)*
+*(Catalog COMPARE — [`catalog_compare.md`](catalog_compare.md).)*

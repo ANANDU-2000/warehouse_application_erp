@@ -45,9 +45,14 @@ export function itemMatchesGalleryFilter(
     case "lowStock":
       return itemLowOrOut(item);
     case "openingMissing":
-      return (
-        item.opening_stock_set === false || item.needs_opening_stock === true
-      );
+      // Flutter checks opening_stock_set / needs_opening_stock; API emits opening_stock_set_at.
+      if (item.needs_opening_stock === true) return true;
+      if (item.opening_stock_set === false) return true;
+      if ("opening_stock_set_at" in item) {
+        const at = item.opening_stock_set_at;
+        return at == null || String(at).trim() === "";
+      }
+      return false;
     default:
       return true;
   }

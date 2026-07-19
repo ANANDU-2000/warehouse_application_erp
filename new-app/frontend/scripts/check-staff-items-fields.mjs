@@ -77,11 +77,7 @@ assert(
   page.includes("allItems") || page.includes("StaffGalleryItem"),
   "items catalog state",
 );
-assert(
-  !page.includes("fetchListStock") && !page.includes("listStock("),
-  "no listStock API yet",
-);
-/* BUTTONS may add expand/menus; WIRE owns listStock */
+/* WIRE owns fetchAllGalleryStock; FIELDS only needs local filter state */
 
 assert(css.includes("search-input--active"), "css search active");
 assert(css.includes("chip--active"), "css chip active");

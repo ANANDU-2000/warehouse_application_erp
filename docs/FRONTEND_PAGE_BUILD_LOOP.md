@@ -149,7 +149,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 2 LAYOUT | ✅ | ChoiceChip tokens + Card/list chrome CSS — [`staff_items_layout_compare.md`](modules/staff_items_layout_compare.md) |
 | 3 FIELDS | ✅ | debounce/filter chips + match helpers — [`staff_items_fields_compare.md`](modules/staff_items_fields_compare.md) |
 | 4 BUTTONS | ✅ | expand/subtabs/row menu/nav — [`staff_items_buttons_compare.md`](modules/staff_items_buttons_compare.md) |
-| 5 WIRE | ⬜ | — |
+| 5 WIRE | ✅ | listStock paginate + gallery fields — [`staff_items_wire_compare.md`](modules/staff_items_wire_compare.md) |
 | 6 STATES | ⬜ | — |
 | 7 COMPARE | ⬜ | — |
 

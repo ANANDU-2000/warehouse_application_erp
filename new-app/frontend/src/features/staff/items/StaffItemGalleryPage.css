@@ -238,6 +238,59 @@
   text-align: center;
 }
 
+.staff-gallery-page__loading,
+.staff-gallery-page__error {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  min-height: 160px;
+}
+
+.staff-gallery-page__spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--sg-outline-variant);
+  border-top-color: var(--sg-brand);
+  border-radius: 50%;
+  animation: staff-gallery-spin 0.8s linear infinite;
+}
+
+@keyframes staff-gallery-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.staff-gallery-page__error-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--sg-brand);
+}
+
+.staff-gallery-page__error-detail {
+  margin: 0;
+  font-size: 13px;
+  color: var(--sg-muted);
+  text-align: center;
+}
+
+.staff-gallery-page__retry {
+  border: none;
+  background: var(--sg-chip-selected);
+  color: var(--sg-brand);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
 /* Category Card chrome — elevation 0, radius 10, border #E2E8E6 (WIRE fills) */
 .staff-gallery-page__category-card {
   margin: 0 0 6px;

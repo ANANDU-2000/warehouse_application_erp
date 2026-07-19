@@ -70,9 +70,9 @@ assert(page.includes('data-slot="categoryCard"'), "category card slot");
 assert(page.includes('data-slot="itemRow"'), "item row slot");
 assert(page.includes('data-slot="itemMenu"'), "item menu slot");
 assert(page.includes("onUpdateStock"), "stock handler present");
-
 assert(router.includes("/catalog/item/:itemId/edit"), "edit route stub");
 assert(router.includes('title="Edit catalog item"'), "edit stub title");
+/* WIRE may call fetchAllGalleryStock */
 
 assert(pkg.includes("test:staff-items-buttons"), "package.json script");
 

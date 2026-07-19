@@ -35,6 +35,17 @@ export type StockListItemOut = {
   current_stock: number;
   reorder_level: number;
   unit: string | null;
+  /** Gallery / full list fields — stock_helpers._item_to_list_row subset */
+  stock_unit?: string | null;
+  default_unit?: string | null;
+  category_name?: string | null;
+  subcategory_name?: string | null;
+  type_name?: string | null;
+  stock_status?: string;
+  missing_barcode?: boolean;
+  missing_item_code?: boolean;
+  opening_stock_set_at?: string | null;
+  opening_stock_qty?: number | null;
 };
 
 export type StockListOut = {
@@ -123,6 +134,11 @@ type CatalogRow = {
   reorder_level: number | null;
   stock_unit: string | null;
   default_unit: string | null;
+  barcode?: string | null;
+  category_name?: string | null;
+  subcategory_name?: string | null;
+  opening_stock_set_at?: Date | string | null;
+  opening_stock_qty?: number | null;
 };
 type NotifRow = {
   payload: string | null;
@@ -215,14 +231,58 @@ function moneyStr(n: number): string {
   return (Number.isFinite(n) ? n : 0).toFixed(2);
 }
 
+/**
+ * FastAPI stock_inventory.stock_status — out / critical / low / healthy.
+ */
+export function computeStockStatus(
+  current: number | null | undefined,
+  reorder: number | null | undefined,
+): string {
+  const cur = Number(current ?? 0);
+  const ro = Number(reorder ?? 0);
+  if (cur <= 0) return "out";
+  if (ro <= 0 && cur > 0 && cur < 1) return "low";
+  if (ro > 0) {
+    if (cur <= ro * 0.5) return "critical";
+    if (cur <= ro) return "low";
+  }
+  return "healthy";
+}
+
 function itemOut(r: CatalogRow): StockListItemOut {
+  const current = Number(r.current_stock ?? 0);
+  const reorder = Number(r.reorder_level ?? 0);
+  const unit = r.stock_unit ?? r.default_unit;
+  const code = r.item_code;
+  const barcode = r.barcode ?? null;
+  const missingBarcode = !(barcode && String(barcode).trim());
+  const missingItemCode = !(code && String(code).trim());
+  const setAt = r.opening_stock_set_at;
+  const setAtIso =
+    setAt == null
+      ? null
+      : setAt instanceof Date
+        ? setAt.toISOString()
+        : String(setAt);
+  const sub = r.subcategory_name ?? null;
   return {
     id: r.id,
     name: r.name,
-    item_code: r.item_code,
-    current_stock: Number(r.current_stock ?? 0),
-    reorder_level: Number(r.reorder_level ?? 0),
-    unit: r.stock_unit ?? r.default_unit,
+    item_code: code,
+    current_stock: current,
+    reorder_level: reorder,
+    unit,
+    stock_unit: unit,
+    default_unit: r.default_unit,
+    category_name: r.category_name ?? null,
+    subcategory_name: sub,
+    type_name: sub,
+    stock_status: computeStockStatus(current, reorder),
+    missing_barcode: missingBarcode,
+    missing_item_code: missingItemCode,
+    opening_stock_set_at: setAtIso,
+    opening_stock_qty:
+      r.opening_stock_qty == null ? null : Number(r.opening_stock_qty),
   };
 }
 
@@ -321,7 +381,8 @@ export class StaffHomeRepository {
     );
     const total = Number(totalRow?.c ?? 0);
     const page = Math.max(1, opts.page);
-    const perPage = Math.min(500, Math.max(1, opts.perPage));
+    /** FastAPI Query le=2000; Flutter gallery uses per_page=500 */
+    const perPage = Math.min(2000, Math.max(1, opts.perPage));
     const offset = (page - 1) * perPage;
 
     if (total === 0) {
@@ -331,8 +392,13 @@ export class StaffHomeRepository {
     const rows = await queryMany<CatalogRow>(
       this.client,
       `SELECT ci.[id], ci.[name], ci.[item_code], ci.[current_stock],
-              ci.[reorder_level], ci.[stock_unit], ci.[default_unit]
+              ci.[reorder_level], ci.[stock_unit], ci.[default_unit],
+              ci.[barcode], ci.[opening_stock_set_at], ci.[opening_stock_qty],
+              ic.[name] AS category_name,
+              ct.[name] AS subcategory_name
        FROM catalog_items ci
+       LEFT JOIN item_categories ic ON ic.[id] = ci.[category_id]
+       LEFT JOIN category_types ct ON ct.[id] = ci.[type_id]
        WHERE ${whereSql}
        ORDER BY ${orderSql}
        OFFSET @offset ROWS FETCH NEXT @perPage ROWS ONLY`,

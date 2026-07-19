@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff search COMPARE · Staff items SCAFFOLD · LAYOUT · FIELDS · **BUTTONS** |
-| 🟡 Current | Staff items **BUTTONS PASS** — ask before WIRE |
-| ⬜ Pending | Staff items WIRE → COMPARE · other Subagent 4 stubs |
-| ⏸ Deferred | `/staff/settings` · `/settings`; listStock (WIRE); QuickStockActionSheet (WIRE) |
+| ✅ Completed | Staff search COMPARE · Staff items SCAFFOLD · LAYOUT · FIELDS · BUTTONS · **WIRE** |
+| 🟡 Current | Staff items **WIRE PASS** — ask before STATES |
+| ⬜ Pending | Staff items STATES → COMPARE · other Subagent 4 stubs |
+| ⏸ Deferred | `/staff/settings` · `/settings`; QuickStockActionSheet (STATES/later) |
 
 ## Legacy vs New
 
@@ -35,4 +35,4 @@
 
 **Rollback:** Revert BUTTONS commit; restore FIELDS list empty-only; remove edit route stub + menu/expand UI + this compare + script; boards → ask before BUTTONS.
 
-**Next (ask first):** `/staff/items` WIRE — do not start until approved.
+**Next (ask first):** WIRE done — [`staff_items_wire_compare.md`](staff_items_wire_compare.md). Ask before STATES.

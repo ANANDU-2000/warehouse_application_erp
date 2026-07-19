@@ -1,11 +1,17 @@
 /**
- * Staff item gallery `/staff/items` — BUTTONS (Step 4).
- * Source: staff_item_gallery_page.dart — category expand / sub tabs / row tap / PopupMenu
- * Deferred: listStock API (WIRE); QuickStockActionSheet (WIRE); load error (STATES).
+ * Staff item gallery `/staff/items` — WIRE (Step 5).
+ * Source: staffGalleryStockProvider + listStock; expand/menus from BUTTONS.
+ * Deferred: QuickStockActionSheet; FriendlyLoadError polish (STATES).
  */
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { readPrimaryBusiness } from "../../../shared/auth/sessionStore";
 import { formatStockQtyNumber } from "../staffPendingDeliveries";
+import {
+  fetchAllGalleryStock,
+  StaffGalleryApiError,
+  StaffGalleryNetworkError,
+} from "./staffItemGalleryApi";
 import {
   STAFF_GALLERY_BACK_FALLBACK,
   STAFF_GALLERY_DEBOUNCE_MS,
@@ -13,6 +19,7 @@ import {
   STAFF_GALLERY_DEFAULT_UNIT,
   STAFF_GALLERY_EMPTY,
   STAFF_GALLERY_HINT,
+  STAFF_GALLERY_LOAD_FAILED,
   STAFF_GALLERY_MENU_ITEM,
   STAFF_GALLERY_MENU_REORDER,
   STAFF_GALLERY_MENU_STOCK,
@@ -78,13 +85,17 @@ function itemUnit(item: StaffGalleryItem): string {
 export function StaffItemGalleryPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const session = readPrimaryBusiness();
+  const businessId = session?.id ?? "";
   const [filter, setFilter] = useState<StaffGalleryFilter>(() =>
     staffGalleryFilterFromQuery(searchParams.get("filter")),
   );
   const [query, setQuery] = useState("");
   const [debounced, setDebounced] = useState("");
-  /** WIRE fills via listStock; BUTTONS render expand/rows when nonempty. */
-  const [allItems] = useState<StaffGalleryItem[]>([]);
+  const [allItems, setAllItems] = useState<StaffGalleryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryTick, setRetryTick] = useState(0);
   const [suggestOpen, setSuggestOpen] = useState(false);
   const [expandedCats, setExpandedCats] = useState<Set<string>>(() => new Set());
   const [subTabByCat, setSubTabByCat] = useState<Record<string, string | null>>(
@@ -106,6 +117,40 @@ export function StaffItemGalleryPage() {
     document.addEventListener("click", onDocClick);
     return () => document.removeEventListener("click", onDocClick);
   }, []);
+
+  useEffect(() => {
+    if (!businessId) {
+      setAllItems([]);
+      setLoading(false);
+      setLoadError(null);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    setLoadError(null);
+    void fetchAllGalleryStock(businessId)
+      .then((rows) => {
+        if (cancelled) return;
+        setAllItems(rows);
+        setLoading(false);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setAllItems([]);
+        setLoading(false);
+        if (
+          err instanceof StaffGalleryApiError ||
+          err instanceof StaffGalleryNetworkError
+        ) {
+          setLoadError(err.message || STAFF_GALLERY_LOAD_FAILED);
+        } else {
+          setLoadError(STAFF_GALLERY_LOAD_FAILED);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [businessId, retryTick]);
 
   const q = debounced.toLowerCase();
   const filtered = filterGalleryItems(allItems, filter, q);
@@ -150,6 +195,10 @@ export function StaffItemGalleryPage() {
     /* no-op: QuickStockActionSheet not ported yet */
   }
 
+  function retryLoad() {
+    setRetryTick((n) => n + 1);
+  }
+
   return (
     <div
       className="staff-gallery-page"
@@ -157,6 +206,8 @@ export function StaffItemGalleryPage() {
       data-back-fallback={STAFF_GALLERY_BACK_FALLBACK}
       data-filter={filter}
       data-debounced={debounced}
+      data-loading={loading ? "true" : "false"}
+      data-load-error={loadError ? "true" : "false"}
     >
       <header className="staff-gallery-page__appbar" data-slot="appBar">
         <div
@@ -277,16 +328,46 @@ export function StaffItemGalleryPage() {
         </p>
 
         <div className="staff-gallery-page__results" data-slot="results">
-          <div className="staff-gallery-page__list" data-slot="list">
-            {filtered.length === 0 ? (
-              <p
-                className="staff-gallery-page__empty"
-                data-slot="empty"
-                data-testid="staff-gallery-empty"
-              >
-                {STAFF_GALLERY_EMPTY}
+          {loading ? (
+            <div
+              className="staff-gallery-page__loading"
+              data-slot="loading"
+              data-testid="staff-gallery-loading"
+              role="status"
+              aria-label="Loading"
+            >
+              <span className="staff-gallery-page__spinner" />
+            </div>
+          ) : loadError != null ? (
+            <div
+              className="staff-gallery-page__error"
+              data-slot="error"
+              data-testid="staff-gallery-error"
+            >
+              <p className="staff-gallery-page__error-title">
+                {STAFF_GALLERY_LOAD_FAILED}
               </p>
-            ) : (
+              <p className="staff-gallery-page__error-detail">{loadError}</p>
+              <button
+                type="button"
+                className="staff-gallery-page__retry"
+                data-testid="staff-gallery-retry"
+                onClick={retryLoad}
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <div className="staff-gallery-page__list" data-slot="list">
+              {filtered.length === 0 ? (
+                <p
+                  className="staff-gallery-page__empty"
+                  data-slot="empty"
+                  data-testid="staff-gallery-empty"
+                >
+                  {STAFF_GALLERY_EMPTY}
+                </p>
+              ) : (
               cats.map((cat) => {
                 const subMap = grouped.get(cat)!;
                 const expanded = expandedCats.has(cat);
@@ -527,7 +608,8 @@ export function StaffItemGalleryPage() {
                 );
               })
             )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -25,6 +25,7 @@ import type { DashboardRepository } from "./repositories/dashboard.repository";
 import type { HomeOverviewRepository } from "./repositories/homeOverview.repository";
 import type { StaffHomeRepository } from "./repositories/staffHome.repository";
 import type { HomeActivityRepository } from "./repositories/homeActivity.repository";
+import type { SearchRepository } from "./repositories/search.repository";
 import type { ConnectionPool } from "mssql";
 import type { CreateUserDeps } from "./services/usersCreate.service";
 import type { PatchUserDeps } from "./services/usersPatch.service";
@@ -42,8 +43,10 @@ import {
   createStockRoutes,
   createTradePurchasesRoutes,
 } from "./routes/staffHome.routes";
+import { createSearchRoutes } from "./routes/search.routes";
 import { createStaffHomeController } from "./controllers/staffHome.controller";
 import { createHomeActivityController } from "./controllers/homeActivity.controller";
+import { createSearchController } from "./controllers/search.controller";
 
 export type AppDeps = {
   /** Injected for tests / when pool is ready. */
@@ -57,6 +60,8 @@ export type AppDeps = {
   homeOverview?: HomeOverviewRepository;
   staffHome?: StaffHomeRepository;
   homeActivity?: HomeActivityRepository;
+  /** Unified search — search.py */
+  search?: SearchRepository;
   /** Users & Roles — business user list */
   businessUsers?: BusinessUsersRepository;
   /** SQL pool for transactional user create. */
@@ -177,6 +182,13 @@ function unavailableHomeActivityRepository(): HomeActivityRepository {
   };
 }
 
+function unavailableSearchRepository(): SearchRepository {
+  const fail = async (): Promise<never> => {
+    throw new Error("Database pool not connected. Call connect() first.");
+  };
+  return { unifiedSearch: fail };
+}
+
 function unavailableBusinessUsersRepository(): BusinessUsersRepository {
   const fail = async (): Promise<never> => {
     throw new Error("Database pool not connected. Call connect() first.");
@@ -271,6 +283,11 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
   app.use(
     "/v1/businesses/:businessId/notifications",
     createNotificationsRoutes(staffHomeController, app.authz),
+  );
+  const search = deps.search ?? unavailableSearchRepository();
+  app.use(
+    "/v1/businesses/:businessId/search",
+    createSearchRoutes(createSearchController({ search }), app.authz),
   );
 
   const businessUsers =

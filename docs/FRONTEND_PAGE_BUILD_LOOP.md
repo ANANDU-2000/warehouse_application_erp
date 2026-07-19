@@ -137,7 +137,7 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 2 LAYOUT | ✅ | ChoiceChip tokens + Quick filters empty chrome — [`staff_search_layout_compare.md`](modules/staff_search_layout_compare.md) |
 | 3 FIELDS | ✅ | query/section/recents + empty catalogs — [`staff_search_fields_compare.md`](modules/staff_search_fields_compare.md) |
 | 4 BUTTONS | ✅ | Quick-filter push/go — [`staff_search_buttons_compare.md`](modules/staff_search_buttons_compare.md) |
-| 5 WIRE | ⬜ | — |
+| 5 WIRE | ✅ | GET /search + rows + addRecent — [`staff_search_wire_compare.md`](modules/staff_search_wire_compare.md) |
 | 6 STATES | ⬜ | — |
 | 7 COMPARE | ⬜ | — |
 

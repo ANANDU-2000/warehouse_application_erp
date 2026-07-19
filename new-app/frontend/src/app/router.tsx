@@ -49,6 +49,10 @@ export function AppRouter() {
           element={<DashboardRouteStubPage title="Purchase history" />}
         />
         <Route
+          path="/staff/purchase-history/:purchaseId"
+          element={<DashboardRouteStubPage title="Purchase history" />}
+        />
+        <Route
           path="/staff/low-stock"
           element={<DashboardRouteStubPage title="Staff low stock" />}
         />

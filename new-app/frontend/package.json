@@ -76,7 +76,8 @@
     "test:staff-search-scaffold": "node scripts/check-staff-search-scaffold.mjs",
     "test:staff-search-layout": "node scripts/check-staff-search-layout.mjs",
     "test:staff-search-fields": "node scripts/check-staff-search-fields.mjs",
-    "test:staff-search-buttons": "node scripts/check-staff-search-buttons.mjs"
+    "test:staff-search-buttons": "node scripts/check-staff-search-buttons.mjs",
+    "test:staff-search-wire": "node scripts/check-staff-search-wire.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

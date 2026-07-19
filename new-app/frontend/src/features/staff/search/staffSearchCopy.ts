@@ -47,3 +47,13 @@ export const STAFF_SEARCH_SECTION_EMPTY_TYPES =
 export const STAFF_SEARCH_SECTION_TITLE_BILLS = "Recent purchase bills";
 export const STAFF_SEARCH_SECTION_EMPTY_BILLS =
   "No bills matched (try item name, supplier, or bill id).";
+
+/** Fuzzy banner — staff hideFinancials path */
+export const STAFF_SEARCH_FUZZY_CATALOG_STAFF =
+  "No exact item title match — showing close catalog matches. Open the item to confirm qty and supplier.";
+
+export const STAFF_SEARCH_FUZZY_ITEM_HINT =
+  "Approximate name match — open item to verify details.";
+
+export const STAFF_SEARCH_FAILED = "Search failed";
+export const STAFF_SEARCH_UPDATING = "Updating results…";

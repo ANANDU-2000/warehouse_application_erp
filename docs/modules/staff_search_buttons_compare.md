@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Notifications COMPARE · Staff search SCAFFOLD · LAYOUT · FIELDS · **BUTTONS** |
-| 🟡 Current | Staff search **BUTTONS PASS** — ask before WIRE |
-| ⬜ Pending | WIRE → STATES → COMPARE · other stubs |
-| ⏸ Deferred | `/staff/settings` · `/settings`; owner `/search`; result-row taps (needs WIRE rows); addRecent on success |
+| ✅ Completed | Notifications COMPARE · Staff search SCAFFOLD · LAYOUT · FIELDS · BUTTONS · **WIRE** |
+| 🟡 Current | Staff search **WIRE PASS** — ask before STATES |
+| ⬜ Pending | STATES → COMPARE · other stubs |
+| ⏸ Deferred | `/staff/settings` · `/settings`; owner `/search`; TradeIntel full fact-rich tile polish (STATES) |
 
 ## Legacy vs New
 
@@ -32,4 +32,4 @@
 
 **Rollback:** Revert BUTTONS commit; restore FIELDS `aria-disabled` QF chips; remove `nav` modes + this compare + script; boards → ask before BUTTONS.
 
-**Next (ask first):** `/staff/search` WIRE — do not start until approved.
+**Next (ask first):** `/staff/search` WIRE — done → [`staff_search_wire_compare.md`](staff_search_wire_compare.md). Ask before STATES.

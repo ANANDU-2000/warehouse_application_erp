@@ -201,6 +201,18 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 6 STATES | ✅ | ListSkeleton 10 + HexaErrorCard map — [`staff_activity_states_compare.md`](modules/staff_activity_states_compare.md) |
 | 7 COMPARE | ✅ | Aggregator SCAFFOLD→STATES — [`staff_activity_compare.md`](modules/staff_activity_compare.md) |
 
+### Staff deliveries (`/staff/deliveries`) — Subagent 4
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | AppBar + 3 sections + empty — [`staff_deliveries_scaffold_compare.md`](modules/staff_deliveries_scaffold_compare.md) |
+| 2 LAYOUT | ⬜ | — |
+| 3 FIELDS | ⬜ | — |
+| 4 BUTTONS | ⬜ | — |
+| 5 WIRE | ⬜ | — |
+| 6 STATES | ⬜ | — |
+| 7 COMPARE | ⬜ | — |
+
 ### Prompt template (copy per page)
 
 ```

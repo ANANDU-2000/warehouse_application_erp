@@ -1,6 +1,6 @@
 /**
- * Staff search `/staff/search` — SCAFFOLD/LAYOUT labels.
- * Source: search_page.dart staffShellEmbedded chrome + empty-query body
+ * Staff search `/staff/search` — labels.
+ * Source: search_page.dart staffShellEmbedded chrome + empty/result copy
  */
 export const STAFF_SEARCH_TITLE = "Search";
 /** Flutter popOrGo(authenticatedHomePath) for staff → /staff/home */
@@ -29,3 +29,21 @@ export const STAFF_SEARCH_QF_SCAN = "Scan barcode";
 
 export const STAFF_SEARCH_EMPTY_HELPER =
   "Search items by name, item code, category, or subcategory. Use quick filters for missing labels and opening stock.";
+
+/** Debounce ms — search_page.dart _scheduleSearch */
+export const STAFF_SEARCH_DEBOUNCE_MS = 350;
+
+/** Nonempty query + empty API data — search_page.dart hasAny == false */
+export const STAFF_SEARCH_NO_MATCH_GLOBAL =
+  "No matching items found. Try recent items, low stock, missing barcode, or scan history.";
+
+export const STAFF_SEARCH_SECTION_TITLE_ITEMS = "Catalog items";
+export const STAFF_SEARCH_SECTION_EMPTY_ITEMS = "No matching catalog items.";
+
+export const STAFF_SEARCH_SECTION_TITLE_TYPES = "Catalog types";
+export const STAFF_SEARCH_SECTION_EMPTY_TYPES =
+  "No matching category / subcategory (type) names.";
+
+export const STAFF_SEARCH_SECTION_TITLE_BILLS = "Recent purchase bills";
+export const STAFF_SEARCH_SECTION_EMPTY_BILLS =
+  "No bills matched (try item name, supplier, or bill id).";

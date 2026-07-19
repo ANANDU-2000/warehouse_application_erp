@@ -7,10 +7,10 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Notifications COMPARE · Staff search SCAFFOLD · **LAYOUT** |
-| 🟡 Current | Staff search **LAYOUT PASS** — ask before FIELDS |
-| ⬜ Pending | FIELDS → BUTTONS → WIRE → STATES → COMPARE · other stubs |
-| ⏸ Deferred | `/staff/settings` · `/settings`; owner `/search`; Recent chips (needs FIELDS store); API |
+| ✅ Completed | Notifications COMPARE · Staff search SCAFFOLD · LAYOUT · **FIELDS** |
+| 🟡 Current | Staff search **FIELDS PASS** — ask before BUTTONS |
+| ⬜ Pending | BUTTONS → WIRE → STATES → COMPARE · other stubs |
+| ⏸ Deferred | `/staff/settings` · `/settings`; owner `/search`; API; addRecent on success (WIRE); QF navigation (BUTTONS) |
 
 ## Legacy vs New
 
@@ -35,4 +35,4 @@
 
 **Rollback:** Revert LAYOUT commit; restore SCAFFOLD page/CSS/copy; remove quick-filters module + this compare + layout script; boards → ask before LAYOUT.
 
-**Next (ask first):** `/staff/search` FIELDS — do not start until approved.
+**Next (ask first):** `/staff/search` FIELDS — done → [`staff_search_fields_compare.md`](staff_search_fields_compare.md). Ask before BUTTONS.

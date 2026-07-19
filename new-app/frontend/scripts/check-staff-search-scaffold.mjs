@@ -75,9 +75,8 @@ assert(page.includes("STAFF_SEARCH_HINT"), "uses hint");
 assert(page.includes("STAFF_SEARCH_SECTION_ORDER"), "uses sections");
 assert(page.includes('data-staff-shell-embedded="true"'), "embedded flag");
 assert(!page.includes('data-slot="appBar"'), "no AppBar (staff embedded)");
-assert(page.includes("readOnly"), "input inert");
-assert(page.includes("pointer-events") || page.includes("tabIndex={-1}"), "inert chips");
-/* WIRE owns GET /search */
+assert(page.includes("STAFF_SEARCH_HINT"), "hint wired");
+/* FIELDS owns editable input; WIRE owns GET /search */
 
 assert(router.includes("StaffSearchPage"), "router imports page");
 assert(router.includes('path="/staff/search"'), "staff search route");

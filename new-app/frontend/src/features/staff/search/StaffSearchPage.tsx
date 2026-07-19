@@ -1,24 +1,84 @@
 /**
- * Staff search `/staff/search` — LAYOUT (Step 2).
+ * Staff search `/staff/search` — FIELDS (Step 3).
  * Source: search_page.dart SearchPage(staffShellEmbedded: true)
- * Chrome + empty-query Quick filters shell — no typing/API (FIELDS/WIRE).
+ * Local query/section/recents — no API (WIRE).
  */
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   STAFF_SEARCH_BACK_FALLBACK,
+  STAFF_SEARCH_DEBOUNCE_MS,
   STAFF_SEARCH_EMPTY_HELPER,
   STAFF_SEARCH_HINT,
+  STAFF_SEARCH_NO_MATCH_GLOBAL,
   STAFF_SEARCH_QUICK_FILTERS_TITLE,
+  STAFF_SEARCH_RECENT_CLEAR,
+  STAFF_SEARCH_RECENT_TITLE,
+  STAFF_SEARCH_SECTION_EMPTY_BILLS,
+  STAFF_SEARCH_SECTION_EMPTY_ITEMS,
+  STAFF_SEARCH_SECTION_TITLE_BILLS,
+  STAFF_SEARCH_SECTION_TITLE_ITEMS,
 } from "./staffSearchCopy";
 import { STAFF_SEARCH_QUICK_FILTERS } from "./staffSearchQuickFilters";
+import {
+  clearRecentSearchQueries,
+  loadRecentSearchQueries,
+} from "./staffSearchRecents";
 import {
   STAFF_SEARCH_DEFAULT_SECTION,
   STAFF_SEARCH_SECTION_LABELS,
   STAFF_SEARCH_SECTION_ORDER,
+  type StaffSearchSection,
 } from "./staffSearchSections";
 import "./StaffSearchPage.css";
 
+function parseSectionParam(raw: string | null): StaffSearchSection | null {
+  if (raw === "items" || raw === "types" || raw === "bills") return raw;
+  return null;
+}
+
 export function StaffSearchPage() {
-  const selected = STAFF_SEARCH_DEFAULT_SECTION;
+  const [searchParams] = useSearchParams();
+  const [section, setSection] = useState<StaffSearchSection>(() => {
+    return (
+      parseSectionParam(searchParams.get("section")) ??
+      STAFF_SEARCH_DEFAULT_SECTION
+    );
+  });
+  const [query, setQuery] = useState("");
+  const [debounced, setDebounced] = useState("");
+  const [recents, setRecents] = useState<string[]>(() =>
+    loadRecentSearchQueries(),
+  );
+
+  useEffect(() => {
+    const fromUrl = parseSectionParam(searchParams.get("section"));
+    if (fromUrl) setSection(fromUrl);
+  }, [searchParams]);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      const next = query.trim();
+      setDebounced((prev) => (prev === next ? prev : next));
+    }, STAFF_SEARCH_DEBOUNCE_MS);
+    return () => window.clearTimeout(t);
+  }, [query]);
+
+  const qEmpty = debounced.length === 0;
+
+  function applyQuery(raw: string) {
+    setQuery(raw);
+    setDebounced(raw.trim());
+  }
+
+  function clearSearch() {
+    setQuery("");
+    setDebounced("");
+  }
+
+  function onClearRecents() {
+    setRecents(clearRecentSearchQueries());
+  }
 
   return (
     <div
@@ -26,6 +86,8 @@ export function StaffSearchPage() {
       data-testid="staff-search-page"
       data-back-fallback={STAFF_SEARCH_BACK_FALLBACK}
       data-staff-shell-embedded="true"
+      data-section={section}
+      data-debounced={debounced}
     >
       <div className="staff-search-page__body" data-slot="body">
         <div
@@ -42,15 +104,30 @@ export function StaffSearchPage() {
             </svg>
           </span>
           <input
-            className="staff-search-page__search-input"
+            className="staff-search-page__search-input staff-search-page__search-input--active"
             type="search"
             placeholder={STAFF_SEARCH_HINT}
             aria-label={STAFF_SEARCH_HINT}
             data-testid="staff-search-input"
-            readOnly
-            tabIndex={-1}
-            value=""
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
           />
+          {query.length > 0 ? (
+            <button
+              type="button"
+              className="staff-search-page__search-clear"
+              data-testid="staff-search-clear"
+              aria-label="Clear search"
+              onClick={clearSearch}
+            >
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                />
+              </svg>
+            </button>
+          ) : null}
         </div>
 
         <div
@@ -65,14 +142,14 @@ export function StaffSearchPage() {
               key={s}
               type="button"
               role="tab"
-              aria-selected={selected === s}
+              aria-selected={section === s}
               className={
-                selected === s
-                  ? "staff-search-page__chip staff-search-page__chip--selected"
-                  : "staff-search-page__chip"
+                section === s
+                  ? "staff-search-page__chip staff-search-page__chip--selected staff-search-page__chip--active"
+                  : "staff-search-page__chip staff-search-page__chip--active"
               }
               data-testid={`staff-search-section-${s}`}
-              tabIndex={-1}
+              onClick={() => setSection(s)}
             >
               {STAFF_SEARCH_SECTION_LABELS[s]}
             </button>
@@ -85,38 +162,111 @@ export function StaffSearchPage() {
           data-testid="staff-search-results-chrome"
           aria-label="Search results"
         >
-          {/* Empty-query chrome — Flutter q.isEmpty (Recent deferred until FIELDS) */}
-          <div
-            className="staff-search-page__empty"
-            data-slot="empty"
-            data-testid="staff-search-empty-chrome"
-          >
-            <h2 className="staff-search-page__section-title">
-              {STAFF_SEARCH_QUICK_FILTERS_TITLE}
-            </h2>
+          {qEmpty ? (
             <div
-              className="staff-search-page__quick-filters"
-              data-testid="staff-search-quick-filters"
+              className="staff-search-page__empty"
+              data-slot="empty"
+              data-testid="staff-search-empty-chrome"
             >
-              {STAFF_SEARCH_QUICK_FILTERS.map((qf) => (
-                <button
-                  key={qf.id}
-                  type="button"
-                  className="staff-search-page__action-chip"
-                  data-testid={`staff-search-qf-${qf.id}`}
-                  data-path={qf.path}
-                  tabIndex={-1}
+              {recents.length > 0 ? (
+                <div
+                  className="staff-search-page__recents"
+                  data-testid="staff-search-recents"
                 >
-                  <span
-                    className="staff-search-page__action-chip-icon"
-                    aria-hidden="true"
-                  />
-                  {qf.label}
-                </button>
-              ))}
+                  <div className="staff-search-page__recents-head">
+                    <h2 className="staff-search-page__section-title staff-search-page__section-title--inline">
+                      {STAFF_SEARCH_RECENT_TITLE}
+                    </h2>
+                    <button
+                      type="button"
+                      className="staff-search-page__text-btn"
+                      data-testid="staff-search-recents-clear"
+                      onClick={onClearRecents}
+                    >
+                      {STAFF_SEARCH_RECENT_CLEAR}
+                    </button>
+                  </div>
+                  <div className="staff-search-page__recents-wrap">
+                    {recents.map((r) => (
+                      <button
+                        key={r}
+                        type="button"
+                        className="staff-search-page__recent-chip"
+                        data-testid="staff-search-recent-chip"
+                        onClick={() => applyQuery(r)}
+                      >
+                        {r}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              <h2 className="staff-search-page__section-title">
+                {STAFF_SEARCH_QUICK_FILTERS_TITLE}
+              </h2>
+              <div
+                className="staff-search-page__quick-filters"
+                data-testid="staff-search-quick-filters"
+              >
+                {STAFF_SEARCH_QUICK_FILTERS.map((qf) => (
+                  <button
+                    key={qf.id}
+                    type="button"
+                    className="staff-search-page__action-chip"
+                    data-testid={`staff-search-qf-${qf.id}`}
+                    data-path={qf.path}
+                    tabIndex={-1}
+                    aria-disabled="true"
+                  >
+                    <span
+                      className="staff-search-page__action-chip-icon"
+                      aria-hidden="true"
+                    />
+                    {qf.label}
+                  </button>
+                ))}
+              </div>
+              <p className="staff-search-page__helper">
+                {STAFF_SEARCH_EMPTY_HELPER}
+              </p>
             </div>
-            <p className="staff-search-page__helper">{STAFF_SEARCH_EMPTY_HELPER}</p>
-          </div>
+          ) : (
+            <div
+              className="staff-search-page__query-results"
+              data-slot="query-results"
+              data-testid="staff-search-query-results"
+            >
+              {/* FIELDS: no API yet — empty catalogs match Flutter hasAny==false */}
+              <p
+                className="staff-search-page__no-match"
+                data-testid="staff-search-no-match-global"
+              >
+                {STAFF_SEARCH_NO_MATCH_GLOBAL}
+              </p>
+              {section === "items" ? (
+                <div data-testid="staff-search-section-block-items">
+                  <h2 className="staff-search-page__result-title">
+                    {STAFF_SEARCH_SECTION_TITLE_ITEMS}
+                  </h2>
+                  <p className="staff-search-page__result-empty">
+                    {STAFF_SEARCH_SECTION_EMPTY_ITEMS}
+                  </p>
+                </div>
+              ) : null}
+              {/* Staff types list block gated in Flutter (!staffShellEmbedded) — N/A */}
+              {section === "bills" ? (
+                <div data-testid="staff-search-section-block-bills">
+                  <h2 className="staff-search-page__result-title">
+                    {STAFF_SEARCH_SECTION_TITLE_BILLS}
+                  </h2>
+                  <p className="staff-search-page__result-empty">
+                    {STAFF_SEARCH_SECTION_EMPTY_BILLS}
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          )}
         </section>
       </div>
     </div>

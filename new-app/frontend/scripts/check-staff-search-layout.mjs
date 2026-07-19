@@ -58,7 +58,11 @@ assert(page.includes('data-slot="empty"'), "empty slot");
 assert(page.includes("STAFF_SEARCH_QUICK_FILTERS"), "uses QF list");
 assert(page.includes("STAFF_SEARCH_EMPTY_HELPER"), "uses helper");
 assert(!page.includes('data-slot="appBar"'), "no AppBar");
-assert(page.includes("readOnly"), "input inert");
+assert(
+  page.includes("search-input--active") || page.includes("readOnly"),
+  "search field present (FIELDS may activate)",
+);
+/* FIELDS owns editable input; BUTTONS owns QF nav; WIRE owns GET /search */
 
 assert(css.includes("#f7f9f6") || css.includes("#F7F9F6"), "brand background");
 assert(css.includes("#0e4f46") || css.includes("#0E4F46"), "brand primary");

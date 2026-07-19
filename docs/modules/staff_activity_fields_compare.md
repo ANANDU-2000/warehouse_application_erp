@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Staff low-stock COMPARE · Staff activity SCAFFOLD → **FIELDS** |
-| 🟡 Current | `/staff/activity` **FIELDS PASS** — ask before BUTTONS |
-| ⬜ Pending | BUTTONS → COMPARE · other Subagent 4 stubs |
+| ✅ Completed | Staff low-stock COMPARE · Staff activity SCAFFOLD → **BUTTONS** |
+| 🟡 Current | `/staff/activity` **BUTTONS PASS** — ask before WIRE |
+| ⬜ Pending | WIRE → COMPARE · other Subagent 4 stubs |
 | ⏸ Deferred | listActivityLog API · ListSkeleton / HexaErrorCard · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -29,4 +29,4 @@
 
 **Rollback:** Revert FIELDS commit; restore LAYOUT fixed period + inert chips; remove fields script + this compare; boards → ask before FIELDS.
 
-**Next (ask first):** BUTTONS — do not start until approved.
+**Next (ask first):** BUTTONS done — [`staff_activity_buttons_compare.md`](staff_activity_buttons_compare.md). Ask before WIRE.

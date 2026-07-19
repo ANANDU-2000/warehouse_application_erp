@@ -1,7 +1,7 @@
 /**
- * Staff activity `/staff/activity` — FIELDS (Step 3).
- * Source: staff_activity_page.dart SegmentedButton onSelectionChanged →
- * _staffActivityPeriodProvider (today|week|month).
+ * Staff activity `/staff/activity` — BUTTONS (Step 4).
+ * Source: staff_activity_page.dart — AppBar back popOrGo; ListTile has **no** onTap
+ * (display-only rows). Period chips already FIELDS.
  * Deferred: listActivityLog → WIRE; ListSkeleton / HexaErrorCard → STATES.
  */
 import { useState } from "react";
@@ -33,6 +33,10 @@ export function StaffActivityPage() {
   const navigate = useNavigate();
   const [period, setPeriod] = useState<StaffActPeriod>(STAFF_ACT_DEFAULT_PERIOD);
 
+  function onBack(): void {
+    popOrGo(navigate, STAFF_ACT_BACK_FALLBACK);
+  }
+
   return (
     <div
       className="staff-act-page"
@@ -45,7 +49,8 @@ export function StaffActivityPage() {
           className="staff-act-appbar__back"
           aria-label="Back"
           data-testid="staff-act-back"
-          onClick={() => popOrGo(navigate, STAFF_ACT_BACK_FALLBACK)}
+          data-action="back"
+          onClick={onBack}
         >
           ←
         </button>
@@ -90,11 +95,12 @@ export function StaffActivityPage() {
             <p className="staff-act-empty__sub">{STAFF_ACT_EMPTY_SUB}</p>
           </div>
 
-          {/* Row chrome sample — hidden until WIRE fills list */}
+          {/* Flutter ListTile: no onTap — display-only until WIRE fills rows */}
           <ul
             className="staff-act-list"
             data-slot="list"
             data-deferred="activity-rows"
+            data-interactive="false"
             aria-hidden="true"
             hidden
           >
@@ -102,6 +108,7 @@ export function StaffActivityPage() {
               className="staff-act-row"
               data-slot="row"
               data-kind="history"
+              data-interactive="false"
             >
               <span
                 className="staff-act-row__avatar staff-act-row__avatar--history"
@@ -120,6 +127,7 @@ export function StaffActivityPage() {
               className="staff-act-row"
               data-slot="row"
               data-kind="purchase"
+              data-interactive="false"
             >
               <span
                 className="staff-act-row__avatar staff-act-row__avatar--purchase"

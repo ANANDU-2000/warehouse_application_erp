@@ -23,4 +23,4 @@
 
 **Rollback:** Revert BUTTONS commit; restore FIELDS inert AppBar; remove this compare + script; boards → ask before BUTTONS.
 
-**Next (ask first):** `/settings/users` WIRE — `GET …/users` list + create/bulk APIs.
+**Next (ask first):** `/settings/users` WIRE — done → [`users_management_wire_compare.md`](users_management_wire_compare.md). Ask before STATES.

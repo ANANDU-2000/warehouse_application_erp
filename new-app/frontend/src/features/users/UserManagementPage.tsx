@@ -1,9 +1,9 @@
 /**
- * Users list — BUTTONS (Step 4).
- * Source: user_management_page.dart AppBar/bulk; user_list_filters.dart drawer.
- * Forbidden this step: live API / fetch / create submit / bulk POST.
+ * Users list — WIRE (Step 5).
+ * Source: business_users_provider + hexa_api list/create/bulk; user_management_page.dart
+ * Full skeleton / FriendlyLoadError → STATES.
  */
-import { useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import {
@@ -21,6 +21,11 @@ import {
   USERS_MGMT_BULK_DELETE,
   USERS_MGMT_CREATE_CANCEL,
   USERS_MGMT_CREATE_USER,
+  USERS_MGMT_CREDENTIALS_COPIED,
+  USERS_MGMT_CREDENTIALS_COPY,
+  USERS_MGMT_CREDENTIALS_DONE,
+  USERS_MGMT_CREDENTIALS_TITLE,
+  USERS_MGMT_EMPTY_FILTERS,
   USERS_MGMT_FIELD_ACTIVE,
   USERS_MGMT_FIELD_EMAIL,
   USERS_MGMT_FIELD_FULL_NAME,
@@ -31,6 +36,8 @@ import {
   USERS_MGMT_FILTER_APPLY,
   USERS_MGMT_FILTER_CLEAR,
   USERS_MGMT_FILTER_HEADING,
+  USERS_MGMT_LOAD_ERROR,
+  USERS_MGMT_LOADING,
   USERS_MGMT_PASSWORD_HELPER,
   USERS_MGMT_ROLE_ADMIN_OWNER,
   USERS_MGMT_ROLE_MANAGER,
@@ -42,21 +49,30 @@ import {
   USERS_MGMT_TOOLTIP_FILTER,
   USERS_MGMT_TOOLTIP_REFRESH,
   USERS_MGMT_TOOLTIP_SELECT,
+  USERS_MGMT_USER_CREATED,
 } from "./usersManagementCopy";
 import {
   USER_LIST_PRIMARY_LABELS,
   USER_LIST_PRIMARY_ORDER,
+  applyUserListFilters,
   copyUserListFilter,
   countForPrimaryFilter,
   DEFAULT_USER_LIST_FILTER,
   drawerActiveCount,
   type UserListFilterState,
   type UserListPrimaryFilter,
-  type UserListRow,
 } from "./userListFilters";
+import {
+  bulkBusinessUsers,
+  createBusinessUser,
+  listBusinessUsers,
+  UsersApiError,
+  UsersNetworkError,
+  type BusinessUserListItem,
+} from "./usersApi";
+import { UserCompactCard } from "./UserCompactCard";
 import "./UserManagementPage.css";
 
-/** Flutter navigation_ext.popOrGo */
 function popOrGo(
   navigate: ReturnType<typeof useNavigate>,
   fallback: string,
@@ -80,12 +96,14 @@ function IconBtn({
   onClick,
   children,
   testId,
+  disabled,
 }: {
   className: string;
   label: string;
   onClick: () => void;
   children: ReactNode;
   testId?: string;
+  disabled?: boolean;
 }) {
   return (
     <button
@@ -95,6 +113,7 @@ function IconBtn({
       aria-label={label}
       onClick={onClick}
       data-testid={testId}
+      disabled={disabled}
     >
       {children}
     </button>
@@ -121,6 +140,13 @@ const EMPTY_CREATE: CreateDraft = {
   active: true,
 };
 
+type CredShare = {
+  name: string;
+  loginEmail: string;
+  password: string;
+  phone: string;
+};
+
 export function UserManagementPage() {
   const navigate = useNavigate();
   const session = readPrimaryBusiness();
@@ -128,14 +154,57 @@ export function UserManagementPage() {
     DEFAULT_USER_LIST_FILTER,
   );
   const [selectMode, setSelectMode] = useState(false);
-  const [selected] = useState<Set<string>>(() => new Set());
+  const [selected, setSelected] = useState<Set<string>>(() => new Set());
   const [filterOpen, setFilterOpen] = useState(false);
   const [draftRoles, setDraftRoles] = useState<Set<string>>(() => new Set());
   const [createOpen, setCreateOpen] = useState(false);
   const [createDraft, setCreateDraft] = useState<CreateDraft>(EMPTY_CREATE);
+  const [createSaving, setCreateSaving] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [credShare, setCredShare] = useState<CredShare | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
-  /** Empty until WIRE — counts stay 0. */
-  const rows = useMemo<UserListRow[]>(() => [], []);
+  const [rows, setRows] = useState<BusinessUserListItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryTick, setRetryTick] = useState(0);
+  const [bulkBusy, setBulkBusy] = useState(false);
+
+  const loadUsers = useCallback(async () => {
+    if (!session?.id) {
+      setRows([]);
+      setLoading(false);
+      setLoadError("Not signed in");
+      return;
+    }
+    setLoading(true);
+    setLoadError(null);
+    try {
+      const list = await listBusinessUsers({
+        businessId: session.id,
+        includeInactive: true,
+      });
+      setRows(list);
+    } catch (e) {
+      const msg =
+        e instanceof UsersApiError || e instanceof UsersNetworkError
+          ? e.message
+          : USERS_MGMT_LOAD_ERROR;
+      setLoadError(msg);
+      setRows([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [session?.id]);
+
+  useEffect(() => {
+    void loadUsers();
+  }, [loadUsers, retryTick]);
+
+  const filtered = useMemo(
+    () => applyUserListFilters(rows, filter),
+    [rows, filter],
+  );
 
   if (!sessionCanManageUsers(session)) {
     return <Navigate to="/settings" replace />;
@@ -144,6 +213,7 @@ export function UserManagementPage() {
   const canAdmin = sessionCanAdminUsers(session);
   const canCreate = sessionCanCreateUsers(session);
   const roleBadge = drawerActiveCount(filter.roles);
+  const businessId = session!.id;
 
   function setPrimary(primary: UserListPrimaryFilter) {
     setFilter((prev) => copyUserListFilter(prev, { primary }));
@@ -156,6 +226,7 @@ export function UserManagementPage() {
   function onLeading() {
     if (selectMode) {
       setSelectMode(false);
+      setSelected(new Set());
       return;
     }
     popOrGo(navigate, USERS_MGMT_BACK_FALLBACK);
@@ -163,19 +234,50 @@ export function UserManagementPage() {
 
   function onToggleSelect() {
     setSelectMode((prev) => {
-      if (prev) return false;
+      if (prev) {
+        setSelected(new Set());
+        return false;
+      }
       return true;
     });
   }
 
-  /** Refresh stub — live invalidate deferred to WIRE. */
   function onRefresh() {
-    /* no-op until WIRE */
+    setRetryTick((n) => n + 1);
   }
 
-  /** Bulk stub — POST /bulk deferred to WIRE. */
-  function onBulkAction(_action: string) {
-    /* no-op until WIRE */
+  function toggleSelected(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  async function onBulkAction(
+    action: "activate" | "deactivate" | "block" | "delete",
+  ) {
+    if (selected.size === 0 || bulkBusy) return;
+    setBulkBusy(true);
+    try {
+      await bulkBusinessUsers({
+        businessId,
+        userIds: [...selected],
+        action,
+      });
+      setSelectMode(false);
+      setSelected(new Set());
+      await loadUsers();
+    } catch (e) {
+      const msg =
+        e instanceof UsersApiError || e instanceof UsersNetworkError
+          ? e.message
+          : "Bulk action failed";
+      setToast(msg);
+    } finally {
+      setBulkBusy(false);
+    }
   }
 
   function openFilterDrawer() {
@@ -193,22 +295,87 @@ export function UserManagementPage() {
   }
 
   function applyFilterRoles() {
-    setFilter((prev) => copyUserListFilter(prev, { roles: new Set(draftRoles) }));
+    setFilter((prev) =>
+      copyUserListFilter(prev, { roles: new Set(draftRoles) }),
+    );
     setFilterOpen(false);
-  }
-
-  function clearFilterRoles() {
-    setDraftRoles(new Set());
   }
 
   function openCreate() {
     setCreateDraft(EMPTY_CREATE);
+    setCreateError(null);
     setCreateOpen(true);
   }
 
-  /** Create submit deferred to WIRE — button present, no fetch. */
-  function onCreateSubmit() {
-    /* no-op until WIRE */
+  async function onCreateSubmit() {
+    if (createSaving) return;
+    const name = createDraft.fullName.trim();
+    const email = createDraft.email.trim();
+    const phone = createDraft.phone.trim();
+    if (!name || email.length < 5 || phone.length < 6) {
+      setCreateError("Full name, email, and phone are required");
+      return;
+    }
+    setCreateSaving(true);
+    setCreateError(null);
+    try {
+      const body = await createBusinessUser({
+        businessId,
+        fullName: name,
+        email,
+        phone,
+        role: createDraft.role,
+        notes: createDraft.notes.trim() || null,
+        password: createDraft.password.trim() || null,
+        isActive: createDraft.active,
+      });
+      setCreateOpen(false);
+      await loadUsers();
+      const user = body.user;
+      const gen = body.generated_password?.toString();
+      const pwd =
+        gen ||
+        (createDraft.password.trim() ? createDraft.password.trim() : null);
+      const loginEmail =
+        body.login_email?.toString() ||
+        user?.email?.toString() ||
+        email;
+      if (pwd) {
+        setCredShare({
+          name: user?.name || name,
+          loginEmail,
+          password: pwd,
+          phone,
+        });
+      } else {
+        setToast(USERS_MGMT_USER_CREATED);
+      }
+    } catch (e) {
+      const msg =
+        e instanceof UsersApiError || e instanceof UsersNetworkError
+          ? e.message
+          : "Could not create user";
+      setCreateError(msg);
+    } finally {
+      setCreateSaving(false);
+    }
+  }
+
+  async function copyCredentials() {
+    if (!credShare) return;
+    const lines = [
+      "Harisree workspace login",
+      `Name: ${credShare.name}`,
+      `Email: ${credShare.loginEmail}`,
+      `Password: ${credShare.password}`,
+      ...(credShare.phone ? [`Phone: ${credShare.phone}`] : []),
+    ];
+    try {
+      await navigator.clipboard.writeText(lines.join("\n"));
+      setToast(USERS_MGMT_CREDENTIALS_COPIED);
+    } catch {
+      setToast(USERS_MGMT_CREDENTIALS_COPIED);
+    }
   }
 
   const titleText = selectMode
@@ -221,7 +388,11 @@ export function UserManagementPage() {
         <div className="users-mgmt__appbar-leading" data-slot="appBar.leading">
           <IconBtn
             className="users-mgmt__icon--back"
-            label={selectMode ? USERS_MGMT_TOOLTIP_EXIT_SELECT : USERS_MGMT_TOOLTIP_BACK}
+            label={
+              selectMode
+                ? USERS_MGMT_TOOLTIP_EXIT_SELECT
+                : USERS_MGMT_TOOLTIP_BACK
+            }
             onClick={onLeading}
             testId="users-mgmt-back"
           >
@@ -268,6 +439,7 @@ export function UserManagementPage() {
             label={USERS_MGMT_TOOLTIP_REFRESH}
             onClick={onRefresh}
             testId="users-mgmt-refresh"
+            disabled={loading}
           >
             <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
               <path
@@ -382,11 +554,52 @@ export function UserManagementPage() {
 
         <div className="users-mgmt__split">
           <section
-            className="users-mgmt__list"
+            className="users-mgmt__list users-mgmt__list--live"
             data-slot="list"
             data-testid="users-mgmt-list-chrome"
-            aria-hidden="true"
-          />
+          >
+            {loading ? (
+              <p className="users-mgmt__status-msg" data-testid="users-mgmt-loading">
+                {USERS_MGMT_LOADING}
+              </p>
+            ) : loadError ? (
+              <div className="users-mgmt__status-msg" data-testid="users-mgmt-error">
+                <p>{USERS_MGMT_LOAD_ERROR}</p>
+                <p>{loadError}</p>
+                <button
+                  type="button"
+                  className="users-mgmt__drawer-btn users-mgmt__drawer-btn--filled"
+                  onClick={() => setRetryTick((n) => n + 1)}
+                >
+                  Retry
+                </button>
+              </div>
+            ) : filtered.length === 0 ? (
+              <p className="users-mgmt__status-msg" data-testid="users-mgmt-empty">
+                {USERS_MGMT_EMPTY_FILTERS}
+              </p>
+            ) : (
+              filtered.map((u) => {
+                const id = u.id;
+                return (
+                  <UserCompactCard
+                    key={id}
+                    user={u}
+                    selectMode={selectMode}
+                    selected={selected.has(id)}
+                    onToggleSelect={() => toggleSelected(id)}
+                    onTap={() => {
+                      if (selectMode) {
+                        toggleSelected(id);
+                      } else {
+                        navigate(`/settings/users/${encodeURIComponent(id)}`);
+                      }
+                    }}
+                  />
+                );
+              })
+            )}
+          </section>
           <aside
             className="users-mgmt__detail"
             data-slot="detailPanel"
@@ -406,7 +619,8 @@ export function UserManagementPage() {
             type="button"
             className="users-mgmt__bulk-btn"
             data-testid="users-mgmt-bulk-activate"
-            onClick={() => onBulkAction("activate")}
+            disabled={bulkBusy || selected.size === 0}
+            onClick={() => void onBulkAction("activate")}
           >
             {USERS_MGMT_BULK_ACTIVATE}
           </button>
@@ -414,7 +628,8 @@ export function UserManagementPage() {
             type="button"
             className="users-mgmt__bulk-btn"
             data-testid="users-mgmt-bulk-deactivate"
-            onClick={() => onBulkAction("deactivate")}
+            disabled={bulkBusy || selected.size === 0}
+            onClick={() => void onBulkAction("deactivate")}
           >
             {USERS_MGMT_BULK_DEACTIVATE}
           </button>
@@ -422,7 +637,8 @@ export function UserManagementPage() {
             type="button"
             className="users-mgmt__bulk-btn"
             data-testid="users-mgmt-bulk-block"
-            onClick={() => onBulkAction("block")}
+            disabled={bulkBusy || selected.size === 0}
+            onClick={() => void onBulkAction("block")}
           >
             {USERS_MGMT_BULK_BLOCK}
           </button>
@@ -430,7 +646,8 @@ export function UserManagementPage() {
             type="button"
             className="users-mgmt__bulk-btn"
             data-testid="users-mgmt-bulk-delete"
-            onClick={() => onBulkAction("delete")}
+            disabled={bulkBusy || selected.size === 0}
+            onClick={() => void onBulkAction("delete")}
           >
             {USERS_MGMT_BULK_DELETE}
           </button>
@@ -459,7 +676,10 @@ export function UserManagementPage() {
             onClick={() => setFilterOpen(false)}
           />
           <div className="users-mgmt__drawer">
-            <h2 id="users-mgmt-filter-heading" className="users-mgmt__drawer-title">
+            <h2
+              id="users-mgmt-filter-heading"
+              className="users-mgmt__drawer-title"
+            >
               {USERS_MGMT_FILTER_HEADING}
             </h2>
             <label className="users-mgmt__check">
@@ -491,7 +711,7 @@ export function UserManagementPage() {
                 type="button"
                 className="users-mgmt__drawer-btn users-mgmt__drawer-btn--outline"
                 data-testid="users-mgmt-filter-clear"
-                onClick={clearFilterRoles}
+                onClick={() => setDraftRoles(new Set())}
               >
                 {USERS_MGMT_FILTER_CLEAR}
               </button>
@@ -523,9 +743,15 @@ export function UserManagementPage() {
             onClick={() => setCreateOpen(false)}
           />
           <div className="users-mgmt__sheet">
-            <h2 id="users-mgmt-create-heading" className="users-mgmt__drawer-title">
+            <h2
+              id="users-mgmt-create-heading"
+              className="users-mgmt__drawer-title"
+            >
               {USERS_MGMT_ADD_SHEET_TITLE}
             </h2>
+            {createError ? (
+              <p className="users-mgmt__form-error">{createError}</p>
+            ) : null}
             <label className="users-mgmt__field">
               <span>{USERS_MGMT_FIELD_FULL_NAME}</span>
               <input
@@ -591,7 +817,9 @@ export function UserManagementPage() {
                   setCreateDraft((d) => ({ ...d, password: e.target.value }))
                 }
               />
-              <span className="users-mgmt__field-hint">{USERS_MGMT_PASSWORD_HELPER}</span>
+              <span className="users-mgmt__field-hint">
+                {USERS_MGMT_PASSWORD_HELPER}
+              </span>
             </label>
             <label className="users-mgmt__check">
               <input
@@ -616,12 +844,65 @@ export function UserManagementPage() {
                 type="button"
                 className="users-mgmt__drawer-btn users-mgmt__drawer-btn--filled"
                 data-testid="users-mgmt-create-submit"
-                onClick={onCreateSubmit}
+                disabled={createSaving}
+                onClick={() => void onCreateSubmit()}
               >
                 {USERS_MGMT_CREATE_USER}
               </button>
             </div>
           </div>
+        </div>
+      ) : null}
+
+      {credShare ? (
+        <div
+          className="users-mgmt__overlay"
+          data-testid="users-mgmt-cred-dialog"
+          role="dialog"
+          aria-modal="true"
+        >
+          <button
+            type="button"
+            className="users-mgmt__overlay-scrim"
+            aria-label="Close"
+            onClick={() => setCredShare(null)}
+          />
+          <div className="users-mgmt__sheet">
+            <h2 className="users-mgmt__drawer-title">
+              {USERS_MGMT_CREDENTIALS_TITLE}
+            </h2>
+            <p>
+              Email: <strong>{credShare.loginEmail}</strong>
+            </p>
+            <p>
+              Password: <strong>{credShare.password}</strong>
+            </p>
+            <div className="users-mgmt__drawer-actions">
+              <button
+                type="button"
+                className="users-mgmt__drawer-btn users-mgmt__drawer-btn--outline"
+                onClick={() => void copyCredentials()}
+              >
+                {USERS_MGMT_CREDENTIALS_COPY}
+              </button>
+              <button
+                type="button"
+                className="users-mgmt__drawer-btn users-mgmt__drawer-btn--filled"
+                onClick={() => setCredShare(null)}
+              >
+                {USERS_MGMT_CREDENTIALS_DONE}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {toast ? (
+        <div className="users-mgmt__toast" role="status">
+          {toast}
+          <button type="button" onClick={() => setToast(null)}>
+            ×
+          </button>
         </div>
       ) : null}
     </div>

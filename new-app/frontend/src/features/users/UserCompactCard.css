@@ -1,0 +1,104 @@
+.user-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  margin: 0 0 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  color: #0f172a;
+  cursor: pointer;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.user-card--selected {
+  background: rgba(14, 79, 70, 0.06);
+  border-color: #0e4f46;
+}
+
+.user-card__check {
+  width: 20px;
+  height: 20px;
+  margin-top: 10px;
+  flex-shrink: 0;
+}
+
+.user-card__avatar {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(14, 79, 70, 0.12);
+  color: #0e4f46;
+  font-size: 15px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-card__avatar--online::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #15803d;
+  border: 2px solid #fff;
+}
+
+.user-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.user-card__name {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.user-card__role {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.user-card__email {
+  font-size: 13px;
+  color: #64748b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-card__meta {
+  margin-top: 4px;
+  font-size: 10px;
+  letter-spacing: 0.15px;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.user-card__status {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.user-card__status--active {
+  color: #15803d;
+}
+
+.user-card__status--blocked {
+  color: #dc2626;
+}

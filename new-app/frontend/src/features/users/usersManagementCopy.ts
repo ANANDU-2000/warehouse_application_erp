@@ -35,5 +35,12 @@ export const USERS_MGMT_PASSWORD_HELPER =
 export const USERS_MGMT_FIELD_ACTIVE = "Active";
 export const USERS_MGMT_CREATE_USER = "Create user";
 export const USERS_MGMT_CREATE_CANCEL = "Cancel";
-
+export const USERS_MGMT_EMPTY_FILTERS = "No users match your filters.";
+export const USERS_MGMT_LOADING = "Loading users…";
+export const USERS_MGMT_LOAD_ERROR = "Could not load users";
+export const USERS_MGMT_CREDENTIALS_TITLE = "Share credentials";
+export const USERS_MGMT_CREDENTIALS_COPY = "Copy";
+export const USERS_MGMT_CREDENTIALS_DONE = "Done";
+export const USERS_MGMT_CREDENTIALS_COPIED = "Credentials copied";
+export const USERS_MGMT_USER_CREATED = "User created";
 export const USERS_MGMT_BACK_FALLBACK = "/settings";

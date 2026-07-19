@@ -89,6 +89,10 @@ export function AppRouter() {
         />
         <Route path="/settings/users" element={<UserManagementPage />} />
         <Route
+          path="/settings/users/:userId"
+          element={<DashboardRouteStubPage title="User profile" />}
+        />
+        <Route
           path="/purchase"
           element={<DashboardRouteStubPage title="Purchases" />}
         />

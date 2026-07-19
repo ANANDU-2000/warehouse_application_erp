@@ -1,10 +1,10 @@
 # Module: Users & Roles
 
 **Queue:** 3 of 15  
-**Status:** Backend Slice 1–14 PASS · UI through BUTTONS PASS (2026-07-19) · WIRE pending  
-**Scope:** Analysis + users admin APIs + bulk; Users list UI page-loop through BUTTONS  
+**Status:** Backend Slice 1–14 PASS · UI through WIRE PASS (2026-07-18) · STATES pending  
+**Scope:** Analysis + users admin APIs + bulk; Users list UI page-loop through WIRE  
 **Source of truth:** `source-app/`  
-**Compare:** backend `users_roles_backend_*` · UI [`users_management_buttons_compare.md`](users_management_buttons_compare.md)
+**Compare:** backend `users_roles_backend_*` · UI [`users_management_wire_compare.md`](users_management_wire_compare.md)
 
 ## Definition
 

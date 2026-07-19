@@ -46,12 +46,9 @@ assert(page.includes("users-mgmt-filter"), "filter button");
 assert(page.includes("users-mgmt-filter-drawer"), "filter drawer");
 assert(page.includes("users-mgmt-create-sheet"), "create sheet");
 assert(page.includes("users-mgmt-bulk-activate"), "bulk activate");
-assert(page.includes("onBulkAction"), "bulk stub");
-assert(page.includes("onCreateSubmit"), "create stub");
-assert(page.includes("onRefresh"), "refresh stub");
-assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("/v1/businesses"), "no users API path");
-
+assert(page.includes("onBulkAction"), "bulk handler");
+assert(page.includes("onCreateSubmit") || page.includes("createBusinessUser"), "create handler");
+assert(page.includes("onRefresh") || page.includes("listBusinessUsers"), "refresh handler");
 assert(
   pkg.includes("test:users-management-buttons"),
   "package.json script registered",

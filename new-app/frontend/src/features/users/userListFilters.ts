@@ -25,12 +25,15 @@ export const USER_LIST_PRIMARY_LABELS: Record<UserListPrimaryFilter, string> = {
 };
 
 export type UserListRow = {
+  id?: string;
   name?: string | null;
   email?: string | null;
   phone?: string | null;
   role?: string | null;
   is_active?: boolean | null;
   is_blocked?: boolean | null;
+  last_active_at?: string | null;
+  created_at?: string | null;
 };
 
 export type UserListFilterState = {

@@ -58,14 +58,25 @@ assert(
 assert(page.includes('data-slot="appBar"'), "appBar");
 assert(page.includes('data-slot="nameField"'), "nameField");
 assert(page.includes('data-slot="footer"'), "footer");
-assert(page.includes('data-deferred="close"'), "close deferred");
+assert(
+  page.includes('data-deferred="close"') || page.includes('data-action="close"'),
+  "close deferred or BUTTONS",
+);
 assert(
   page.includes('data-deferred="name-field"') ||
     page.includes('data-testid="add-category-name"'),
   "name deferred or FIELDS input",
 );
-assert(page.includes('data-deferred="cancel"'), "cancel deferred");
-assert(page.includes('data-deferred="create"'), "create deferred");
+assert(
+  page.includes('data-deferred="cancel"') ||
+    page.includes('data-action="cancel"'),
+  "cancel deferred or BUTTONS",
+);
+assert(
+  page.includes('data-deferred="create"') ||
+    page.includes('data-action="create"'),
+  "create deferred or BUTTONS",
+);
 assert(!page.includes("<Navigate"), "staff allowed — no redirect");
 assert(!page.includes("fetch("), "no fetch");
 assert(

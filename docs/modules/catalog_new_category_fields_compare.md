@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy COMPARE · new-category SCAFFOLD→LAYOUT→**FIELDS** |
-| 🟡 Current | `/catalog/new-category` **FIELDS PASS** — ask before BUTTONS |
-| ⬜ Pending | BUTTONS → COMPARE · new-subcategory · category detail · item routes |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy COMPARE · new-category SCAFFOLD→LAYOUT→FIELDS→**BUTTONS** |
+| 🟡 Current | superseded — see [`catalog_new_category_buttons_compare.md`](catalog_new_category_buttons_compare.md) |
+| ⬜ Pending | WIRE → COMPARE · new-subcategory · category detail · item routes |
 | ⏸ Deferred | quick taxonomy sheet · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -40,4 +40,4 @@ npm run build
 
 Revert FIELDS commit; restore LAYOUT inert name chrome; remove `catalogAddCategoryFields.ts` + fields script + this compare; boards → ask before FIELDS.
 
-**Next (ask first):** BUTTONS — Close/Cancel pop · Create triggers touch/validation (no API). Stop after FIELDS.
+**Next (ask first):** BUTTONS — done → [`catalog_new_category_buttons_compare.md`](catalog_new_category_buttons_compare.md). Ask before WIRE.

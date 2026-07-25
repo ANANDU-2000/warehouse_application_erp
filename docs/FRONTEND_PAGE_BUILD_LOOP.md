@@ -244,7 +244,8 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 1 SCAFFOLD | ✅ | AppBar + name/footer slots + staff allowed — [`catalog_new_category_scaffold_compare.md`](modules/catalog_new_category_scaffold_compare.md) |
 | 2 LAYOUT | ✅ | Hexa tokens + Outline name + Cancel/Create chrome — [`catalog_new_category_layout_compare.md`](modules/catalog_new_category_layout_compare.md) |
 | 3 FIELDS | ✅ | Name input + `Enter a name` — [`catalog_new_category_fields_compare.md`](modules/catalog_new_category_fields_compare.md) |
-| 4–7 | ⬜ | Ask before BUTTONS |
+| 4 BUTTONS | ✅ | Close/Cancel pop + Create touch validation — [`catalog_new_category_buttons_compare.md`](modules/catalog_new_category_buttons_compare.md) |
+| 5–7 | ⬜ | Ask before WIRE |
 
 ### Prompt template (copy per page)
 

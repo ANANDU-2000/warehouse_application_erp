@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy COMPARE · new-category SCAFFOLD→…→**WIRE** |
-| 🟡 Current | `/catalog/new-category` **WIRE PASS** — ask before STATES |
-| ⬜ Pending | STATES → COMPARE · new-subcategory · category detail · item routes |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy COMPARE · new-category SCAFFOLD→…→**STATES** |
+| 🟡 Current | superseded — see [`catalog_new_category_states_compare.md`](catalog_new_category_states_compare.md) |
+| ⬜ Pending | COMPARE · new-subcategory · category detail · item routes |
 | ⏸ Deferred | pull gesture · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -41,4 +41,4 @@ npm run build
 
 Revert WIRE commit; restore BUTTONS Create stub; remove `createItemCategory` if unused elsewhere; remove wire script + this compare; boards → ask before WIRE.
 
-**Next (ask first):** STATES — saving spinner polish / retryable error mapping if needed. Stop after WIRE.
+**Next (ask first):** STATES — done → [`catalog_new_category_states_compare.md`](catalog_new_category_states_compare.md). Ask before COMPARE.

@@ -1,15 +1,12 @@
 /**
- * Catalog new category `/catalog/new-category` — WIRE (Step 5).
- * Formula source: catalog_add_category_page.dart
- * Similar fuzzy minScore 86 · limit 4 · POST createItemCategory · snack · pop.
- * Saving disables close/cancel/create (PopScope canPop: !_saving).
+ * Catalog new category `/catalog/new-category` — STATES (Step 6).
+ * Formula source: catalog_add_category_page.dart · form_feedback.dart
+ * showRetryableErrorSnackBar (Retry action) · PopScope !_saving.
  */
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import {
-  CatalogApiError,
-  CatalogNetworkError,
   createItemCategory,
   listItemCategories,
 } from "./catalogApi";
@@ -22,6 +19,7 @@ import {
   ADD_CATEGORY_LOAD_FAILED,
   ADD_CATEGORY_NAME_HINT,
   ADD_CATEGORY_NAME_LABEL,
+  ADD_CATEGORY_RETRY,
   ADD_CATEGORY_SIMILAR_GO_BACK,
   ADD_CATEGORY_SIMILAR_LIMIT,
   ADD_CATEGORY_SIMILAR_MIN_SCORE,
@@ -30,6 +28,7 @@ import {
   ADD_CATEGORY_TOOLTIP_CLOSE,
   addCategorySimilarBody,
 } from "./catalogAddCategoryCopy";
+import { mapAddCategoryError } from "./catalogAddCategoryError";
 import {
   addCategoryNameError,
   addCategoryNameIsEmpty,
@@ -48,12 +47,9 @@ function popOrGo(
   navigate(fallback);
 }
 
-function friendlyAddCategoryError(e: unknown): string {
-  if (e instanceof CatalogApiError) return e.detail;
-  if (e instanceof CatalogNetworkError) return e.message;
-  if (e instanceof Error && e.message) return e.message;
-  return ADD_CATEGORY_LOAD_FAILED;
-}
+type SnackState =
+  | { kind: "ok"; message: string }
+  | { kind: "error"; message: string };
 
 export function CatalogAddCategoryPage() {
   const navigate = useNavigate();
@@ -68,17 +64,32 @@ export function CatalogAddCategoryPage() {
   const [name, setName] = useState("");
   const [touched, setTouched] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [snack, setSnack] = useState<string | null>(null);
+  const [snack, setSnack] = useState<SnackState | null>(null);
   const [similarOpen, setSimilarOpen] = useState(false);
   const [similarBody, setSimilarBody] = useState("");
   const [pendingName, setPendingName] = useState("");
+  const lastCreateNameRef = useRef("");
+  const snackTimerRef = useRef<number | null>(null);
 
   const nameError = addCategoryNameError({ touched, name });
   const showError = nameError != null;
 
-  const flash = (msg: string) => {
-    setSnack(msg);
-    window.setTimeout(() => setSnack(null), 2500);
+  const clearSnackTimer = () => {
+    if (snackTimerRef.current != null) {
+      window.clearTimeout(snackTimerRef.current);
+      snackTimerRef.current = null;
+    }
+  };
+
+  const flashOk = (msg: string) => {
+    clearSnackTimer();
+    setSnack({ kind: "ok", message: msg });
+    snackTimerRef.current = window.setTimeout(() => setSnack(null), 2500);
+  };
+
+  const flashError = (msg: string) => {
+    clearSnackTimer();
+    setSnack({ kind: "error", message: msg });
   };
 
   const onClose = () => {
@@ -92,18 +103,19 @@ export function CatalogAddCategoryPage() {
 
   const postCreate = async (n: string) => {
     if (!businessId) {
-      flash(ADD_CATEGORY_LOAD_FAILED);
+      flashError(ADD_CATEGORY_LOAD_FAILED);
       return;
     }
+    lastCreateNameRef.current = n;
     setSaving(true);
     try {
       await createItemCategory({ businessId, name: n });
-      flash(ADD_CATEGORY_CREATED_SNACK);
+      flashOk(ADD_CATEGORY_CREATED_SNACK);
       window.setTimeout(() => {
         popOrGo(navigate, backFallback);
       }, 400);
     } catch (e: unknown) {
-      flash(friendlyAddCategoryError(e));
+      flashError(mapAddCategoryError(e));
     } finally {
       setSaving(false);
     }
@@ -139,6 +151,13 @@ export function CatalogAddCategoryPage() {
     await postCreate(n);
   };
 
+  const onRetry = () => {
+    const n = lastCreateNameRef.current.trim() || name.trim();
+    if (!n) return;
+    setSnack(null);
+    void postCreate(n);
+  };
+
   const onSimilarGoBack = () => {
     setSimilarOpen(false);
     setPendingName("");
@@ -156,7 +175,7 @@ export function CatalogAddCategoryPage() {
     <div
       className="add-category-page"
       data-page="catalog-new-category"
-      data-step="WIRE"
+      data-step="STATES"
     >
       <header className="add-category-page__appbar" data-slot="appBar">
         <button
@@ -283,8 +302,26 @@ export function CatalogAddCategoryPage() {
       ) : null}
 
       {snack ? (
-        <div className="add-category-page__snack" data-testid="add-category-snack">
-          {snack}
+        <div
+          className={
+            snack.kind === "error"
+              ? "add-category-page__snack add-category-page__snack--error"
+              : "add-category-page__snack"
+          }
+          data-testid="add-category-snack"
+          data-snack-kind={snack.kind}
+        >
+          <span className="add-category-page__snack-text">{snack.message}</span>
+          {snack.kind === "error" ? (
+            <button
+              type="button"
+              className="add-category-page__snack-retry"
+              data-action="retry"
+              onClick={onRetry}
+            >
+              {ADD_CATEGORY_RETRY}
+            </button>
+          ) : null}
         </div>
       ) : null}
     </div>

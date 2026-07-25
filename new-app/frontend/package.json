@@ -135,6 +135,7 @@
     "test:catalog-new-category-fields": "node scripts/check-catalog-new-category-fields.mjs",
     "test:catalog-new-category-buttons": "node scripts/check-catalog-new-category-buttons.mjs",
     "test:catalog-new-category-wire": "node scripts/check-catalog-new-category-wire.mjs",
+    "test:catalog-new-category-states": "node scripts/check-catalog-new-category-states.mjs",
     "test:staff-deliveries-layout": "node scripts/check-staff-deliveries-layout.mjs",
     "test:staff-deliveries-fields": "node scripts/check-staff-deliveries-fields.mjs",
     "test:staff-deliveries-buttons": "node scripts/check-staff-deliveries-buttons.mjs",

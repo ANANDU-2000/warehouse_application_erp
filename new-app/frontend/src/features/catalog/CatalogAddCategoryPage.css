@@ -274,4 +274,27 @@
   color: #ffffff;
   font-size: 14px;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.add-category-page__snack--error {
+  background: #7f1d1d;
+}
+
+.add-category-page__snack-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.add-category-page__snack-retry {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: #fde68a;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 6px;
 }

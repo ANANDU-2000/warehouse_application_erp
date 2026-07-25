@@ -63,10 +63,10 @@
 
 ## Next (ask first)
 
-1. **`/catalog/new-category` STATES** — page loop step 6, **or**  
+1. **`/catalog/new-category` COMPARE** — page loop step 7, **or**  
 2. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11), **or**  
 3. Hold / merge review of `ops/products-module` → `main`.
 
 **Do not** invent purchase/barcode UI.
 
-*(New-category WIRE — [`catalog_new_category_wire_compare.md`](catalog_new_category_wire_compare.md).)*
+*(New-category STATES — [`catalog_new_category_states_compare.md`](catalog_new_category_states_compare.md).)*

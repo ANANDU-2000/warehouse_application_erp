@@ -12,10 +12,10 @@
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
 | 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 nest COMPLETE · Catalog COMPARE · taxonomy COMPARE · new-category COMPARE | Ask before new-subcategory SCAFFOLD — [`catalog_new_category_compare.md`](modules/catalog_new_category_compare.md) |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 nest COMPLETE · Catalog COMPARE · taxonomy COMPARE · new-category COMPARE · new-subcategory SCAFFOLD | Ask before new-subcategory LAYOUT — [`catalog_new_subcategory_scaffold_compare.md`](modules/catalog_new_subcategory_scaffold_compare.md) |
 | 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list+profile COMPARE · Activity WIRE | Next: ask next Subagent 4 stub — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
-| 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | 🟡 Slice 1–7 · hub COMPARE · taxonomy COMPARE · new-category COMPARE | Ask before new-subcategory SCAFFOLD — [`catalog_new_category_compare.md`](modules/catalog_new_category_compare.md) |
-| 5 | Categories | 1 | ✅ `categories.md` | 🟡 Slice 1–2 · new-category COMPARE PASS | Next: new-subcategory SCAFFOLD — [`catalog_new_category_compare.md`](modules/catalog_new_category_compare.md) |
+| 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | 🟡 Slice 1–7 · hub COMPARE · taxonomy COMPARE · new-category COMPARE · new-subcategory SCAFFOLD | Ask before new-subcategory LAYOUT — [`catalog_new_subcategory_scaffold_compare.md`](modules/catalog_new_subcategory_scaffold_compare.md) |
+| 5 | Categories | 1 | ✅ `categories.md` | 🟡 Slice 1–2 · new-category COMPARE · new-subcategory SCAFFOLD | Next: new-subcategory LAYOUT — [`catalog_new_subcategory_scaffold_compare.md`](modules/catalog_new_subcategory_scaffold_compare.md) |
 | 6 | Suppliers/Brokers | 12 | ✅ `suppliers.md` | ❌ | Blocked |
 | 7 | Purchase Orders | 6 | ✅ `purchase-orders.md` | ❌ | Blocked |
 | 8 | Goods Receipt (staff receive) | 2 | ✅ `goods-receipt.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard nest **COMPLETE**. Products **Slice 1–7 PASS**. Categories **Slice 1–2 PASS**. Catalog hub **COMPARE PASS**. Taxonomy hub **COMPARE PASS**. New-category **COMPARE PASS**. Next: ask before **`/catalog/category/:id/new-subcategory` SCAFFOLD**. Purchase / barcode / receive **UI blocked** until their backends (docs/06 Seq 7–8 / 11).
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard nest **COMPLETE**. Products **Slice 1–7 PASS**. Categories **Slice 1–2 PASS**. Catalog hub **COMPARE PASS**. Taxonomy hub **COMPARE PASS**. New-category **COMPARE PASS**. New-subcategory **SCAFFOLD PASS**. Next: ask before **`/catalog/category/:categoryId/new-subcategory` LAYOUT**. Purchase / barcode / receive **UI blocked** until their backends (docs/06 Seq 7–8 / 11).
 
 ---
 
@@ -115,7 +115,7 @@ Backend (wire in later steps): `POST /v1/auth/login`, `POST /v1/auth/refresh`, `
 | `/catalog/setup-reorder-levels` | |
 | `/catalog/taxonomy` | **COMPARE PASS** — [`catalog_taxonomy_compare.md`](modules/catalog_taxonomy_compare.md) |
 | `/catalog/new-category` | **COMPARE PASS** — [`catalog_new_category_compare.md`](modules/catalog_new_category_compare.md) |
-| `/catalog/category/:id/new-subcategory` | |
+| `/catalog/category/:id/new-subcategory` | **SCAFFOLD PASS** — [`catalog_new_subcategory_scaffold_compare.md`](modules/catalog_new_subcategory_scaffold_compare.md) |
 | `/catalog/category/:id/type/:tid/add-item` | |
 | `/catalog/item/:id` | |
 | `/catalog/item/:id/edit` | |

@@ -137,6 +137,7 @@
     "test:catalog-new-category-wire": "node scripts/check-catalog-new-category-wire.mjs",
     "test:catalog-new-category-states": "node scripts/check-catalog-new-category-states.mjs",
     "test:catalog-new-category-compare": "node scripts/check-catalog-new-category-compare.mjs",
+    "test:catalog-new-subcategory-scaffold": "node scripts/check-catalog-new-subcategory-scaffold.mjs",
     "test:staff-deliveries-layout": "node scripts/check-staff-deliveries-layout.mjs",
     "test:staff-deliveries-fields": "node scripts/check-staff-deliveries-fields.mjs",
     "test:staff-deliveries-buttons": "node scripts/check-staff-deliveries-buttons.mjs",

@@ -19,6 +19,7 @@ import { StaffActivityPage } from "../features/staff/activity/StaffActivityPage"
 import { StaffDeliveriesPage } from "../features/staff/deliveries/StaffDeliveriesPage";
 import { CatalogPage } from "../features/catalog/CatalogPage";
 import { CatalogAddCategoryPage } from "../features/catalog/CatalogAddCategoryPage";
+import { CatalogAddSubcategoryPage } from "../features/catalog/CatalogAddSubcategoryPage";
 import { CatalogTaxonomyHubPage } from "../features/catalog/CatalogTaxonomyHubPage";
 
 /**
@@ -84,7 +85,7 @@ export function AppRouter() {
         />
         <Route
           path="/catalog/category/:categoryId/new-subcategory"
-          element={<DashboardRouteStubPage title="New subcategory" />}
+          element={<CatalogAddSubcategoryPage />}
         />
         <Route
           path="/catalog/category/:categoryId"

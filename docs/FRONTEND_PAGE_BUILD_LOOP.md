@@ -249,6 +249,18 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 6 STATES | ✅ | Retryable error snack + saving polish — [`catalog_new_category_states_compare.md`](modules/catalog_new_category_states_compare.md) |
 | 7 COMPARE | ✅ | Aggregator SCAFFOLD→STATES — [`catalog_new_category_compare.md`](modules/catalog_new_category_compare.md) |
 
+### Catalog new subcategory (`/catalog/category/:categoryId/new-subcategory`) — Seq 5
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ✅ | AppBar + name/footer slots + categoryId + staff allowed — [`catalog_new_subcategory_scaffold_compare.md`](modules/catalog_new_subcategory_scaffold_compare.md) |
+| 2 LAYOUT | ⬜ | Ask before LAYOUT |
+| 3 FIELDS | ⬜ | |
+| 4 BUTTONS | ⬜ | |
+| 5 WIRE | ⬜ | |
+| 6 STATES | ⬜ | |
+| 7 COMPARE | ⬜ | |
+
 ### Prompt template (copy per page)
 
 ```

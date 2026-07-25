@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy COMPARE · new-category SCAFFOLD→…→**BUTTONS** |
-| 🟡 Current | `/catalog/new-category` **BUTTONS PASS** — ask before WIRE |
-| ⬜ Pending | WIRE → COMPARE · new-subcategory · category detail · item routes |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy COMPARE · new-category SCAFFOLD→…→**WIRE** |
+| 🟡 Current | superseded — see [`catalog_new_category_wire_compare.md`](catalog_new_category_wire_compare.md) |
+| ⬜ Pending | STATES → COMPARE · new-subcategory · category detail · item routes |
 | ⏸ Deferred | quick taxonomy sheet · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -36,4 +36,4 @@ npm run build
 
 Revert BUTTONS commit; restore FIELDS deferred Close/Cancel/Create; remove buttons script + this compare; boards → ask before BUTTONS.
 
-**Next (ask first):** WIRE — `POST …/item-categories` + similar-name dialog (minScore 86) + snack. Stop after BUTTONS.
+**Next (ask first):** WIRE — done → [`catalog_new_category_wire_compare.md`](catalog_new_category_wire_compare.md). Ask before STATES.

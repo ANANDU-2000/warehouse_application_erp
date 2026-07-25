@@ -1,6 +1,7 @@
 /**
  * Catalog hub WIRE API — Formula source: hexa_api listItemCategories /
- * listCatalogItems / listCategoryTypesIndex / updateItemCategory / deleteItemCategory
+ * listCatalogItems / listCategoryTypesIndex / createItemCategory /
+ * updateItemCategory / deleteItemCategory
  */
 import { readTokens } from "../../shared/auth/tokenStore";
 
@@ -144,6 +145,30 @@ export async function listCategoryTypesIndex(
     category_name: String(r.category_name ?? ""),
     name: String(r.name ?? ""),
   }));
+}
+
+export async function createItemCategory(args: {
+  businessId: string;
+  name: string;
+}): Promise<CatalogCategory> {
+  let res: Response;
+  try {
+    res = await fetch(
+      `/v1/businesses/${encodeURIComponent(args.businessId)}/item-categories`,
+      {
+        method: "POST",
+        headers: authHeaders(true),
+        body: JSON.stringify({ name: args.name }),
+      },
+    );
+  } catch {
+    throw new CatalogNetworkError("Network error");
+  }
+  if (!res.ok) {
+    throw new CatalogApiError(res.status, await readDetail(res));
+  }
+  const r = (await res.json()) as Record<string, unknown>;
+  return { id: String(r.id ?? ""), name: String(r.name ?? args.name) };
 }
 
 export async function updateItemCategory(args: {

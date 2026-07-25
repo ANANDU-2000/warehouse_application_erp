@@ -245,7 +245,8 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 2 LAYOUT | ✅ | Hexa tokens + Outline name + Cancel/Create chrome — [`catalog_new_category_layout_compare.md`](modules/catalog_new_category_layout_compare.md) |
 | 3 FIELDS | ✅ | Name input + `Enter a name` — [`catalog_new_category_fields_compare.md`](modules/catalog_new_category_fields_compare.md) |
 | 4 BUTTONS | ✅ | Close/Cancel pop + Create touch validation — [`catalog_new_category_buttons_compare.md`](modules/catalog_new_category_buttons_compare.md) |
-| 5–7 | ⬜ | Ask before WIRE |
+| 5 WIRE | ✅ | POST create + similar fuzzy 86 + snack — [`catalog_new_category_wire_compare.md`](modules/catalog_new_category_wire_compare.md) |
+| 6–7 | ⬜ | Ask before STATES |
 
 ### Prompt template (copy per page)
 

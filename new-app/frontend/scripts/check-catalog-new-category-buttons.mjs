@@ -55,9 +55,21 @@ assert(page.includes('data-action="close"'), "close action");
 assert(page.includes('data-action="cancel"'), "cancel action");
 assert(page.includes('data-action="create"'), "create action");
 assert(page.includes("setTouched(true)"), "create sets touched");
-assert(!page.includes("fetch("), "no fetch");
-assert(!page.includes("createItemCategory"), "no createItemCategory yet");
-assert(!page.includes('method: "POST"'), "no POST method yet");
+assert(!page.includes("fetch(") || page.includes("createItemCategory"), "no raw fetch unless WIRE");
+assert(
+  page.includes("WIRE") ||
+    page.includes("STATES") ||
+    page.includes("COMPARE") ||
+    !page.includes("createItemCategory"),
+  "create API only on WIRE+",
+);
+assert(
+  page.includes("WIRE") ||
+    page.includes("STATES") ||
+    page.includes("COMPARE") ||
+    !page.includes('method: "POST"'),
+  "POST only on WIRE+ (api file separate)",
+);
 
 assert(css.includes("add-category-page__icon-btn--active"), "icon active");
 assert(css.includes("add-category-page__btn--active"), "btn active");

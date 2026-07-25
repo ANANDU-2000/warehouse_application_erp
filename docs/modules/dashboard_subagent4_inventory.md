@@ -63,10 +63,10 @@
 
 ## Next (ask first)
 
-1. **`/catalog/category/:categoryId/new-subcategory` LAYOUT** — page loop step 2, **or**  
+1. **`/catalog/category/:categoryId/new-subcategory` FIELDS** — page loop step 3, **or**  
 2. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11), **or**  
 3. Hold / merge review of `ops/products-module` → `main`.
 
 **Do not** invent purchase/barcode UI.
 
-*(New-subcategory SCAFFOLD PASS — [`catalog_new_subcategory_scaffold_compare.md`](catalog_new_subcategory_scaffold_compare.md).)*
+*(New-subcategory LAYOUT PASS — [`catalog_new_subcategory_layout_compare.md`](catalog_new_subcategory_layout_compare.md).)*

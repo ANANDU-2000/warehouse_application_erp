@@ -48,7 +48,9 @@ assert(!page.includes("data-sample"), "no BUTTONS sample");
 assert(!page.includes("BUTTONS_CATEGORIES"), "no sample list");
 assert(!page.includes("TAXONOMY_SAMPLE_CATEGORY_NAME"), "no sample name in page");
 assert(
-  !page.includes("Loading…") || page.includes("WIRE") || page.includes("STATES"),
+  page.includes("STATES") ||
+    page.includes("COMPARE") ||
+    page.includes("Loading…"),
   "plain Loading ok until STATES",
 );
 

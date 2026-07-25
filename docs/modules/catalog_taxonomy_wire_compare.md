@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy SCAFFOLD→…→**WIRE** |
-| 🟡 Current | `/catalog/taxonomy` **WIRE PASS** — ask before STATES |
-| ⬜ Pending | STATES → COMPARE · `/catalog/new-category` · category detail · item routes |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy SCAFFOLD→…→**WIRE** · **STATES** |
+| 🟡 Current | superseded — see [`catalog_taxonomy_compare.md`](catalog_taxonomy_compare.md) |
+| ⬜ Pending | COMPARE · `/catalog/new-category` · category detail · item routes |
 | ⏸ Deferred | quick taxonomy sheet create API · pull gesture · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -39,4 +39,4 @@ npm run build
 
 Revert WIRE commit; restore BUTTONS sample list; remove wire script + this compare; boards → ask before WIRE.
 
-**Next (ask first):** STATES — ListSkeleton + FriendlyLoadError defaults. Stop after WIRE.
+**Next (ask first):** STATES — done → [`catalog_taxonomy_states_compare.md`](catalog_taxonomy_states_compare.md). COMPARE done → [`catalog_taxonomy_compare.md`](catalog_taxonomy_compare.md).

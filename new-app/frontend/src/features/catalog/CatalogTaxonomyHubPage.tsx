@@ -1,15 +1,13 @@
 /**
- * Catalog taxonomy hub `/catalog/taxonomy` — WIRE (Step 5).
- * Formula source: catalog_taxonomy_hub_page.dart · itemCategoriesListProvider ·
- * categoryTypesIndexProvider · contains filter · row sub counts.
- * Creates stay on stubs (quick sheet deferred). Loading/error basic until STATES.
+ * Catalog taxonomy hub `/catalog/taxonomy` — STATES (Step 6).
+ * Formula source: catalog_taxonomy_hub_page.dart ListSkeleton() · FriendlyLoadError
+ * defaults (`Unable to load data` / `Tap to retry.`). Soft reload keeps body when hasData.
+ * Creates stay on stubs (quick sheet deferred).
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import {
-  CatalogApiError,
-  CatalogNetworkError,
   listCategoryTypesIndex,
   listItemCategories,
   type CatalogCategory,
@@ -23,13 +21,14 @@ import {
   TAXONOMY_EMPTY_PRIMARY,
   TAXONOMY_EXPLAINER,
   TAXONOMY_FAB_TOOLTIP,
-  TAXONOMY_LOAD_FAILED,
   TAXONOMY_PATH_CATALOG,
   TAXONOMY_PATH_NEW_CATEGORY,
   TAXONOMY_RETRY,
   TAXONOMY_ROW_ADD_SUB_TOOLTIP,
   TAXONOMY_ROW_NO_SUBS,
   TAXONOMY_SEARCH_HINT,
+  TAXONOMY_SKELETON_HEIGHT_PX,
+  TAXONOMY_SKELETON_ROWS,
   TAXONOMY_TITLE,
   TAXONOMY_TOOLTIP_BACK,
   TAXONOMY_TOOLTIP_FULL_CATALOG,
@@ -43,6 +42,10 @@ import {
   taxonomyEmptyTitle,
   taxonomyFilterCategories,
 } from "./catalogTaxonomyFields";
+import {
+  mapTaxonomyLoadSubtitle,
+  mapTaxonomyLoadTitle,
+} from "./catalogTaxonomyLoadSubtitle";
 import { typeCountForCategory } from "./catalogTaxonomy";
 import "./CatalogTaxonomyHubPage.css";
 
@@ -55,13 +58,6 @@ function popOrGo(
     return;
   }
   navigate(fallback);
-}
-
-function friendlyTaxonomyError(e: unknown): string {
-  if (e instanceof CatalogApiError) return e.detail;
-  if (e instanceof CatalogNetworkError) return e.message;
-  if (e instanceof Error && e.message) return e.message;
-  return TAXONOMY_LOAD_FAILED;
 }
 
 export function CatalogTaxonomyHubPage() {
@@ -142,15 +138,17 @@ export function CatalogTaxonomyHubPage() {
     [categories, searchQuery],
   );
 
-  const showInitialLoad = loading && !hasData;
+  const showInitialSkeleton = loading && !hasData;
   const showError = !loading && loadError != null && !hasData;
-  const showBody = !showInitialLoad && !showError;
+  const showBody = !showInitialSkeleton && !showError;
   const showEmpty = showBody && displayList.length === 0;
   const emptyMode = taxonomyEmptyMode({
     listLength: displayList.length,
     searchQuery,
   });
   const showClear = searchDraft.length > 0;
+  const errorTitle = mapTaxonomyLoadTitle(loadError);
+  const errorSubtitle = mapTaxonomyLoadSubtitle(loadError);
 
   const retryLoad = () => setRetryTick((n) => n + 1);
 
@@ -184,7 +182,7 @@ export function CatalogTaxonomyHubPage() {
     <div
       className="taxonomy-hub-page"
       data-page="catalog-taxonomy"
-      data-step="WIRE"
+      data-step="STATES"
     >
       <header className="taxonomy-hub-page__appbar" data-slot="appBar">
         <button
@@ -261,7 +259,7 @@ export function CatalogTaxonomyHubPage() {
             aria-label={TAXONOMY_SEARCH_HINT}
             data-testid="taxonomy-search"
             autoComplete="off"
-            disabled={showInitialLoad}
+            disabled={showInitialSkeleton}
           />
           {showClear ? (
             <button
@@ -276,29 +274,42 @@ export function CatalogTaxonomyHubPage() {
           ) : null}
         </div>
 
-        {showInitialLoad ? (
+        {showInitialSkeleton ? (
           <div
-            className="taxonomy-hub-page__loading"
+            className="taxonomy-hub-page__skeleton"
             data-slot="loading"
             data-testid="taxonomy-loading"
+            aria-busy="true"
+            aria-label="ListSkeleton"
           >
-            Loading…
+            {Array.from({ length: TAXONOMY_SKELETON_ROWS }, (_, i) => (
+              <div
+                key={i}
+                className="taxonomy-hub-page__skeleton-row"
+                style={{ height: TAXONOMY_SKELETON_HEIGHT_PX }}
+              />
+            ))}
           </div>
         ) : null}
 
         {showError ? (
           <div
-            className="taxonomy-hub-page__error"
+            className="taxonomy-hub-page__friendly-error"
             data-slot="error"
             data-testid="taxonomy-error"
+            role="alert"
           >
-            <p className="taxonomy-hub-page__error-title">
-              {friendlyTaxonomyError(loadError)}
+            <p className="taxonomy-hub-page__friendly-error-title">
+              {errorTitle}
+            </p>
+            <p className="taxonomy-hub-page__friendly-error-sub">
+              {errorSubtitle}
             </p>
             <button
               type="button"
-              className="taxonomy-hub-page__error-retry"
+              className="taxonomy-hub-page__friendly-error-retry"
               data-action="retry"
+              data-testid="taxonomy-retry"
               onClick={retryLoad}
             >
               {TAXONOMY_RETRY}

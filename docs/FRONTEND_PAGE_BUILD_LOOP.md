@@ -234,7 +234,15 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 3 FIELDS | ✅ | Search contains (no debounce) + empty catalogs — [`catalog_taxonomy_fields_compare.md`](modules/catalog_taxonomy_fields_compare.md) |
 | 4 BUTTONS | ✅ | Back/full-catalog/chips/FAB/empty/row nav stubs — [`catalog_taxonomy_buttons_compare.md`](modules/catalog_taxonomy_buttons_compare.md) |
 | 5 WIRE | ✅ | item-categories + types-index + sub counts — [`catalog_taxonomy_wire_compare.md`](modules/catalog_taxonomy_wire_compare.md) |
-| 6–7 | ⬜ | Ask before STATES |
+| 6 STATES | ✅ | ListSkeleton 6×84 + FriendlyLoadError — [`catalog_taxonomy_states_compare.md`](modules/catalog_taxonomy_states_compare.md) |
+| 7 COMPARE | ✅ | Aggregator SCAFFOLD→STATES — [`catalog_taxonomy_compare.md`](modules/catalog_taxonomy_compare.md) |
+
+### Catalog new category (`/catalog/new-category`) — Seq 5
+
+| Step | Status | Evidence |
+|---|---|---|
+| 1 SCAFFOLD | ⬜ | — |
+| 2–7 | ⬜ | Ask before start |
 
 ### Prompt template (copy per page)
 

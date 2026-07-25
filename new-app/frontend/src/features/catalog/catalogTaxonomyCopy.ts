@@ -26,9 +26,14 @@ export const TAXONOMY_NO_MATCHES_TITLE = "No matches";
 export const TAXONOMY_EMPTY_SUB = "Tap Category to add your first one.";
 export const TAXONOMY_EMPTY_PRIMARY = "Add category";
 
-/** FriendlyLoadError default — polish in STATES */
+/** FriendlyLoadError defaults — friendly_load_error.dart */
 export const TAXONOMY_LOAD_FAILED = "Unable to load data";
+export const TAXONOMY_RETRY_SUBTITLE = "Tap to retry.";
 export const TAXONOMY_RETRY = "Retry";
+
+/** ListSkeleton defaults — list_skeleton.dart rowCount 6 · rowHeight 84 */
+export const TAXONOMY_SKELETON_ROWS = 6;
+export const TAXONOMY_SKELETON_HEIGHT_PX = 84;
 
 /** Row subtitle when subN == 0 */
 export const TAXONOMY_ROW_NO_SUBS =

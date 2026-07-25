@@ -13,9 +13,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy **SCAFFOLD→COMPARE** · new-category SCAFFOLD→…→**STATES** |
-| 🟡 Current | `/catalog/new-category` **STATES PASS** — ask before COMPARE |
-| ⬜ Pending | new-category COMPARE · category detail · item routes · trade-summary |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy **SCAFFOLD→COMPARE** · new-category **SCAFFOLD→COMPARE** |
+| 🟡 Current | Ask before new-subcategory SCAFFOLD — [`catalog_new_category_compare.md`](catalog_new_category_compare.md) |
+| ⬜ Pending | new-subcategory · category detail · item routes · trade-summary |
 | ⏸ Deferred | purchase entry · barcode/print · receive **bodies** · Settings · pull gesture · quick sheet · merge to `main` |
 
 ---
@@ -41,7 +41,7 @@
 | Item | Why deferred |
 |---|---|
 | Quick taxonomy sheet create API | Chips/FAB → `/catalog/new-category` / new-sub stubs |
-| `/catalog/new-category` · category detail bodies | **new-category STATES done** — COMPARE next ([`catalog_new_category_states_compare.md`](catalog_new_category_states_compare.md)) |
+| `/catalog/new-category` · category detail bodies | **new-category COMPARE PASS** — [`catalog_new_category_compare.md`](catalog_new_category_compare.md) |
 | Pull RefreshIndicator gesture | Retry covers; gesture polish deferred |
 | Purchase entry `/purchase` · `/purchase/new` | Backend blocked (docs/06 Seq 7) |
 | Barcode scan / bulk print **bodies** | Backend blocked (docs/06 Seq 11) |
@@ -68,7 +68,7 @@ Docs/checklist + smoke script only: revert COMPARE commit. Application code unch
 
 ## 5. Next after Approve
 
-1. **`/catalog/new-category` SCAFFOLD** (page loop step 1 — ask first), **or**  
+1. **`/catalog/category/:id/new-subcategory` SCAFFOLD** (page loop step 1 — ask first), **or**  
 2. Hold — purchase / barcode / receive need backends (docs/06 Seq 7–8 / 11), **or**  
 3. Hold / merge review of `ops/products-module` → `main`.
 

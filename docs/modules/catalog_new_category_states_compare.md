@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy COMPARE · new-category SCAFFOLD→…→**STATES** |
-| 🟡 Current | `/catalog/new-category` **STATES PASS** — ask before COMPARE |
-| ⬜ Pending | COMPARE · new-subcategory · category detail · item routes |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy COMPARE · new-category **SCAFFOLD→COMPARE** |
+| 🟡 Current | superseded — see [`catalog_new_category_compare.md`](catalog_new_category_compare.md) |
+| ⬜ Pending | new-subcategory · category detail · item routes |
 | ⏸ Deferred | purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -40,4 +40,4 @@ npm run build
 
 Revert STATES commit; restore WIRE plain flash errors; remove `catalogAddCategoryError.ts` + states script + this compare; boards → ask before STATES.
 
-**Next (ask first):** COMPARE — aggregator SCAFFOLD→STATES PASS/FAIL. Stop after STATES.
+**Next (ask first):** COMPARE — done → [`catalog_new_category_compare.md`](catalog_new_category_compare.md). Ask before new-subcategory SCAFFOLD.

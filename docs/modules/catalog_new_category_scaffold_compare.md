@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy COMPARE · **new-category SCAFFOLD** |
-| 🟡 Current | `/catalog/new-category` **SCAFFOLD PASS** — ask before LAYOUT |
-| ⬜ Pending | LAYOUT → COMPARE · new-subcategory · category detail · item routes |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy COMPARE · new-category SCAFFOLD→**LAYOUT** |
+| 🟡 Current | superseded — see [`catalog_new_category_layout_compare.md`](catalog_new_category_layout_compare.md) |
+| ⬜ Pending | FIELDS → COMPARE · new-subcategory · category detail · item routes |
 | ⏸ Deferred | quick taxonomy sheet · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -39,4 +39,4 @@ npm run build
 
 Revert SCAFFOLD commit; remove `CatalogAddCategoryPage*` + `catalogAddCategoryCopy.ts` + scaffold script + package script; restore `DashboardRouteStubPage title="New category"`; boards → taxonomy COMPARE current.
 
-**Next (ask first):** LAYOUT — Hexa chrome for AppBar / Outline name / Cancel+Create footer. Stop after SCAFFOLD.
+**Next (ask first):** LAYOUT — done → [`catalog_new_category_layout_compare.md`](catalog_new_category_layout_compare.md). Ask before FIELDS.

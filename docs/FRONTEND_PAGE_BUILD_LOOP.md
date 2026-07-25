@@ -242,7 +242,8 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | Step | Status | Evidence |
 |---|---|---|
 | 1 SCAFFOLD | ✅ | AppBar + name/footer slots + staff allowed — [`catalog_new_category_scaffold_compare.md`](modules/catalog_new_category_scaffold_compare.md) |
-| 2–7 | ⬜ | Ask before LAYOUT |
+| 2 LAYOUT | ✅ | Hexa tokens + Outline name + Cancel/Create chrome — [`catalog_new_category_layout_compare.md`](modules/catalog_new_category_layout_compare.md) |
+| 3–7 | ⬜ | Ask before FIELDS |
 
 ### Prompt template (copy per page)
 

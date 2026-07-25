@@ -22,15 +22,15 @@
 | 1.11 | Roles & permissions matrix (confirm "manager" role question) | ✅ | `docs/matrix/roles_permissions_matrix.md` — manager confirmed |
 | 1.12 | Phase 1 sign-off | ✅ | `docs/PHASE1_SIGN_OFF.md` — Review PASS 2026-07-18; Phase 2 unlocked |
 
-**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: Dashboard nest COMPLETE. **New-category LAYOUT PASS** on `ops/products-module` — ask before FIELDS.
+**Phase 1 status: COMPLETE.** Phase 2: **COMPLETE** (live SQL verified — `docs/44`). Phase 3: **COMPLETE** (platform). Phase 4: Dashboard nest COMPLETE. **New-category FIELDS PASS** on `ops/products-module` — ask before BUTTONS.
 
 ### Task board (Dashboard staff WIRE-2)
 
 | State | Step |
 |---|---|
-| ✅ Completed | Login/Splash/home/staff COMPARE · WIRE-2a–2f · Users COMPARE · Notifications COMPARE · Staff nest **COMPARE** · **Products Slice 1–7** · **Categories Slice 1–2** · Catalog hub **COMPARE** · taxonomy **COMPARE** · new-category SCAFFOLD→**LAYOUT** |
-| 🟡 Current | `/catalog/new-category` **LAYOUT PASS** — ask before FIELDS — [`catalog_new_category_layout_compare.md`](modules/catalog_new_category_layout_compare.md) |
-| ⬜ Pending | new-category FIELDS→COMPARE · other `/catalog/*` · Seq 7–8 / 11 purchase/receive/barcode |
+| ✅ Completed | Login/Splash/home/staff COMPARE · WIRE-2a–2f · Users COMPARE · Notifications COMPARE · Staff nest **COMPARE** · **Products Slice 1–7** · **Categories Slice 1–2** · Catalog hub **COMPARE** · taxonomy **COMPARE** · new-category SCAFFOLD→LAYOUT→**FIELDS** |
+| 🟡 Current | `/catalog/new-category` **FIELDS PASS** — ask before BUTTONS — [`catalog_new_category_fields_compare.md`](modules/catalog_new_category_fields_compare.md) |
+| ⬜ Pending | new-category BUTTONS→COMPARE · other `/catalog/*` · Seq 7–8 / 11 purchase/receive/barcode |
 | ⏸ Deferred | `/staff/settings` · `/settings`; owner `/stock`; purchase entry (**backend blocked**); barcode/print (**blocked**); receive body (**blocked**); merge to `main` |
 
 ### Phase 1 module analysis queue (strict — one at a time)
@@ -38,10 +38,10 @@
 | # | Module | Status | Evidence |
 |---|---|---|---|
 | 1 | Login | ✅ UI COMPARE PASS | COMPARE [`login_compare.md`](modules/login_compare.md) · Splash [`splash_compare.md`](modules/splash_compare.md) |
-| 2 | Dashboard | 🟡 nest COMPLETE · Catalog COMPARE · taxonomy COMPARE · new-category LAYOUT | [`catalog_new_category_layout_compare.md`](modules/catalog_new_category_layout_compare.md) · [`catalog_taxonomy_compare.md`](modules/catalog_taxonomy_compare.md) |
+| 2 | Dashboard | 🟡 nest COMPLETE · Catalog COMPARE · taxonomy COMPARE · new-category FIELDS | [`catalog_new_category_fields_compare.md`](modules/catalog_new_category_fields_compare.md) · [`catalog_taxonomy_compare.md`](modules/catalog_taxonomy_compare.md) |
 | 3 | Users & Roles | 🟡 Backend 1–14 · list+profile COMPARE · Activity WIRE | [`user_profile_activity_wire_compare.md`](modules/user_profile_activity_wire_compare.md) · [`user_profile_compare.md`](modules/user_profile_compare.md) |
 | 4 | Products | 🟡 Backend Slice 1–7 · Catalog hub COMPARE | [`catalog_compare.md`](modules/catalog_compare.md) · [`products_backend_slice7.md`](modules/products_backend_slice7.md) |
-| 5 | Categories | 🟡 Backend Slice 1–2 · taxonomy COMPARE · new-category LAYOUT | [`catalog_new_category_layout_compare.md`](modules/catalog_new_category_layout_compare.md) · `docs/modules/categories.md` |
+| 5 | Categories | 🟡 Backend Slice 1–2 · taxonomy COMPARE · new-category FIELDS | [`catalog_new_category_fields_compare.md`](modules/catalog_new_category_fields_compare.md) · `docs/modules/categories.md` |
 | 6 | Units | ✅ Analyze+Review PASS | `docs/modules/units.md`, `docs/matrix/units_traceability.md`, branch `phase1/units-analysis` |
 | 7 | Suppliers | ✅ Analyze+Review PASS | `docs/modules/suppliers.md`, `docs/matrix/suppliers_traceability.md`, branch `phase1/suppliers-analysis` |
 | 8 | Customers | ✅ Analyze+Review PASS | `docs/modules/customers.md`, `docs/matrix/customers_traceability.md` — **absent in source**; branch `phase1/customers-analysis` |
@@ -53,7 +53,7 @@
 | 14 | Reports | ✅ Analyze+Review PASS | `docs/modules/reports.md`, `docs/matrix/reports_traceability.md`, branch `phase1/reports-analysis` — also closes **1.10** |
 | 15 | Settings | ✅ Analyze+Review PASS | `docs/modules/settings.md`, `docs/matrix/settings_traceability.md` — backup/export emphasized; implement locked |
 
-**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). New-category **LAYOUT PASS** ([`catalog_new_category_layout_compare.md`](modules/catalog_new_category_layout_compare.md)). Ask before FIELDS. Purchase / barcode / receive remain **backend-blocked**.
+**Rule:** Do not implement any module until its analysis Review PASS and Phase 2 schema gates for that work are ready. Master UI order: [`docs/06_Master_Page_Build_Order.md`](06_Master_Page_Build_Order.md). Page loop: [`FRONTEND_PAGE_BUILD_LOOP.md`](FRONTEND_PAGE_BUILD_LOOP.md). Orchestrator: [`07_Master_Module_Prompt.md`](07_Master_Module_Prompt.md). New-category **FIELDS PASS** ([`catalog_new_category_fields_compare.md`](modules/catalog_new_category_fields_compare.md)). Ask before BUTTONS. Purchase / barcode / receive remain **backend-blocked**.
 
 ### Cursor operator setup (workspace)
 
@@ -111,7 +111,7 @@
 
 ## PHASE 4 — Frontend Migration (React + TypeScript) 🟡
 
-**Unlocked.** Phase 3 platform PASS. Dashboard nest COMPLETE. Catalog hub COMPARE PASS. Taxonomy COMPARE PASS. New-category LAYOUT PASS. Ask before FIELDS.
+**Unlocked.** Phase 3 platform PASS. Dashboard nest COMPLETE. Catalog hub COMPARE PASS. Taxonomy COMPARE PASS. New-category FIELDS PASS. Ask before BUTTONS.
 
 | # | Task | Status |
 |---|---|---|
@@ -125,7 +125,7 @@
 | 4.8 | Accessibility | 🔒 |
 | 4.9 | Phase 4 sign-off (per module) | 🔒 |
 
-**4.2 / 4.5 note:** Dashboard nest COMPLETE. Catalog hub COMPARE — [`catalog_compare.md`](modules/catalog_compare.md). Taxonomy COMPARE — [`catalog_taxonomy_compare.md`](modules/catalog_taxonomy_compare.md). New-category LAYOUT — [`catalog_new_category_layout_compare.md`](modules/catalog_new_category_layout_compare.md). Ask before FIELDS. Settings hub skipped (implement locked).
+**4.2 / 4.5 note:** Dashboard nest COMPLETE. Catalog hub COMPARE — [`catalog_compare.md`](modules/catalog_compare.md). Taxonomy COMPARE — [`catalog_taxonomy_compare.md`](modules/catalog_taxonomy_compare.md). New-category FIELDS — [`catalog_new_category_fields_compare.md`](modules/catalog_new_category_fields_compare.md). Ask before BUTTONS. Settings hub skipped (implement locked).
  
 ---
 
@@ -203,4 +203,4 @@
 6. I stop and ask you before continuing past a phase boundary.
 
 ---
-*Last updated: 2026-07-25 — New-category LAYOUT PASS ([`catalog_new_category_layout_compare.md`](modules/catalog_new_category_layout_compare.md)); ask before FIELDS.*
+*Last updated: 2026-07-25 — New-category FIELDS PASS ([`catalog_new_category_fields_compare.md`](modules/catalog_new_category_fields_compare.md)); ask before BUTTONS.*

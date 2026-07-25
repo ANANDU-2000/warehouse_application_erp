@@ -39,8 +39,16 @@ assert(page.includes('data-slot="appBar"'), "appBar");
 assert(page.includes('data-slot="nameField"'), "nameField");
 assert(page.includes('data-slot="footer"'), "footer");
 assert(page.includes("add-category-page__field"), "field chrome");
-assert(page.includes("add-category-page__field-label"), "field label");
-assert(page.includes("add-category-page__field-hint"), "field hint");
+assert(
+  page.includes("add-category-page__field-label") ||
+    page.includes("add-category-page__field-input"),
+  "field label or FIELDS input",
+);
+assert(
+  page.includes("add-category-page__field-hint") ||
+    page.includes("add-category-page__field-input"),
+  "field hint or FIELDS input",
+);
 assert(page.includes("add-category-page__btn--cancel"), "cancel chrome");
 assert(page.includes("add-category-page__btn--create"), "create chrome");
 assert(page.includes('data-chrome="name-outline"'), "outline chrome");

@@ -132,6 +132,7 @@
     "test:catalog-taxonomy-compare": "node scripts/check-catalog-taxonomy-compare.mjs",
     "test:catalog-new-category-scaffold": "node scripts/check-catalog-new-category-scaffold.mjs",
     "test:catalog-new-category-layout": "node scripts/check-catalog-new-category-layout.mjs",
+    "test:catalog-new-category-fields": "node scripts/check-catalog-new-category-fields.mjs",
     "test:staff-deliveries-layout": "node scripts/check-staff-deliveries-layout.mjs",
     "test:staff-deliveries-fields": "node scripts/check-staff-deliveries-fields.mjs",
     "test:staff-deliveries-buttons": "node scripts/check-staff-deliveries-buttons.mjs",

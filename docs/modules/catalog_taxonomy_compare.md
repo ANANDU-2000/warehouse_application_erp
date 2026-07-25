@@ -13,9 +13,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy **SCAFFOLD→COMPARE** · new-category **SCAFFOLD→COMPARE** · new-subcategory SCAFFOLD→LAYOUT→**FIELDS** |
-| 🟡 Current | Ask before new-subcategory BUTTONS — [`catalog_new_subcategory_fields_compare.md`](catalog_new_subcategory_fields_compare.md) |
-| ⬜ Pending | new-subcategory BUTTONS→COMPARE · category detail · item routes · trade-summary |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy **SCAFFOLD→COMPARE** · new-category **SCAFFOLD→COMPARE** · new-subcategory SCAFFOLD→…→**BUTTONS** |
+| 🟡 Current | Ask before new-subcategory WIRE — [`catalog_new_subcategory_buttons_compare.md`](catalog_new_subcategory_buttons_compare.md) |
+| ⬜ Pending | new-subcategory WIRE→COMPARE · category detail · item routes · trade-summary |
 | ⏸ Deferred | purchase entry · barcode/print · receive **bodies** · Settings · pull gesture · quick sheet · merge to `main` |
 
 ---
@@ -68,7 +68,7 @@ Docs/checklist + smoke script only: revert COMPARE commit. Application code unch
 
 ## 5. Next after Approve
 
-1. **`/catalog/category/:categoryId/new-subcategory` BUTTONS** (page loop step 4 — ask first), **or**  
+1. **`/catalog/category/:categoryId/new-subcategory` WIRE** (page loop step 5 — ask first), **or**  
 2. Hold — purchase / barcode / receive need backends (docs/06 Seq 7–8 / 11), **or**  
 3. Hold / merge review of `ops/products-module` → `main`.
 

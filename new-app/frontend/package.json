@@ -140,6 +140,7 @@
     "test:catalog-new-subcategory-scaffold": "node scripts/check-catalog-new-subcategory-scaffold.mjs",
     "test:catalog-new-subcategory-layout": "node scripts/check-catalog-new-subcategory-layout.mjs",
     "test:catalog-new-subcategory-fields": "node scripts/check-catalog-new-subcategory-fields.mjs",
+    "test:catalog-new-subcategory-buttons": "node scripts/check-catalog-new-subcategory-buttons.mjs",
     "test:staff-deliveries-layout": "node scripts/check-staff-deliveries-layout.mjs",
     "test:staff-deliveries-fields": "node scripts/check-staff-deliveries-fields.mjs",
     "test:staff-deliveries-buttons": "node scripts/check-staff-deliveries-buttons.mjs",

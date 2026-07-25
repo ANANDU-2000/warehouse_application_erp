@@ -61,6 +61,12 @@
   border: none;
   background: transparent;
   padding: 0;
+  cursor: default;
+}
+
+.add-subcategory-page__icon-btn--active {
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .add-subcategory-page__body {
@@ -159,6 +165,12 @@
   line-height: 1.2;
   pointer-events: none;
   user-select: none;
+  cursor: default;
+}
+
+.add-subcategory-page__btn--active {
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .add-subcategory-page__btn--cancel {

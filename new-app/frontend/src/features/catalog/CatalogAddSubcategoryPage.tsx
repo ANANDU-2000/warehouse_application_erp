@@ -1,12 +1,16 @@
 /**
  * Catalog new subcategory `/catalog/category/:categoryId/new-subcategory` —
- * FIELDS (Step 3).
+ * BUTTONS (Step 4).
  * Formula source: catalog_add_subcategory_page.dart
- * Name input + touched empty → `Enter a name`. Forbidden: submit/API (BUTTONS/WIRE).
+ * Close/Cancel → pop(false); Create → touch empty validation only.
+ * Forbidden: POST create / similar dialog (WIRE).
  */
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import {
+  ADD_SUBCATEGORY_BACK_FALLBACK_OWNER,
+  ADD_SUBCATEGORY_BACK_FALLBACK_STAFF,
   ADD_SUBCATEGORY_CANCEL,
   ADD_SUBCATEGORY_CREATE,
   ADD_SUBCATEGORY_NAME_HINT,
@@ -14,32 +18,67 @@ import {
   ADD_SUBCATEGORY_TITLE,
   ADD_SUBCATEGORY_TOOLTIP_CLOSE,
 } from "./catalogAddSubcategoryCopy";
-import { addSubcategoryNameError } from "./catalogAddSubcategoryFields";
+import {
+  addSubcategoryNameError,
+  addSubcategoryNameIsEmpty,
+} from "./catalogAddSubcategoryFields";
 import "./CatalogAddSubcategoryPage.css";
 
+function popOrGo(
+  navigate: ReturnType<typeof useNavigate>,
+  fallback: string,
+): void {
+  if (window.history.length > 1) {
+    navigate(-1);
+    return;
+  }
+  navigate(fallback);
+}
+
 export function CatalogAddSubcategoryPage() {
+  const navigate = useNavigate();
   const { categoryId = "" } = useParams<{ categoryId: string }>();
+  const session = readPrimaryBusiness();
+  const role = (session?.role ?? "").toLowerCase();
+  const isStaff = role === "staff";
+  const backFallback = isStaff
+    ? ADD_SUBCATEGORY_BACK_FALLBACK_STAFF
+    : ADD_SUBCATEGORY_BACK_FALLBACK_OWNER;
+
   const [name, setName] = useState("");
   const [touched, setTouched] = useState(false);
   const nameError = addSubcategoryNameError({ touched, name });
   const showError = nameError != null;
 
+  const onClose = () => popOrGo(navigate, backFallback);
+  const onCancel = () => popOrGo(navigate, backFallback);
+  /** Flutter `_create`: empty → set touched; non-empty → API (WIRE). */
+  const onCreate = () => {
+    if (addSubcategoryNameIsEmpty(name)) {
+      setTouched(true);
+      return;
+    }
+    /* Valid name — POST + similar dialog deferred to WIRE */
+  };
+
   return (
     <div
       className="add-subcategory-page"
       data-page="catalog-new-subcategory"
-      data-step="FIELDS"
+      data-step="BUTTONS"
       data-category-id={categoryId}
     >
       <header className="add-subcategory-page__appbar" data-slot="appBar">
-        <span
-          className="add-subcategory-page__icon-btn"
-          data-deferred="close"
+        <button
+          type="button"
+          className="add-subcategory-page__icon-btn add-subcategory-page__icon-btn--active"
+          data-action="close"
           title={ADD_SUBCATEGORY_TOOLTIP_CLOSE}
-          aria-hidden
+          aria-label={ADD_SUBCATEGORY_TOOLTIP_CLOSE}
+          onClick={onClose}
         >
           ×
-        </span>
+        </button>
         <h1 className="add-subcategory-page__title">{ADD_SUBCATEGORY_TITLE}</h1>
       </header>
 
@@ -83,20 +122,24 @@ export function CatalogAddSubcategoryPage() {
         </label>
 
         <div className="add-subcategory-page__footer" data-slot="footer">
-          <span
-            className="add-subcategory-page__btn add-subcategory-page__btn--cancel"
-            data-deferred="cancel"
+          <button
+            type="button"
+            className="add-subcategory-page__btn add-subcategory-page__btn--cancel add-subcategory-page__btn--active"
+            data-action="cancel"
             data-label={ADD_SUBCATEGORY_CANCEL}
+            onClick={onCancel}
           >
             {ADD_SUBCATEGORY_CANCEL}
-          </span>
-          <span
-            className="add-subcategory-page__btn add-subcategory-page__btn--create"
-            data-deferred="create"
+          </button>
+          <button
+            type="button"
+            className="add-subcategory-page__btn add-subcategory-page__btn--create add-subcategory-page__btn--active"
+            data-action="create"
             data-label={ADD_SUBCATEGORY_CREATE}
+            onClick={onCreate}
           >
             {ADD_SUBCATEGORY_CREATE}
-          </span>
+          </button>
         </div>
       </div>
     </div>

@@ -256,8 +256,8 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 | 1 SCAFFOLD | ✅ | AppBar + name/footer slots + categoryId + staff allowed — [`catalog_new_subcategory_scaffold_compare.md`](modules/catalog_new_subcategory_scaffold_compare.md) |
 | 2 LAYOUT | ✅ | Hexa tokens + Outline name + Cancel/Create chrome — [`catalog_new_subcategory_layout_compare.md`](modules/catalog_new_subcategory_layout_compare.md) |
 | 3 FIELDS | ✅ | Name input + `Enter a name` — [`catalog_new_subcategory_fields_compare.md`](modules/catalog_new_subcategory_fields_compare.md) |
-| 4 BUTTONS | ⬜ | Ask before BUTTONS |
-| 5 WIRE | ⬜ | |
+| 4 BUTTONS | ✅ | Close/Cancel pop + Create touch validation — [`catalog_new_subcategory_buttons_compare.md`](modules/catalog_new_subcategory_buttons_compare.md) |
+| 5 WIRE | ⬜ | Ask before WIRE |
 | 6 STATES | ⬜ | |
 | 7 COMPARE | ⬜ | |
 

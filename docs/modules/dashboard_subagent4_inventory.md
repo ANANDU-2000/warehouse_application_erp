@@ -63,10 +63,10 @@
 
 ## Next (ask first)
 
-1. **`/catalog/new-category` SCAFFOLD** — page loop step 1, **or**  
+1. **`/catalog/new-category` LAYOUT** — page loop step 2, **or**  
 2. Hold — purchase entry / barcode / receive **bodies** need **their** backends first (Seq 7–8 / 11), **or**  
 3. Hold / merge review of `ops/products-module` → `main`.
 
 **Do not** invent purchase/barcode UI.
 
-*(Taxonomy COMPARE — [`catalog_taxonomy_compare.md`](catalog_taxonomy_compare.md).)*
+*(New-category SCAFFOLD — [`catalog_new_category_scaffold_compare.md`](catalog_new_category_scaffold_compare.md).)*

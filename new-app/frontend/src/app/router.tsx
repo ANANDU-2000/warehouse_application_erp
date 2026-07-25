@@ -18,6 +18,7 @@ import { StaffLowStockPage } from "../features/staff/lowStock/StaffLowStockPage"
 import { StaffActivityPage } from "../features/staff/activity/StaffActivityPage";
 import { StaffDeliveriesPage } from "../features/staff/deliveries/StaffDeliveriesPage";
 import { CatalogPage } from "../features/catalog/CatalogPage";
+import { CatalogAddCategoryPage } from "../features/catalog/CatalogAddCategoryPage";
 import { CatalogTaxonomyHubPage } from "../features/catalog/CatalogTaxonomyHubPage";
 
 /**
@@ -79,7 +80,7 @@ export function AppRouter() {
         <Route path="/catalog/taxonomy" element={<CatalogTaxonomyHubPage />} />
         <Route
           path="/catalog/new-category"
-          element={<DashboardRouteStubPage title="New category" />}
+          element={<CatalogAddCategoryPage />}
         />
         <Route
           path="/catalog/category/:categoryId/new-subcategory"

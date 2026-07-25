@@ -13,9 +13,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy **SCAFFOLD→COMPARE** |
-| 🟡 Current | Taxonomy hub **COMPARE PASS** — ask before `/catalog/new-category` SCAFFOLD |
-| ⬜ Pending | `/catalog/new-category` · category detail · item routes · trade-summary |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy **SCAFFOLD→COMPARE** · new-category **SCAFFOLD** |
+| 🟡 Current | `/catalog/new-category` **SCAFFOLD PASS** — ask before LAYOUT |
+| ⬜ Pending | new-category LAYOUT→COMPARE · category detail · item routes · trade-summary |
 | ⏸ Deferred | purchase entry · barcode/print · receive **bodies** · Settings · pull gesture · quick sheet · merge to `main` |
 
 ---
@@ -41,7 +41,7 @@
 | Item | Why deferred |
 |---|---|
 | Quick taxonomy sheet create API | Chips/FAB → `/catalog/new-category` / new-sub stubs |
-| `/catalog/new-category` · category detail bodies | Next page-loop routes (stubs OK) |
+| `/catalog/new-category` · category detail bodies | **new-category SCAFFOLD done** — LAYOUT next ([`catalog_new_category_scaffold_compare.md`](catalog_new_category_scaffold_compare.md)) |
 | Pull RefreshIndicator gesture | Retry covers; gesture polish deferred |
 | Purchase entry `/purchase` · `/purchase/new` | Backend blocked (docs/06 Seq 7) |
 | Barcode scan / bulk print **bodies** | Backend blocked (docs/06 Seq 11) |

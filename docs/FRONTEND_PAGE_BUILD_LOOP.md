@@ -241,8 +241,8 @@ After COMPARE PASS → update [`00_MASTER_CHECKLIST.md`](00_MASTER_CHECKLIST.md)
 
 | Step | Status | Evidence |
 |---|---|---|
-| 1 SCAFFOLD | ⬜ | — |
-| 2–7 | ⬜ | Ask before start |
+| 1 SCAFFOLD | ✅ | AppBar + name/footer slots + staff allowed — [`catalog_new_category_scaffold_compare.md`](modules/catalog_new_category_scaffold_compare.md) |
+| 2–7 | ⬜ | Ask before LAYOUT |
 
 ### Prompt template (copy per page)
 

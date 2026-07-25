@@ -7,9 +7,9 @@
 
 | State | Step |
 |---|---|
-| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy COMPARE · new-category COMPARE · new-subcategory SCAFFOLD→**LAYOUT** |
-| 🟡 Current | `/catalog/category/:categoryId/new-subcategory` **LAYOUT PASS** — ask before FIELDS |
-| ⬜ Pending | FIELDS → COMPARE · category detail · item routes |
+| ✅ Completed | Products Slice 1–7 · Categories Slice 1–2 · Catalog hub COMPARE · taxonomy COMPARE · new-category COMPARE · new-subcategory SCAFFOLD→LAYOUT→**FIELDS** |
+| 🟡 Current | superseded — see [`catalog_new_subcategory_fields_compare.md`](catalog_new_subcategory_fields_compare.md) |
+| ⬜ Pending | BUTTONS → COMPARE · category detail · item routes |
 | ⏸ Deferred | quick taxonomy sheet · purchase entry · barcode/print · receive · Settings · merge to `main` |
 
 ## Legacy vs New
@@ -43,4 +43,4 @@ npm run build
 
 Revert LAYOUT commit; restore SCAFFOLD page/CSS; remove layout script + this compare; boards → ask before LAYOUT.
 
-**Next (ask first):** FIELDS — Name input + `Enter a name` client validation (no submit/API). Stop after LAYOUT.
+**Next (ask first):** FIELDS — done → [`catalog_new_subcategory_fields_compare.md`](catalog_new_subcategory_fields_compare.md). Ask before BUTTONS.

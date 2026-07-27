@@ -34,3 +34,11 @@ export {
   createHomeActivityRepository,
   type HomeActivityRepository,
 } from "./homeActivity.repository";
+export {
+  createContactsRepository,
+  type ContactsRepository,
+} from "./contacts.repository";
+export {
+  createPurchaseRepository,
+  type PurchaseRepository,
+} from "./purchases.repository";

@@ -243,6 +243,42 @@ export function createCatalogItemsController(deps: CatalogItemsControllerDeps) {
         next(e);
       }
     },
+
+    async getItemInsights(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const itemId = req.params.itemId as string;
+        const fromDate = (req.query.from as string);
+        const toDate = (req.query.to as string);
+        if (!fromDate || !toDate) {
+          res.status(400).json({ error: "from and to query params are required" });
+          return;
+        }
+        const insights = await deps.catalogItems.getItemInsights(businessId, itemId, fromDate, toDate);
+        res.json(insights);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async getItemLines(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const itemId = req.params.itemId as string;
+        const fromDate = (req.query.from as string);
+        const toDate = (req.query.to as string);
+        if (!fromDate || !toDate) {
+          res.status(400).json({ error: "from and to query params are required" });
+          return;
+        }
+        const limit = Math.min(50, Math.max(1, Number(req.query.limit ?? 20)));
+        const offset = Math.max(0, Number(req.query.offset ?? 0));
+        const lines = await deps.catalogItems.getItemLines(businessId, itemId, fromDate, toDate, limit, offset);
+        res.json(lines);
+      } catch (e) {
+        next(e);
+      }
+    },
   };
 }
 

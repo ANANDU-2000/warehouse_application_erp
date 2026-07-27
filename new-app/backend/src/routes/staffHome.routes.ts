@@ -17,6 +17,12 @@ export function createActivityLogRoutes(
     authz.requireMembership,
     (req, res, next) => void staffHome.listActivityLog(req, res, next),
   );
+  r.post(
+    "/",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void staffHome.postActivityLog(req, res, next),
+  );
   return r;
 }
 
@@ -25,6 +31,20 @@ export function createNotificationsRoutes(
   authz: AuthzMiddleware,
 ): Router {
   const r = Router({ mergeParams: true });
+  r.get(
+    "/summary",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void staffHome.notificationsSummary(req, res, next),
+  );
+
+  r.post(
+    "/client-event",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void staffHome.clientNotificationEvent(req, res, next),
+  );
+
   r.get(
     "/unread-count",
     authz.requireAuth,

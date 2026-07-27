@@ -22,6 +22,41 @@ export class BusinessesRepository {
       [{ name: "id", type: sql.UniqueIdentifier, value: id }],
     );
   }
+
+  async updateBranding(
+    id: string,
+    fields: Record<string, unknown>,
+  ): Promise<void> {
+    const setClauses: string[] = [];
+    const params: import("./sql").SqlParam[] = [
+      { name: "id", type: sql.UniqueIdentifier, value: id },
+    ];
+    let i = 0;
+    for (const [key, val] of Object.entries(fields)) {
+      const col = key.replace(/([A-Z])/g, "_$1").toLowerCase();
+      const pname = `p${i}`;
+      setClauses.push(`[${col}] = @${pname}`);
+      params.push({
+        name: pname,
+        type:
+          val === null || val === undefined
+            ? sql.NVarChar(sql.MAX)
+            : typeof val === "number"
+              ? sql.Decimal(18, 2)
+              : sql.NVarChar(sql.MAX),
+        value: val ?? null,
+      });
+      i++;
+    }
+    if (setClauses.length === 0) return;
+    const request = this.client.request();
+    for (const p of params) {
+      request.input(p.name, p.type as never, p.value);
+    }
+    await request.query(
+      `UPDATE businesses SET ${setClauses.join(", ")} WHERE id = @id`,
+    );
+  }
 }
 
 export function createBusinessesRepository(client: SqlClient): BusinessesRepository {

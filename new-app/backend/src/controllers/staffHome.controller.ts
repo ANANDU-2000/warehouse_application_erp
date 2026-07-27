@@ -216,6 +216,43 @@ export function createStaffHomeController(deps: StaffHomeControllerDeps) {
       }
     },
 
+    async postActivityLog(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId;
+        if (typeof businessId !== "string") {
+          sendDetail(res, 400, "businessId required");
+          return;
+        }
+        const user = req.user;
+        if (!user) {
+          sendDetail(res, 401, "Not authenticated");
+          return;
+        }
+        const { action_type, item_id, item_name, details } = req.body as {
+          action_type?: string;
+          item_id?: string;
+          item_name?: string;
+          details?: string;
+        };
+        if (!action_type) {
+          sendDetail(res, 400, "action_type is required");
+          return;
+        }
+        const id = await deps.staffHome.insertActivityLog({
+          businessId,
+          userId: user.id,
+          userName: user.name ?? user.username ?? user.email ?? null,
+          actionType: action_type,
+          itemId: item_id ?? null,
+          itemName: item_name ?? null,
+          details: details ?? null,
+        });
+        res.status(201).json({ id });
+      } catch (e) {
+        next(e);
+      }
+    },
+
     /**
      * GET …/notifications — notifications.py list_notifications
      */
@@ -486,6 +523,37 @@ export function createStaffHomeController(deps: StaffHomeControllerDeps) {
           }
           throw e;
         }
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async notificationsSummary(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = (req as any).businessId as string;
+        const userId = (req as any).userId as string;
+        if (!businessId || !userId) {
+          res.status(401).json({ error: "Unauthorized" });
+          return;
+        }
+        const summary = await deps.staffHome.notificationsSummary(businessId, userId);
+        res.json(summary);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async clientNotificationEvent(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = (req as any).businessId as string;
+        const userId = (req as any).userId as string;
+        const { kind, title, body } = req.body as { kind?: string; title?: string; body?: string };
+        if (!kind || !title) {
+          res.status(400).json({ error: "kind and title are required" });
+          return;
+        }
+        const result = await deps.staffHome.insertClientNotification(businessId, userId, kind, title, body ?? null);
+        res.status(201).json({ id: result.id, updated: 1 });
       } catch (e) {
         next(e);
       }

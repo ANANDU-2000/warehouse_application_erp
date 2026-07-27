@@ -63,6 +63,7 @@ export function createItemCategoriesService(deps: ItemCategoriesServiceDeps) {
     },
 
     async create(businessId: string, body: unknown): Promise<ItemCategoryRow> {
+      try {
       const data = validateWithSchema(
         itemCategoryCreateSchema,
         body,
@@ -89,6 +90,7 @@ export function createItemCategoriesService(deps: ItemCategoriesServiceDeps) {
         if (!row) throw new HttpError(500, "Created category not found");
         return row;
       });
+      } catch (e) { console.error("CREATE_CATEGORY_ERR:", e instanceof Error ? e.message : e, e instanceof Error ? e.stack : ""); throw e; }
     },
 
     /** Source: catalog.py update_item_category */
@@ -253,6 +255,23 @@ export function createItemCategoriesService(deps: ItemCategoriesServiceDeps) {
         }
         await repo.deleteType(categoryId, typeId);
       });
+    },
+
+    async getCategoryInsights(
+      businessId: string,
+      categoryId: string,
+      fromDate: string,
+      toDate: string,
+    ): Promise<{
+      item_count: number;
+      linked_line_count: number;
+      total_profit: number;
+      top_item_name: string | null;
+      top_item_profit: number | null;
+      worst_item_name: string | null;
+      worst_item_profit: number | null;
+    }> {
+      return deps.categories.getCategoryInsights(businessId, categoryId, fromDate, toDate);
     },
   };
 }

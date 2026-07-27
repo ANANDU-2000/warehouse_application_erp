@@ -3,6 +3,7 @@
  */
 import { sql } from "../config/database";
 import { queryMany, queryOne, type SqlClient, type SqlParam } from "./sql";
+import { tradeLineAmountExprSql, tradeLineSellingExprSql, tradePurchaseStatusInReportsSql } from "../services/tradeLineSql";
 import { normName } from "../validation/catalogItems.schemas";
 
 export const GENERAL_TYPE_NAME = "General";
@@ -72,6 +73,20 @@ export type ItemCategoriesRepository = {
   countCatalogItemsByType(typeId: string): Promise<number>;
   deleteType(categoryId: string, typeId: string): Promise<void>;
   listTypesIndex(businessId: string): Promise<CategoryTypeIndexRow[]>;
+  getCategoryInsights(
+    businessId: string,
+    categoryId: string,
+    fromDate: string,
+    toDate: string,
+  ): Promise<{
+    item_count: number;
+    linked_line_count: number;
+    total_profit: number;
+    top_item_name: string | null;
+    top_item_profit: number | null;
+    worst_item_name: string | null;
+    worst_item_profit: number | null;
+  }>;
 };
 
 export function createItemCategoriesRepository(
@@ -129,8 +144,8 @@ export function createItemCategoriesRepository(
     async insertCategory(row) {
       await queryOne(
         db,
-        `INSERT INTO item_categories ([id], [business_id], [name], [created_at])
-         VALUES (@id, @businessId, @name, SYSUTCDATETIME())`,
+        `INSERT INTO item_categories ([id], [business_id], [name], [is_perishable], [created_at])
+         VALUES (@id, @businessId, @name, 0, SYSUTCDATETIME())`,
         [
           { name: "id", type: sql.UniqueIdentifier, value: row.id },
           {
@@ -308,6 +323,106 @@ export function createItemCategoriesRepository(
         category_name: String(r.category_name),
         name: String(r.name),
       }));
+    },
+
+    async getCategoryInsights(
+      businessId: string,
+      categoryId: string,
+      fromDate: string,
+      toDate: string,
+    ): Promise<{
+      item_count: number;
+      linked_line_count: number;
+      total_profit: number;
+      top_item_name: string | null;
+      top_item_profit: number | null;
+      worst_item_name: string | null;
+      worst_item_profit: number | null;
+    }> {
+      const profitExpr = `COALESCE(tpl.[profit], (${tradeLineSellingExprSql("tpl")}) - (${tradeLineAmountExprSql("tpl")}))`;
+      const itemCountR = await queryOne<any>(
+        db,
+        `SELECT COUNT([id]) AS c FROM catalog_items
+         WHERE [business_id] = @businessId AND [category_id] = @categoryId AND [deleted_at] IS NULL`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "categoryId", type: sql.UniqueIdentifier, value: categoryId },
+        ],
+      );
+      const itemCount = Number(itemCountR?.c ?? 0);
+
+      const lineCountR = await queryOne<any>(
+        db,
+        `SELECT COUNT(tpl.[id]) AS c
+         FROM trade_purchase_lines tpl
+         INNER JOIN trade_purchases tp ON tp.[id] = tpl.[trade_purchase_id]
+         INNER JOIN catalog_items ci ON ci.[id] = tpl.[catalog_item_id]
+         WHERE tp.[business_id] = @businessId
+           AND ci.[category_id] = @categoryId
+           AND tp.[purchase_date] >= @fromDate
+           AND tp.[purchase_date] <= @toDate
+           AND ${tradePurchaseStatusInReportsSql("tp")}`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "categoryId", type: sql.UniqueIdentifier, value: categoryId },
+          { name: "fromDate", type: sql.Date, value: fromDate },
+          { name: "toDate", type: sql.Date, value: toDate },
+        ],
+      );
+      const linkedLineCount = Number(lineCountR?.c ?? 0);
+
+      const profitR = await queryOne<any>(
+        db,
+        `SELECT COALESCE(SUM(${profitExpr}), 0) AS total_profit
+         FROM trade_purchase_lines tpl
+         INNER JOIN trade_purchases tp ON tp.[id] = tpl.[trade_purchase_id]
+         INNER JOIN catalog_items ci ON ci.[id] = tpl.[catalog_item_id]
+         WHERE tp.[business_id] = @businessId
+           AND ci.[category_id] = @categoryId
+           AND tp.[purchase_date] >= @fromDate
+           AND tp.[purchase_date] <= @toDate
+           AND ${tradePurchaseStatusInReportsSql("tp")}`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "categoryId", type: sql.UniqueIdentifier, value: categoryId },
+          { name: "fromDate", type: sql.Date, value: fromDate },
+          { name: "toDate", type: sql.Date, value: toDate },
+        ],
+      );
+      const totalProfit = Number(profitR?.total_profit ?? 0);
+
+      const perItem = await queryMany<any>(
+        db,
+        `SELECT ci.[id], ci.[name], COALESCE(SUM(${profitExpr}), 0) AS item_profit
+         FROM catalog_items ci
+         INNER JOIN trade_purchase_lines tpl ON tpl.[catalog_item_id] = ci.[id]
+         INNER JOIN trade_purchases tp ON tp.[id] = tpl.[trade_purchase_id]
+         WHERE tp.[business_id] = @businessId
+           AND ci.[category_id] = @categoryId
+           AND tp.[purchase_date] >= @fromDate
+           AND tp.[purchase_date] <= @toDate
+           AND ${tradePurchaseStatusInReportsSql("tp")}
+         GROUP BY ci.[id], ci.[name]`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "categoryId", type: sql.UniqueIdentifier, value: categoryId },
+          { name: "fromDate", type: sql.Date, value: fromDate },
+          { name: "toDate", type: sql.Date, value: toDate },
+        ],
+      );
+      let topName: string | null = null;
+      let topProfit: number | null = null;
+      let worstName: string | null = null;
+      let worstProfit: number | null = null;
+      if (perItem.length > 0) {
+        const best = perItem.reduce((a: any, b: any) => Number(a.item_profit) > Number(b.item_profit) ? a : b);
+        const worst = perItem.reduce((a: any, b: any) => Number(a.item_profit) < Number(b.item_profit) ? a : b);
+        topName = best.name;
+        topProfit = Number(best.item_profit);
+        worstName = worst.name;
+        worstProfit = Number(worst.item_profit);
+      }
+      return { item_count: itemCount, linked_line_count: linkedLineCount, total_profit: totalProfit, top_item_name: topName, top_item_profit: topProfit, worst_item_name: worstName, worst_item_profit: worstProfit };
     },
   };
 }

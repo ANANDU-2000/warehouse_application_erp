@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { healthRoutes } from "./health.routes";
+import { createHealthRoutes } from "./health.routes";
 
 export const apiRouter = Router();
 
-apiRouter.use("/health", healthRoutes);
+apiRouter.use("/health", createHealthRoutes());

@@ -216,12 +216,12 @@
 
 .home-page__custom-field input[type="date"] {
   font-family: inherit;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--home-text);
   border: 1px solid var(--home-border);
   border-radius: 8px;
-  padding: 6px 8px;
+  padding: 8px 10px;
   background: #ffffff;
 }
 

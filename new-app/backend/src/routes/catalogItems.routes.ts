@@ -61,6 +61,19 @@ export function createCatalogItemsRoutes(
     authz.requireMembership,
     (req, res, next) => void catalog.getById(req, res, next),
   );
+  r.get(
+    "/:itemId/insights",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void catalog.getItemInsights(req, res, next),
+  );
+
+  r.get(
+    "/:itemId/lines",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void catalog.getItemLines(req, res, next),
+  );
   r.patch(
     "/:itemId",
     authz.requireAuth,

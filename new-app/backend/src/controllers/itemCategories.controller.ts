@@ -101,6 +101,23 @@ export function createItemCategoriesController(
       }
     },
 
+    async getCategoryInsights(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const categoryId = req.params.categoryId as string;
+        const fromDate = (req.query.from as string);
+        const toDate = (req.query.to as string);
+        if (!fromDate || !toDate) {
+          res.status(400).json({ error: "from and to query params are required" });
+          return;
+        }
+        const insights = await deps.categories.getCategoryInsights(businessId, categoryId, fromDate, toDate);
+        res.json(insights);
+      } catch (e) {
+        next(e);
+      }
+    },
+
     async listTypes(req: Request, res: Response, next: NextFunction) {
       try {
         const businessId = req.params.businessId;
@@ -233,6 +250,12 @@ export function createItemCategoriesRoutes(
     authz.requireAuth,
     authz.requireMembership,
     (req, res, next) => void catalog.getById(req, res, next),
+  );
+  r.get(
+    "/:categoryId/insights",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void catalog.getCategoryInsights(req, res, next),
   );
   r.patch(
     "/:categoryId",

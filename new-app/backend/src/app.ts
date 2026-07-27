@@ -1,4 +1,5 @@
 import express from "express";
+import { getPool } from "./config/database";
 import { errorHandler } from "./middleware/errorHandler";
 import { requestId } from "./middleware/requestId";
 import { requestLog } from "./middleware/requestLog";
@@ -25,6 +26,8 @@ import type { DashboardRepository } from "./repositories/dashboard.repository";
 import type { HomeOverviewRepository } from "./repositories/homeOverview.repository";
 import type { StaffHomeRepository } from "./repositories/staffHome.repository";
 import type { HomeActivityRepository } from "./repositories/homeActivity.repository";
+import type { StockRepository } from "./repositories/stock.repository";
+import { createStockRepository } from "./repositories/stock.repository";
 import type { SearchRepository } from "./repositories/search.repository";
 import type { CatalogItemsRepository } from "./repositories/catalogItems.repository";
 import type { ConnectionPool } from "mssql";
@@ -42,7 +45,6 @@ import {
   createNotificationsRoutes,
   createStaffHomeMeRoutes,
   createStockRoutes,
-  createTradePurchasesRoutes,
 } from "./routes/staffHome.routes";
 import { createSearchRoutes } from "./routes/search.routes";
 import { createCatalogItemsRoutes } from "./routes/catalogItems.routes";
@@ -71,6 +73,43 @@ import {
   createItemCategoriesRoutes,
   createCategoryTypesIndexRoutes,
 } from "./controllers/itemCategories.controller";
+import type { ContactsRepository } from "./repositories/contacts.repository";
+import { createContactsRepository } from "./repositories/contacts.repository";
+import { createContactsService } from "./services/contacts.service";
+import { createContactsController } from "./controllers/contacts.controller";
+import { createContactsRoutes } from "./routes/contacts.routes";
+import type { PurchaseRepository } from "./repositories/purchases.repository";
+import { createPurchaseRepository } from "./repositories/purchases.repository";
+import { createPurchaseService } from "./services/purchases.service";
+import { createPurchaseController } from "./controllers/purchases.controller";
+import { createPurchaseRoutes } from "./routes/purchases.routes";
+import { createStockService } from "./services/stock.service";
+import { createStockController } from "./controllers/stock.controller";
+import { createStockDetailRoutes } from "./routes/stock.routes";
+import { createExportsRepository } from "./repositories/exports.repository";
+import type { ExportsRepository } from "./repositories/exports.repository";
+import { createExportsService } from "./services/exports.service";
+import { createSettingsController } from "./controllers/settings.controller";
+import {
+  createBrandingRoutes,
+  createExportsRoutes,
+} from "./routes/settings.routes";
+import type { ReportsRepository } from "./repositories/reports.repository";
+import { createReportsRepository } from "./repositories/reports.repository";
+import type { OperationsRepository } from "./repositories/operations.repository";
+import { createOperationsRepository } from "./repositories/operations.repository";
+import { OperationsController } from "./controllers/operations.controller";
+import { createOperationsRoutes } from "./routes/operations.routes";
+import { createHealthRoutes } from "./routes/health.routes";
+import { PublicController } from "./controllers/public.controller";
+import { createPublicRoutes } from "./routes/public.routes";
+import { createDamageReportsRepository } from "./repositories/damageReports.repository";
+import { createDamageReportsController } from "./controllers/damageReports.controller";
+import { createDamageReportsRoutes } from "./routes/damageReports.routes";
+import { createRealtimeRoutes } from "./routes/realtime.routes";
+import { createStockAuditRepository } from "./repositories/stockAudit.repository";
+import { createStockAuditController } from "./controllers/stockAudit.controller";
+import { createStockAuditRoutes } from "./routes/stockAudit.routes";
 
 export type AppDeps = {
   /** Injected for tests / when pool is ready. */
@@ -130,6 +169,18 @@ export type AppDeps = {
   ledgerNow?: Date;
   /** Test seam for active-sessions UTC now. */
   activeSessionsNow?: Date;
+  /** Contacts — suppliers & brokers */
+  contacts?: ContactsRepository;
+  /** Purchase Orders — trade purchases */
+  purchases?: PurchaseRepository;
+  /** Stock module — stock detail / movements / adjustments */
+  stock?: StockRepository;
+  /** Settings — exports/backup */
+  exports?: ExportsRepository;
+  /** Reports — trade reporting queries */
+  reportsRepo?: ReportsRepository;
+  /** Operations — checklists, usage logs, snapshots */
+  operations?: OperationsRepository;
 };
 
 /** Fail-closed users repo when SQL pool is not wired. */
@@ -275,6 +326,8 @@ function unavailableCatalogItemsRepository(): CatalogItemsRepository {
     updateBarcode: fail,
     bulkSoftDelete: fail,
     bulkSetReorderLevel: fail,
+    getItemInsights: fail,
+    getItemLines: fail,
   };
 }
 
@@ -314,6 +367,53 @@ function unavailableItemCategoriesRepository(): ItemCategoriesRepository {
     countCatalogItemsByType: fail,
     deleteType: fail,
     listTypesIndex: fail,
+    getCategoryInsights: fail,
+  };
+}
+
+function unavailableContactsRepository(): ContactsRepository {
+  const fail = async (): Promise<never> => {
+    throw new Error("Database pool not connected. Call connect() first.");
+  };
+  return {
+    listSuppliers: fail, listSuppliersCompact: fail, getSupplier: fail,
+    findDupSupplierId: fail, insertSupplier: fail, updateSupplier: fail,
+    deleteSupplier: fail, countActiveTradePurchasesForSupplier: fail,
+    listBrokers: fail, getBroker: fail, findDupBrokerId: fail,
+    insertBroker: fail, updateBroker: fail, deleteBroker: fail,
+    countActiveTradePurchasesForBroker: fail,
+    countSuppliersAssignedToBroker: fail,
+    listBrokerSupplierLinksBySupplier: fail,
+    listBrokerSupplierLinksByBroker: fail,
+    deleteBrokerLinksBySupplier: fail, deleteBrokerLinksByBroker: fail,
+    insertBrokerSupplierLink: fail,
+    verifyBrokerInBusiness: fail, verifySupplierInBusiness: fail,
+    updateSupplierBrokerId: fail,
+    getLastPurchaseDateForSupplier: fail,
+    getLastPurchaseDateForBroker: fail,
+    getSupplierMetrics: fail,
+    getBrokerMetricsDeals: fail, getBrokerMetricsCommission: fail,
+    getBrokerMetricsProfit: fail, getLinkedSuppliers: fail,
+  };
+}
+
+function unavailablePurchaseRepository(): PurchaseRepository {
+  const fail = async (): Promise<never> => {
+    throw new Error("Database pool not connected. Call connect() first.");
+  };
+  return {
+    getDraft: fail, upsertDraft: fail, deleteDraft: fail,
+    maxHumanIdSequence: fail, lastTradeLineForItem: fail,
+    listPurchases: fail, listPurchaseLines: fail,
+    getPurchase: fail, getPurchaseLines: fail, getPurchaseWithLines: fail,
+    insertPurchase: fail, insertPurchaseLines: fail,
+    updatePurchase: fail, deletePurchaseLines: fail,
+    softDeletePurchase: fail, cancelPurchase: fail,
+    updatePurchasePayment: fail,
+    insertLifecycleEvent: fail, listLifecycleEventsByPurchase: fail,
+    findDuplicatePurchases: fail, getPurchaseLinesForCheck: fail,
+    getDeliveryPipeline: fail, getDeliveryPendingAmount: fail,
+    updatePurchaseFields: fail, updateLineVerification: fail,
   };
 }
 
@@ -351,6 +451,23 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
   app.use(requestLog);
   app.use("/api", apiRouter);
 
+  // TEMP DEBUG
+  app.get("/debug/schema/:table", async (req, res) => {
+    try {
+      const table = req.params.table;
+      const pool = getPool();
+      const result = await pool.request().query(`SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '${table}' ORDER BY ORDINAL_POSITION`);
+      res.json(result.recordset);
+    } catch (e) {
+      res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
+    }
+  });
+
+  // TEMP: test error handler
+  app.get("/debug/test-error", (_req, _res, next) => {
+    next(new Error("Test error from debug endpoint"));
+  });
+
   const users = deps.users ?? deps.auth?.users ?? unavailableUsersRepository();
   const memberships = deps.memberships ?? unavailableMembershipsRepository();
   const businesses = deps.businesses ?? unavailableBusinessesRepository();
@@ -377,6 +494,28 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
   const homeActivityController = createHomeActivityController({ homeActivity });
   app.use("/v1/me", createStaffHomeMeRoutes(staffHomeController, app.authz));
 
+  const exportsRepo =
+    deps.exports ??
+    (deps.pool
+      ? createExportsRepository(deps.pool)
+      : createExportsRepository(null as unknown as import("mssql").ConnectionPool));
+  const exportsSvc = createExportsService({
+    exportsRepo,
+    businessesRepo: businesses,
+  });
+  const settingsCtrl = createSettingsController({
+    businesses,
+    exports: exportsSvc,
+  });
+  app.use(
+    "/v1/me/businesses/:businessId",
+    createBrandingRoutes(settingsCtrl, app.authz),
+  );
+  app.use(
+    "/v1/businesses/:businessId/exports",
+    createExportsRoutes(settingsCtrl, app.authz),
+  );
+
   const dashboard = deps.dashboard ?? unavailableDashboardRepository();
   const homeOverview =
     deps.homeOverview ?? unavailableHomeOverviewRepository();
@@ -385,24 +524,40 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
     "/v1/businesses/:businessId",
     createDashboardRoutes(createDashboardController({ dashboard }), app.authz),
   );
+  const reportsRepo = deps.reportsRepo ?? (deps.pool ? createReportsRepository(deps.pool) : createReportsRepository(null as unknown as import("mssql").ConnectionPool));
   app.use(
     "/v1/businesses/:businessId/reports",
     createReportsRoutes(
-      createReportsController({ homeOverview }),
+      createReportsController({ homeOverview, reportsRepo }),
       app.authz,
     ),
   );
+  const purchaseRepo = deps.purchases ?? (deps.pool ? createPurchaseRepository(deps.pool) : unavailablePurchaseRepository());
+  const purchaseSvc = createPurchaseService(purchaseRepo);
+  const purchaseCtrl = createPurchaseController(purchaseSvc);
   app.use(
     "/v1/businesses/:businessId/trade-purchases",
-    createTradePurchasesRoutes(
-      staffHomeController,
-      homeActivityController,
-      app.authz,
-    ),
+    createPurchaseRoutes(purchaseCtrl, app.authz),
   );
+  const stockRepo =
+    deps.stock ??
+    (deps.pool
+      ? createStockRepository(deps.pool)
+      : createStockRepository(null as unknown as import("mssql").ConnectionPool));
+  const stockSvc = createStockService({
+    stockRepo,
+  });
+  const stockCtrl = createStockController({
+    stockService: stockSvc,
+    homeOverview,
+  });
   app.use(
     "/v1/businesses/:businessId/stock",
     createStockRoutes(staffHomeController, homeActivityController, app.authz),
+  );
+  app.use(
+    "/v1/businesses/:businessId/stock",
+    createStockDetailRoutes(stockCtrl, app.authz),
   );
   app.use(
     "/v1/businesses/:businessId/activity-log",
@@ -490,6 +645,14 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
     createCategoryTypesIndexRoutes(itemCategoriesCtrl, app.authz),
   );
 
+  const contactsRepo = deps.contacts ?? (deps.pool ? createContactsRepository(deps.pool) : unavailableContactsRepository());
+  const contactsSvc = createContactsService(contactsRepo);
+  const contactsCtrl = createContactsController(contactsSvc);
+  app.use(
+    "/v1/businesses/:businessId",
+    createContactsRoutes(contactsCtrl, app.authz),
+  );
+
   const businessUsers =
     deps.businessUsers ?? unavailableBusinessUsersRepository();
   app.use(
@@ -511,6 +674,45 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
       app.authz,
     ),
   );
+
+  const opsRepo = deps.operations ?? (deps.pool ? createOperationsRepository(deps.pool) : createOperationsRepository(null as unknown as import("mssql").ConnectionPool));
+  const opsCtrl = new OperationsController(opsRepo);
+  app.use(
+    "/v1/businesses/:businessId/operations",
+    createOperationsRoutes(opsCtrl, app.authz),
+  );
+
+  app.use("/health", createHealthRoutes());
+
+  const publicCtrl = new PublicController();
+  app.use("/public", createPublicRoutes(publicCtrl));
+
+  const damageReportsRepo = deps.pool ? createDamageReportsRepository(deps.pool) : createDamageReportsRepository(null as unknown as import("mssql").ConnectionPool);
+  const damageReportsCtrl = createDamageReportsController(damageReportsRepo);
+  app.use(
+    "/v1/businesses/:businessId/damage-reports",
+    createDamageReportsRoutes(damageReportsCtrl, app.authz),
+  );
+
+  app.use(
+    "/v1/businesses/:businessId/realtime",
+    createRealtimeRoutes(app.authz),
+  );
+
+  const stockAuditRepo = deps.pool ? createStockAuditRepository(deps.pool) : createStockAuditRepository(null as unknown as import("mssql").ConnectionPool);
+  const stockAuditCtrl = createStockAuditController(stockAuditRepo, stockSvc);
+  app.use(
+    "/v1/businesses/:businessId/stock-audits",
+    createStockAuditRoutes(stockAuditCtrl, app.authz),
+  );
+
+  app.get("/", (_req, res) => {
+    res.json({
+      service: "HEXA Purchase Assistant API",
+      version: "2.0",
+      docs: "/docs",
+    });
+  });
 
   app.use(errorHandler);
   return app;

@@ -2,7 +2,7 @@
  * Catalog items list/get — Formula source: catalog.py list_catalog_items / get_catalog_item
  */
 import { sql } from "../config/database";
-import { tradePurchaseStatusInReportsSql } from "../services/tradeLineSql";
+import { tradeLineProfitExprSql, tradeLineSellingExprSql, tradePurchaseStatusInReportsSql } from "../services/tradeLineSql";
 import { queryMany, queryOne, type SqlClient, type SqlParam } from "./sql";
 
 export type CatalogItemRow = {
@@ -203,6 +203,43 @@ export type CatalogItemsRepository = {
   ): Promise<void>;
   /** Soft-delete active items by id list. Returns count updated. */
   bulkSoftDelete(businessId: string, itemIds: string[]): Promise<number>;
+  getItemInsights(
+    businessId: string,
+    itemId: string,
+    fromDate: string,
+    toDate: string,
+  ): Promise<{
+    line_count: number;
+    entry_count: number;
+    total_profit: number;
+    avg_landing: number | null;
+    avg_selling: number | null;
+    last_entry_date: string | null;
+    profit_margin_pct: number | null;
+  }>;
+  getItemLines(
+    businessId: string,
+    itemId: string,
+    fromDate: string,
+    toDate: string,
+    limit: number,
+    offset: number,
+  ): Promise<Array<{
+    entry_id: string;
+    entry_date: string;
+    qty: number;
+    unit: string;
+    landing_cost: number;
+    selling_price: number | null;
+    profit: number | null;
+    supplier_name: string | null;
+    supplier_phone: string | null;
+    broker_name: string | null;
+    broker_phone: string | null;
+    purchase_human_id: string | null;
+    kg_per_unit: number | null;
+    landing_cost_per_kg: number | null;
+  }>>;
   /** Set reorder_level on active items. Returns count updated. */
   bulkSetReorderLevel(
     businessId: string,
@@ -1374,6 +1411,161 @@ export function createCatalogItemsRepository(
         params,
       );
       return rows.length;
+    },
+
+    async getItemInsights(
+      businessId: string,
+      itemId: string,
+      fromDate: string,
+      toDate: string,
+    ): Promise<{
+      line_count: number;
+      entry_count: number;
+      total_profit: number;
+      avg_landing: number | null;
+      avg_selling: number | null;
+      last_entry_date: string | null;
+      profit_margin_pct: number | null;
+    }> {
+      const profitExpr = tradeLineProfitExprSql("tpl");
+      const sellExpr = tradeLineSellingExprSql("tpl");
+      const r = await queryOne<any>(
+        db,
+        `SELECT
+           COUNT(tpl.[id]) AS line_count,
+           COUNT(DISTINCT tpl.[trade_purchase_id]) AS entry_count,
+           COALESCE(SUM(${profitExpr}), 0) AS total_profit,
+           AVG(tpl.[landing_cost]) AS avg_landing,
+           AVG(${sellExpr}) AS avg_selling,
+           MAX(tp.[purchase_date]) AS last_entry_date
+         FROM trade_purchase_lines tpl
+         INNER JOIN trade_purchases tp ON tp.[id] = tpl.[trade_purchase_id]
+         WHERE tp.[business_id] = @businessId
+           AND tpl.[catalog_item_id] = @itemId
+           AND tp.[purchase_date] >= @fromDate
+           AND tp.[purchase_date] <= @toDate
+           AND ${tradePurchaseStatusInReportsSql("tp")}`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+          { name: "fromDate", type: sql.Date, value: fromDate },
+          { name: "toDate", type: sql.Date, value: toDate },
+        ],
+      );
+      if (!r) return { line_count: 0, entry_count: 0, total_profit: 0, avg_landing: null, avg_selling: null, last_entry_date: null, profit_margin_pct: null };
+      const lineCount = Number(r.line_count ?? 0);
+      const totalProfit = Number(r.total_profit ?? 0);
+      let profitMarginPct: number | null = null;
+      if (lineCount > 0) {
+        const revR = await queryOne<any>(
+          db,
+          `SELECT COALESCE(SUM(tpl.[qty] * ${sellExpr}), 0) AS total_rev
+           FROM trade_purchase_lines tpl
+           INNER JOIN trade_purchases tp ON tp.[id] = tpl.[trade_purchase_id]
+           WHERE tp.[business_id] = @businessId
+             AND tpl.[catalog_item_id] = @itemId
+             AND tp.[purchase_date] >= @fromDate
+             AND tp.[purchase_date] <= @toDate
+             AND ${sellExpr} IS NOT NULL
+             AND ${tradePurchaseStatusInReportsSql("tp")}`,
+          [
+            { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+            { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+            { name: "fromDate", type: sql.Date, value: fromDate },
+            { name: "toDate", type: sql.Date, value: toDate },
+          ],
+        );
+        const totalRev = Number(revR?.total_rev ?? 0);
+        if (totalRev > 0) {
+          profitMarginPct = (totalProfit / totalRev) * 100;
+        }
+      }
+      return {
+        line_count: lineCount,
+        entry_count: Number(r.entry_count ?? 0),
+        total_profit: totalProfit,
+        avg_landing: r.avg_landing != null ? Number(r.avg_landing) : null,
+        avg_selling: r.avg_selling != null ? Number(r.avg_selling) : null,
+        last_entry_date: r.last_entry_date ? (r.last_entry_date instanceof Date ? r.last_entry_date.toISOString().split("T")[0] : String(r.last_entry_date).split("T")[0]) : null,
+        profit_margin_pct: profitMarginPct,
+      };
+    },
+
+    async getItemLines(
+      businessId: string,
+      itemId: string,
+      fromDate: string,
+      toDate: string,
+      limit: number,
+      offset: number,
+    ): Promise<Array<{
+      entry_id: string;
+      entry_date: string;
+      qty: number;
+      unit: string;
+      landing_cost: number;
+      selling_price: number | null;
+      profit: number | null;
+      supplier_name: string | null;
+      supplier_phone: string | null;
+      broker_name: string | null;
+      broker_phone: string | null;
+      purchase_human_id: string | null;
+      kg_per_unit: number | null;
+      landing_cost_per_kg: number | null;
+    }>> {
+      const profitExpr = tradeLineProfitExprSql("tpl");
+      const sellExpr = tradeLineSellingExprSql("tpl");
+      const cap = Math.min(500, Math.max(limit + offset, 1) * 4 + 20);
+      const rows = await queryMany<any>(
+        db,
+        `SELECT tpl.[id], tp.[purchase_date], tp.[human_id],
+                tpl.[qty], tpl.[unit], tpl.[landing_cost],
+                ${sellExpr} AS selling_price,
+                ${profitExpr} AS profit,
+                tpl.[kg_per_unit], tpl.[landing_cost_per_kg],
+                s.[name] AS supplier_name, s.[phone] AS supplier_phone,
+                b.[name] AS broker_name, b.[phone] AS broker_phone
+         FROM trade_purchase_lines tpl
+         INNER JOIN trade_purchases tp ON tp.[id] = tpl.[trade_purchase_id]
+         LEFT JOIN suppliers s ON s.[id] = tp.[supplier_id]
+         LEFT JOIN brokers b ON b.[id] = tp.[broker_id]
+         WHERE tp.[business_id] = @businessId
+           AND tpl.[catalog_item_id] = @itemId
+           AND tp.[purchase_date] >= @fromDate
+           AND tp.[purchase_date] <= @toDate
+           AND ${tradePurchaseStatusInReportsSql("tp")}
+         ORDER BY tp.[purchase_date] DESC, tpl.[id] DESC
+         OFFSET 0 ROWS FETCH NEXT ${cap} ROWS ONLY`,
+        [
+          { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+          { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+          { name: "fromDate", type: sql.Date, value: fromDate },
+          { name: "toDate", type: sql.Date, value: toDate },
+        ],
+      );
+      const sorted = rows.sort((a: any, b: any) => {
+        const da = new Date(a.purchase_date).getTime();
+        const db2 = new Date(b.purchase_date).getTime();
+        return db2 - da || String(b.id).localeCompare(String(a.id));
+      });
+      const page = sorted.slice(offset, offset + limit);
+      return page.map((r: any) => ({
+        entry_id: String(r.id),
+        entry_date: r.purchase_date ? (r.purchase_date instanceof Date ? r.purchase_date.toISOString().split("T")[0] : String(r.purchase_date).split("T")[0]) : "",
+        qty: Number(r.qty ?? 0),
+        unit: String(r.unit ?? ""),
+        landing_cost: Number(r.landing_cost ?? 0),
+        selling_price: r.selling_price != null ? Number(r.selling_price) : null,
+        profit: r.profit != null ? Number(r.profit) : null,
+        supplier_name: r.supplier_name ?? null,
+        supplier_phone: r.supplier_phone ?? null,
+        broker_name: r.broker_name ?? null,
+        broker_phone: r.broker_phone ?? null,
+        purchase_human_id: r.human_id ?? null,
+        kg_per_unit: r.kg_per_unit != null ? Number(r.kg_per_unit) : null,
+        landing_cost_per_kg: r.landing_cost_per_kg != null ? Number(r.landing_cost_per_kg) : null,
+      }));
     },
   };
 }

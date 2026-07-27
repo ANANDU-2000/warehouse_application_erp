@@ -787,6 +787,36 @@ export class StaffHomeRepository {
     });
   }
 
+  async insertActivityLog(opts: {
+    businessId: string;
+    userId: string;
+    userName: string | null;
+    actionType: string;
+    itemId: string | null;
+    itemName: string | null;
+    details: string | null;
+  }): Promise<string> {
+    const id = randomUUID();
+    const now = new Date();
+    await queryOne(
+      this.client,
+      `INSERT INTO [staff_activity_log] ([id], [business_id], [user_id], [user_name], [action_type], [item_id], [item_name], [details], [created_at])
+       VALUES (@id, @businessId, @userId, @userName, @actionType, @itemId, @itemName, @details, @createdAt)`,
+      [
+        { name: "id", type: sql.UniqueIdentifier, value: id },
+        { name: "businessId", type: sql.UniqueIdentifier, value: opts.businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: opts.userId },
+        { name: "userName", type: sql.NVarChar(255), value: opts.userName },
+        { name: "actionType", type: sql.NVarChar(50), value: opts.actionType },
+        { name: "itemId", type: sql.UniqueIdentifier, value: opts.itemId ?? null },
+        { name: "itemName", type: sql.NVarChar(255), value: opts.itemName ?? null },
+        { name: "details", type: sql.NVarChar(-1), value: opts.details ?? null },
+        { name: "createdAt", type: sql.DateTimeOffset, value: now },
+      ],
+    );
+    return id;
+  }
+
   /**
    * GET notifications — notifications.py list_notifications
    */
@@ -1378,6 +1408,65 @@ export class StaffHomeRepository {
     }
 
     return { ok: true, notifications_created: inserted };
+  }
+
+  async notificationsSummary(
+    businessId: string,
+    userId: string,
+  ): Promise<{
+    unread_by_category: Array<{ category: string; count: number }>;
+    unread_by_priority: Array<{ priority: string; count: number }>;
+  }> {
+    const byCategory = await queryMany<any>(
+      this.client,
+      `SELECT [category], COUNT(*) AS [count]
+       FROM notifications
+       WHERE [business_id] = @businessId AND [user_id] = @userId AND [read_at] IS NULL
+       GROUP BY [category]`,
+      [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: userId },
+      ],
+    );
+    const byPriority = await queryMany<any>(
+        this.client,
+        `SELECT [priority], COUNT(*) AS [count]
+       FROM notifications
+       WHERE [business_id] = @businessId AND [user_id] = @userId AND [read_at] IS NULL
+       GROUP BY [priority]`,
+      [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: userId },
+      ],
+    );
+    return {
+      unread_by_category: byCategory.map((r: any) => ({ category: String(r.category), count: Number(r.count) })),
+      unread_by_priority: byPriority.map((r: any) => ({ priority: String(r.priority), count: Number(r.count) })),
+    };
+  }
+
+  async insertClientNotification(
+    businessId: string,
+    userId: string,
+    kind: string,
+    title: string,
+    body: string | null,
+  ): Promise<{ id: string }> {
+    const id = randomUUID();
+      await queryOne(
+        this.client,
+        `INSERT INTO notifications ([id], [business_id], [user_id], [kind], [title], [body], [priority], [category], [created_at])
+       VALUES (@id, @businessId, @userId, @kind, @title, @body, N'medium', N'system', SYSUTCDATETIME())`,
+      [
+        { name: "id", type: sql.UniqueIdentifier, value: id },
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "userId", type: sql.UniqueIdentifier, value: userId },
+        { name: "kind", type: sql.NVarChar(64), value: kind },
+        { name: "title", type: sql.NVarChar(500), value: title },
+        { name: "body", type: sql.NVarChar(sql.MAX), value: body ?? null },
+      ],
+    );
+    return { id };
   }
 
   private parsePeriod(

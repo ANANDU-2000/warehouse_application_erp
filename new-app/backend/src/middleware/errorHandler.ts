@@ -66,5 +66,6 @@ export function errorHandler(
     fields.stack = err.stack;
   }
   log.error("Unhandled", fields);
-  sendDetail(res, 500, "Internal Server Error");
+  console.error("DEBUG_ERROR:", JSON.stringify({ message, stack: err instanceof Error ? err.stack : undefined }));
+  sendDetail(res, 500, message);
 }

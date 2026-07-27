@@ -1,0 +1,40 @@
+.pd-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.pd-banner__inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pd-banner__icon {
+  display: flex;
+  flex-shrink: 0;
+}
+.pd-banner__label {
+  font-size: 14px;
+  font-weight: 600;
+}
+.pd-banner__actions {
+  display: flex;
+  gap: 8px;
+}
+.pd-banner__btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  min-height: 36px;
+}
+.pd-banner__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

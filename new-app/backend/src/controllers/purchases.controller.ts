@@ -1,5 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import type { PurchaseService } from "../services/purchases.service";
+import type { BusinessesRepository } from "../repositories/businesses.repository";
+import { buildPurchasePdfBuffer, buildPurchasePdfFileName, tryFetchPdfLogo } from "../services/purchasePdf.service";
 import {
   PurchaseValidationError,
   PurchaseDuplicateError,
@@ -34,6 +36,8 @@ export type PurchaseController = {
   patchDelivery: (req: Request, res: Response, next: NextFunction) => void;
   commitStock: (req: Request, res: Response, next: NextFunction) => void;
   autoCommitStock: (req: Request, res: Response, next: NextFunction) => void;
+  // PDF
+  exportPdf: (req: Request, res: Response, next: NextFunction) => void;
 };
 
 function handleServiceError(err: unknown, res: Response): void {
@@ -58,7 +62,7 @@ function handleServiceError(err: unknown, res: Response): void {
   throw err;
 }
 
-export function createPurchaseController(svc: PurchaseService): PurchaseController {
+export function createPurchaseController(svc: PurchaseService, businessesRepo?: BusinessesRepository): PurchaseController {
   const wrap = (fn: (req: Request, res: Response) => Promise<void>) => {
     return (req: Request, res: Response, _next: NextFunction) => {
       fn(req, res).catch((err) => handleServiceError(err, res));
@@ -207,6 +211,21 @@ export function createPurchaseController(svc: PurchaseService): PurchaseControll
       const result = await svc.autoCommitStock(req.params["businessId"] as string, req.params["purchaseId"] as string);
       if (!result) { res.status(400).json({ error: "Auto-commit not available" }); return; }
       res.json(result);
+    }),
+
+    exportPdf: wrap(async (req, res) => {
+      const businessId = req.params["businessId"] as string;
+      const purchaseId = req.params["purchaseId"] as string;
+      const purchase = await svc.getPurchase(businessId, purchaseId);
+      if (!businessesRepo) { res.status(500).json({ error: "Business repository not available" }); return; }
+      const biz = await businessesRepo.findById(businessId);
+      if (!biz) { res.status(404).json({ error: "Business not found" }); return; }
+      const logo = await tryFetchPdfLogo(biz.branding_logo_url);
+      const pdfBuffer = await buildPurchasePdfBuffer(purchase, biz, logo);
+      const filename = buildPurchasePdfFileName(purchase);
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+      res.send(pdfBuffer);
     }),
   };
 }

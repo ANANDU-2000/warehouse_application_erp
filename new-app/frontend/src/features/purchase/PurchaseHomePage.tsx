@@ -1,7 +1,22 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { readPrimaryBusiness } from "../../shared/auth/sessionStore";
 import "./PurchaseHomePage.css";
+
+const WIP_STORAGE_KEY = "hexa_purchase_wip_draft";
+
+type WipDraft = Record<string, unknown> | null;
+
+function readWipDraft(): WipDraft {
+  try {
+    const raw = localStorage.getItem(WIP_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function discardWipDraft(): void {
+  try { localStorage.removeItem(WIP_STORAGE_KEY); } catch {}
+}
 
 type PurchaseRow = {
   id: string;
@@ -42,6 +57,12 @@ export function PurchaseHomePage() {
 
   const [period, setPeriod] = useState<Period>("month");
   const [search, setSearch] = useState("");
+  const [wipDraft, setWipDraft] = useState<WipDraft>(null);
+
+  // Check for WIP draft on mount
+  useEffect(() => {
+    setWipDraft(readWipDraft());
+  }, []);
   const [purchases, setPurchases] = useState<PurchaseRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -140,6 +161,20 @@ export function PurchaseHomePage() {
           </button>
         </div>
       </header>
+
+      {/* WIP resume banner */}
+      {wipDraft && (
+        <div className="purchase-home__wip-banner">
+          <div className="purchase-home__wip-info">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#D97706"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" /></svg>
+            <span>Resume unsaved purchase</span>
+          </div>
+          <div className="purchase-home__wip-actions">
+            <button type="button" className="purchase-home__wip-resume" onClick={() => navigate("/purchase/new")}>Resume</button>
+            <button type="button" className="purchase-home__wip-discard" onClick={() => { discardWipDraft(); setWipDraft(null); }}>Discard</button>
+          </div>
+        </div>
+      )}
 
       <div className="purchase-home__period">
         {PERIOD_ORDER.map((key) => (

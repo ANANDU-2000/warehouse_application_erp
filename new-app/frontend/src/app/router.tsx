@@ -65,6 +65,7 @@ export function AppRouter() {
         <Route path="/purchase" element={<OwnerShell><PurchaseHomePage /></OwnerShell>} />
         <Route path="/purchase/new" element={<OwnerShell><PurchaseEntryPage /></OwnerShell>} />
         <Route path="/purchase/:purchaseId" element={<OwnerShell><PurchaseDetailPage /></OwnerShell>} />
+        <Route path="/purchase/:purchaseId/edit" element={<OwnerShell><PurchaseEntryPage /></OwnerShell>} />
 
         <Route path="/search" element={<OwnerShell><SearchPage /></OwnerShell>} />
 

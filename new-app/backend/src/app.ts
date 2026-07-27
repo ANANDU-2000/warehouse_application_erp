@@ -534,7 +534,7 @@ export function createApp(deps: AppDeps = {}): AppWithAuthz {
   );
   const purchaseRepo = deps.purchases ?? (deps.pool ? createPurchaseRepository(deps.pool) : unavailablePurchaseRepository());
   const purchaseSvc = createPurchaseService(purchaseRepo);
-  const purchaseCtrl = createPurchaseController(purchaseSvc);
+  const purchaseCtrl = createPurchaseController(purchaseSvc, businesses);
   app.use(
     "/v1/businesses/:businessId/trade-purchases",
     createPurchaseRoutes(purchaseCtrl, app.authz),

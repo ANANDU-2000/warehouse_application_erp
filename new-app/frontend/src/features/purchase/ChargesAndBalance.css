@@ -1,0 +1,61 @@
+.pd-charges {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #E5E7EB;
+  overflow: hidden;
+}
+.pd-charges__toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.pd-charges__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1F2937;
+  margin: 0;
+  text-align: left;
+}
+.pd-charges__chevron {
+  font-size: 14px;
+  color: #6B7280;
+}
+.pd-charges__body {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pd-charges__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #374151;
+}
+.pd-charges__row--profit {
+  font-weight: 700;
+  padding-top: 4px;
+}
+.pd-charges__val {
+  font-weight: 600;
+  color: #1F2937;
+}
+.pd-charges__val--green {
+  color: #059669;
+}
+.pd-charges__val--red {
+  color: #DC2626;
+}
+.pd-charges__divider {
+  height: 1px;
+  background: #E5E7EB;
+  margin: 4px 0;
+}

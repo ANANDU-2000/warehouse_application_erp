@@ -49,5 +49,8 @@ export function createPurchaseRoutes(
   r.post("/:purchaseId/mark-paid", authz.requireAuth, authz.requireMembership, authz.requirePermission("purchase_edit"), (req, res, next) => void ctrl.markPaid(req, res, next));
   r.post("/:purchaseId/cancel", authz.requireAuth, authz.requireMembership, authz.requirePermission("purchase_edit"), (req, res, next) => void ctrl.cancel(req, res, next));
 
+  // PDF
+  r.get("/:purchaseId/pdf", authz.requireAuth, authz.requireMembership, (req, res, next) => void ctrl.exportPdf(req, res, next));
+
   return r;
 }

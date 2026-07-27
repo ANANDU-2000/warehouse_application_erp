@@ -280,3 +280,46 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+/* WIP resume banner */
+.purchase-home__wip-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #FFFBEB;
+  border-bottom: 1px solid #FDE68A;
+  font-size: 13px;
+  color: #92400E;
+}
+.purchase-home__wip-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.purchase-home__wip-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.purchase-home__wip-resume {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid #D97706;
+  background: #fff;
+  color: #92400E;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.purchase-home__wip-discard {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #6B7280;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}

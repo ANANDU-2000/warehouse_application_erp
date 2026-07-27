@@ -1,0 +1,12 @@
+.cie-page { min-height:100vh; background:#F8FAFB; }
+.cie-hdr { display:flex; align-items:center; gap:12px; padding:12px 16px; background:#fff; border-bottom:1px solid #E5E7EB; position:sticky; top:0; z-index:50; }
+.cie-back { background:none; border:none; font-size:15px; color:#6B7280; font-weight:600; cursor:pointer; padding:8px; }
+.cie-title { flex:1; font-size:17px; font-weight:700; color:#1F2937; margin:0; text-align:center; }
+.cie-save { background:none; border:none; font-size:15px; color:#0E7C6B; font-weight:700; cursor:pointer; padding:8px; }
+.cie-save:disabled { opacity:.5; }
+.cie-body { padding:12px 16px 40px; display:flex; flex-direction:column; gap:14px; }
+.cie-field { display:flex; flex-direction:column; gap:6px; }
+.cie-label { font-size:13px; font-weight:600; color:#374151; }
+.cie-input { width:100%; padding:14px 16px; border:1.5px solid #E5E7EB; border-radius:12px; font-size:16px; outline:none; background:#fff; }
+.cie-input:focus { border-color:#0E7C6B; }
+.cie-loading { text-align:center; padding:60px 20px; color:#6B7280; }

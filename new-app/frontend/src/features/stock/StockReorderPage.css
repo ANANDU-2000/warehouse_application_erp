@@ -1,0 +1,30 @@
+.ror-page { min-height:100vh; background:#F8FAFB; }
+.ror-hdr { display:flex; align-items:center; gap:12px; padding:12px 16px; background:#fff; border-bottom:1px solid #E5E7EB; position:sticky; top:0; z-index:50; }
+.ror-back { width:40px; height:40px; border-radius:10px; border:none; background:#F3F4F6; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.ror-title { flex:1; font-size:17px; font-weight:700; color:#1F2937; margin:0; }
+.ror-count { font-size:13px; color:#6B7280; font-weight:600; }
+.ror-tabs { display:flex; gap:6px; padding:12px 16px; }
+.ror-tab { flex:1; padding:10px; border-radius:10px; border:1.5px solid #E5E7EB; background:#fff; font-size:13px; font-weight:600; color:#6B7280; cursor:pointer; text-align:center; min-height:40px; }
+.ror-tab--on { background:#0E7C6B; color:#fff; border-color:#0E7C6B; }
+.ror-search-wrap { padding:0 16px 12px; }
+.ror-search { width:100%; padding:12px 16px; border:1.5px solid #E5E7EB; border-radius:12px; font-size:16px; background:#fff; outline:none; }
+.ror-search:focus { border-color:#0E7C6B; }
+.ror-loading, .ror-error, .ror-empty { text-align:center; padding:40px; color:#6B7280; font-size:14px; }
+.ror-error button { margin-top:8px; padding:8px 16px; border-radius:8px; border:none; background:#DC2626; color:#fff; font-weight:600; }
+.ror-list { padding:0 16px 100px; display:flex; flex-direction:column; gap:8px; }
+.ror-card { background:#fff; border:1px solid #E5E7EB; border-radius:14px; padding:14px; }
+.ror-card-top { display:flex; gap:10px; align-items:flex-start; }
+.ror-dot { width:10px; height:10px; border-radius:50%; margin-top:6px; flex-shrink:0; }
+.ror-dot[data-status="pending"] { background:#F59E0B; }
+.ror-dot[data-status="ordered"] { background:#0E7C6B; }
+.ror-dot[data-status="done"] { background:#9CA3AF; }
+.ror-card-info { flex:1; display:flex; flex-direction:column; gap:2px; }
+.ror-card-name { font-size:15px; font-weight:600; color:#1F2937; }
+.ror-card-sub { font-size:12px; color:#6B7280; }
+.ror-card-sup { font-size:12px; color:#6B7280; }
+.ror-card-meta { font-size:11px; color:#9CA3AF; }
+.ror-card-actions { display:flex; gap:8px; margin-top:10px; }
+.ror-btn { padding:8px 14px; border-radius:8px; border:none; font-size:13px; font-weight:600; cursor:pointer; min-height:36px; }
+.ror-btn--pri { background:#0E7C6B; color:#fff; }
+.ror-btn--sec { background:#F3F4F6; color:#374151; }
+.ror-btn--del { background:#FEE2E2; color:#DC2626; }

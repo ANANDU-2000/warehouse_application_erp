@@ -1,0 +1,73 @@
+/**
+ * Owner /home/activity SCAFFOLD smoke checks.
+ * Run: node scripts/check-home-activity-scaffold.mjs
+ */
+import { readFileSync, existsSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const failures = [];
+
+function assert(cond, msg) {
+  if (!cond) failures.push(msg);
+}
+
+const pagePath = join(
+  root,
+  "src/features/home/HomeWarehouseActivityPage.tsx",
+);
+assert(existsSync(pagePath), "HomeWarehouseActivityPage exists");
+
+const page = readFileSync(pagePath, "utf8");
+const copyPath = join(root, "src/features/home/homeActivityCopy.ts");
+assert(
+  existsSync(copyPath) || page.includes("Warehouse activity"),
+  "title source exists",
+);
+if (existsSync(copyPath)) {
+  const copy = readFileSync(copyPath, "utf8");
+  assert(copy.includes("Warehouse activity"), "AppBar title");
+} else {
+  assert(page.includes("Warehouse activity"), "AppBar title");
+}
+assert(
+  page.includes("Warehouse activity") ||
+    page.includes("HOME_ACTIVITY_APPBAR_TITLE"),
+  "AppBar title in page",
+);
+assert(page.includes('data-slot="appbar"'), "appbar slot");
+assert(page.includes('data-slot="period-filter"'), "period-filter slot");
+assert(page.includes('data-slot="period-caption"'), "period-caption slot");
+assert(page.includes('data-slot="activity-list"'), "activity-list slot");
+assert(!page.includes("fetch(") || page.includes("homeActivity"), "API via module");
+/* WIRE may fetch — SCAFFOLD slots still required */
+
+const router = readFileSync(join(root, "src/app/router.tsx"), "utf8");
+assert(
+  router.includes("HomeWarehouseActivityPage"),
+  "router imports activity page",
+);
+assert(router.includes('path="/home/activity"'), "activity route");
+assert(
+  !router.includes(
+    'path="/home/activity"\n          element={<DashboardRouteStubPage',
+  ),
+  "not stub page",
+);
+
+const css = readFileSync(
+  join(root, "src/features/home/HomeWarehouseActivityPage.css"),
+  "utf8",
+);
+assert(
+  css.includes("#f7f9f6") || css.includes("#F7F9F6"),
+  "brandBackground #F7F9F6",
+);
+
+if (failures.length) {
+  console.error("Home activity SCAFFOLD checks FAILED:");
+  for (const f of failures) console.error(" -", f);
+  process.exit(1);
+}
+console.log("Home activity SCAFFOLD checks PASS");

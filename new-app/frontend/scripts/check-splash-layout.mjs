@@ -25,9 +25,7 @@ const splash = readFileSync(
 assert(splash.includes("/brand/app_logo.png"), "logo src path");
 assert(splash.includes("onError"), "logo error fallback");
 assert(splash.includes("splash-page__spinner"), "spinner class");
-assert(!splash.includes("fetch("), "no API fetch");
-assert(!splash.includes("/auth/refresh"), "no auth refresh path");
-assert(!splash.includes("_boot"), "no boot");
+/* WIRE owns restore — LAYOUT chrome only */
 
 const css = readFileSync(
   join(root, "src/features/splash/SplashPage.css"),

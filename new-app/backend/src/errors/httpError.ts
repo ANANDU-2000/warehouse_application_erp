@@ -4,10 +4,10 @@
  */
 export class HttpError extends Error {
   readonly status: number;
-  readonly detail: string;
+  readonly detail: string | Record<string, unknown>;
 
-  constructor(status: number, detail: string) {
-    super(detail);
+  constructor(status: number, detail: string | Record<string, unknown>) {
+    super(typeof detail === "string" ? detail : JSON.stringify(detail));
     this.name = "HttpError";
     this.status = status;
     this.detail = detail;

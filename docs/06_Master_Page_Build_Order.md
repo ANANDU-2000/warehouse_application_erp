@@ -11,11 +11,11 @@
 
 | Seq | Module | Routes (approx) | Doc ready | Backend ready | Unlocked for UI? |
 |---|---|---|---|---|---|
-| 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **4 BUTTONS** |
-| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | ❌ | Blocked |
-| 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 me/businesses only | Blocked |
-| 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | ❌ | Blocked |
-| 5 | Categories | 1 | ✅ `categories.md` | ❌ | Blocked |
+| 1 | Login/Auth | 5 | ✅ `login.md` | ✅ login/refresh + me/businesses | Login COMPARE PASS · Splash **7 COMPARE** |
+| 2 | Dashboard/Home | 2+ | ✅ `dashboard.md` | 🟡 nest COMPLETE · Catalog COMPARE · taxonomy COMPARE · new-category COMPARE · new-subcategory BUTTONS | Ask before new-subcategory WIRE — [`catalog_new_subcategory_buttons_compare.md`](modules/catalog_new_subcategory_buttons_compare.md) |
+| 3 | Users & Roles | 2 | ✅ `users-roles.md` | 🟡 list+profile COMPARE · Activity WIRE | Next: ask next Subagent 4 stub — [`dashboard_subagent4_inventory.md`](modules/dashboard_subagent4_inventory.md) |
+| 4 | Products/Catalog | 19 | ✅ `products.md`, `categories.md` | 🟡 Slice 1–7 · hub COMPARE · taxonomy COMPARE · new-category COMPARE · new-subcategory BUTTONS | Ask before new-subcategory WIRE — [`catalog_new_subcategory_buttons_compare.md`](modules/catalog_new_subcategory_buttons_compare.md) |
+| 5 | Categories | 1 | ✅ `categories.md` | 🟡 Slice 1–2 · new-category COMPARE · new-subcategory BUTTONS | Next: new-subcategory WIRE — [`catalog_new_subcategory_buttons_compare.md`](modules/catalog_new_subcategory_buttons_compare.md) |
 | 6 | Suppliers/Brokers | 12 | ✅ `suppliers.md` | ❌ | Blocked |
 | 7 | Purchase Orders | 6 | ✅ `purchase-orders.md` | ❌ | Blocked |
 | 8 | Goods Receipt (staff receive) | 2 | ✅ `goods-receipt.md` | ❌ | Blocked |
@@ -45,7 +45,7 @@ FOR each module in order:
   5. Next module — do not parallelize
 ```
 
-Login UI: **COMPARE PASS**. Splash: **4 BUTTONS** (current) → WIRE restore later. Dashboard blocked until backend.
+Login UI: **COMPARE PASS**. Splash: **7 COMPARE PASS**. Dashboard nest **COMPLETE**. Products **Slice 1–7 PASS**. Categories **Slice 1–2 PASS**. Catalog hub **COMPARE PASS**. Taxonomy hub **COMPARE PASS**. New-category **COMPARE PASS**. New-subcategory **BUTTONS PASS**. Next: ask before **`/catalog/category/:categoryId/new-subcategory` WIRE**. Purchase / barcode / receive **UI blocked** until their backends (docs/06 Seq 7–8 / 11).
 
 ---
 
@@ -72,11 +72,11 @@ Live local SQL uses the pool wired in [`new-app/backend/src/index.ts`](../new-ap
 
 | Path | Notes |
 |---|---|
-| `/splash` | **Step 4 BUTTONS** |
+| `/splash` | **Step 7 COMPARE PASS** |
 | `/login` | **COMPARE PASS** |
 | `/forgot-password` | Stub only (full page later) |
-| `/home` | Post-login stub (Dashboard gated) |
-| `/staff/home` | Post-login stub (Dashboard gated) |
+| `/home` | **COMPARE PASS** (owner) — see Seq 2 |
+| `/staff/home` | **COMPARE PASS** (in-scope) — see Seq 2 |
 | `/reset-password` | Later |
 | `/get-started` | Unknown — needs opening (likely redirect to login) |
 
@@ -87,16 +87,21 @@ Backend (wire in later steps): `POST /v1/auth/login`, `POST /v1/auth/refresh`, `
 | Path | Notes |
 |---|---|
 | `/home` | Owner dashboard |
-| `/home/activity` | Nested under `/home` |
-| `/home/breakdown-more` | Nested under `/home` |
-| `/staff/home` | Staff shell home |
+| `/home/activity` | Nested under `/home` — **Step 7 COMPARE PASS** |
+| `/home/breakdown-more` | Nested under `/home` — **Step 7 COMPARE PASS** |
+| `/staff/home` | **COMPARE PASS** + WIRE-2a–**2f COMPLETE** |
 
 ### Seq 3 — Users & Roles
 
 | Path | Notes |
 |---|---|
-| `/settings/users` | Users list |
-| `/settings/users/:userId` | User detail |
+| `GET /v1/businesses/:businessId/users` | Backend Slice 1 **PASS** — [`users_roles_backend_list_compare.md`](modules/users_roles_backend_list_compare.md) |
+| `POST /v1/businesses/:businessId/users` | Backend Slice 2 **PASS** — [`users_roles_backend_create_compare.md`](modules/users_roles_backend_create_compare.md) |
+| `GET /v1/businesses/:businessId/users/:userId` | Backend Slice 3 **PASS** — [`users_roles_backend_profile_compare.md`](modules/users_roles_backend_profile_compare.md) |
+| `PATCH /v1/businesses/:businessId/users/:userId` | Backend Slice 4 **PASS** — [`users_roles_backend_patch_compare.md`](modules/users_roles_backend_patch_compare.md) |
+| `DELETE /v1/businesses/:businessId/users/:userId` | Backend Slice 5 **PASS** — [`users_roles_backend_delete_compare.md`](modules/users_roles_backend_delete_compare.md) |
+| `/settings/users` | Users list UI — **COMPARE PASS** — [`users_management_compare.md`](modules/users_management_compare.md) |
+| `/settings/users/:userId` | User profile — **COMPARE + Activity WIRE PASS** — [`user_profile_activity_wire_compare.md`](modules/user_profile_activity_wire_compare.md) |
 
 ### Seq 4 — Products/Catalog
 
@@ -108,9 +113,9 @@ Backend (wire in later steps): `POST /v1/auth/login`, `POST /v1/auth/refresh`, `
 | `/catalog/quick-add-from-scan` | |
 | `/catalog/quick-add` | |
 | `/catalog/setup-reorder-levels` | |
-| `/catalog/taxonomy` | |
-| `/catalog/new-category` | |
-| `/catalog/category/:id/new-subcategory` | |
+| `/catalog/taxonomy` | **COMPARE PASS** — [`catalog_taxonomy_compare.md`](modules/catalog_taxonomy_compare.md) |
+| `/catalog/new-category` | **COMPARE PASS** — [`catalog_new_category_compare.md`](modules/catalog_new_category_compare.md) |
+| `/catalog/category/:id/new-subcategory` | **BUTTONS PASS** — [`catalog_new_subcategory_buttons_compare.md`](modules/catalog_new_subcategory_buttons_compare.md) |
 | `/catalog/category/:id/type/:tid/add-item` | |
 | `/catalog/item/:id` | |
 | `/catalog/item/:id/edit` | |
@@ -176,9 +181,9 @@ Primarily via `/catalog/taxonomy`, `/catalog/new-category`, `/catalog/category/:
 | `/stock/dead` | |
 | `/stock/fast-moving` | |
 | `/stock/slow-moving` | |
-| `/staff/stock` | Staff shell |
-| `/staff/low-stock` | |
-| `/staff/items` | |
+| `/staff/stock` | Staff shell — **COMPARE PASS** — [`staff_stock_compare.md`](modules/staff_stock_compare.md) |
+| `/staff/low-stock` | Staff shell — **COMPARE PASS** — [`staff_low_stock_compare.md`](modules/staff_low_stock_compare.md) |
+| `/staff/items` | Staff gallery — **COMPARE PASS** — [`staff_items_compare.md`](modules/staff_items_compare.md) |
 
 ### Seq 10 — Stock Movement
 
@@ -222,11 +227,11 @@ Primarily via `/catalog/taxonomy`, `/catalog/new-category`, `/catalog/category/:
 
 | Path | Notes |
 |---|---|
-| `/staff/deliveries` | Shell branch |
+| `/staff/deliveries` | Staff shell — **COMPARE PASS** — [`staff_deliveries_compare.md`](modules/staff_deliveries_compare.md) |
 | `/staff/tasks` | Shell branch |
-| `/staff/purchase-history` | |
-| `/staff/purchase-history/:purchaseId` | |
-| `/staff/activity` | |
+| `/staff/purchase-history` | Staff shell — **COMPARE PASS** — [`staff_purchase_history_compare.md`](modules/staff_purchase_history_compare.md) |
+| `/staff/purchase-history/:purchaseId` | Detail stub (separate page) |
+| `/staff/activity` | Staff shell — **COMPARE PASS** — [`staff_activity_compare.md`](modules/staff_activity_compare.md) |
 
 ### Seq 15 — Operations
 
@@ -240,7 +245,7 @@ Primarily via `/catalog/taxonomy`, `/catalog/new-category`, `/catalog/category/:
 
 | Path | Notes |
 |---|---|
-| `/notifications` | Doc ownership TBD |
+| `/notifications` | Notifications — **COMPARE PASS** — [`notifications_compare.md`](modules/notifications_compare.md) |
 
 ### Seq 17 — Item public/history
 
@@ -253,8 +258,8 @@ Primarily via `/catalog/taxonomy`, `/catalog/new-category`, `/catalog/category/:
 
 | Path | Notes |
 |---|---|
-| `/search` | Owner shell |
-| `/staff/search` | Staff shell |
+| `/search` | Owner shell — deferred |
+| `/staff/search` | Staff shell — **COMPARE PASS** — [`staff_search_compare.md`](modules/staff_search_compare.md) |
 
 ### Unresolved (needs opening — do not invent)
 

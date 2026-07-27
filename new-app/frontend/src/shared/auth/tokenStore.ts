@@ -25,4 +25,10 @@ export function readTokens(): StoredTokens | null {
 export function clearTokens(): void {
   localStorage.removeItem(ACCESS_KEY);
   localStorage.removeItem(REFRESH_KEY);
+  localStorage.removeItem("access_token");
+}
+
+/** Read access token from either key */
+export function readAccessToken(): string {
+  return localStorage.getItem(ACCESS_KEY) ?? localStorage.getItem("access_token") ?? "";
 }

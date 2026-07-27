@@ -15,6 +15,14 @@ import {
   createMembershipsRepository,
   createBusinessesRepository,
 } from "./repositories";
+import { createBusinessUsersRepository } from "./repositories/businessUsers.repository";
+import { createDashboardRepository } from "./repositories/dashboard.repository";
+import { createHomeOverviewRepository } from "./repositories/homeOverview.repository";
+import { createStaffHomeRepository } from "./repositories/staffHome.repository";
+import { createHomeActivityRepository } from "./repositories/homeActivity.repository";
+import { createSearchRepository } from "./repositories/search.repository";
+import { createCatalogItemsRepository } from "./repositories/catalogItems.repository";
+import { createContactsRepository } from "./repositories/contacts.repository";
 import { logger } from "./logging/logger";
 
 async function main(): Promise<void> {
@@ -27,6 +35,15 @@ async function main(): Promise<void> {
         users: createUsersRepository(pool),
         memberships: createMembershipsRepository(pool),
         businesses: createBusinessesRepository(pool),
+        businessUsers: createBusinessUsersRepository(pool),
+        pool,
+        dashboard: createDashboardRepository(pool),
+        homeOverview: createHomeOverviewRepository(pool),
+        staffHome: createStaffHomeRepository(pool),
+        homeActivity: createHomeActivityRepository(pool),
+        search: createSearchRepository(pool),
+        catalogItems: createCatalogItemsRepository(pool),
+        contacts: createContactsRepository(pool),
       };
       logger.info("database.connected", {
         host: env.sql.host,

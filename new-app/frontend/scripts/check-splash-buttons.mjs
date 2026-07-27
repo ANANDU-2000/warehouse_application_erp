@@ -1,5 +1,5 @@
 /**
- * Splash BUTTONS smoke checks.
+ * Splash BUTTONS smoke checks (labels/CSS remain valid after WIRE).
  * Run: node scripts/check-splash-buttons.mjs
  */
 import { readFileSync, existsSync } from "node:fs";
@@ -22,21 +22,21 @@ const splash = readFileSync(
   join(root, "src/features/splash/SplashPage.tsx"),
   "utf8",
 );
-assert(splash.includes("Retry"), "Retry label");
-assert(splash.includes("Use another account"), "Use another account label");
+const copy = readFileSync(
+  join(root, "src/features/splash/splashCopy.ts"),
+  "utf8",
+);
+assert(copy.includes("Retry"), "Retry label in splashCopy");
+assert(copy.includes("Use another account"), "Use another account in splashCopy");
 assert(
-  splash.includes(
+  copy.includes(
     "We couldn't refresh your session. Check your connection and tap Retry.",
   ),
   "session refresh error string",
 );
-assert(splash.includes('navigate("/login")'), "navigate to /login");
 assert(splash.includes("handleRetry"), "Retry handler");
-assert(splash.includes("300"), "Retry stub delay");
-assert(!splash.includes("fetch("), "no fetch");
-assert(!splash.includes("/auth/refresh"), "no auth refresh path");
-assert(!splash.includes("meBusinesses"), "no meBusinesses");
-assert(!splash.includes("_boot"), "no boot");
+assert(splash.includes('navigate("/login")'), "navigate to /login");
+assert(splash.includes("SPLASH_RETRY_LABEL"), "uses Retry copy constant");
 
 const css = readFileSync(
   join(root, "src/features/splash/SplashPage.css"),

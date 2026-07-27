@@ -1,9 +1,10 @@
 # Module: Users & Roles
 
 **Queue:** 3 of 15  
-**Status:** Review PASS (2026-07-18)  
-**Scope:** Analysis only — no `new-app` implementation  
+**Status:** Backend Slice 1–14 PASS · list+profile COMPARE PASS · Activity WIRE PASS (2026-07-19)  
+**Scope:** Analysis + users admin APIs + bulk; list + profile UI through COMPARE; activity tab WIRE  
 **Source of truth:** `source-app/`  
+**Compare:** backend `users_roles_backend_*` · list [`users_management_compare.md`](users_management_compare.md) · profile [`user_profile_compare.md`](user_profile_compare.md) · activity [`user_profile_activity_wire_compare.md`](user_profile_activity_wire_compare.md)
 
 ## Definition
 

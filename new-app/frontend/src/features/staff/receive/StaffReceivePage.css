@@ -1,0 +1,26 @@
+.rcv-page { min-height:100vh; background:#F8FAFB; }
+.rcv-hdr { display:flex; align-items:center; gap:12px; padding:12px 16px; background:#fff; border-bottom:1px solid #E5E7EB; position:sticky; top:0; z-index:50; }
+.rcv-back { width:40px; height:40px; border-radius:10px; border:none; background:#F3F4F6; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.rcv-title { flex:1; font-size:17px; font-weight:700; color:#1F2937; margin:0; }
+.rcv-body { padding:12px 16px 40px; display:flex; flex-direction:column; gap:12px; }
+.rcv-info-card { background:#fff; border:1px solid #E5E7EB; border-radius:14px; padding:14px; }
+.rcv-info-row { display:flex; justify-content:space-between; padding:6px 0; font-size:14px; }
+.rcv-info-row span:first-child { color:#6B7280; }
+.rcv-info-row span:last-child { font-weight:600; color:#1F2937; }
+.rcv-banner { padding:12px; background:#ECFDF5; border-radius:10px; font-size:13px; color:#065F46; }
+.rcv-line { background:#fff; border:1px solid #E5E7EB; border-radius:12px; padding:14px; }
+.rcv-line-name { font-size:15px; font-weight:600; color:#1F2937; margin:0; }
+.rcv-line-ordered { font-size:13px; color:#6B7280; margin:4px 0 10px; }
+.rcv-line-fields { display:flex; gap:8px; }
+.rcv-field { display:flex; flex-direction:column; gap:4px; flex:1; }
+.rcv-label { font-size:12px; font-weight:600; color:#374151; }
+.rcv-input, .rcv-textarea { width:100%; padding:12px 14px; border:1.5px solid #E5E7EB; border-radius:10px; font-size:16px; outline:none; background:#fff; }
+.rcv-textarea { resize:vertical; min-height:60px; }
+.rcv-input:focus, .rcv-textarea:focus { border-color:#0E7C6B; }
+.rcv-actions { display:flex; gap:10px; margin-top:8px; }
+.rcv-btn { flex:1; padding:14px; border-radius:12px; border:none; font-size:16px; font-weight:600; cursor:pointer; min-height:48px; }
+.rcv-btn--pri { background:#0E7C6B; color:#fff; }
+.rcv-btn--pri:disabled { opacity:.5; }
+.rcv-btn--sec { background:#F3F4F6; color:#374151; }
+.rcv-loading { text-align:center; padding:60px 20px; color:#6B7280; }
+.rcv-done { text-align:center; padding:40px; background:#ECFDF5; border-radius:14px; color:#065F46; font-size:15px; font-weight:600; }

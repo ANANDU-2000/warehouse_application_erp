@@ -85,6 +85,21 @@ export async function login(
   return (await res.json()) as TokenPair;
 }
 
+/** POST /v1/auth/refresh — Flutter session_notifier refresh path. */
+export async function refreshTokens(
+  refreshToken: string,
+): Promise<TokenPair> {
+  const res = await fetchAuth("/v1/auth/refresh", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refresh_token: refreshToken }),
+  });
+  if (!res.ok) {
+    throw new AuthApiError(res.status, await readDetail(res));
+  }
+  return (await res.json()) as TokenPair;
+}
+
 export async function meBusinesses(
   accessToken: string,
 ): Promise<BusinessBrief[]> {

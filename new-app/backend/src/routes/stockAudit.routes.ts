@@ -80,5 +80,12 @@ export function createStockAuditRoutes(
     (req, res, next) => void controller.delete(req, res, next),
   );
 
+  r.get(
+    "/active",
+    authz.requireAuth,
+    authz.requireMembership,
+    (req, res, next) => void controller.getActive(req, res, next),
+  );
+
   return r;
 }

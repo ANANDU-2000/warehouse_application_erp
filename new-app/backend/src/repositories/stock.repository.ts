@@ -1013,6 +1013,497 @@ export class StockRepository {
     }
     return { suggested_qty: Math.round(suggestedQty), avg_interval_days: avgInterval ? Math.round(avgInterval) : null, default_supplier: defaultSupplier };
   }
+
+  async listStockWithFilters(opts: {
+    businessId: string;
+    page?: number;
+    perPage?: number;
+    q?: string;
+    category?: string;
+    subcategory?: string;
+    status?: string;
+    sort?: string;
+    missingBarcode?: boolean;
+    missingItemCode?: boolean;
+    reorderOnly?: boolean;
+    unit?: string;
+  }): Promise<{ items: any[]; total: number }> {
+    const page = Math.max(1, opts.page ?? 1);
+    const perPage = Math.min(2000, Math.max(1, opts.perPage ?? 50));
+    const offset = (page - 1) * perPage;
+
+    const where: string[] = ["ci.[deleted_at] IS NULL", "ci.[business_id] = @businessId"];
+    const params: SqlParam[] = [
+      { name: "businessId", type: sql.UniqueIdentifier, value: opts.businessId },
+    ];
+
+    if (opts.q && opts.q.trim()) {
+      where.push("(ci.[name] LIKE @q OR ci.[item_code] LIKE @q OR ci.[barcode] LIKE @q)");
+      params.push({ name: "q", type: sql.NVarChar(255), value: `%${opts.q.trim()}%` });
+    }
+    if (opts.category) {
+      where.push("ic.[name] = @category");
+      params.push({ name: "category", type: sql.NVarChar(255), value: opts.category });
+    }
+    if (opts.subcategory) {
+      where.push("ct.[name] = @subcategory");
+      params.push({ name: "subcategory", type: sql.NVarChar(255), value: opts.subcategory });
+    }
+    if (opts.unit) {
+      where.push("(ci.[stock_unit] = @unit OR ci.[default_unit] = @unit)");
+      params.push({ name: "unit", type: sql.NVarChar(32), value: opts.unit });
+    }
+    if (opts.missingBarcode) {
+      where.push("(ci.[barcode] IS NULL OR LTRIM(RTRIM(ci.[barcode])) = '')");
+    }
+    if (opts.missingItemCode) {
+      where.push("(ci.[item_code] IS NULL OR LTRIM(RTRIM(ci.[item_code])) = '')");
+    }
+    if (opts.reorderOnly) {
+      where.push("ci.[reorder_level] > 0 AND ISNULL(ci.[current_stock], 0) <= ci.[reorder_level]");
+    }
+    if (opts.status && opts.status !== "all") {
+      const cur = "ISNULL(ci.[current_stock], 0)";
+      const ro = "ISNULL(ci.[reorder_level], 0)";
+      switch (opts.status) {
+        case "out":
+          where.push(`${cur} <= 0`);
+          break;
+        case "critical":
+          where.push(`${cur} > 0 AND ${ro} > 0 AND ${cur} <= ${ro} * 0.5`);
+          break;
+        case "low":
+          where.push(`(${cur} > 0 AND ${ro} > 0 AND ${cur} <= ${ro}) OR (${cur} > 0 AND ${ro} <= 0 AND ${cur} < 1)`);
+          break;
+        case "shortage":
+          where.push(`(${cur} <= 0) OR (${cur} > 0 AND ${ro} > 0 AND ${cur} <= ${ro}) OR (${cur} > 0 AND ${ro} <= 0 AND ${cur} < 1)`);
+          break;
+      }
+    }
+
+    const whereClause = where.join(" AND ");
+
+    const countRow = await queryOne<CountRow>(
+      this.client,
+      `SELECT COUNT(ci.[id]) AS c
+       FROM catalog_items ci
+       LEFT JOIN item_categories ic ON ic.[id] = ci.[category_id]
+       LEFT JOIN category_types ct ON ct.[id] = ci.[type_id]
+       WHERE ${whereClause}`,
+      params,
+    );
+    const total = Number(countRow?.c ?? 0);
+    if (total === 0) return { items: [], total: 0 };
+
+    let orderBy = "LOWER(ci.[name]) ASC";
+    switch (opts.sort) {
+      case "stock_asc":
+        orderBy = "ISNULL(ci.[current_stock], 0) ASC";
+        break;
+      case "stock_desc":
+        orderBy = "ISNULL(ci.[current_stock], 0) DESC";
+        break;
+      case "recent":
+        orderBy = "ci.[last_stock_updated_at] DESC";
+        break;
+    }
+
+    const rows = await queryMany<any>(
+      this.client,
+      `SELECT ci.[id], ci.[name], ci.[item_code], ci.[barcode],
+              ci.[current_stock], ci.[reorder_level],
+              ci.[stock_unit], ci.[default_unit], ci.[stock_version],
+              ci.[opening_stock_set_at], ci.[opening_stock_qty],
+              ci.[opening_stock_locked], ci.[last_stock_updated_at],
+              ci.[last_stock_updated_by], ci.[rack_location],
+              ci.[last_purchase_at], ci.[eviction_days],
+              ic.[name] AS category_name, ct.[name] AS subcategory_name
+       FROM catalog_items ci
+       LEFT JOIN item_categories ic ON ic.[id] = ci.[category_id]
+       LEFT JOIN category_types ct ON ct.[id] = ci.[type_id]
+       WHERE ${whereClause}
+       ORDER BY ${orderBy}
+       OFFSET @offset ROWS FETCH NEXT @perPage ROWS ONLY`,
+      [...params,
+        { name: "offset", type: sql.Int, value: offset },
+        { name: "perPage", type: sql.Int, value: perPage },
+      ],
+    );
+
+    return {
+      items: rows.map((r) => {
+        const current = num(r.current_stock);
+        const reorder = num(r.reorder_level);
+        let stockStatus = "healthy";
+        if (current <= 0) stockStatus = "out";
+        else if (reorder > 0 && current <= reorder * 0.5) stockStatus = "critical";
+        else if (reorder > 0 && current <= reorder) stockStatus = "low";
+        else if (reorder <= 0 && current > 0 && current < 1) stockStatus = "low";
+
+        return {
+          id: r.id,
+          name: r.name,
+          item_code: r.item_code,
+          barcode: r.barcode,
+          current_stock: current,
+          reorder_level: r.reorder_level != null ? num(r.reorder_level) : null,
+          stock_unit: r.stock_unit,
+          default_unit: r.default_unit,
+          category_name: r.category_name,
+          subcategory_name: r.subcategory_name,
+          stock_status: stockStatus,
+          opening_stock_set_at: toIso(r.opening_stock_set_at),
+          opening_stock_qty: r.opening_stock_qty != null ? num(r.opening_stock_qty) : null,
+          opening_stock_locked: r.opening_stock_locked ?? false,
+          stock_version: r.stock_version,
+          last_stock_updated_at: toIso(r.last_stock_updated_at),
+          last_stock_updated_by: r.last_stock_updated_by,
+          rack_location: r.rack_location,
+          missing_barcode: !r.barcode || !r.barcode.trim(),
+          missing_item_code: !r.item_code || !r.item_code.trim(),
+          is_perishable: false,
+          needs_eviction: false,
+          days_since_last_purchase: r.last_purchase_at
+            ? Math.max(0, Math.floor((Date.now() - new Date(r.last_purchase_at).getTime()) / 86400000))
+            : null,
+        };
+      }),
+      total,
+    };
+  }
+
+  async getStockAlertsSummary(businessId: string): Promise<{
+    low_stock: number;
+    critical_stock: number;
+    out_of_stock: number;
+    active_out_of_stock: number;
+    missing_barcode: number;
+    missing_item_code: number;
+    missing_usage_logs: number;
+    eviction_count: number;
+    total_items: number;
+  }> {
+    const row = await queryOne<any>(
+      this.client,
+      `SELECT
+         COUNT(*) AS total_items,
+         SUM(CASE WHEN ISNULL(ci.[current_stock], 0) <= 0 THEN 1 ELSE 0 END) AS out_of_stock,
+         SUM(CASE WHEN ISNULL(ci.[current_stock], 0) > 0 AND ISNULL(ci.[reorder_level], 0) > 0 AND ISNULL(ci.[current_stock], 0) <= ISNULL(ci.[reorder_level], 0) * 0.5 THEN 1 ELSE 0 END) AS critical_stock,
+         SUM(CASE WHEN ISNULL(ci.[current_stock], 0) > 0 AND ISNULL(ci.[reorder_level], 0) > 0 AND ISNULL(ci.[current_stock], 0) <= ISNULL(ci.[reorder_level], 0) THEN 1 ELSE 0 END) AS low_stock,
+         SUM(CASE WHEN ISNULL(ci.[current_stock], 0) <= 0 AND (ci.[opening_stock_qty] IS NOT NULL OR ci.[last_purchase_at] IS NOT NULL) THEN 1 ELSE 0 END) AS active_out_of_stock,
+         SUM(CASE WHEN ci.[barcode] IS NULL OR LTRIM(RTRIM(ci.[barcode])) = '' THEN 1 ELSE 0 END) AS missing_barcode,
+         SUM(CASE WHEN ci.[item_code] IS NULL OR LTRIM(RTRIM(ci.[item_code])) = '' THEN 1 ELSE 0 END) AS missing_item_code,
+         0 AS missing_usage_logs,
+         0 AS eviction_count
+       FROM catalog_items ci
+       WHERE ci.[business_id] = @businessId AND ci.[deleted_at] IS NULL`,
+      [{ name: "businessId", type: sql.UniqueIdentifier, value: businessId }],
+    );
+    return {
+      low_stock: Number(row?.low_stock ?? 0),
+      critical_stock: Number(row?.critical_stock ?? 0),
+      out_of_stock: Number(row?.out_of_stock ?? 0),
+      active_out_of_stock: Number(row?.active_out_of_stock ?? 0),
+      missing_barcode: Number(row?.missing_barcode ?? 0),
+      missing_item_code: Number(row?.missing_item_code ?? 0),
+      missing_usage_logs: Number(row?.missing_usage_logs ?? 0),
+      eviction_count: Number(row?.eviction_count ?? 0),
+      total_items: Number(row?.total_items ?? 0),
+    };
+  }
+
+  async getWarehouseAlertsSummary(businessId: string): Promise<{
+    pending_deliveries: number;
+    low_stock: number;
+    critical_stock: number;
+    pending_verifications: number;
+    missing_barcode: number;
+    missing_usage_logs: number;
+    eviction_count: number;
+    checklist_completion_pct: number;
+    total_items: number;
+  }> {
+    const stockSummary = await this.getStockAlertsSummary(businessId);
+    const pendingRow = await queryOne<CountRow>(
+      this.client,
+      `SELECT COUNT(*) AS c FROM trade_purchases
+       WHERE [business_id] = @businessId
+         AND [status] NOT IN (N'cancelled', N'deleted')
+         AND [is_delivered] = 0`,
+      [{ name: "businessId", type: sql.UniqueIdentifier, value: businessId }],
+    );
+    const verifRow = await queryOne<CountRow>(
+      this.client,
+      `SELECT COUNT(*) AS c FROM stock_adjustment_log
+       WHERE [business_id] = @businessId
+         AND [adjustment_type] IN (N'verification', N'correction', N'manual')
+         AND CAST([updated_at] AS DATE) = CAST(SYSUTCDATETIME() AS DATE)`,
+      [{ name: "businessId", type: sql.UniqueIdentifier, value: businessId }],
+    );
+    return {
+      pending_deliveries: Number(pendingRow?.c ?? 0),
+      low_stock: stockSummary.low_stock,
+      critical_stock: stockSummary.critical_stock,
+      pending_verifications: Number(verifRow?.c ?? 0),
+      missing_barcode: stockSummary.missing_barcode,
+      missing_usage_logs: stockSummary.missing_usage_logs,
+      eviction_count: stockSummary.eviction_count,
+      checklist_completion_pct: 100.0,
+      total_items: stockSummary.total_items,
+    };
+  }
+
+  async getLowStockOperationsSummary(businessId: string): Promise<{
+    total_attention: number;
+    out_of_stock: number;
+    pending_purchase: number;
+    delayed_supplier: number;
+    mismatch_items: number;
+    pending_verification: number;
+    disputed_items: number;
+    estimated_impact_units_per_day: number;
+  }> {
+    const row = await queryOne<any>(
+      this.client,
+      `SELECT
+         SUM(CASE WHEN ISNULL(ci.[current_stock], 0) <= 0 OR (ISNULL(ci.[current_stock], 0) > 0 AND ISNULL(ci.[reorder_level], 0) > 0 AND ISNULL(ci.[current_stock], 0) <= ISNULL(ci.[reorder_level], 0)) THEN 1 ELSE 0 END) AS total_attention,
+         SUM(CASE WHEN ISNULL(ci.[current_stock], 0) <= 0 THEN 1 ELSE 0 END) AS out_of_stock
+       FROM catalog_items ci
+       WHERE ci.[business_id] = @businessId AND ci.[deleted_at] IS NULL`,
+      [{ name: "businessId", type: sql.UniqueIdentifier, value: businessId }],
+    );
+    const pendingRow = await queryOne<CountRow>(
+      this.client,
+      `SELECT COUNT(DISTINCT tp.[id]) AS c
+       FROM trade_purchases tp
+       INNER JOIN trade_purchase_lines tpl ON tpl.[trade_purchase_id] = tp.[id]
+       WHERE tp.[business_id] = @businessId
+         AND tp.[status] NOT IN (N'cancelled', N'deleted')
+         AND tp.[is_delivered] = 0`,
+      [{ name: "businessId", type: sql.UniqueIdentifier, value: businessId }],
+    );
+    return {
+      total_attention: Number(row?.total_attention ?? 0),
+      out_of_stock: Number(row?.out_of_stock ?? 0),
+      pending_purchase: Number(pendingRow?.c ?? 0),
+      delayed_supplier: 0,
+      mismatch_items: 0,
+      pending_verification: 0,
+      disputed_items: 0,
+      estimated_impact_units_per_day: 0,
+    };
+  }
+
+  async listOpeningStockSetup(businessId: string): Promise<{
+    summary: { pending: number; completed: number; total: number };
+    items: any[];
+  }> {
+    const summaryRow = await queryOne<any>(
+      this.client,
+      `SELECT
+         COUNT(*) AS total,
+         SUM(CASE WHEN ci.[opening_stock_set_at] IS NULL THEN 1 ELSE 0 END) AS pending,
+         SUM(CASE WHEN ci.[opening_stock_set_at] IS NOT NULL THEN 1 ELSE 0 END) AS completed
+       FROM catalog_items ci
+       WHERE ci.[business_id] = @businessId AND ci.[deleted_at] IS NULL`,
+      [{ name: "businessId", type: sql.UniqueIdentifier, value: businessId }],
+    );
+    const rows = await queryMany<any>(
+      this.client,
+      `SELECT ci.[id], ci.[name], ci.[item_code], ci.[barcode],
+              ci.[current_stock], ci.[stock_unit],
+              ci.[opening_stock_set_at], ci.[opening_stock_qty],
+              ic.[name] AS category_name
+       FROM catalog_items ci
+       LEFT JOIN item_categories ic ON ic.[id] = ci.[category_id]
+       WHERE ci.[business_id] = @businessId AND ci.[deleted_at] IS NULL
+       ORDER BY CASE WHEN ci.[opening_stock_set_at] IS NULL THEN 0 ELSE 1 END, LOWER(ci.[name])`,
+      [{ name: "businessId", type: sql.UniqueIdentifier, value: businessId }],
+    );
+    return {
+      summary: {
+        pending: Number(summaryRow?.pending ?? 0),
+        completed: Number(summaryRow?.completed ?? 0),
+        total: Number(summaryRow?.total ?? 0),
+      },
+      items: rows.map((r) => ({
+        id: r.id,
+        name: r.name,
+        item_code: r.item_code,
+        barcode: r.barcode,
+        current_stock: r.current_stock != null ? num(r.current_stock) : null,
+        stock_unit: r.stock_unit,
+        category_name: r.category_name,
+        opening_stock_set_at: toIso(r.opening_stock_set_at),
+        opening_stock_qty: r.opening_stock_qty != null ? num(r.opening_stock_qty) : null,
+        setup_status: r.opening_stock_set_at ? "completed" : "pending",
+      })),
+    };
+  }
+
+  async listMissingBarcodes(businessId: string): Promise<{
+    missing_barcode: any[];
+    missing_item_code: any[];
+  }> {
+    const barcodeRows = await queryMany<any>(
+      this.client,
+      `SELECT ci.[id], ci.[name], ci.[item_code], ci.[barcode],
+              ci.[current_stock], ci.[stock_unit],
+              ic.[name] AS category_name
+       FROM catalog_items ci
+       LEFT JOIN item_categories ic ON ic.[id] = ci.[category_id]
+       WHERE ci.[business_id] = @businessId AND ci.[deleted_at] IS NULL
+         AND (ci.[barcode] IS NULL OR LTRIM(RTRIM(ci.[barcode])) = '')`,
+      [{ name: "businessId", type: sql.UniqueIdentifier, value: businessId }],
+    );
+    const codeRows = await queryMany<any>(
+      this.client,
+      `SELECT ci.[id], ci.[name], ci.[item_code], ci.[barcode],
+              ci.[current_stock], ci.[stock_unit],
+              ic.[name] AS category_name
+       FROM catalog_items ci
+       LEFT JOIN item_categories ic ON ic.[id] = ci.[category_id]
+       WHERE ci.[business_id] = @businessId AND ci.[deleted_at] IS NULL
+         AND (ci.[item_code] IS NULL OR LTRIM(RTRIM(ci.[item_code])) = '')`,
+      [{ name: "businessId", type: sql.UniqueIdentifier, value: businessId }],
+    );
+    return {
+      missing_barcode: barcodeRows.map((r) => ({
+        id: r.id, name: r.name, item_code: r.item_code, barcode: r.barcode,
+        current_stock: num(r.current_stock), stock_unit: r.stock_unit,
+        category_name: r.category_name,
+      })),
+      missing_item_code: codeRows.map((r) => ({
+        id: r.id, name: r.name, item_code: r.item_code, barcode: r.barcode,
+        current_stock: num(r.current_stock), stock_unit: r.stock_unit,
+        category_name: r.category_name,
+      })),
+    };
+  }
+
+  async getItemIntelligence(businessId: string, itemId: string): Promise<any | null> {
+    const detail = await this.getStockDetail(businessId, itemId);
+    if (!detail) return null;
+    const supplierName = await this.getSupplierNameForItem(businessId, itemId);
+    const lastPurHumanId = await this.getLastPurchaseHumanId(businessId, itemId);
+    const recentPurchases = await queryMany<any>(
+      this.client,
+      `SELECT TOP 5 tp.[id], tp.[human_id], tp.[purchase_date],
+              tpl.[qty], tpl.[unit], tpl.[landing_cost], tpl.[purchase_rate],
+              s.[name] AS supplier_name
+       FROM trade_purchase_lines tpl
+       INNER JOIN trade_purchases tp ON tp.[id] = tpl.[trade_purchase_id]
+       LEFT JOIN suppliers s ON s.[id] = tp.[supplier_id]
+       WHERE tp.[business_id] = @businessId AND tpl.[catalog_item_id] = @itemId
+         AND tp.[status] NOT IN (N'cancelled', N'deleted')
+       ORDER BY tp.[purchase_date] DESC`,
+      [
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+        { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+      ],
+    );
+    const recentAdjustments = await this.listStockAuditByItem(businessId, itemId, 10);
+    return {
+      ...detail,
+      supplier_name: supplierName,
+      last_purchase_human_id: lastPurHumanId,
+      recent_purchases: recentPurchases.map((r) => ({
+        id: r.id, human_id: r.human_id, purchase_date: toIso(r.purchase_date),
+        qty: num(r.qty), unit: r.unit, landing_cost: num(r.landing_cost),
+        purchase_rate: num(r.purchase_rate), supplier_name: r.supplier_name,
+      })),
+      recent_adjustments: recentAdjustments,
+    };
+  }
+
+  async getItemHistory(businessId: string, itemId: string, limit: number, offset: number): Promise<any[]> {
+    const movements = await this.listMovements(businessId, itemId, limit, offset);
+    return movements;
+  }
+
+  async getItemBundle(businessId: string, itemId: string): Promise<any | null> {
+    const detail = await this.getStockDetail(businessId, itemId);
+    if (!detail) return null;
+    const activity = await this.listMovements(businessId, itemId, 20, 0);
+    const intelligence = await this.getItemIntelligence(businessId, itemId);
+    return { detail, activity, intelligence };
+  }
+
+  async getItemSummary(businessId: string, itemId: string): Promise<any | null> {
+    const row = await queryOne<any>(
+      this.client,
+      `SELECT ci.[id], ci.[current_stock], ci.[stock_version],
+              ci.[last_stock_updated_at]
+       FROM catalog_items ci
+       WHERE ci.[id] = @itemId AND ci.[business_id] = @businessId AND ci.[deleted_at] IS NULL`,
+      [
+        { name: "itemId", type: sql.UniqueIdentifier, value: itemId },
+        { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+      ],
+    );
+    if (!row) return null;
+    const current = num(row.current_stock);
+    let stockStatus = "healthy";
+    if (current <= 0) stockStatus = "out";
+    return {
+      id: row.id,
+      current_stock: current,
+      physical_stock_qty: null,
+      physical_stock_difference_qty: null,
+      stock_version: row.stock_version,
+      last_stock_updated_at: toIso(row.last_stock_updated_at),
+      stock_status: stockStatus,
+    };
+  }
+
+  async listStaffPurchaseLogs(businessId: string, itemId?: string): Promise<any[]> {
+    let query = `SELECT [id], [item_id], [item_name], [qty], [unit],
+                        [supplier_name], [broker_name], [notes],
+                        [created_by_name], [created_at]
+                 FROM staff_purchase_logs
+                 WHERE [business_id] = @businessId`;
+    const params: SqlParam[] = [
+      { name: "businessId", type: sql.UniqueIdentifier, value: businessId },
+    ];
+    if (itemId) {
+      query += ` AND [item_id] = @itemId`;
+      params.push({ name: "itemId", type: sql.UniqueIdentifier, value: itemId });
+    }
+    query += ` ORDER BY [created_at] DESC`;
+    const rows = await queryMany<StaffPurchRow>(this.client, query, params);
+    return rows.map((r) => ({
+      id: r.id,
+      item_id: r.item_id,
+      item_name: r.item_name,
+      qty: num(r.qty),
+      unit: r.unit,
+      supplier_name: r.supplier_name,
+      broker_name: r.broker_name,
+      notes: r.notes,
+      created_by_name: r.created_by_name,
+      created_at: toIso(r.created_at),
+    }));
+  }
+
+  async getActiveAuditSession(businessId: string): Promise<any | null> {
+    const row = await queryOne<any>(
+      this.client,
+      `SELECT TOP 1 [id], [audit_date], [auditor_id], [status], [notes], [created_at]
+       FROM stock_audits
+       WHERE [business_id] = @businessId AND [status] IN (N'draft', N'pending_review')
+       ORDER BY [created_at] DESC`,
+      [{ name: "businessId", type: sql.UniqueIdentifier, value: businessId }],
+    );
+    if (!row) return null;
+    return {
+      id: row.id,
+      audit_date: toIso(row.audit_date),
+      auditor_id: row.auditor_id,
+      status: row.status,
+      notes: row.notes,
+      created_at: toIso(row.created_at),
+    };
+  }
 }
 
 export function createStockRepository(client: SqlClient): StockRepository {

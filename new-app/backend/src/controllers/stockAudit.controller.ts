@@ -172,6 +172,14 @@ export function createStockAuditController(repo: StockAuditRepository, stockServ
         res.json(lines);
       } catch (e) { next(e); }
     },
+
+    async getActive(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const result = await stockService.getActiveAuditSession(businessId);
+        res.json(result);
+      } catch (e) { next(e); }
+    },
   };
 }
 

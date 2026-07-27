@@ -7,7 +7,10 @@ import {
   QuickPurchaseInSchema,
   OpeningStockInSchema,
   PhysicalCountInSchema,
+  PhysicalUpdateInSchema,
+  VerifyCountInSchema,
   ReorderListPatchInSchema,
+  StaffPurchaseLogInSchema,
 } from "../validation/stock.schemas";
 
 export type StockControllerDeps = {
@@ -440,6 +443,379 @@ export function createStockController(deps: StockControllerDeps) {
         const businessId = req.params.businessId as string;
         const itemId = req.params.itemId as string;
         const result = await deps.stockService.getPurchaseIntelligence(businessId, itemId);
+        res.json(result);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async listStock(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const page = Math.max(1, Number(req.query.page ?? 1) || 1);
+        const perPage = Math.min(2000, Math.max(1, Number(req.query.per_page ?? 50) || 50));
+        const result = await deps.stockService.listStock({
+          businessId,
+          page,
+          perPage,
+          q: typeof req.query.q === "string" ? req.query.q : "",
+          category: typeof req.query.category === "string" ? req.query.category : "",
+          subcategory: typeof req.query.subcategory === "string" ? req.query.subcategory : "",
+          status: typeof req.query.status === "string" ? req.query.status : "all",
+          sort: typeof req.query.sort === "string" ? req.query.sort : "name",
+          missingBarcode: req.query.missing_barcode === "true",
+          missingItemCode: req.query.missing_item_code === "true",
+          reorderOnly: req.query.reorder_only === "true",
+          unit: typeof req.query.unit === "string" ? req.query.unit : "",
+        });
+        res.json(result);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async listStockCompact(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const page = Math.max(1, Number(req.query.page ?? 1) || 1);
+        const perPage = Math.min(2000, Math.max(1, Number(req.query.per_page ?? 50) || 50));
+        const result = await deps.stockService.listStock({
+          businessId,
+          page,
+          perPage,
+          q: typeof req.query.q === "string" ? req.query.q : "",
+          category: typeof req.query.category === "string" ? req.query.category : "",
+          subcategory: typeof req.query.subcategory === "string" ? req.query.subcategory : "",
+          status: typeof req.query.status === "string" ? req.query.status : "all",
+          sort: typeof req.query.sort === "string" ? req.query.sort : "name",
+        });
+        const minimal = result.items.map((i: any) => ({
+          id: i.id,
+          name: i.name,
+          item_code: i.item_code,
+          barcode: i.barcode,
+          current_stock: i.current_stock,
+          stock_unit: i.stock_unit,
+          stock_status: i.stock_status,
+          supplier_name: i.supplier_name,
+          reorder_level: i.reorder_level,
+          rack_location: i.rack_location,
+          is_perishable: i.is_perishable,
+          missing_barcode: i.missing_barcode,
+          opening_stock_qty: i.opening_stock_qty,
+          last_stock_updated_at: i.last_stock_updated_at,
+        }));
+        res.json({ items: minimal, total: result.total, page: result.page, per_page: result.per_page });
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async searchStock(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const page = Math.max(1, Number(req.query.page ?? 1) || 1);
+        const perPage = Math.min(2000, Math.max(1, Number(req.query.per_page ?? 50) || 50));
+        const result = await deps.stockService.listStock({
+          businessId,
+          page,
+          perPage,
+          q: typeof req.query.q === "string" ? req.query.q : "",
+          category: typeof req.query.category === "string" ? req.query.category : "",
+          subcategory: typeof req.query.subcategory === "string" ? req.query.subcategory : "",
+          status: typeof req.query.status === "string" ? req.query.status : "all",
+          sort: typeof req.query.sort === "string" ? req.query.sort : "name",
+        });
+        res.json(result);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async getLowStock(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const page = Math.max(1, Number(req.query.page ?? 1) || 1);
+        const perPage = Math.min(2000, Math.max(1, Number(req.query.per_page ?? 50) || 50));
+        const result = await deps.stockService.listStock({
+          businessId,
+          page,
+          perPage,
+          status: "low",
+          sort: "stock_asc",
+        });
+        res.json(result);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async getCriticalStock(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const page = Math.max(1, Number(req.query.page ?? 1) || 1);
+        const perPage = Math.min(2000, Math.max(1, Number(req.query.per_page ?? 50) || 50));
+        const result = await deps.stockService.listStock({
+          businessId,
+          page,
+          perPage,
+          status: "critical",
+        });
+        res.json(result);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async getStockAlertsSummary(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const result = await deps.stockService.getStockAlertsSummary(businessId);
+        res.json(result);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async getWarehouseAlertsSummary(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const result = await deps.stockService.getWarehouseAlertsSummary(businessId);
+        res.json(result);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async getLowStockSummary(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const result = await deps.stockService.getLowStockSummary(businessId);
+        res.json(result);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async getLowStockOperations(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const result = await deps.stockService.getLowStockSummary(businessId);
+        res.json({ summary_slice: result, items: [], total: result.total_attention, page: 1, per_page: 50 });
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async getShellBundle(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const page = Math.max(1, Number(req.query.page ?? 1) || 1);
+        const perPage = Math.min(200, Math.max(1, Number(req.query.per_page ?? 50) || 50));
+        const [list, statusCounts, deliveryCounts] = await Promise.all([
+          deps.stockService.listStock({
+            businessId,
+            page,
+            perPage,
+            q: typeof req.query.q === "string" ? req.query.q : "",
+            category: typeof req.query.category === "string" ? req.query.category : "",
+            subcategory: typeof req.query.subcategory === "string" ? req.query.subcategory : "",
+            status: typeof req.query.status === "string" ? req.query.status : "all",
+            sort: typeof req.query.sort === "string" ? req.query.sort : "name",
+          }),
+          deps.stockService.getStockAlertsSummary(businessId),
+          Promise.resolve({ pending: 0, delivered: 0 }),
+        ]);
+        res.json({ list, status_counts: statusCounts, delivery_counts: deliveryCounts, audit_recent: [] });
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async getDeliveryIndicatorCounts(_req: Request, res: Response, next: NextFunction) {
+      try {
+        res.json({ pending: 0, delivered: 0 });
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async listOpeningStockSetup(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const result = await deps.stockService.listOpeningStockSetup(businessId);
+        res.json(result);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async getItemIntelligence(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const itemId = req.params.itemId as string;
+        const result = await deps.stockService.getItemIntelligence(businessId, itemId);
+        if (!result) {
+          sendDetail(res, 404, "Item not found");
+          return;
+        }
+        res.json(result);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async getItemSummary(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const itemId = req.params.itemId as string;
+        const result = await deps.stockService.getItemSummary(businessId, itemId);
+        if (!result) {
+          sendDetail(res, 404, "Item not found");
+          return;
+        }
+        res.json(result);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async getItemBundle(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const itemId = req.params.itemId as string;
+        const result = await deps.stockService.getItemBundle(businessId, itemId);
+        if (!result) {
+          sendDetail(res, 404, "Item not found");
+          return;
+        }
+        res.json(result);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async updatePhysicalStock(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const itemId = req.params.itemId as string;
+        const user = req.user;
+        if (!user) {
+          sendDetail(res, 401, "Not authenticated");
+          return;
+        }
+        const parsed = PhysicalUpdateInSchema.safeParse(req.body);
+        if (!parsed.success) {
+          sendDetail(res, 400, parsed.error.issues[0]?.message ?? "Invalid input");
+          return;
+        }
+        const result = await deps.stockService.updatePhysicalStock({
+          businessId,
+          itemId,
+          newQty: parsed.data.new_qty,
+          adjustmentType: parsed.data.adjustment_type,
+          reason: parsed.data.reason,
+          lastSeenStockVersion: parsed.data.last_seen_stock_version,
+          actorId: user.id,
+          actorName: user.name ?? user.username ?? user.email ?? "Staff",
+        });
+        if (result.conflict) {
+          sendDetail(res, 409, result.message ?? "Stock version conflict");
+          return;
+        }
+        if (!result.success) {
+          sendDetail(res, 400, result.message ?? "Update failed");
+          return;
+        }
+        const updated = await deps.stockService.getStockDetail(businessId, itemId);
+        res.json(updated);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async verifyStockCount(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const itemId = req.params.itemId as string;
+        const user = req.user;
+        if (!user) {
+          sendDetail(res, 401, "Not authenticated");
+          return;
+        }
+        const parsed = VerifyCountInSchema.safeParse(req.body);
+        if (!parsed.success) {
+          sendDetail(res, 400, parsed.error.issues[0]?.message ?? "Invalid input");
+          return;
+        }
+        const result = await deps.stockService.verifyStockCount({
+          businessId,
+          itemId,
+          countedQty: parsed.data.counted_qty,
+          reason: parsed.data.reason,
+          actorId: user.id,
+          actorName: user.name ?? user.username ?? user.email ?? "Staff",
+        });
+        if (!result.success) {
+          sendDetail(res, 400, result.message ?? "Verify failed");
+          return;
+        }
+        const updated = await deps.stockService.getStockDetail(businessId, itemId);
+        res.json(updated);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async listStaffPurchaseLogs(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const itemId = typeof req.query.item_id === "string" ? req.query.item_id : undefined;
+        const logs = await deps.stockService.listStaffPurchaseLogs(businessId, itemId);
+        res.json(logs);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async createStaffPurchase(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const user = req.user;
+        if (!user) {
+          sendDetail(res, 401, "Not authenticated");
+          return;
+        }
+        const parsed = StaffPurchaseLogInSchema.safeParse(req.body);
+        if (!parsed.success) {
+          sendDetail(res, 400, parsed.error.issues[0]?.message ?? "Invalid input");
+          return;
+        }
+        const result = await deps.stockService.createStaffPurchase({
+          businessId,
+          itemId: parsed.data.item_id,
+          qty: parsed.data.qty,
+          supplierId: parsed.data.supplier_id,
+          brokerId: parsed.data.broker_id,
+          notes: parsed.data.notes,
+          idempotencyKey: parsed.data.idempotency_key,
+          actorId: user.id,
+          actorName: user.name ?? user.username ?? user.email ?? "Staff",
+        });
+        if (!result.success) {
+          sendDetail(res, 400, result.message ?? "Create failed");
+          return;
+        }
+        res.status(201).json(result.out);
+      } catch (e) {
+        next(e);
+      }
+    },
+
+    async getActiveAuditSession(req: Request, res: Response, next: NextFunction) {
+      try {
+        const businessId = req.params.businessId as string;
+        const result = await deps.stockService.getActiveAuditSession(businessId);
         res.json(result);
       } catch (e) {
         next(e);

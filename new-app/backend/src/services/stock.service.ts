@@ -517,6 +517,231 @@ export function createStockService(deps: StockServiceDeps) {
     }> {
       return repo.getPurchaseIntelligence(businessId, itemId);
     },
+
+    async listStock(opts: {
+      businessId: string;
+      page?: number;
+      perPage?: number;
+      q?: string;
+      category?: string;
+      subcategory?: string;
+      status?: string;
+      sort?: string;
+      missingBarcode?: boolean;
+      missingItemCode?: boolean;
+      reorderOnly?: boolean;
+      unit?: string;
+    }): Promise<{ items: any[]; total: number; page: number; per_page: number }> {
+      const result = await repo.listStockWithFilters(opts);
+      return {
+        ...result,
+        page: opts.page ?? 1,
+        per_page: opts.perPage ?? 50,
+      };
+    },
+
+    async getStockAlertsSummary(businessId: string): Promise<import("../validation/stock.schemas").StockAlertsSummaryOut> {
+      return repo.getStockAlertsSummary(businessId);
+    },
+
+    async getWarehouseAlertsSummary(businessId: string): Promise<import("../validation/stock.schemas").WarehouseAlertsSummaryOut> {
+      return repo.getWarehouseAlertsSummary(businessId);
+    },
+
+    async getLowStockSummary(businessId: string): Promise<import("../validation/stock.schemas").LowStockOpsSummaryOut> {
+      return repo.getLowStockOperationsSummary(businessId);
+    },
+
+    async listOpeningStockSetup(businessId: string): Promise<{
+      summary: { pending: number; completed: number; total: number };
+      items: any[];
+    }> {
+      return repo.listOpeningStockSetup(businessId);
+    },
+
+    async listMissingBarcodes(businessId: string): Promise<{
+      missing_barcode: any[];
+      missing_item_code: any[];
+    }> {
+      return repo.listMissingBarcodes(businessId);
+    },
+
+    async getItemIntelligence(businessId: string, itemId: string): Promise<any | null> {
+      return repo.getItemIntelligence(businessId, itemId);
+    },
+
+    async getItemHistory(businessId: string, itemId: string, limit: number, offset: number): Promise<any[]> {
+      return repo.getItemHistory(businessId, itemId, limit, offset);
+    },
+
+    async getItemBundle(businessId: string, itemId: string): Promise<any | null> {
+      return repo.getItemBundle(businessId, itemId);
+    },
+
+    async getItemSummary(businessId: string, itemId: string): Promise<any | null> {
+      return repo.getItemSummary(businessId, itemId);
+    },
+
+    async listStaffPurchaseLogs(businessId: string, itemId?: string): Promise<import("../validation/stock.schemas").StaffPurchaseLogOut[]> {
+      return repo.listStaffPurchaseLogs(businessId, itemId);
+    },
+
+    async createStaffPurchase(opts: {
+      businessId: string;
+      itemId: string;
+      qty: number;
+      supplierId?: string;
+      brokerId?: string;
+      notes?: string;
+      idempotencyKey?: string;
+      actorId: string | null;
+      actorName: string | null;
+    }): Promise<{
+      success: boolean;
+      conflict?: boolean;
+      message?: string;
+      out?: import("../validation/stock.schemas").StaffPurchaseLogOut;
+    }> {
+      const ik = opts.idempotencyKey ?? `sp:${opts.itemId}:${Date.now()}`;
+      const existing = await repo.findExistingStaffPurchase(opts.businessId, ik);
+      if (existing) {
+        return { success: true, out: existing };
+      }
+
+      const item = await repo.getCatalogItemForPatch(opts.businessId, opts.itemId);
+      if (!item) return { success: false, message: "Item not found" };
+
+      const result = await applyStockMovement({
+        businessId: opts.businessId,
+        itemId: opts.itemId,
+        movementKind: "quick_purchase",
+        deltaQty: opts.qty,
+        mode: "delta",
+        reason: "Staff purchase",
+        notes: opts.notes ?? null,
+        idempotencyKey: ik,
+        actorId: opts.actorId,
+        actorName: opts.actorName,
+        adjustmentType: "quick_purchase",
+      });
+      if (!result.success) {
+        return { success: false, conflict: result.conflict, message: result.message };
+      }
+
+      const logId = randomUUID();
+      await repo.insertStaffPurchaseLog({
+        id: logId,
+        businessId: opts.businessId,
+        itemId: opts.itemId,
+        itemName: item.name,
+        qty: opts.qty,
+        unit: item.stock_unit,
+        amount: null,
+        supplierId: opts.supplierId ?? null,
+        supplierName: null,
+        brokerId: opts.brokerId ?? null,
+        brokerName: null,
+        notes: opts.notes ?? null,
+        idempotencyKey: ik,
+        stockMovementId: result.movementId ?? null,
+        createdBy: opts.actorId,
+        createdByName: opts.actorName,
+      });
+
+      return {
+        success: true,
+        out: {
+          id: logId,
+          item_id: opts.itemId,
+          item_name: item.name,
+          qty: opts.qty,
+          unit: item.stock_unit,
+          supplier_name: null,
+          broker_name: null,
+          notes: opts.notes ?? null,
+          created_by_name: opts.actorName,
+          created_at: new Date().toISOString(),
+        },
+      };
+    },
+
+    async updatePhysicalStock(opts: {
+      businessId: string;
+      itemId: string;
+      newQty: number;
+      adjustmentType: string;
+      reason: string;
+      lastSeenStockVersion?: number;
+      actorId: string | null;
+      actorName: string | null;
+    }): Promise<{
+      success: boolean;
+      conflict?: boolean;
+      message?: string;
+    }> {
+      return applyStockMovement({
+        businessId: opts.businessId,
+        itemId: opts.itemId,
+        movementKind: "physical_update",
+        deltaQty: opts.newQty,
+        mode: "absolute",
+        reason: opts.reason,
+        notes: null,
+        idempotencyKey: `pu:${opts.itemId}:${Date.now()}`,
+        actorId: opts.actorId,
+        actorName: opts.actorName,
+        lastSeenStockVersion: opts.lastSeenStockVersion,
+        adjustmentType: opts.adjustmentType,
+      }) as Promise<{ success: boolean; conflict?: boolean; message?: string }>;
+    },
+
+    async verifyStockCount(opts: {
+      businessId: string;
+      itemId: string;
+      countedQty: number;
+      reason?: string;
+      actorId: string | null;
+      actorName: string | null;
+    }): Promise<{
+      success: boolean;
+      message?: string;
+    }> {
+      const item = await repo.getCatalogItemForPatch(opts.businessId, opts.itemId);
+      if (!item) return { success: false, message: "Item not found" };
+
+      await repo.insertPhysicalCount({
+        businessId: opts.businessId,
+        itemId: opts.itemId,
+        systemQty: item.current_stock,
+        countedQty: opts.countedQty,
+        purchasedQty: null,
+        stockUnit: item.stock_unit,
+        periodStart: null,
+        periodEnd: null,
+        notes: opts.reason ?? "Barcode count verify",
+        countedBy: opts.actorId,
+        countedByName: opts.actorName,
+      });
+
+      const result = await applyStockMovement({
+        businessId: opts.businessId,
+        itemId: opts.itemId,
+        movementKind: "verification",
+        deltaQty: opts.countedQty,
+        mode: "absolute",
+        reason: opts.reason ?? "Barcode count verify",
+        notes: null,
+        idempotencyKey: `verify:${opts.itemId}:${Date.now()}`,
+        actorId: opts.actorId,
+        actorName: opts.actorName,
+        adjustmentType: "verification",
+      });
+      return { success: result.success, message: result.message };
+    },
+
+    async getActiveAuditSession(businessId: string): Promise<any | null> {
+      return repo.getActiveAuditSession(businessId);
+    },
   };
 }
 
